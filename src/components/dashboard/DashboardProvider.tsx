@@ -1,0 +1,128 @@
+'use client';
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { getSupabaseClient } from '@/lib/supabase/client';
+
+interface ChildProfile {
+    id: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    profile_image_url?: string;
+}
+
+interface ParentProfile {
+    id: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    profile_image_url?: string;
+}
+
+interface DashboardContextType {
+    parentProfile: ParentProfile | null;
+    children: ChildProfile[];
+    selectedProfileId: string;
+    setSelectedProfileId: (id: string) => void;
+    hasParentMembership: boolean;
+    isLoading: boolean;
+    refreshChildren: () => Promise<void>;
+}
+
+const DashboardContext = createContext<DashboardContextType | null>(null);
+
+export function useDashboard() {
+    const context = useContext(DashboardContext);
+    // Return default values if used outside DashboardProvider (e.g., admin/instructor layouts)
+    if (!context) {
+        return {
+            parentProfile: null,
+            children: [],
+            selectedProfileId: '',
+            setSelectedProfileId: () => { },
+            hasParentMembership: true, // Default to true for non-member contexts
+            isLoading: false,
+            refreshChildren: async () => { },
+        };
+    }
+    return context;
+}
+
+interface DashboardProviderProps {
+    children: ReactNode;
+    initialParentProfile: ParentProfile;
+    initialChildren: ChildProfile[];
+    initialHasParentMembership: boolean;
+}
+
+export function DashboardProvider({
+    children,
+    initialParentProfile,
+    initialChildren,
+    initialHasParentMembership,
+}: DashboardProviderProps) {
+    const supabase = getSupabaseClient();
+    const [parentProfile] = useState(initialParentProfile);
+    const [childProfiles, setChildProfiles] = useState<ChildProfile[]>(initialChildren);
+    const [hasParentMembership] = useState(initialHasParentMembership);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Default to parent's profile if they have membership, otherwise first child
+    const defaultProfileId = initialHasParentMembership
+        ? initialParentProfile.user_id
+        : (initialChildren[0]?.user_id || initialParentProfile.user_id);
+
+    const [selectedProfileId, setSelectedProfileId] = useState(defaultProfileId);
+
+    // Persist selection to localStorage
+    useEffect(() => {
+        const saved = localStorage.getItem('selectedProfileId');
+        if (saved) {
+            // Validate saved ID still exists
+            const validIds = [
+                parentProfile.user_id,
+                ...childProfiles.map(c => c.user_id),
+            ];
+            if (validIds.includes(saved)) {
+                setSelectedProfileId(saved);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('selectedProfileId', selectedProfileId);
+    }, [selectedProfileId]);
+
+    const refreshChildren = async () => {
+        setIsLoading(true);
+        try {
+            // parent_guardian_id is a FK to profiles.id, not profiles.user_id
+            const { data } = await supabase
+                .from('profiles')
+                .select('id, user_id, first_name, last_name, profile_image_url')
+                .eq('parent_guardian_id', parentProfile.id);
+
+            setChildProfiles(data || []);
+        } catch (err) {
+            console.error('Error refreshing children:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <DashboardContext.Provider
+            value={{
+                parentProfile,
+                children: childProfiles,
+                selectedProfileId,
+                setSelectedProfileId,
+                hasParentMembership,
+                isLoading,
+                refreshChildren,
+            }}
+        >
+            {children}
+        </DashboardContext.Provider>
+    );
+}

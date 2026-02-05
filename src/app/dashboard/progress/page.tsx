@@ -1,0 +1,446 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Award, Star, Trophy, Target, Calendar, Loader2, MessageSquare } from 'lucide-react';
+import BJJBelt from '@/components/BJJBelt';
+import { getSupabaseClient } from '@/lib/supabase/client';
+import { useDashboard } from '@/components/dashboard/DashboardProvider';
+
+const ADULT_BELT_ORDER = ['white', 'blue', 'purple', 'brown', 'black'];
+const KIDS_BELT_ORDER = [
+    'white',
+    'grey-white', 'grey', 'grey-black',
+    'yellow-white', 'yellow', 'yellow-black',
+    'orange-white', 'orange', 'orange-black',
+    'green-white', 'green', 'green-black'
+];
+
+const BELT_COLORS: Record<string, string> = {
+    white: '#FFFFFF',
+    blue: '#1E40AF',
+    purple: '#6B21A8',
+    brown: '#78350F',
+    black: '#1A1A1A',
+    // Kids belt colors
+    grey: '#6B7280',
+    'grey-white': '#9CA3AF',
+    'grey-black': '#4B5563',
+    yellow: '#EAB308',
+    'yellow-white': '#FDE047',
+    'yellow-black': '#A16207',
+    orange: '#EA580C',
+    'orange-white': '#FB923C',
+    'orange-black': '#C2410C',
+    green: '#16A34A',
+    'green-white': '#4ADE80',
+    'green-black': '#15803D',
+};
+
+interface ProfileData {
+    belt_rank: string;
+    stripes: number;
+    is_child: boolean;
+}
+
+interface PromotionRecord {
+    id: string;
+    previous_belt: string;
+    previous_stripes: number;
+    new_belt: string;
+    new_stripes: number;
+    comments: string | null;
+    promotion_date: string;
+    promoted_by?: string;
+    promoted_by_profile?: { first_name: string; last_name: string } | null;
+}
+
+interface FeedbackRecord {
+    id: string;
+    feedback: string;
+    created_at: string;
+    professor_id?: string;
+    professor?: { first_name: string; last_name: string } | null;
+}
+
+export default function MemberProgressPage() {
+    const supabase = getSupabaseClient();
+    const { selectedProfileId } = useDashboard();
+
+    const [profile, setProfile] = useState<ProfileData | null>(null);
+    const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
+    const [feedback, setFeedback] = useState<FeedbackRecord[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchData();
+    }, [selectedProfileId]);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            // Get profile with current belt and stripes
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('belt_rank, stripes, is_child')
+                .eq('user_id', selectedProfileId)
+                .single();
+
+            setProfile(profileData);
+
+            // Get promotion history (simple query without FK join)
+            const { data: promotionsData } = await supabase
+                .from('promotions')
+                .select('*')
+                .eq('user_id', selectedProfileId)
+                .order('promotion_date', { ascending: false });
+
+            // Fetch promoter names for promotions
+            if (promotionsData && promotionsData.length > 0) {
+                const promoterIds = [...new Set(promotionsData.map(p => p.promoted_by).filter(Boolean))];
+                if (promoterIds.length > 0) {
+                    const { data: promotersData } = await supabase
+                        .from('profiles')
+                        .select('user_id, first_name, last_name')
+                        .in('user_id', promoterIds);
+
+                    const promoterMap = new Map(promotersData?.map(p => [p.user_id, p]) || []);
+
+                    const promotionsWithPromoters = promotionsData.map(p => ({
+                        ...p,
+                        promoted_by_profile: promoterMap.get(p.promoted_by) || null
+                    }));
+                    setPromotions(promotionsWithPromoters);
+                } else {
+                    setPromotions(promotionsData);
+                }
+            } else {
+                setPromotions([]);
+            }
+
+            // Get professor feedback (simple query without FK join)
+            const { data: feedbackData, error: feedbackError } = await supabase
+                .from('professor_feedback')
+                .select('id, feedback, created_at, professor_id')
+                .eq('user_id', selectedProfileId)
+                .order('created_at', { ascending: false });
+
+            console.log('Feedback query result:', { feedbackData, feedbackError, selectedProfileId });
+
+            // Fetch professor names for feedback
+            if (feedbackData && feedbackData.length > 0) {
+                const professorIds = [...new Set(feedbackData.map(f => f.professor_id))];
+                const { data: professorsData } = await supabase
+                    .from('profiles')
+                    .select('user_id, first_name, last_name')
+                    .in('user_id', professorIds);
+
+                const professorMap = new Map(professorsData?.map(p => [p.user_id, p]) || []);
+
+                const feedbackWithProfessors = feedbackData.map(f => ({
+                    ...f,
+                    professor: professorMap.get(f.professor_id) || null
+                }));
+                setFeedback(feedbackWithProfessors);
+            } else {
+                setFeedback([]);
+            }
+        } catch (err) {
+            console.error('Error fetching progress data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-12)', gap: 'var(--space-3)' }}>
+                <Loader2 size={24} className="animate-spin" />
+                <span>Loading progress...</span>
+            </div>
+        );
+    }
+
+    // Determine which belt order to use based on whether this is a child
+    const isChild = profile?.is_child || false;
+    const BELT_ORDER = isChild ? KIDS_BELT_ORDER : ADULT_BELT_ORDER;
+
+    const currentBelt = profile?.belt_rank || 'white';
+    const currentBeltIndex = BELT_ORDER.indexOf(currentBelt);
+    const currentStripes = profile?.stripes || 0;
+
+    return (
+        <div>
+            <div className="dashboard-header">
+                <h1 className="dashboard-title">Belt Progress</h1>
+                <p className="dashboard-subtitle">Track your martial arts journey</p>
+            </div>
+
+            {/* Current Belt Display */}
+            <div className="glass-card" style={{
+                marginBottom: 'var(--space-6)',
+                padding: 'var(--space-6)',
+                textAlign: 'center',
+            }}>
+                <h3 style={{
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-tertiary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    marginBottom: 'var(--space-2)',
+                }}>
+                    Current Rank
+                </h3>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
+                    <BJJBelt
+                        belt={(currentBelt as 'white' | 'blue' | 'purple' | 'brown' | 'black')}
+                        stripes={currentStripes}
+                        size="lg"
+                        isChild={isChild}
+                    />
+                </div>
+                <h2 style={{ textTransform: 'capitalize', marginBottom: 'var(--space-1)' }}>
+                    {currentBelt.replace('-', '/')} Belt
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+                    {currentStripes} stripe{currentStripes !== 1 ? 's' : ''}
+                </p>
+            </div>
+
+            {/* Belt Journey */}
+            <h3 style={{
+                fontSize: 'var(--text-lg)',
+                marginBottom: 'var(--space-4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+            }}>
+                <Target size={20} color="var(--color-gold)" />
+                Your Journey
+            </h3>
+
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: 'var(--space-8)',
+                padding: 'var(--space-4)',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-xl)',
+                position: 'relative',
+                overflowX: 'auto',
+                gap: 'var(--space-2)',
+            }}>
+                {/* Progress Line */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 'var(--space-6)',
+                    right: 'var(--space-6)',
+                    height: '4px',
+                    background: 'var(--border-light)',
+                    transform: 'translateY(-50%)',
+                    zIndex: 0,
+                }}>
+                    <div style={{
+                        width: `${(currentBeltIndex / Math.max(BELT_ORDER.length - 1, 1)) * 100}%`,
+                        height: '100%',
+                        background: 'var(--color-gold-gradient)',
+                        borderRadius: 'var(--radius-full)',
+                    }} />
+                </div>
+
+                {BELT_ORDER.map((belt, index) => {
+                    const isAchieved = index <= currentBeltIndex;
+                    const isCurrent = belt === currentBelt;
+
+                    return (
+                        <div
+                            key={belt}
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: 'var(--space-2)',
+                                position: 'relative',
+                                zIndex: 1,
+                                minWidth: isChild ? '40px' : 'auto',
+                            }}
+                        >
+                            <div style={{
+                                width: isCurrent ? '48px' : '36px',
+                                height: isCurrent ? '48px' : '36px',
+                                borderRadius: 'var(--radius-full)',
+                                background: isAchieved ? BELT_COLORS[belt] : 'var(--bg-primary)',
+                                border: belt === 'white' && isAchieved ? '2px solid var(--border-medium)' : isAchieved ? 'none' : '2px dashed var(--border-light)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: isCurrent ? 'var(--shadow-gold)' : isAchieved ? 'var(--shadow-sm)' : 'none',
+                                flexShrink: 0,
+                            }}>
+                                {isAchieved && (
+                                    <Star
+                                        size={isCurrent ? 20 : 16}
+                                        color={belt === 'white' ? 'var(--color-gold)' : 'white'}
+                                        fill={belt === 'white' ? 'var(--color-gold)' : 'white'}
+                                    />
+                                )}
+                            </div>
+                            <span style={{
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: isCurrent ? '700' : '500',
+                                textTransform: 'capitalize',
+                                color: isCurrent ? 'var(--color-gold)' : isAchieved ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {belt.replace('-', '/')}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Promotion History */}
+            <h3 style={{
+                fontSize: 'var(--text-lg)',
+                marginBottom: 'var(--space-4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+            }}>
+                <Trophy size={20} color="var(--color-gold)" />
+                Promotion History
+            </h3>
+
+            {promotions.length === 0 ? (
+                <div className="card">
+                    <div className="card-body" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                        <Award size={32} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-2)' }} />
+                        <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+                            Your promotion history will appear here as you progress.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="card">
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {promotions.map((record, index) => (
+                            <div
+                                key={record.id}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-4)',
+                                    padding: 'var(--space-4)',
+                                    borderBottom: index < promotions.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                    flexWrap: 'wrap',
+                                }}
+                            >
+                                {/* Belt display */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                    <div style={{
+                                        width: '32px',
+                                        height: '12px',
+                                        borderRadius: 'var(--radius-sm)',
+                                        background: BELT_COLORS[record.previous_belt] || '#ccc',
+                                        border: record.previous_belt === 'white' ? '1px solid var(--border-medium)' : 'none',
+                                    }} />
+                                    <span style={{ color: 'var(--text-tertiary)' }}>→</span>
+                                    <div style={{
+                                        width: '48px',
+                                        height: '16px',
+                                        borderRadius: 'var(--radius-sm)',
+                                        background: BELT_COLORS[record.new_belt] || '#ccc',
+                                        border: record.new_belt === 'white' ? '1px solid var(--border-medium)' : 'none',
+                                    }} />
+                                </div>
+
+                                {/* Promotion details */}
+                                <div style={{ flex: 1, minWidth: '150px' }}>
+                                    <p style={{ fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>
+                                        {record.new_belt.replace('-', '/')} Belt
+                                        {record.new_stripes > 0 && ` • ${record.new_stripes} stripe${record.new_stripes !== 1 ? 's' : ''}`}
+                                    </p>
+                                    {record.comments && (
+                                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0, marginTop: '2px' }}>
+                                            &ldquo;{record.comments}&rdquo;
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Date and professor */}
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', fontWeight: '500' }}>
+                                        <Calendar size={12} />
+                                        {new Date(record.promotion_date).toLocaleDateString('en-GB', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                        })}
+                                    </div>
+                                    {record.promoted_by_profile && (
+                                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0 }}>
+                                            By {record.promoted_by_profile.first_name} {record.promoted_by_profile.last_name}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Professor Feedback */}
+            {feedback.length > 0 && (
+                <>
+                    <h3 style={{
+                        fontSize: 'var(--text-lg)',
+                        marginTop: 'var(--space-8)',
+                        marginBottom: 'var(--space-4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                    }}>
+                        <MessageSquare size={20} color="var(--color-gold)" />
+                        Feedback from Professors
+                    </h3>
+
+                    <div className="card">
+                        <div className="card-body" style={{ padding: 0 }}>
+                            {feedback.map((item, index) => (
+                                <div
+                                    key={item.id}
+                                    style={{
+                                        padding: 'var(--space-4)',
+                                        borderBottom: index < feedback.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                    }}
+                                >
+                                    <p style={{
+                                        margin: 0,
+                                        marginBottom: 'var(--space-2)',
+                                        lineHeight: 1.6,
+                                    }}>
+                                        &ldquo;{item.feedback}&rdquo;
+                                    </p>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                                        {item.professor && (
+                                            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                                                — {item.professor.first_name} {item.professor.last_name}
+                                            </span>
+                                        )}
+                                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                                            {new Date(item.created_at).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric',
+                                            })}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}

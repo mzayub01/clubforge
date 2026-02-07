@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -42,6 +43,9 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // Get tenant context
+        const tenantId = await getTenantId();
+
         // Create promotion record
         const { error: promotionError } = await supabase
             .from('promotions')
@@ -55,6 +59,7 @@ export async function POST(request: NextRequest) {
                 new_stripes: newStripes,
                 comments,
                 promotion_date: new Date().toISOString().split('T')[0],
+                ...(tenantId && { tenant_id: tenantId }),
             });
 
         if (promotionError) {

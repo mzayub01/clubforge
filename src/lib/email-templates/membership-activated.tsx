@@ -17,7 +17,7 @@ export function MembershipActivatedEmail({
     membershipType,
     price,
     startDate,
-    dashboardUrl = 'https://clubforge.com/dashboard',
+    dashboardUrl = 'https://clubforgehq.com/dashboard',
 }: MembershipActivatedEmailProps) {
     return (
         <BaseEmailLayout previewText={`Your ${membershipType} membership is now active!`}>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     if (!isStripeConfigured()) {
@@ -81,6 +82,9 @@ export async function POST(request: NextRequest) {
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+        // Get tenant context for metadata
+        const tenantId = await getTenantId();
+
         // Get or create Stripe customer
         let customerId = profile.stripe_customer_id;
         if (!customerId) {
@@ -120,6 +124,7 @@ export async function POST(request: NextRequest) {
                 tierName: tier.name,
                 isMultisite: 'true',
                 siteNumber: (currentSiteCount + 1).toString(),
+                ...(tenantId && { tenantId }),
             },
             line_items: [{
                 price: tier.stripe_price_id,
@@ -135,6 +140,7 @@ export async function POST(request: NextRequest) {
                     tierName: tier.name,
                     locationName: location?.name || 'Unknown',
                     isMultisite: 'true',
+                    ...(tenantId && { tenantId }),
                 },
             },
         });

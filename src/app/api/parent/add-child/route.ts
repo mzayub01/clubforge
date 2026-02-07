@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -39,6 +40,9 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
+
+        // Get tenant context
+        const tenantId = await getTenantId();
 
         // Validate and sanitize gender - only allow 'male' or 'female'
         const validGender = gender === 'male' || gender === 'female' ? gender : null;
@@ -153,6 +157,14 @@ export async function POST(request: NextRequest) {
                         .select()
                         .single();
 
+                    // Add tenant_id to migrated child profile if available
+                    if (!profileError && newChildProfile && tenantId) {
+                        await supabaseAdmin
+                            .from('profiles')
+                            .update({ tenant_id: tenantId })
+                            .eq('id', newChildProfile.id);
+                    }
+
                     if (profileError) {
                         await supabaseAdmin.auth.admin.deleteUser(childAuth.user.id);
                         throw new Error('Failed to create migrated child profile: ' + profileError.message);
@@ -246,6 +258,7 @@ export async function POST(request: NextRequest) {
                 best_practice_accepted_at: new Date().toISOString(),
                 waiver_accepted: true,
                 waiver_accepted_at: new Date().toISOString(),
+                ...(tenantId && { tenant_id: tenantId }),
             }, { onConflict: 'user_id' })
             .select()
             .single();
@@ -291,6 +304,7 @@ export async function POST(request: NextRequest) {
                 membership_type_id: membershipTypeId,
                 status: membershipStatus,
                 start_date: new Date().toISOString().split('T')[0],
+                ...(tenantId && { tenant_id: tenantId }),
             });
 
         if (membershipError) {

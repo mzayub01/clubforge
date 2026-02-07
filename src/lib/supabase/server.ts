@@ -1,7 +1,12 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { createClient as createStandardClient } from '@supabase/supabase-js';
+import { getTenantId } from '@/lib/tenant';
 
-// Mock client for when Supabase is not configured
+// -----------------------------------------------
+// Mock client (when Supabase is not configured)
+// -----------------------------------------------
+
 const createMockClient = () => ({
     auth: {
         getUser: async () => ({ data: { user: null }, error: null }),
@@ -36,13 +41,17 @@ const createMockClient = () => ({
         update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
         delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
     }),
+    rpc: async () => ({ data: null, error: null }),
 });
+
+// -----------------------------------------------
+// Server client (uses anon key, respects RLS)
+// -----------------------------------------------
 
 export async function createClient() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    // Return mock client if not configured
     if (!supabaseUrl || !supabaseKey) {
         console.warn('Supabase credentials not configured. Using mock client.');
         return createMockClient() as ReturnType<typeof createServerClient>;
@@ -50,7 +59,7 @@ export async function createClient() {
 
     const cookieStore = await cookies();
 
-    return createServerClient(
+    const supabase = createServerClient(
         supabaseUrl,
         supabaseKey,
         {
@@ -75,11 +84,20 @@ export async function createClient() {
             },
         }
     );
+
+    // Set tenant context for RLS policies
+    const tenantId = await getTenantId();
+    if (tenantId) {
+        await supabase.rpc('set_tenant_context', { p_tenant_id: tenantId });
+    }
+
+    return supabase;
 }
 
-// Admin client with service role (server-side only)
-// Uses standard client (not SSR) to properly bypass RLS
-import { createClient as createStandardClient } from '@supabase/supabase-js';
+// -----------------------------------------------
+// Admin client (service role, bypasses RLS)
+// Use for cross-tenant operations and platform admin tasks
+// -----------------------------------------------
 
 export async function createAdminClient() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -90,11 +108,40 @@ export async function createAdminClient() {
         return createMockClient() as ReturnType<typeof createServerClient>;
     }
 
-    // Use standard client with service role key to bypass RLS
     return createStandardClient(supabaseUrl, serviceKey, {
         auth: {
             autoRefreshToken: false,
             persistSession: false,
         },
     });
+}
+
+// -----------------------------------------------
+// Tenant-scoped admin client (service role + tenant context)
+// Bypasses RLS but still filters by tenant for convenience
+// -----------------------------------------------
+
+export async function createTenantAdminClient() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceKey) {
+        console.warn('Supabase admin credentials not configured. Using mock client.');
+        return createMockClient() as ReturnType<typeof createServerClient>;
+    }
+
+    const client = createStandardClient(supabaseUrl, serviceKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+        },
+    });
+
+    // Set tenant context even for admin client
+    const tenantId = await getTenantId();
+    if (tenantId) {
+        await client.rpc('set_tenant_context', { p_tenant_id: tenantId });
+    }
+
+    return client;
 }

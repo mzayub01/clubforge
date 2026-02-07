@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, MapPin, Users, Settings, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { useTenantId } from '@/lib/hooks/useTenantId';
 import type { Location } from '@/lib/types';
 
 export default function AdminLocationsPage() {
@@ -14,6 +15,7 @@ export default function AdminLocationsPage() {
     const [success, setSuccess] = useState('');
 
     const supabase = getSupabaseClient();
+    const tenantId = useTenantId();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -106,6 +108,7 @@ export default function AdminLocationsPage() {
                 const { error } = await supabase
                     .from('locations')
                     .insert({
+                        tenant_id: tenantId,
                         name: formData.name,
                         address: formData.address,
                         city: formData.city,

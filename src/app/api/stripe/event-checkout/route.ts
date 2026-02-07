@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
         console.log('Event checkout: Creating session for event', eventId, 'price', price);
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+        // Get tenant context for metadata
+        const tenantId = await getTenantId();
 
         // Create or get Stripe customer
         let customer;
@@ -78,6 +82,7 @@ export async function POST(request: NextRequest) {
                 userName,
                 userEmail,
                 userPhone,
+                ...(tenantId && { tenantId }),
             },
             line_items: [
                 {

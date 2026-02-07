@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Failed to create user' }, { status: 500 });
         }
 
+        // Get tenant context
+        const tenantId = await getTenantId();
+
         // Create/update profile for the user (upsert in case trigger already created it)
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
@@ -73,6 +77,7 @@ export async function POST(request: NextRequest) {
                 emergency_contact_phone: '',
                 best_practice_accepted: false,
                 waiver_accepted: false,
+                ...(tenantId && { tenant_id: tenantId }),
             }, { onConflict: 'user_id' });
 
         if (profileError) {

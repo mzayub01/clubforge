@@ -1,6 +1,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { getTenantId } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +27,9 @@ export async function GET(req: NextRequest) {
 
         const results: Array<{ original_user: string; new_child_id?: string; status?: string; error?: string }> = [];
 
+        // Get tenant context
+        const tenantId = await getTenantId();
+
         for (const candidate of candidates || []) {
             // Check if anyone points to this candidate as guardian (and is NOT the candidate themselves)
             const { count } = await supabaseAdmin
@@ -36,7 +40,7 @@ export async function GET(req: NextRequest) {
 
             if (count && count > 0) {
                 console.log(`Migrating ${candidate.first_name}...`);
-                const result = await performMigration(candidate);
+                const result = await performMigration(candidate, tenantId);
                 results.push(result);
             }
         }
@@ -52,7 +56,7 @@ export async function GET(req: NextRequest) {
     }
 }
 
-async function performMigration(currentProfile: any) {
+async function performMigration(currentProfile: any, tenantId: string | null) {
     try {
         // 1. Create Phantom Auth User
         const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.clubforge.local`;
@@ -103,7 +107,8 @@ async function performMigration(currentProfile: any) {
                 profile_image_url: currentFullProfile.profile_image_url,
                 parent_guardian_id: currentProfile.id, // Current ID will become Guardian
                 best_practice_accepted: currentFullProfile.best_practice_accepted,
-                waiver_accepted: currentFullProfile.waiver_accepted
+                waiver_accepted: currentFullProfile.waiver_accepted,
+                ...(tenantId && { tenant_id: tenantId }),
             })
             .select()
             .single();

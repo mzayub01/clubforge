@@ -21,7 +21,7 @@ export function EventConfirmationEmail({
     eventLocation,
     ticketType,
     amountPaid,
-    eventUrl = 'https://clubforge.com/events',
+    eventUrl = 'https://clubforgehq.com/events',
 }: EventConfirmationEmailProps) {
     return (
         <BaseEmailLayout previewText={`Your booking for ${eventTitle} is confirmed!`}>

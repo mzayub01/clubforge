@@ -159,8 +159,8 @@ export default function WaitlistConfirmationPage() {
                     fontSize: 'var(--text-sm)',
                 }}>
                     Questions? Contact us at{' '}
-                    <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>
-                        support@clubforge.com
+                    <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>
+                        support@clubforgehq.com
                     </a>
                 </p>
             </div>

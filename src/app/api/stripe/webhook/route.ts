@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
         // Check if this is an event payment
         if (metadata.type === 'event') {
-            const { eventId, userId, userName, userEmail, userPhone } = metadata;
+            const { eventId, userId, userName, userEmail, userPhone, tenantId } = metadata;
 
             console.log('Processing event payment for event:', eventId);
 
@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
                     status: 'confirmed',
                     payment_status: 'paid',
                     stripe_payment_id: session.payment_intent as string,
+                    ...(tenantId && { tenant_id: tenantId }),
                 });
 
                 if (rsvpError) {
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
             }
         } else {
             // Membership payment (existing logic)
-            const { userId, locationId, membershipTypeId } = metadata;
+            const { userId, locationId, membershipTypeId, tenantId: membershipTenantId } = metadata;
 
             if (userId && locationId) {
                 const supabase = await createAdminClient();
@@ -158,6 +159,7 @@ export async function POST(request: NextRequest) {
                             status: 'active',
                             stripe_subscription_id: session.subscription as string,
                             start_date: new Date().toISOString().split('T')[0],
+                            ...(membershipTenantId && { tenant_id: membershipTenantId }),
                         });
                 }
 

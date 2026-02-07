@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, MapPin, User, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { useTenantId } from '@/lib/hooks/useTenantId';
 import type { Class, Location, Instructor } from '@/lib/types';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -26,6 +27,7 @@ export default function AdminClassesPage() {
     const [success, setSuccess] = useState('');
 
     const supabase = getSupabaseClient();
+    const tenantId = useTenantId();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -112,6 +114,7 @@ export default function AdminClassesPage() {
 
         try {
             const payload = {
+                tenant_id: tenantId,
                 name: formData.name,
                 description: formData.description || null,
                 class_type: formData.class_type,
@@ -145,6 +148,7 @@ export default function AdminClassesPage() {
             // Then, insert new associations
             if (formData.membership_type_ids.length > 0) {
                 const associations = formData.membership_type_ids.map(typeId => ({
+                    tenant_id: tenantId,
                     class_id: classId,
                     membership_type_id: typeId,
                 }));

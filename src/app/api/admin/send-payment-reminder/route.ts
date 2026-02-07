@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate the payment link (link to membership page where they can complete payment)
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforge.com';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
         const paymentLink = `${baseUrl}/dashboard/membership`;
 
         // Render the email template
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             to: email,
             subject: rendered.subject,
             html: rendered.html,
-            replyTo: 'support@clubforge.com',
+            replyTo: 'support@clubforgehq.com',
         });
 
         if (!result.success) {

@@ -13,7 +13,7 @@ export function WelcomeEmail({
     firstName,
     locationName,
     membershipType,
-    dashboardUrl = 'https://clubforge.com/dashboard',
+    dashboardUrl = 'https://clubforgehq.com/dashboard',
 }: WelcomeEmailProps) {
     return (
         <BaseEmailLayout previewText={`Welcome to ClubForge, ${firstName}!`}>

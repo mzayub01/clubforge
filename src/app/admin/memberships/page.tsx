@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { useTenantId } from '@/lib/hooks/useTenantId';
 
 interface Membership {
     id: string;
@@ -68,6 +69,7 @@ export default function AdminMembershipsPage() {
     });
 
     const supabase = getSupabaseClient();
+    const tenantId = useTenantId();
 
     useEffect(() => {
         fetchData();
@@ -193,6 +195,7 @@ export default function AdminMembershipsPage() {
                 const { error } = await supabase
                     .from('memberships')
                     .insert({
+                        tenant_id: tenantId,
                         user_id: formData.user_id,
                         location_id: formData.location_id,
                         status: formData.status,

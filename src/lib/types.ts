@@ -2,8 +2,15 @@
 // ClubForge - Type Definitions
 // ===============================================
 
-// User Roles
+// User Roles (per-tenant role via tenant_members)
 export type UserRole = 'member' | 'instructor' | 'professor' | 'admin';
+
+// Platform-level role (ClubForge operators)
+export type PlatformRole = 'platform_admin';
+
+// Subscription Tiers
+export type SubscriptionTier = 'free' | 'pro' | 'enterprise';
+export type SubscriptionStatus = 'active' | 'past_due' | 'cancelled' | 'trialing';
 
 // Adult Belt Ranks
 export type BeltRank = 'white' | 'blue' | 'purple' | 'brown' | 'black';
@@ -33,6 +40,41 @@ export type RSVPStatus = 'pending' | 'confirmed' | 'declined' | 'waitlist';
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 // ===============================================
+// Multi-Tenancy Models
+// ===============================================
+
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  owner_user_id?: string;
+  logo_url?: string;
+  primary_color: string;
+  contact_email?: string;
+  contact_phone?: string;
+  stripe_account_id?: string;
+  subscription_tier: SubscriptionTier;
+  subscription_status: SubscriptionStatus;
+  settings: Record<string, unknown>;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantMember {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  role: UserRole;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  tenant?: Tenant;
+  profile?: Profile;
+}
+
+// ===============================================
 // Database Models
 // ===============================================
 
@@ -47,6 +89,7 @@ export interface User {
 export interface Profile {
   id: string;
   user_id: string;
+  tenant_id?: string;
   first_name: string;
   last_name: string;
   date_of_birth: string;
@@ -74,6 +117,7 @@ export interface Profile {
 
 export interface Location {
   id: string;
+  tenant_id?: string;
   name: string;
   address: string;
   city: string;
@@ -98,6 +142,7 @@ export interface LocationSettings {
 
 export interface MembershipType {
   id: string;
+  tenant_id?: string;
   location_id: string;
   name: string;
   description?: string;
@@ -114,6 +159,7 @@ export interface MembershipType {
 
 export interface Membership {
   id: string;
+  tenant_id?: string;
   user_id: string;
   location_id: string;
   membership_type_id: string;
@@ -144,6 +190,7 @@ export interface LocationMembershipConfig {
 
 export interface WaitlistEntry {
   id: string;
+  tenant_id?: string;
   user_id: string;
   location_id: string;
   membership_type_id?: string;
@@ -157,6 +204,7 @@ export interface WaitlistEntry {
 
 export interface Instructor {
   id: string;
+  tenant_id?: string;
   user_id: string;
   bio?: string;
   specializations?: string[];
@@ -169,6 +217,7 @@ export interface Instructor {
 
 export interface Class {
   id: string;
+  tenant_id?: string;
   location_id: string;
   instructor_id?: string;
   membership_type_id?: string;
@@ -190,6 +239,7 @@ export interface Class {
 
 export interface Attendance {
   id: string;
+  tenant_id?: string;
   class_id: string;
   user_id: string;
   check_in_time: string;
@@ -204,6 +254,7 @@ export interface Attendance {
 
 export interface BeltProgression {
   id: string;
+  tenant_id?: string;
   user_id: string;
   belt_rank: BeltRank;
   stripes: number;
@@ -218,6 +269,7 @@ export interface BeltProgression {
 
 export interface Video {
   id: string;
+  tenant_id?: string;
   title: string;
   description?: string;
   url: string;
@@ -232,6 +284,7 @@ export interface Video {
 
 export interface Event {
   id: string;
+  tenant_id?: string;
   title: string;
   description?: string;
   event_type: EventType;
@@ -254,6 +307,7 @@ export interface Event {
 
 export interface EventRSVP {
   id: string;
+  tenant_id?: string;
   event_id: string;
   user_id?: string;
   full_name: string;
@@ -271,6 +325,7 @@ export interface EventRSVP {
 
 export interface Announcement {
   id: string;
+  tenant_id?: string;
   title: string;
   message: string;
   location_id?: string; // null for all locations
@@ -286,6 +341,7 @@ export interface Announcement {
 
 export interface Naseeha {
   id: string;
+  tenant_id?: string;
   title: string;
   content: string;
   week_number: number;

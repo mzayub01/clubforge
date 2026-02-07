@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
             });
         }
 
+        // Get tenant context
+        const tenantId = await getTenantId();
+
         // Create attendance record for the target profile
         const { error } = await supabase
             .from('attendance')
@@ -71,6 +75,7 @@ export async function POST(request: NextRequest) {
                 user_id: targetUserId,
                 class_date: today,
                 check_in_time: new Date().toISOString(),
+                ...(tenantId && { tenant_id: tenantId }),
             });
 
         if (error) {

@@ -148,7 +148,7 @@ export default async function PrivacyPage() {
                                     <li><strong>Right to Withdraw Consent:</strong> Where processing is based on consent</li>
                                 </ul>
                                 <p>
-                                    To exercise any of these rights, please contact us at <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a>.
+                                    To exercise any of these rights, please contact us at <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a>.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>9. Children&apos;s Privacy</h2>
@@ -178,7 +178,7 @@ export default async function PrivacyPage() {
                                 }}>
                                     <p style={{ margin: 0 }}>
                                         <strong>ClubForge</strong><br />
-                                        Email: <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a><br />
+                                        Email: <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a><br />
                                         Manchester, United Kingdom
                                     </p>
                                 </div>

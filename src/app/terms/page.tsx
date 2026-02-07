@@ -81,7 +81,7 @@ export default async function TermsPage() {
 
                                 <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--text-lg)' }}>2.3 Membership Changes</h3>
                                 <p>
-                                    For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us at <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a>. We aim to process requests within 48 hours.
+                                    For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us at <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a>. We aim to process requests within 48 hours.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>3. Code of Conduct</h2>
@@ -200,7 +200,7 @@ export default async function TermsPage() {
                                 }}>
                                     <p style={{ margin: 0 }}>
                                         <strong>ClubForge</strong><br />
-                                        Email: <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a><br />
+                                        Email: <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a><br />
                                         Manchester, United Kingdom
                                     </p>
                                 </div>

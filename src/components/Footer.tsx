@@ -91,7 +91,7 @@ export default function Footer() {
                         </li>
                         <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <Mail size={16} />
-                            <a href="mailto:support@clubforge.com">support@clubforge.com</a>
+                            <a href="mailto:support@clubforgehq.com">support@clubforgehq.com</a>
                         </li>
                     </ul>
                 </div>

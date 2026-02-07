@@ -206,7 +206,7 @@ export default async function WaiverPage() {
                                 }}>
                                     <p style={{ margin: 0 }}>
                                         <strong>ClubForge</strong><br />
-                                        Email: <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a><br />
+                                        Email: <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a><br />
                                         Manchester, United Kingdom
                                     </p>
                                 </div>

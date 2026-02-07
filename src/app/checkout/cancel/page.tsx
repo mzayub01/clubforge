@@ -74,7 +74,7 @@ export default function CheckoutCancelPage() {
                     fontSize: 'var(--text-sm)',
                     color: 'var(--text-tertiary)',
                 }}>
-                    Need help? Contact us at support@clubforge.com
+                    Need help? Contact us at support@clubforgehq.com
                 </p>
             </div>
         </div>

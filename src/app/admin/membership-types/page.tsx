@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, CreditCard, Edit, Trash2, CheckCircle, AlertCircle, MapPin, Tag } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { useTenantId } from '@/lib/hooks/useTenantId';
 
 interface Location {
     id: string;
@@ -46,6 +47,7 @@ export default function AdminMembershipTypesPage() {
     const [filterMultisite, setFilterMultisite] = useState<string>('all');
 
     const supabase = getSupabaseClient();
+    const tenantId = useTenantId();
 
     const [formData, setFormData] = useState({
         location_id: '',
@@ -187,6 +189,7 @@ export default function AdminMembershipTypesPage() {
         }
 
         const payload = {
+            tenant_id: tenantId,
             location_id: formData.location_id,
             name: formData.name,
             description: formData.description || null,

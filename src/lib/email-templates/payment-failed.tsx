@@ -17,7 +17,7 @@ export function PaymentFailedEmail({
     amountDue,
     attemptCount,
     nextAttemptDate,
-    updatePaymentUrl = 'https://clubforge.com/dashboard/membership',
+    updatePaymentUrl = 'https://clubforgehq.com/dashboard/membership',
 }: PaymentFailedEmailProps) {
     const isLastAttempt = attemptCount >= 3;
 

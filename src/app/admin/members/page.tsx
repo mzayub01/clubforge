@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, User, Mail, Phone, Award, Shield, Edit, ChevronDown, AlertCircle, CheckCircle, XCircle, Calendar, MapPin, Filter, ClipboardList, Plus, Loader2, Eye, EyeOff, X, Info, ChevronUp, Trash2, Download, Send } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { useTenantId } from '@/lib/hooks/useTenantId';
 import type { Location, MembershipType } from '@/lib/types';
 import MemberAttendanceModal from '@/components/admin/MemberAttendanceModal';
 import Avatar from '@/components/Avatar';
@@ -91,6 +92,7 @@ export default function AdminMembersPage() {
     const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
 
     const supabase = getSupabaseClient();
+    const tenantId = useTenantId();
 
     useEffect(() => {
         fetchData();
@@ -251,6 +253,7 @@ export default function AdminMembersPage() {
                     await supabase
                         .from('instructors')
                         .insert({
+                            tenant_id: tenantId,
                             user_id: editingMember.user_id,
                             is_active: true,
                         });
@@ -275,6 +278,7 @@ export default function AdminMembersPage() {
                 await supabase
                     .from('belt_progression')
                     .insert({
+                        tenant_id: tenantId,
                         user_id: editingMember.user_id,
                         belt_rank: formData.belt_rank,
                         stripes: formData.stripes,

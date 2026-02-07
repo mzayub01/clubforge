@@ -94,7 +94,7 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                 <Container style={baseStyles.container}>
                     <Section style={baseStyles.card}>
                         <Img
-                            src="https://clubforge.com/logo-full.png"
+                            src="https://clubforgehq.com/logo-full.png"
                             alt="ClubForge"
                             style={baseStyles.logo}
                             height={60}
@@ -108,7 +108,7 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                         <Text style={baseStyles.footerText}>
                             Brazilian Jiu-Jitsu Classes in Manchester
                         </Text>
-                        <Link href="https://clubforge.com" style={baseStyles.footerLink}>
+                        <Link href="https://clubforgehq.com" style={baseStyles.footerLink}>
                             Visit our website
                         </Link>
                     </Section>

@@ -22,7 +22,7 @@ export default function CheckoutCancelPage() {
                 <Link href="/">
                     <Image
                         src="/logo-full.png"
-                        alt="Sport of Kings"
+                        alt="DojoHub"
                         width={140}
                         height={70}
                         style={{ height: '50px', width: 'auto', margin: '0 auto var(--space-6)' }}
@@ -74,7 +74,7 @@ export default function CheckoutCancelPage() {
                     fontSize: 'var(--text-sm)',
                     color: 'var(--text-tertiary)',
                 }}>
-                    Need help? Contact us at support@sportofkings.co.uk
+                    Need help? Contact us at support@dojohub.com
                 </p>
             </div>
         </div>

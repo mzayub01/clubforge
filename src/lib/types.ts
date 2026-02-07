@@ -1,5 +1,5 @@
 // ===============================================
-// Sport of Kings - Type Definitions
+// DojoHub - Type Definitions
 // ===============================================
 
 // User Roles

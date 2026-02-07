@@ -19,7 +19,7 @@ export default function Footer() {
                 <div className="footer-brand">
                     <Image
                         src="/logo-simple.png"
-                        alt="Sport of Kings"
+                        alt="DojoHub"
                         width={120}
                         height={120}
                         style={{
@@ -29,8 +29,7 @@ export default function Footer() {
                         }}
                     />
                     <p style={{ marginTop: 'var(--space-4)' }}>
-                        Professional martial arts instruction in a safe and friendly environment.
-                        Reviving the Sunnah through sports excellence.
+                        The all-in-one management platform for martial arts gyms and fitness centers.
                     </p>
                     <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
                         <a
@@ -73,13 +72,12 @@ export default function Footer() {
 
                 {/* Locations */}
                 <div>
-                    <h4 className="footer-title">Our Locations</h4>
+                    <h4 className="footer-title">Platform</h4>
                     <ul className="footer-links">
-                        <li><Link href="/classes">Fats Gym, Mcr City</Link></li>
-                        <li><Link href="/classes">Cheadle Masjid</Link></li>
-                        <li><Link href="/classes">Afifah School</Link></li>
-                        <li><Link href="/classes">Guidance Hub</Link></li>
-                        <li><Link href="/classes">PCC</Link></li>
+                        <li><Link href="/classes">Features</Link></li>
+                        <li><Link href="/faq">Pricing</Link></li>
+                        <li><Link href="/about">About</Link></li>
+                        <li><Link href="/faq">Support</Link></li>
                     </ul>
                 </div>
 
@@ -89,18 +87,18 @@ export default function Footer() {
                     <ul className="footer-links">
                         <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <MapPin size={16} />
-                            <span>Manchester, UK</span>
+                            <span>Worldwide</span>
                         </li>
                         <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <Mail size={16} />
-                            <a href="mailto:info@sportofkings.co.uk">info@sportofkings.co.uk</a>
+                            <a href="mailto:support@dojohub.com">support@dojohub.com</a>
                         </li>
                     </ul>
                 </div>
             </div>
 
             <div className="footer-bottom">
-                <p>© {currentYear} Sport of Kings - Seerat Un Nabi. All rights reserved.</p>
+                <p>© {currentYear} DojoHub. All rights reserved.</p>
                 <div style={{ marginTop: 'var(--space-2)', display: 'flex', justifyContent: 'center', gap: 'var(--space-4)' }}>
                     <Link href="/privacy">Privacy Policy</Link>
                     <Link href="/terms">Terms of Service</Link>

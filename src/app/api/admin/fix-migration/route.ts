@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 async function performMigration(currentProfile: any) {
     try {
         // 1. Create Phantom Auth User
-        const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.sport-of-kings.local`;
+        const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.dojohub.local`;
         const childPassword = crypto.randomUUID();
 
         const { data: childAuth, error: authError } = await supabaseAdmin.auth.admin.createUser({

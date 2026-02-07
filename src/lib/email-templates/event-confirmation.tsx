@@ -21,7 +21,7 @@ export function EventConfirmationEmail({
     eventLocation,
     ticketType,
     amountPaid,
-    eventUrl = 'https://sportofkings.info/events',
+    eventUrl = 'https://dojohub.com/events',
 }: EventConfirmationEmailProps) {
     return (
         <BaseEmailLayout previewText={`Your booking for ${eventTitle} is confirmed!`}>
@@ -81,7 +81,7 @@ export function EventConfirmationEmail({
 
             <Text style={baseStyles.text}>
                 JazakAllahu Khayran,<br />
-                <strong>The Sport of Kings Team</strong>
+                <strong>The DojoHub Team</strong>
             </Text>
         </BaseEmailLayout>
     );

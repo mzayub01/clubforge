@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
                     if (profileData?.email) {
                         const html = renderMembershipActivatedEmail({
                             firstName: profileData.first_name || 'Member',
-                            locationName: locationData?.name || 'Sport of Kings',
+                            locationName: locationData?.name || 'DojoHub',
                             membershipType: membershipTypeData?.name || 'Membership',
                             price: membershipTypeData?.price ? `£${membershipTypeData.price}/month` : 'N/A',
                             startDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
 
                         await sendEmail({
                             to: profileData.email,
-                            subject: 'Your Sport of Kings Membership is Now Active!',
+                            subject: 'Your DojoHub Membership is Now Active!',
                             html,
                         });
                         console.log('Membership activation email sent to:', profileData.email);

@@ -87,7 +87,7 @@ const PhotoGallery = () => {
     const photos = [
         { src: '/majid-1.jpg', alt: 'Majid Ali training' },
         { src: '/majid-2.jpg', alt: 'Majid Ali sparring' },
-        { src: '/majid-3.jpg', alt: 'Sport of Kings pride' },
+        { src: '/majid-3.jpg', alt: 'DojoHub pride' },
     ];
 
     return (
@@ -188,7 +188,7 @@ export default function LaunchPage() {
                     }}>
                         <Image
                             src="/logo-full.png"
-                            alt="Sport of Kings"
+                            alt="DojoHub"
                             width={200}
                             height={100}
                             priority
@@ -283,7 +283,7 @@ export default function LaunchPage() {
                             color: '#FFFFF0',
                             marginBottom: 'var(--space-2)',
                         }}>
-                            The Sport of Kings App Is Finally Here! 🚀
+                            The DojoHub App Is Finally Here! 🚀
                         </h2>
 
                         <p style={{
@@ -332,7 +332,7 @@ export default function LaunchPage() {
                         color: 'var(--text-tertiary)',
                         fontSize: 'var(--text-sm)',
                     }}>
-                        Click to explore the Sport of Kings experience
+                        Click to explore the DojoHub experience
                     </p>
                 </div>
             </div>

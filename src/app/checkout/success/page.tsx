@@ -54,7 +54,7 @@ function SuccessContent() {
                 <Link href="/">
                     <Image
                         src="/logo-full.png"
-                        alt="Sport of Kings"
+                        alt="DojoHub"
                         width={140}
                         height={70}
                         style={{ height: '50px', width: 'auto', margin: '0 auto var(--space-6)' }}
@@ -89,7 +89,7 @@ function SuccessContent() {
                     marginBottom: 'var(--space-8)',
                     fontSize: 'var(--text-lg)',
                 }}>
-                    Your membership is now active. Welcome to Sport of Kings!
+                    Your membership is now active. Welcome to DojoHub!
                 </p>
 
                 <Link href="/dashboard" className="btn btn-primary btn-lg" style={{ width: '100%' }}>

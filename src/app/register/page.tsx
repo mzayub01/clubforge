@@ -37,7 +37,7 @@ Displaying Good Adab: Adab (good manners) is a fundamental aspect of our practic
 By following these guidelines, we can create a respectful and inclusive atmosphere that aligns with the teachings of Islam and promotes the revival of our beloved Prophet Muhammad's Sunnah. May Allah bless our training and strengthen our bonds of brotherhood/sisterhood.`;
 
 // Waiver text
-const WAIVER_TEXT = `Disclaimer and Waiver of Liability for Brazilian Jiu-Jitsu Classes by Sport of Kings Seerat Un Nabi
+const WAIVER_TEXT = `Disclaimer and Waiver of Liability for Brazilian Jiu-Jitsu Classes by DojoHub
 
 As the participant or legal guardian of the participant(s), I hereby acknowledge and agree to the following terms and conditions for participation in the Brazilian Jiu-Jitsu (BJJ) classes:
 
@@ -45,15 +45,15 @@ Risk Acknowledgement: I understand that Brazilian Jiu-Jitsu is a contact sport t
 
 Fitness and Health: I confirm that the participant(s) is/are physically fit, in good health, and do not have any condition or ailment that could be adversely affected by participation in these classes.
 
-Rules and Supervision: I agree that the participant(s) will adhere to all class rules and instructions provided by instructors and staff members of Sport of Kings Seerat Un Nabi. I understand that supervision and guidance will be provided during all class sessions.
+Rules and Supervision: I agree that the participant(s) will adhere to all class rules and instructions provided by instructors and staff members of DojoHub. I understand that supervision and guidance will be provided during all class sessions.
 
-Waiver of Liability: I hereby release, waive, discharge, and covenant not to sue Sport of Kings Seerat Un Nabi, their officers, agents, employees, coaches, volunteers, or other representatives for any injury, loss, or damage to the participant(s) or my/our property arising out of or in connection with participation in these classes, whether caused by negligence or otherwise.
+Waiver of Liability: I hereby release, waive, discharge, and covenant not to sue DojoHub, their officers, agents, employees, coaches, volunteers, or other representatives for any injury, loss, or damage to the participant(s) or my/our property arising out of or in connection with participation in these classes, whether caused by negligence or otherwise.
 
 Medical Attention: In the event of an injury, I authorise the class staff to secure emergency medical care for the participant(s). I agree to be responsible for any medical or other charges in connection with the participant's participation in these classes.
 
-Photography/Video Consent: I consent to the use of photographs and videos taken during the classes for promotional, educational, or training purposes by Sport of Kings Seerat Un Nabi.
+Photography/Video Consent: I consent to the use of photographs and videos taken during the classes for promotional, educational, or training purposes by DojoHub.
 
-Compliance with Policies: I agree to comply with all the policies, procedures, and regulations set by Sport of Kings Seerat Un Nabi during the classes.
+Compliance with Policies: I agree to comply with all the policies, procedures, and regulations set by DojoHub during the classes.
 
 Understanding of Terms: I have read this waiver and release of liability and fully understand its terms. I understand that I/we have given up substantial rights by agreeing to it and do so freely and voluntarily without any inducement.`;
 
@@ -635,7 +635,7 @@ function RegisterPageContent() {
                     <Link href="/">
                         <Image
                             src="/logo-full.png"
-                            alt="Sport of Kings"
+                            alt="DojoHub"
                             width={140}
                             height={70}
                             priority
@@ -646,7 +646,7 @@ function RegisterPageContent() {
                         fontSize: 'var(--text-2xl)',
                         marginTop: 'var(--space-4)',
                     }}>
-                        Join Sport of Kings
+                        Join DojoHub
                     </h1>
                     <p style={{ color: 'var(--text-secondary)' }}>
                         Begin your martial arts journey

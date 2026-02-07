@@ -25,22 +25,22 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Sport of Kings - Seerat Un Nabi | BJJ & Martial Arts Manchester",
-  description: "Professional martial arts instruction in Manchester UK. Join us for Brazilian Jiu-Jitsu classes. Reviving the Sunnah through sports excellence.",
-  keywords: ["BJJ", "Brazilian Jiu-Jitsu", "martial arts", "Manchester", "Islamic", "Sunnah", "fitness"],
-  authors: [{ name: "Sport of Kings" }],
+  title: "DojoHub | Gym & Martial Arts Management Platform",
+  description: "The all-in-one SaaS platform for martial arts gyms. Manage memberships, classes, belt progression, and more.",
+  keywords: ["gym management", "martial arts software", "dojo management", "membership management", "SaaS", "BJJ"],
+  authors: [{ name: "DojoHub" }],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Sport of Kings',
+    title: 'DojoHub',
   },
   formatDetection: {
     telephone: true,
   },
   openGraph: {
-    title: "Sport of Kings - Seerat Un Nabi",
-    description: "Professional martial arts instruction in Manchester. Brazilian Jiu-Jitsu and more.",
+    title: "DojoHub | Gym & Martial Arts Management",
+    description: "The all-in-one SaaS platform for martial arts gyms and fitness centers.",
     type: "website",
     locale: "en_GB",
   },

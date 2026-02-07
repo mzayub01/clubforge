@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 
 export const metadata = {
-    title: 'Admin Dashboard | Sport of Kings',
-    description: 'Admin dashboard for Sport of Kings',
+    title: 'Admin Dashboard | DojoHub',
+    description: 'Admin dashboard for DojoHub',
 };
 
 export default async function AdminDashboard() {
@@ -111,7 +111,7 @@ export default async function AdminDashboard() {
             <div className="dashboard-header">
                 <h1 className="dashboard-title">Admin Dashboard</h1>
                 <p className="dashboard-subtitle">
-                    Overview of Sport of Kings operations
+                    Overview of DojoHub operations
                 </p>
             </div>
 

@@ -387,7 +387,7 @@ export default function DashboardContent() {
                                 If there are any issues with your payment set up then please note your membership may become inactive until the payments are set up.
                             </p>
                             <p style={{ marginBottom: 'var(--space-4)' }}>
-                                <strong>For existing members:</strong> Your payments should already be set up. If they have not, please email <a href="mailto:sportofkings786@gmail.com" style={{ color: 'var(--color-gold)' }}>sportofkings786@gmail.com</a> stating your payments have not yet been set up.
+                                <strong>For existing members:</strong> Your payments should already be set up. If they have not, please email <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>support@dojohub.com</a> stating your payments have not yet been set up.
                             </p>
                             <p style={{ marginBottom: 0 }}>
                                 <strong>New members:</strong> You will receive separate email instructions on setting up payment for the first time.

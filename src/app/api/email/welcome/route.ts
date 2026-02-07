@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         // Try to get template from database first
         const dbTemplate = await renderEmailFromDatabase('welcome', {
             firstName,
-            locationName: locationName || 'Sport of Kings',
+            locationName: locationName || 'DojoHub',
             membershipType: membershipType || 'Member',
         });
 
@@ -33,10 +33,10 @@ export async function POST(request: NextRequest) {
             // Fallback to static template
             html = renderWelcomeEmail({
                 firstName,
-                locationName: locationName || 'Sport of Kings',
+                locationName: locationName || 'DojoHub',
                 membershipType: membershipType || 'Member',
             });
-            subject = `Welcome to Sport of Kings, ${firstName}!`;
+            subject = `Welcome to DojoHub, ${firstName}!`;
         }
 
         // Send the email

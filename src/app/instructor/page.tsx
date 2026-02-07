@@ -17,7 +17,7 @@ interface RecentStudent {
 }
 
 export const metadata = {
-    title: 'Instructor Dashboard | Sport of Kings',
+    title: 'Instructor Dashboard | DojoHub',
     description: 'Instructor dashboard for managing classes and students',
 };
 

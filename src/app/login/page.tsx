@@ -81,7 +81,7 @@ export default function LoginPage() {
                     <Link href="/">
                         <Image
                             src="/logo-full.png"
-                            alt="Sport of Kings"
+                            alt="DojoHub"
                             width={160}
                             height={80}
                             priority

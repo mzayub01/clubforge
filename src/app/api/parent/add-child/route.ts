@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
                     console.log('Initiating Guardian Migration for user:', user.id);
 
                     // 1. Create Phantom Auth User for First Child
-                    const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.sport-of-kings.local`;
+                    const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.dojohub.local`;
                     const childPassword = crypto.randomUUID();
 
                     const { data: childAuth, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate a unique email for the child (they won't use it to log in)
-        const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.sport-of-kings.local`;
+        const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.dojohub.local`;
         const childPassword = crypto.randomUUID(); // Random password - child won't use it
 
         // Create auth user for child (required for profile foreign key)

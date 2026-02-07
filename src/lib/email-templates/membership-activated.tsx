@@ -17,7 +17,7 @@ export function MembershipActivatedEmail({
     membershipType,
     price,
     startDate,
-    dashboardUrl = 'https://sportofkings.info/dashboard',
+    dashboardUrl = 'https://dojohub.com/dashboard',
 }: MembershipActivatedEmailProps) {
     return (
         <BaseEmailLayout previewText={`Your ${membershipType} membership is now active!`}>
@@ -75,7 +75,7 @@ export function MembershipActivatedEmail({
 
             <Text style={baseStyles.text}>
                 JazakAllahu Khayran,<br />
-                <strong>The Sport of Kings Team</strong>
+                <strong>The DojoHub Team</strong>
             </Text>
         </BaseEmailLayout>
     );

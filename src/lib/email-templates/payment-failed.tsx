@@ -17,7 +17,7 @@ export function PaymentFailedEmail({
     amountDue,
     attemptCount,
     nextAttemptDate,
-    updatePaymentUrl = 'https://sportofkings.info/dashboard/membership',
+    updatePaymentUrl = 'https://dojohub.com/dashboard/membership',
 }: PaymentFailedEmailProps) {
     const isLastAttempt = attemptCount >= 3;
 
@@ -86,7 +86,7 @@ export function PaymentFailedEmail({
 
             <Text style={baseStyles.text}>
                 JazakAllahu Khayran,<br />
-                <strong>The Sport of Kings Team</strong>
+                <strong>The DojoHub Team</strong>
             </Text>
         </BaseEmailLayout>
     );

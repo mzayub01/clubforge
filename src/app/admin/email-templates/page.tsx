@@ -153,7 +153,7 @@ export default function AdminEmailTemplatesPage() {
                     <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
                         <img
                             src="/logo-full.png"
-                            alt="Sport of Kings"
+                            alt="DojoHub"
                             style={{ height: '60px', width: 'auto' }}
                         />
                     </div>
@@ -234,7 +234,7 @@ export default function AdminEmailTemplatesPage() {
                         color: '#888',
                         fontSize: 'var(--text-sm)',
                     }}>
-                        <p style={{ margin: '0 0 4px' }}>Sport of Kings - Seerat Un Nabi</p>
+                        <p style={{ margin: '0 0 4px' }}>DojoHub</p>
                         <p style={{ margin: 0 }}>Brazilian Jiu-Jitsu Classes in Manchester</p>
                     </div>
                 </div>

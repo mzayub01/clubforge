@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { Bell, Calendar, MapPin, Info } from 'lucide-react';
 
 export const metadata = {
-    title: 'Announcements | Sport of Kings',
-    description: 'View announcements and updates from Sport of Kings',
+    title: 'Announcements | DojoHub',
+    description: 'View announcements and updates from DojoHub',
 };
 
 interface Announcement {
@@ -63,7 +63,7 @@ export default async function AnnouncementsPage() {
             <div className="dashboard-header">
                 <h1 className="dashboard-title">Announcements</h1>
                 <p className="dashboard-subtitle">
-                    Stay updated with the latest news from Sport of Kings
+                    Stay updated with the latest news from DojoHub
                 </p>
             </div>
 

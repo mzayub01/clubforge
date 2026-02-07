@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate the payment link (link to membership page where they can complete payment)
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sportofkings.info';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://dojohub.com';
         const paymentLink = `${baseUrl}/dashboard/membership`;
 
         // Render the email template
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             to: email,
             subject: rendered.subject,
             html: rendered.html,
-            replyTo: 'sportofkings786@gmail.com',
+            replyTo: 'support@dojohub.com',
         });
 
         if (!result.success) {

@@ -60,7 +60,7 @@ export default function WaitlistConfirmationPage() {
                 <Link href="/">
                     <Image
                         src="/logo-full.png"
-                        alt="Sport of Kings"
+                        alt="DojoHub"
                         width={140}
                         height={70}
                         priority
@@ -100,7 +100,7 @@ export default function WaitlistConfirmationPage() {
                                 marginBottom: 'var(--space-6)',
                                 fontSize: 'var(--text-lg)',
                             }}>
-                                Thank you for registering with Sport of Kings.
+                                Thank you for registering with DojoHub.
                             </p>
 
                             {position && (
@@ -159,8 +159,8 @@ export default function WaitlistConfirmationPage() {
                     fontSize: 'var(--text-sm)',
                 }}>
                     Questions? Contact us at{' '}
-                    <a href="mailto:info@sportofkings.uk" style={{ color: 'var(--color-gold)' }}>
-                        info@sportofkings.uk
+                    <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>
+                        support@dojohub.com
                     </a>
                 </p>
             </div>

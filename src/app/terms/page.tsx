@@ -5,8 +5,8 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'Terms of Service | Sport of Kings',
-    description: 'Terms of Service for Sport of Kings - The terms and conditions governing your use of our services.',
+    title: 'Terms of Service | DojoHub',
+    description: 'Terms of Service for DojoHub - The terms and conditions governing your use of our services.',
 };
 
 export default async function TermsPage() {
@@ -54,7 +54,7 @@ export default async function TermsPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)', marginTop: 0 }}>1. Introduction</h2>
                                 <p>
-                                    These Terms of Service (&quot;Terms&quot;) govern your use of the Sport of Kings website, services, and membership. Sport of Kings operates under the registered charity Seerat Un Nabi in England and Wales.
+                                    These Terms of Service (&quot;Terms&quot;) govern your use of the DojoHub website, services, and membership. DojoHub operates under the registered charity DojoHub in England and Wales.
                                 </p>
                                 <p>
                                     By registering for membership, attending classes, or using our website, you agree to be bound by these Terms. If you do not agree, please do not use our services.
@@ -81,7 +81,7 @@ export default async function TermsPage() {
 
                                 <h3 style={{ color: 'var(--text-primary)', fontSize: 'var(--text-lg)' }}>2.3 Membership Changes</h3>
                                 <p>
-                                    For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us at <a href="mailto:info@sportofkings.co.uk" style={{ color: 'var(--color-gold)' }}>info@sportofkings.co.uk</a>. We aim to process requests within 48 hours.
+                                    For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us at <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>support@dojohub.com</a>. We aim to process requests within 48 hours.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>3. Code of Conduct</h2>
@@ -138,7 +138,7 @@ export default async function TermsPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>7. Photography and Recording</h2>
                                 <p>
-                                    Sport of Kings may take photographs or videos during classes and events for promotional purposes. By participating, you consent to the use of such media unless you notify us in writing otherwise.
+                                    DojoHub may take photographs or videos during classes and events for promotional purposes. By participating, you consent to the use of such media unless you notify us in writing otherwise.
                                 </p>
                                 <p>
                                     Personal photography and recording during classes requires instructor approval.
@@ -146,7 +146,7 @@ export default async function TermsPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>8. Intellectual Property</h2>
                                 <p>
-                                    All content on the Sport of Kings website, including text, graphics, logos, and training materials, is the property of Sport of Kings or its licensors and is protected by copyright laws.
+                                    All content on the DojoHub website, including text, graphics, logos, and training materials, is the property of DojoHub or its licensors and is protected by copyright laws.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>9. Limitation of Liability</h2>
@@ -154,7 +154,7 @@ export default async function TermsPage() {
                                     To the fullest extent permitted by law:
                                 </p>
                                 <ul style={{ paddingLeft: 'var(--space-6)' }}>
-                                    <li>Sport of Kings is not liable for any injuries sustained during training where reasonable safety measures were in place</li>
+                                    <li>DojoHub is not liable for any injuries sustained during training where reasonable safety measures were in place</li>
                                     <li>We are not responsible for loss or damage to personal property at training venues</li>
                                     <li>Our total liability shall not exceed the fees paid by you in the 12 months preceding any claim</li>
                                 </ul>
@@ -164,7 +164,7 @@ export default async function TermsPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>10. Safeguarding</h2>
                                 <p>
-                                    Sport of Kings is committed to safeguarding children and vulnerable adults. We have comprehensive safeguarding policies in place, and all instructors are DBS-checked. Any concerns should be reported immediately to our safeguarding lead.
+                                    DojoHub is committed to safeguarding children and vulnerable adults. We have comprehensive safeguarding policies in place, and all instructors are DBS-checked. Any concerns should be reported immediately to our safeguarding lead.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>11. Termination</h2>
@@ -199,8 +199,8 @@ export default async function TermsPage() {
                                     marginTop: 'var(--space-4)'
                                 }}>
                                     <p style={{ margin: 0 }}>
-                                        <strong>Sport of Kings (Seerat Un Nabi)</strong><br />
-                                        Email: <a href="mailto:info@sportofkings.co.uk" style={{ color: 'var(--color-gold)' }}>info@sportofkings.co.uk</a><br />
+                                        <strong>DojoHub</strong><br />
+                                        Email: <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>support@dojohub.com</a><br />
                                         Manchester, United Kingdom
                                     </p>
                                 </div>

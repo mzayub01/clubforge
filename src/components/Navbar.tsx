@@ -75,7 +75,7 @@ export default function Navbar({ user }: NavbarProps) {
                     <Link href="/" className="navbar-logo">
                         <Image
                             src="/logo-full.png"
-                            alt="Sport of Kings"
+                            alt="DojoHub"
                             width={160}
                             height={48}
                             priority
@@ -147,7 +147,7 @@ export default function Navbar({ user }: NavbarProps) {
                 <div className="mobile-menu-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                         <Crown size={24} color="var(--color-gold)" />
-                        <span style={{ fontWeight: '700', fontSize: 'var(--text-lg)' }}>Sport of Kings</span>
+                        <span style={{ fontWeight: '700', fontSize: 'var(--text-lg)' }}>DojoHub</span>
                     </div>
                     <button
                         className="mobile-menu-close"

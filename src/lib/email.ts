@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Default from address
-const DEFAULT_FROM = process.env.EMAIL_FROM || 'Sport of Kings <noreply@sportofkings.app>';
+const DEFAULT_FROM = process.env.EMAIL_FROM || 'DojoHub <noreply@dojohub.com>';
 
 export interface SendEmailOptions {
     to: string | string[];

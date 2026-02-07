@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Video, Play, Clock, Award, Filter } from 'lucide-react';
 
 export const metadata = {
-    title: 'Video Library | Sport of Kings',
+    title: 'Video Library | DojoHub',
     description: 'Training drill videos for members',
 };
 

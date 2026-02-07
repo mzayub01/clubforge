@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export const metadata = {
-    title: 'Financial MI | Sport of Kings Admin',
+    title: 'Financial MI | DojoHub Admin',
     description: 'Financial Management Information dashboard',
 };
 

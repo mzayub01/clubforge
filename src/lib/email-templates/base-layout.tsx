@@ -94,8 +94,8 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                 <Container style={baseStyles.container}>
                     <Section style={baseStyles.card}>
                         <Img
-                            src="https://sportofkings.info/logo-full.png"
-                            alt="Sport of Kings"
+                            src="https://dojohub.com/logo-full.png"
+                            alt="DojoHub"
                             style={baseStyles.logo}
                             height={60}
                         />
@@ -103,12 +103,12 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                     </Section>
                     <Section style={baseStyles.footer}>
                         <Text style={baseStyles.footerText}>
-                            Sport of Kings - Seerat Un Nabi
+                            DojoHub
                         </Text>
                         <Text style={baseStyles.footerText}>
                             Brazilian Jiu-Jitsu Classes in Manchester
                         </Text>
-                        <Link href="https://sportofkings.info" style={baseStyles.footerLink}>
+                        <Link href="https://dojohub.com" style={baseStyles.footerLink}>
                             Visit our website
                         </Link>
                     </Section>

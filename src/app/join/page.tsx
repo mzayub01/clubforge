@@ -192,7 +192,7 @@ export default function JoinPage() {
                     <Link href="/">
                         <Image
                             src="/logo-full.png"
-                            alt="DojoHub"
+                            alt="ClubForge"
                             width={140}
                             height={70}
                             priority

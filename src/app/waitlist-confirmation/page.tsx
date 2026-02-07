@@ -60,7 +60,7 @@ export default function WaitlistConfirmationPage() {
                 <Link href="/">
                     <Image
                         src="/logo-full.png"
-                        alt="DojoHub"
+                        alt="ClubForge"
                         width={140}
                         height={70}
                         priority
@@ -100,7 +100,7 @@ export default function WaitlistConfirmationPage() {
                                 marginBottom: 'var(--space-6)',
                                 fontSize: 'var(--text-lg)',
                             }}>
-                                Thank you for registering with DojoHub.
+                                Thank you for registering with ClubForge.
                             </p>
 
                             {position && (
@@ -159,8 +159,8 @@ export default function WaitlistConfirmationPage() {
                     fontSize: 'var(--text-sm)',
                 }}>
                     Questions? Contact us at{' '}
-                    <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>
-                        support@dojohub.com
+                    <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>
+                        support@clubforge.com
                     </a>
                 </p>
             </div>

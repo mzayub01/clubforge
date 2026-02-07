@@ -1,8 +1,8 @@
 import DashboardContent from '@/components/dashboard/DashboardContent';
 
 export const metadata = {
-    title: 'Dashboard | DojoHub',
-    description: 'Your personal dashboard at DojoHub',
+    title: 'Dashboard | ClubForge',
+    description: 'Your personal dashboard at ClubForge',
 };
 
 export default function MemberDashboard() {

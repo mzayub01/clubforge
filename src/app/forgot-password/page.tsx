@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
                     <Link href="/">
                         <Image
                             src="/logo-full.png"
-                            alt="DojoHub"
+                            alt="ClubForge"
                             width={160}
                             height={80}
                             priority

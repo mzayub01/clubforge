@@ -13,12 +13,12 @@ export function WelcomeEmail({
     firstName,
     locationName,
     membershipType,
-    dashboardUrl = 'https://dojohub.com/dashboard',
+    dashboardUrl = 'https://clubforge.com/dashboard',
 }: WelcomeEmailProps) {
     return (
-        <BaseEmailLayout previewText={`Welcome to DojoHub, ${firstName}!`}>
+        <BaseEmailLayout previewText={`Welcome to ClubForge, ${firstName}!`}>
             <Text style={baseStyles.heading}>
-                Welcome to DojoHub! 🥋
+                Welcome to ClubForge! 🥋
             </Text>
 
             <Text style={baseStyles.text}>
@@ -63,7 +63,7 @@ export function WelcomeEmail({
 
             <Text style={baseStyles.text}>
                 See you on the mats!<br />
-                <strong>The DojoHub Team</strong>
+                <strong>The ClubForge Team</strong>
             </Text>
         </BaseEmailLayout>
     );

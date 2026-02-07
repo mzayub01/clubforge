@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Users, Award, CheckCircle, TrendingUp, Calendar } from 'lucide-react';
 
 export const metadata = {
-    title: 'My Students | Instructor - DojoHub',
+    title: 'My Students | Instructor - ClubForge',
     description: 'View students who attend your classes',
 };
 

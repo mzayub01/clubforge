@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
             if (profile.is_child) continue;
 
             // Skip if email looks like a child placeholder
-            if (profile.email.includes('@child.dojohub.local')) continue;
+            if (profile.email.includes('@child.clubforge.local')) continue;
 
             // Filter by target audience
             if (targetAudience === 'members' && profile.role !== 'member') continue;
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
                         <p>We have an important announcement:</p>
                         <h2>${announcementTitle}</h2>
                         <p>${announcementMessage.replace(/\n/g, '<br>')}</p>
-                        <p>JazakAllahu Khayran,<br>The DojoHub Team</p>
+                        <p>Best regards,<br>The ClubForge Team</p>
                     `;
                     const result = await sendEmail({
                         to: recipient.email,

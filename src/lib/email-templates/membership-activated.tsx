@@ -17,7 +17,7 @@ export function MembershipActivatedEmail({
     membershipType,
     price,
     startDate,
-    dashboardUrl = 'https://dojohub.com/dashboard',
+    dashboardUrl = 'https://clubforge.com/dashboard',
 }: MembershipActivatedEmailProps) {
     return (
         <BaseEmailLayout previewText={`Your ${membershipType} membership is now active!`}>
@@ -74,8 +74,8 @@ export function MembershipActivatedEmail({
             </Text>
 
             <Text style={baseStyles.text}>
-                JazakAllahu Khayran,<br />
-                <strong>The DojoHub Team</strong>
+                Best regards,<br />
+                <strong>The ClubForge Team</strong>
             </Text>
         </BaseEmailLayout>
     );

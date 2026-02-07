@@ -25,21 +25,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "DojoHub | Gym & Martial Arts Management Platform",
+  title: "ClubForge | Gym & Martial Arts Management Platform",
   description: "The all-in-one SaaS platform for martial arts gyms. Manage memberships, classes, belt progression, and more.",
   keywords: ["gym management", "martial arts software", "dojo management", "membership management", "SaaS", "BJJ"],
-  authors: [{ name: "DojoHub" }],
+  authors: [{ name: "ClubForge" }],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'DojoHub',
+    title: 'ClubForge',
   },
   formatDetection: {
     telephone: true,
   },
   openGraph: {
-    title: "DojoHub | Gym & Martial Arts Management",
+    title: "ClubForge | Gym & Martial Arts Management",
     description: "The all-in-one SaaS platform for martial arts gyms and fitness centers.",
     type: "website",
     locale: "en_GB",

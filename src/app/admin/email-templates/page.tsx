@@ -153,7 +153,7 @@ export default function AdminEmailTemplatesPage() {
                     <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
                         <img
                             src="/logo-full.png"
-                            alt="DojoHub"
+                            alt="ClubForge"
                             style={{ height: '60px', width: 'auto' }}
                         />
                     </div>
@@ -221,7 +221,7 @@ export default function AdminEmailTemplatesPage() {
 
                     {/* Signature */}
                     <p style={{ color: '#4a4a4a' }}>
-                        JazakAllahu Khayran,<br />
+                        Best regards,<br />
                         <strong>{template.signature}</strong>
                     </p>
 
@@ -234,7 +234,7 @@ export default function AdminEmailTemplatesPage() {
                         color: '#888',
                         fontSize: 'var(--text-sm)',
                     }}>
-                        <p style={{ margin: '0 0 4px' }}>DojoHub</p>
+                        <p style={{ margin: '0 0 4px' }}>ClubForge</p>
                         <p style={{ margin: 0 }}>Brazilian Jiu-Jitsu Classes in Manchester</p>
                     </div>
                 </div>

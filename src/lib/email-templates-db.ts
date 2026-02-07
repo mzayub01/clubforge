@@ -52,12 +52,12 @@ export function replacePlaceholders(text: string, data: Record<string, string>):
 }
 
 /**
- * Render an email template to HTML with the DojoHub branding
+ * Render an email template to HTML with the ClubForge branding
  */
 export function renderTemplateToHtml(
     template: EmailTemplateData,
     data: Record<string, string>,
-    logoUrl: string = 'https://dojohub.com/logo-full.png'
+    logoUrl: string = 'https://clubforge.com/logo-full.png'
 ): string {
     const subject = replacePlaceholders(template.subject, data);
     const greeting = replacePlaceholders(template.greeting, data);
@@ -88,7 +88,7 @@ export function renderTemplateToHtml(
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 24px;">
-                                        <img src="${logoUrl}" alt="DojoHub" height="60" style="height: 60px; width: auto;">
+                                        <img src="${logoUrl}" alt="ClubForge" height="60" style="height: 60px; width: auto;">
                                     </td>
                                 </tr>
                             </table>
@@ -148,7 +148,7 @@ export function renderTemplateToHtml(
                             
                             <!-- Signature -->
                             <p style="font-size: 16px; line-height: 1.6; color: #4a4a4a; margin: 0;">
-                                JazakAllahu Khayran,<br>
+                                Best regards,<br>
                                 <strong>${template.signature}</strong>
                             </p>
                         </td>
@@ -158,12 +158,12 @@ export function renderTemplateToHtml(
                     <tr>
                         <td style="padding-top: 24px; text-align: center;">
                             <p style="font-size: 14px; color: #888888; margin: 0 0 4px;">
-                                DojoHub
+                                ClubForge
                             </p>
                             <p style="font-size: 14px; color: #888888; margin: 0 0 8px;">
                                 Brazilian Jiu-Jitsu Classes in Manchester
                             </p>
-                            <a href="https://dojohub.com" style="font-size: 14px; color: #c5a456; text-decoration: none;">
+                            <a href="https://clubforge.com" style="font-size: 14px; color: #c5a456; text-decoration: none;">
                                 Visit our website
                             </a>
                         </td>

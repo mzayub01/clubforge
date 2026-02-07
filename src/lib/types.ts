@@ -1,5 +1,5 @@
 // ===============================================
-// DojoHub - Type Definitions
+// ClubForge - Type Definitions
 // ===============================================
 
 // User Roles

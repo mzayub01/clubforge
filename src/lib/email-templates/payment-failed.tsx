@@ -17,7 +17,7 @@ export function PaymentFailedEmail({
     amountDue,
     attemptCount,
     nextAttemptDate,
-    updatePaymentUrl = 'https://dojohub.com/dashboard/membership',
+    updatePaymentUrl = 'https://clubforge.com/dashboard/membership',
 }: PaymentFailedEmailProps) {
     const isLastAttempt = attemptCount >= 3;
 
@@ -85,8 +85,8 @@ export function PaymentFailedEmail({
             </Text>
 
             <Text style={baseStyles.text}>
-                JazakAllahu Khayran,<br />
-                <strong>The DojoHub Team</strong>
+                Best regards,<br />
+                <strong>The ClubForge Team</strong>
             </Text>
         </BaseEmailLayout>
     );

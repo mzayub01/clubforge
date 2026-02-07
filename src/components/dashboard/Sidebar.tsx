@@ -168,7 +168,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                 <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
                     <Image
                         src="/logo-full.png"
-                        alt="DojoHub"
+                        alt="ClubForge"
                         width={120}
                         height={36}
                         style={{ height: '32px', width: 'auto' }}
@@ -193,7 +193,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                             <Image
                                 src="/logo-full.png"
-                                alt="DojoHub"
+                                alt="ClubForge"
                                 width={140}
                                 height={40}
                                 style={{ height: '36px', width: 'auto' }}

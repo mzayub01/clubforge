@@ -17,7 +17,7 @@ interface RecentStudent {
 }
 
 export const metadata = {
-    title: 'Instructor Dashboard | DojoHub',
+    title: 'Instructor Dashboard | ClubForge',
     description: 'Instructor dashboard for managing classes and students',
 };
 

@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'Classes & Locations | DojoHub',
+    title: 'Classes & Locations | ClubForge',
     description: 'Find Brazilian Jiu-Jitsu classes at one of our 5 locations across Manchester. Classes for kids, teens, and adults.',
 };
 

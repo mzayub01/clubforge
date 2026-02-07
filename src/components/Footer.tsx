@@ -19,7 +19,7 @@ export default function Footer() {
                 <div className="footer-brand">
                     <Image
                         src="/logo-simple.png"
-                        alt="DojoHub"
+                        alt="ClubForge"
                         width={120}
                         height={120}
                         style={{
@@ -91,14 +91,14 @@ export default function Footer() {
                         </li>
                         <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <Mail size={16} />
-                            <a href="mailto:support@dojohub.com">support@dojohub.com</a>
+                            <a href="mailto:support@clubforge.com">support@clubforge.com</a>
                         </li>
                     </ul>
                 </div>
             </div>
 
             <div className="footer-bottom">
-                <p>© {currentYear} DojoHub. All rights reserved.</p>
+                <p>© {currentYear} ClubForge. All rights reserved.</p>
                 <div style={{ marginTop: 'var(--space-2)', display: 'flex', justifyContent: 'center', gap: 'var(--space-4)' }}>
                     <Link href="/privacy">Privacy Policy</Link>
                     <Link href="/terms">Terms of Service</Link>

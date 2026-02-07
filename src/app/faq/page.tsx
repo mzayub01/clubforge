@@ -100,18 +100,18 @@ export default function FAQPage() {
 
     const faqSections: FAQSection[] = [
         {
-            title: 'About DojoHub',
+            title: 'About ClubForge',
             icon: Shield,
             items: [
                 {
-                    question: 'What is DojoHub?',
-                    answer: 'DojoHub is a non-profit registered charity organisation that uses Sunnah sports to build strong, disciplined, faith-anchored individuals and communities — not just fighters. We are a holistic development platform rooted in Sunnah sports, faith, and community, training individuals for the mats and for life. Everyone is welcome.'
+                    question: 'What is ClubForge?',
+                    answer: 'ClubForge is a non-profit registered charity organisation that uses Sunnah sports to build strong, disciplined, faith-anchored individuals and communities — not just fighters. We are a holistic development platform rooted in Sunnah sports, faith, and community, training individuals for the mats and for life. Everyone is welcome.'
                 },
                 {
-                    question: 'Is DojoHub just about Brazilian Jiu-Jitsu?',
+                    question: 'Is ClubForge just about Brazilian Jiu-Jitsu?',
                     answer: (
                         <div>
-                            <p style={{ marginTop: 0 }}>No. While BJJ and grappling are our core focus, DojoHub offers much more:</p>
+                            <p style={{ marginTop: 0 }}>No. While BJJ and grappling are our core focus, ClubForge offers much more:</p>
                             <ul style={{ paddingLeft: 'var(--space-5)', marginBottom: 0 }}>
                                 <li><strong>Sunnah Sports:</strong> Wrestling, grappling, archery (coming soon), horse riding (coming soon)</li>
                                 <li><strong>Spiritual Development:</strong> Dhikr gatherings, youth dars, Islamic learning sessions, retreats</li>
@@ -122,10 +122,10 @@ export default function FAQPage() {
                     )
                 },
                 {
-                    question: 'What makes DojoHub different from other martial arts clubs?',
+                    question: 'What makes ClubForge different from other martial arts clubs?',
                     answer: (
                         <div>
-                            <p style={{ marginTop: 0 }}>DojoHub is fundamentally different in several ways:</p>
+                            <p style={{ marginTop: 0 }}>ClubForge is fundamentally different in several ways:</p>
                             <ul style={{ paddingLeft: 'var(--space-5)', marginBottom: 0 }}>
                                 <li><strong>Sunnah-Centred:</strong> Training is framed as a revival of Sunnah sports with emphasis on adab, intention, and character</li>
                                 <li><strong>Faith-Aligned:</strong> Islamic etiquette, modesty, and safeguarding are built into our culture with appropriate provision for all</li>
@@ -138,7 +138,7 @@ export default function FAQPage() {
                 },
                 {
                     question: 'Will this fit with Islamic values?',
-                    answer: 'Absolutely. DojoHub is intentionally designed to uphold Islamic etiquette (adab), encourage good character and brotherhood/sisterhood, and align training with faith — not distract from it. Classes are structured around salah times where relevant, and we maintain clear separation and appropriate provision for women, girls, boys, and men.'
+                    answer: 'Absolutely. ClubForge is intentionally designed to uphold Islamic etiquette (adab), encourage good character and brotherhood/sisterhood, and align training with faith — not distract from it. Classes are structured around salah times where relevant, and we maintain clear separation and appropriate provision for women, girls, boys, and men.'
                 },
             ]
         },
@@ -160,7 +160,7 @@ export default function FAQPage() {
                 },
                 {
                     question: 'Is training too aggressive?',
-                    answer: 'No. DojoHub emphasises self-control, humility, and discipline. We have zero tolerance for bullying or reckless behaviour. Strength is framed as responsibility, not dominance. Our students learn to protect themselves while respecting others.'
+                    answer: 'No. ClubForge emphasises self-control, humility, and discipline. We have zero tolerance for bullying or reckless behaviour. Strength is framed as responsibility, not dominance. Our students learn to protect themselves while respecting others.'
                 },
                 {
                     question: 'What age groups do you cater for?',
@@ -200,7 +200,7 @@ export default function FAQPage() {
                 },
                 {
                     question: 'How do I make changes to my membership?',
-                    answer: 'For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us directly at support@dojohub.com. Our team will be happy to assist you and discuss the best options for your situation.'
+                    answer: 'For any changes to your membership — including upgrades, downgrades, pausing, or cancellations — please contact us directly at support@clubforge.com. Our team will be happy to assist you and discuss the best options for your situation.'
                 },
             ]
         },
@@ -300,10 +300,10 @@ export default function FAQPage() {
             icon: Star,
             items: [
                 {
-                    question: 'What spiritual activities does DojoHub offer?',
+                    question: 'What spiritual activities does ClubForge offer?',
                     answer: (
                         <div>
-                            <p style={{ marginTop: 0 }}>DojoHub integrates faith throughout our programme:</p>
+                            <p style={{ marginTop: 0 }}>ClubForge integrates faith throughout our programme:</p>
                             <ul style={{ paddingLeft: 'var(--space-5)', marginBottom: 0 }}>
                                 <li>Regular dhikr gatherings and nasheeds</li>
                                 <li>Youth dars and Islamic learning sessions</li>
@@ -332,7 +332,7 @@ export default function FAQPage() {
                 },
                 {
                     question: 'What is the Fajr40 Challenge?',
-                    answer: 'The Fajr40 Challenge is a DojoHub initiative encouraging 40 days of Fajr prayer in congregation. It\'s a spiritual challenge to build consistency, discipline, and connection with Allah ﷻ. It demonstrates our commitment to developing individuals on and off the mats.'
+                    answer: 'The Fajr40 Challenge is a ClubForge initiative encouraging 40 days of Fajr prayer in congregation. It\'s a spiritual challenge to build consistency, discipline, and connection with Allah ﷻ. It demonstrates our commitment to developing individuals on and off the mats.'
                 },
                 {
                     question: 'Are there opportunities for retreats or trips?',
@@ -362,7 +362,7 @@ export default function FAQPage() {
                 },
                 {
                     question: 'Who do I contact for support?',
-                    answer: 'For any questions or support needs, email us at support@dojohub.com. For urgent matters during class times, speak directly to your instructor. We aim to respond to all enquiries within 24-48 hours.'
+                    answer: 'For any questions or support needs, email us at support@clubforge.com. For urgent matters during class times, speak directly to your instructor. We aim to respond to all enquiries within 24-48 hours.'
                 },
             ]
         },
@@ -397,7 +397,7 @@ export default function FAQPage() {
                             maxWidth: '600px',
                             margin: '0 auto',
                         }}>
-                            Everything you need to know about DojoHub —
+                            Everything you need to know about ClubForge —
                             a movement building strong, disciplined, faith-anchored individuals and communities.
                         </p>
                     </div>
@@ -485,7 +485,7 @@ export default function FAQPage() {
                             flexWrap: 'wrap',
                         }}>
                             <a
-                                href="mailto:support@dojohub.com"
+                                href="mailto:support@clubforge.com"
                                 className="btn btn-primary btn-lg"
                             >
                                 Email Us

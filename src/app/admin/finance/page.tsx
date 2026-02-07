@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export const metadata = {
-    title: 'Financial MI | DojoHub Admin',
+    title: 'Financial MI | ClubForge Admin',
     description: 'Financial Management Information dashboard',
 };
 

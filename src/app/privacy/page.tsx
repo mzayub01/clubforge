@@ -5,8 +5,8 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'Privacy Policy | DojoHub',
-    description: 'Privacy Policy for DojoHub - Learn how we collect, use, and protect your personal information.',
+    title: 'Privacy Policy | ClubForge',
+    description: 'Privacy Policy for ClubForge - Learn how we collect, use, and protect your personal information.',
 };
 
 export default async function PrivacyPage() {
@@ -54,7 +54,7 @@ export default async function PrivacyPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)', marginTop: 0 }}>1. Introduction</h2>
                                 <p>
-                                    DojoHub (&quot;DojoHub&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is a registered charity in England and Wales. We are committed to protecting and respecting your privacy in accordance with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.
+                                    ClubForge (&quot;ClubForge&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is a registered charity in England and Wales. We are committed to protecting and respecting your privacy in accordance with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.
                                 </p>
                                 <p>
                                     This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our website, register for membership, attend our classes, or engage with our services.
@@ -148,7 +148,7 @@ export default async function PrivacyPage() {
                                     <li><strong>Right to Withdraw Consent:</strong> Where processing is based on consent</li>
                                 </ul>
                                 <p>
-                                    To exercise any of these rights, please contact us at <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>support@dojohub.com</a>.
+                                    To exercise any of these rights, please contact us at <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a>.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>9. Children&apos;s Privacy</h2>
@@ -177,8 +177,8 @@ export default async function PrivacyPage() {
                                     marginTop: 'var(--space-4)'
                                 }}>
                                     <p style={{ margin: 0 }}>
-                                        <strong>DojoHub</strong><br />
-                                        Email: <a href="mailto:support@dojohub.com" style={{ color: 'var(--color-gold)' }}>support@dojohub.com</a><br />
+                                        <strong>ClubForge</strong><br />
+                                        Email: <a href="mailto:support@clubforge.com" style={{ color: 'var(--color-gold)' }}>support@clubforge.com</a><br />
                                         Manchester, United Kingdom
                                     </p>
                                 </div>

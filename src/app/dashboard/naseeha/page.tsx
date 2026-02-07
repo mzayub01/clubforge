@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { BookOpen, Calendar, Heart } from 'lucide-react';
 
 export const metadata = {
-    title: 'Naseeha | DojoHub',
+    title: 'Naseeha | ClubForge',
     description: 'Weekly Islamic advice and spiritual guidance',
 };
 

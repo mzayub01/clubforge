@@ -86,7 +86,7 @@ export default async function HomePage() {
             <div style={{ marginBottom: 'var(--space-6)' }}>
               <Image
                 src="/logo-full.png"
-                alt="DojoHub"
+                alt="ClubForge"
                 width={200}
                 height={200}
                 priority
@@ -164,7 +164,7 @@ export default async function HomePage() {
                 lineHeight: '1.8',
                 marginBottom: 'var(--space-6)',
               }}>
-                DojoHub is a <strong style={{ color: 'var(--color-gold)' }}>registered charity</strong> dedicated to whole-person development — <strong style={{ color: 'var(--color-gold)' }}>physical</strong>, <strong style={{ color: 'var(--color-gold)' }}>spiritual</strong>, and <strong style={{ color: 'var(--color-gold)' }}>communal</strong>. We train individuals for the mats and for life, welcoming everyone from all backgrounds.
+                ClubForge is a <strong style={{ color: 'var(--color-gold)' }}>registered charity</strong> dedicated to whole-person development — <strong style={{ color: 'var(--color-gold)' }}>physical</strong>, <strong style={{ color: 'var(--color-gold)' }}>spiritual</strong>, and <strong style={{ color: 'var(--color-gold)' }}>communal</strong>. We train individuals for the mats and for life, welcoming everyone from all backgrounds.
               </p>
               <p style={{
                 fontSize: 'var(--text-lg)',
@@ -231,7 +231,7 @@ export default async function HomePage() {
               marginBottom: 'var(--space-4)',
             }}>
               <span style={{ color: 'var(--color-gold)', fontSize: 'var(--text-xs)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                ⭐ DojoHub Initiative
+                ⭐ ClubForge Initiative
               </span>
             </div>
 
@@ -250,7 +250,7 @@ export default async function HomePage() {
               margin: '0 auto var(--space-6)',
               lineHeight: '1.7',
             }}>
-              40 days of Fajr in congregation. A spiritual challenge to build consistency, discipline, and connection with Allah ﷻ — brought to you by DojoHub.
+              40 days of Fajr in congregation. A spiritual challenge to build consistency, discipline, and connection with Allah ﷻ — brought to you by ClubForge.
             </p>
 
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -288,7 +288,7 @@ export default async function HomePage() {
               marginTop: 'var(--space-6)',
               marginBottom: 0,
             }}>
-              DojoHub is more than BJJ — we&apos;re building strong individuals on and off the mats.
+              ClubForge is more than BJJ — we&apos;re building strong individuals on and off the mats.
             </p>
           </div>
         </section>
@@ -350,7 +350,7 @@ export default async function HomePage() {
         <section className="section">
           <div className="container">
             <div className="section-title">
-              <h2>DojoHub is Committed To</h2>
+              <h2>ClubForge is Committed To</h2>
               <p>
                 Using sport as a vehicle for positive change within the Ummah.
               </p>
@@ -466,7 +466,7 @@ export default async function HomePage() {
               fontSize: 'var(--text-lg)',
             }}>
               Whether you&apos;re a complete beginner or an experienced martial artist,
-              DojoHub welcomes you. Join us across 5 locations in Manchester.
+              ClubForge welcomes you. Join us across 5 locations in Manchester.
             </p>
             <div style={{
               display: 'flex',

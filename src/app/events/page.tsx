@@ -8,7 +8,7 @@ import EventRegistration from '@/components/events/EventRegistration';
 import PaymentStatusBanner from '@/components/events/PaymentStatusBanner';
 
 export const metadata = {
-    title: 'Events | DojoHub',
+    title: 'Events | ClubForge',
     description: 'Upcoming seminars, competitions, and community gatherings.',
 };
 

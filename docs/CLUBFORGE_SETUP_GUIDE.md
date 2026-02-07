@@ -1,6 +1,6 @@
-# DojoHub SaaS Platform - Setup Guide
+# ClubForge SaaS Platform - Setup Guide
 
-> Complete guide to set up a new DojoHub instance with Supabase, Stripe, and Vercel.
+> Complete guide to set up a new ClubForge instance with Supabase, Stripe, and Vercel.
 
 ---
 
@@ -9,7 +9,7 @@
 ```
 c:\Users\user\dev\
 ├── soknew/              ← Sport of Kings (production gym)
-└── dojohub/             ← DojoHub SaaS platform (NEW)
+└── ClubForge/             ← ClubForge SaaS platform (NEW)
 ```
 
 ---
@@ -20,7 +20,7 @@ c:\Users\user\dev\
 
 1. Go to [supabase.com](https://supabase.com) → **New Project**
 2. Choose organization and enter:
-   - **Name**: `dojohub-saas`
+   - **Name**: `ClubForge-saas`
    - **Database Password**: (generate and save securely)
    - **Region**: Choose closest to your users
 
@@ -29,8 +29,8 @@ c:\Users\user\dev\
 Run the existing migrations in order:
 
 ```bash
-# From the dojohub folder
-cd c:\Users\user\dev\dojohub
+# From the ClubForge folder
+cd c:\Users\user\dev\ClubForge
 
 # Connect to Supabase CLI (if not already)
 npx supabase login
@@ -57,7 +57,7 @@ From **Project Settings → API**:
 ### Create New Stripe Account
 
 1. Go to [dashboard.stripe.com](https://dashboard.stripe.com)
-2. Create a new account specifically for DojoHub platform billing
+2. Create a new account specifically for ClubForge platform billing
 3. Complete business verification
 
 ### Enable Stripe Connect (for multi-tenant)
@@ -71,7 +71,7 @@ This allows each gym (tenant) to receive their own payments:
 
 ### Create Products & Prices
 
-For DojoHub platform subscriptions (what gym owners pay):
+For ClubForge platform subscriptions (what gym owners pay):
 
 | Plan | Monthly Price | Features |
 |------|--------------|----------|
@@ -110,7 +110,7 @@ From **Developers → API Keys**:
 ### Create New Project
 
 1. Go to [vercel.com](https://vercel.com) → **New Project**
-2. Import the `dojohub` Git repository
+2. Import the `ClubForge` Git repository
 3. Configure:
    - **Framework Preset**: Next.js
    - **Root Directory**: `./`
@@ -135,27 +135,27 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 RESEND_API_KEY=re_...
 
 # App
-NEXT_PUBLIC_APP_URL=https://dojohub.com
+NEXT_PUBLIC_APP_URL=https://clubforge.com
 ```
 
 ### Configure Domain
 
 1. Go to **Settings → Domains**
-2. Add your domain: `dojohub.com`
-3. For wildcard subdomains (tenant routing): `*.dojohub.com`
+2. Add your domain: `clubforge.com`
+3. For wildcard subdomains (tenant routing): `*.clubforge.com`
 
 ---
 
 ## 4️⃣ Environment Variables Template
 
-Create `.env.local` in the dojohub folder:
+Create `.env.local` in the ClubForge folder:
 
 ```env
 # ===========================================
-# DOJOHUB SAAS PLATFORM - ENVIRONMENT CONFIG
+# ClubForge SAAS PLATFORM - ENVIRONMENT CONFIG
 # ===========================================
 
-# Supabase (NEW project for DojoHub)
+# Supabase (NEW project for ClubForge)
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -178,8 +178,8 @@ NODE_ENV=development
 ## 5️⃣ Local Development
 
 ```bash
-# Navigate to dojohub
-cd c:\Users\user\dev\dojohub
+# Navigate to ClubForge
+cd c:\Users\user\dev\ClubForge
 
 # Install dependencies
 npm install
@@ -199,10 +199,10 @@ Visit `http://localhost:3000`
 ## 6️⃣ Push to GitHub
 
 ```bash
-cd c:\Users\user\dev\dojohub
+cd c:\Users\user\dev\ClubForge
 
 # Create new GitHub repository first, then:
-git remote add origin https://github.com/YOUR_USERNAME/dojohub.git
+git remote add origin https://github.com/YOUR_USERNAME/ClubForge.git
 git branch -M main
 git push -u origin main
 ```

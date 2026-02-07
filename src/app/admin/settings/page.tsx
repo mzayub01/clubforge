@@ -249,7 +249,7 @@ export default function AdminSettingsPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ color: 'var(--text-secondary)' }}>App Name</span>
-                                <span style={{ fontWeight: '500' }}>DojoHub</span>
+                                <span style={{ fontWeight: '500' }}>ClubForge</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ color: 'var(--text-secondary)' }}>Framework</span>

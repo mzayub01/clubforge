@@ -1,4 +1,4 @@
-# DojoHub - Whitelabel SaaS Transformation Plan
+# ClubForge - Whitelabel SaaS Transformation Plan
 
 > **Reference Document** - Created: 2026-01-28  
 > Resume work with this plan when continuing the SaaS transformation.
@@ -7,7 +7,7 @@
 
 ## Project Overview
 
-Transform **Sport of Kings** (BJJ gym management app) into **DojoHub** - a multi-tenant SaaS platform where martial arts gyms can sign up and get their own branded instance.
+Transform **Sport of Kings** (BJJ gym management app) into **ClubForge** - a multi-tenant SaaS platform where martial arts gyms can sign up and get their own branded instance.
 
 ---
 
@@ -35,7 +35,7 @@ Transform **Sport of Kings** (BJJ gym management app) into **DojoHub** - a multi
 CREATE TABLE tenants (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,      -- subdomain: "ironmonger" → ironmonger.dojohub.com
+  slug TEXT UNIQUE NOT NULL,      -- subdomain: "ironmonger" → ironmonger.clubforge.com
   custom_domain TEXT UNIQUE,       -- optional custom domain
   logo_url TEXT,
   primary_color TEXT DEFAULT '#C5A456',
@@ -108,7 +108,7 @@ All 14 existing tables need migration:
 
 ## Open Decisions
 
-1. **Subdomain strategy**: `gym.dojohub.com` vs `dojohub.com/gym`
+1. **Subdomain strategy**: `gym.clubforge.com` vs `clubforge.com/gym`
 2. **Existing data**: Sport of Kings becomes Tenant #1?
 3. **Feature flexibility**: Abstract belt ranks to configurable "levels"?
 4. **Pricing tiers**: What features gate behind Pro/Enterprise?

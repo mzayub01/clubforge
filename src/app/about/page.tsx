@@ -6,8 +6,8 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'About Us | DojoHub',
-    description: 'DojoHub is a non-profit registered charity using Sunnah sports to build strong, disciplined, faith-anchored individuals and communities.',
+    title: 'About Us | ClubForge',
+    description: 'ClubForge is a non-profit registered charity using Sunnah sports to build strong, disciplined, faith-anchored individuals and communities.',
 };
 
 export default async function AboutPage() {
@@ -88,7 +88,7 @@ export default async function AboutPage() {
                             marginBottom: 'var(--space-4)',
                         }}>
                             <span style={{ color: 'var(--color-gold)', fontSize: 'var(--text-sm)', fontWeight: '600' }}>
-                                Registered Charity • DojoHub
+                                Registered Charity • ClubForge
                             </span>
                         </div>
                         <h1 style={{
@@ -98,7 +98,7 @@ export default async function AboutPage() {
                             WebkitTextFillColor: 'transparent',
                             backgroundClip: 'text',
                         }}>
-                            About DojoHub
+                            About ClubForge
                         </h1>
                         <p style={{
                             fontSize: 'var(--text-xl)',
@@ -127,7 +127,7 @@ export default async function AboutPage() {
                             }}>
                                 <Image
                                     src="/logo-full.png"
-                                    alt="DojoHub"
+                                    alt="ClubForge"
                                     width={180}
                                     height={180}
                                     style={{ height: '140px', width: 'auto' }}
@@ -146,7 +146,7 @@ export default async function AboutPage() {
                                 maxWidth: '800px',
                                 margin: '0 auto var(--space-6)',
                             }}>
-                                We exist to build <strong>strong individuals</strong>, <strong>resilient families</strong>, and <strong>confident communities</strong> — physically, mentally, and spiritually. DojoHub is a holistic development platform rooted in Sunnah sports, faith, and community, training individuals for the mats and for life. Everyone is welcome.
+                                We exist to build <strong>strong individuals</strong>, <strong>resilient families</strong>, and <strong>confident communities</strong> — physically, mentally, and spiritually. ClubForge is a holistic development platform rooted in Sunnah sports, faith, and community, training individuals for the mats and for life. Everyone is welcome.
                             </p>
 
                             <p style={{
@@ -186,7 +186,7 @@ export default async function AboutPage() {
                             maxWidth: '600px',
                             margin: '0 auto var(--space-8)',
                         }}>
-                            While Brazilian Jiu-Jitsu and grappling are our core focus, DojoHub is a comprehensive platform offering:
+                            While Brazilian Jiu-Jitsu and grappling are our core focus, ClubForge is a comprehensive platform offering:
                         </p>
 
                         <div style={{
@@ -289,7 +289,7 @@ export default async function AboutPage() {
                             textAlign: 'center',
                             marginBottom: 'var(--space-8)',
                         }}>
-                            DojoHub is Committed To
+                            ClubForge is Committed To
                         </h2>
 
                         <div style={{
@@ -349,7 +349,7 @@ export default async function AboutPage() {
                             maxWidth: '600px',
                             margin: '0 auto var(--space-8)',
                         }}>
-                            DojoHub trains individuals for the mats and for life.
+                            ClubForge trains individuals for the mats and for life.
                         </p>
 
                         <div style={{
@@ -416,7 +416,7 @@ export default async function AboutPage() {
                                     marginBottom: 'var(--space-4)',
                                     color: 'var(--text-primary)',
                                 }}>
-                                    DojoHub is not about trophies or titles.
+                                    ClubForge is not about trophies or titles.
                                 </p>
                                 <p style={{
                                     fontSize: 'var(--text-lg)',
@@ -512,7 +512,7 @@ export default async function AboutPage() {
                             fontSize: 'var(--text-lg)',
                         }}>
                             Whether you&apos;re a complete beginner or an experienced martial artist,
-                            DojoHub welcomes you. Join a movement building strong individuals on and off the mats.
+                            ClubForge welcomes you. Join a movement building strong individuals on and off the mats.
                         </p>
                         <div style={{
                             display: 'flex',

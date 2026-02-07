@@ -13,7 +13,7 @@ interface InstructorClass {
 }
 
 export const metadata = {
-    title: 'My Classes | Instructor - DojoHub',
+    title: 'My Classes | Instructor - ClubForge',
     description: 'View your assigned class schedule',
 };
 

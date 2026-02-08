@@ -20,10 +20,12 @@ export default function PublicBottomNav() {
         return pathname.startsWith(href);
     };
 
-    // Don't show on dashboard, admin, or instructor pages
+    // Don't show on dashboard, admin, instructor, professor, or tenant pages
     if (pathname.startsWith('/dashboard') ||
         pathname.startsWith('/admin') ||
         pathname.startsWith('/instructor') ||
+        pathname.startsWith('/professor') ||
+        pathname.startsWith('/tenant-home') ||
         pathname.startsWith('/login') ||
         pathname.startsWith('/register')) {
         return null;

@@ -18,6 +18,63 @@ export async function middleware(request: NextRequest) {
         requestHeaders.set(TENANT_SLUG_HEADER, slug);
     }
 
+    // -----------------------------------------------
+    // 1b. Route bifurcation for tenant subdomains
+    // Block SaaS-only pages and rewrite homepage
+    // -----------------------------------------------
+    if (slug) {
+        const pathname = request.nextUrl.pathname;
+
+        // SaaS-only pages that should not be visible on tenant subdomains
+        const saasOnlyPaths = ['/get-started', '/pricing', '/faq', '/about', '/demo'];
+        if (saasOnlyPaths.some(p => pathname === p || pathname.startsWith(p + '/'))) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/';
+            return NextResponse.redirect(url);
+        }
+
+        // Rewrite homepage to the tenant welcome page
+        if (pathname === '/') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/tenant-home';
+            // Use rewrite (not redirect) to keep the URL clean
+            const rewriteResponse = NextResponse.rewrite(url, {
+                request: { headers: requestHeaders },
+            });
+            // Continue to resolve tenant ID and refresh session below
+            // We need to do this inline since rewrite returns immediately
+            if (supabaseUrl && supabaseKey) {
+                const supabase = createServerClient(supabaseUrl, supabaseKey, {
+                    cookies: {
+                        get(name: string) {
+                            return request.cookies.get(name)?.value;
+                        },
+                        set(name: string, value: string, options: CookieOptions) {
+                            rewriteResponse.cookies.set({ name, value, ...options });
+                        },
+                        remove(name: string, options: CookieOptions) {
+                            rewriteResponse.cookies.set({ name, value: '', ...options });
+                        },
+                    },
+                });
+                await supabase.auth.getUser();
+
+                const { data: tenant } = await supabase
+                    .from('tenants')
+                    .select('id')
+                    .eq('slug', slug)
+                    .eq('is_active', true)
+                    .single();
+
+                if (tenant) {
+                    rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
+                    requestHeaders.set(TENANT_ID_HEADER, tenant.id);
+                }
+            }
+            return rewriteResponse;
+        }
+    }
+
     let response = NextResponse.next({
         request: { headers: requestHeaders },
     });

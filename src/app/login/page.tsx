@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,31 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const supabase = getSupabaseClient();
+
+    // Tenant branding state
+    const [tenantInfo, setTenantInfo] = useState<{
+        name: string;
+        logoUrl: string | null;
+        primaryColor: string;
+    } | null>(null);
+    const [isTenant, setIsTenant] = useState(false);
+
+    // Detect tenant subdomain and fetch branding
+    useEffect(() => {
+        const hostname = window.location.hostname;
+        const isSubdomain = hostname.includes('.') && !hostname.startsWith('www.');
+        const isLocalSubdomain = hostname.endsWith('.localhost') && hostname !== 'localhost';
+
+        if (isSubdomain || isLocalSubdomain) {
+            setIsTenant(true);
+            fetch('/api/tenant/public')
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.tenant) setTenantInfo(data.tenant);
+                })
+                .catch(() => { });
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -72,27 +97,72 @@ export default function LoginPage() {
                     padding: 'var(--space-8)',
                 }}
             >
-                {/* Logo */}
+                {/* Logo / Club Branding */}
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-                    <Link href="/">
-                        <Image
-                            src="/logo-full.png"
-                            alt="ClubForge"
-                            width={160}
-                            height={80}
-                            priority
-                            style={{ height: '70px', width: 'auto', margin: '0 auto' }}
-                        />
-                    </Link>
-                    <h1 style={{
-                        fontSize: 'var(--text-2xl)',
-                        marginTop: 'var(--space-4)',
-                    }}>
-                        Welcome Back
-                    </h1>
-                    <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-2)' }}>
-                        Sign in to your account
-                    </p>
+                    {isTenant && tenantInfo ? (
+                        <>
+                            <Link href="/">
+                                {tenantInfo.logoUrl ? (
+                                    <Image
+                                        src={tenantInfo.logoUrl}
+                                        alt={tenantInfo.name}
+                                        width={100}
+                                        height={100}
+                                        priority
+                                        style={{ height: '80px', width: 'auto', margin: '0 auto', borderRadius: '16px' }}
+                                    />
+                                ) : (
+                                    <div style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        borderRadius: '16px',
+                                        background: `linear-gradient(135deg, ${tenantInfo.primaryColor}30, ${tenantInfo.primaryColor}10)`,
+                                        border: `2px solid ${tenantInfo.primaryColor}40`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '2rem',
+                                        fontWeight: 700,
+                                        color: tenantInfo.primaryColor,
+                                        margin: '0 auto',
+                                    }}>
+                                        {tenantInfo.name.charAt(0)}
+                                    </div>
+                                )}
+                            </Link>
+                            <h1 style={{
+                                fontSize: 'var(--text-2xl)',
+                                marginTop: 'var(--space-4)',
+                            }}>
+                                Sign in to {tenantInfo.name}
+                            </h1>
+                            <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-2)' }}>
+                                Enter your member credentials
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/">
+                                <Image
+                                    src="/logo-full.png"
+                                    alt="ClubForge"
+                                    width={160}
+                                    height={80}
+                                    priority
+                                    style={{ height: '70px', width: 'auto', margin: '0 auto' }}
+                                />
+                            </Link>
+                            <h1 style={{
+                                fontSize: 'var(--text-2xl)',
+                                marginTop: 'var(--space-4)',
+                            }}>
+                                Welcome Back
+                            </h1>
+                            <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-2)' }}>
+                                Sign in to your account
+                            </p>
+                        </>
+                    )}
                 </div>
 
                 {/* Error Message */}

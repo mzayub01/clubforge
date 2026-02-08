@@ -32,25 +32,18 @@ export default function LoginPage() {
                 return;
             }
 
-            // Get user role from tenant_members and redirect accordingly
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                const { data: tenantMember } = await supabase
-                    .from('tenant_members')
-                    .select('role')
-                    .eq('user_id', user.id)
-                    .eq('is_active', true)
-                    .single();
+            // Get user role via server API (bypasses RLS for reliable lookup)
+            const roleRes = await fetch('/api/auth/role');
+            const { role } = await roleRes.json();
 
-                if (tenantMember?.role === 'admin') {
-                    router.push('/admin');
-                } else if (tenantMember?.role === 'instructor' || tenantMember?.role === 'professor') {
-                    router.push('/instructor');
-                } else {
-                    router.push('/dashboard');
-                }
-                router.refresh();
+            if (role === 'admin') {
+                router.push('/admin');
+            } else if (role === 'instructor' || role === 'professor') {
+                router.push('/instructor');
+            } else {
+                router.push('/dashboard');
             }
+            router.refresh();
         } catch {
             setError('An unexpected error occurred');
         } finally {

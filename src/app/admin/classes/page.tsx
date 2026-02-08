@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, MapPin, User, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import EmptyState from '@/components/admin/EmptyState';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useTenantId } from '@/lib/hooks/useTenantId';
 import type { Class, Location, Instructor } from '@/lib/types';
@@ -202,17 +203,13 @@ export default function AdminClassesPage() {
                     <div className="spinner spinner-lg" />
                 </div>
             ) : classes.length === 0 ? (
-                <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
-                    <Calendar size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Classes Yet</h3>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                        Create your first class schedule.
-                    </p>
-                    <button className="btn btn-primary" onClick={() => openModal()}>
-                        <Plus size={18} />
-                        Add Class
-                    </button>
-                </div>
+                <EmptyState
+                    icon={Calendar}
+                    title="No classes yet"
+                    description="Create your first class to start scheduling training sessions for your members."
+                    actionLabel="Create First Class"
+                    onAction={() => openModal()}
+                />
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                     {DAYS_OF_WEEK.map((day, index) => {

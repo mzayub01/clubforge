@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, User, Mail, Phone, Award, Shield, Edit, ChevronDown, AlertCircle, CheckCircle, XCircle, Calendar, MapPin, Filter, ClipboardList, Plus, Loader2, Eye, EyeOff, X, Info, ChevronUp, Trash2, Download, Send } from 'lucide-react';
+import { Plus, Search, Download, Edit, Trash2, AlertCircle, CheckCircle, User, Phone, Mail, Award, Shield, ChevronDown, ChevronUp, CreditCard, MoreHorizontal, Send, X, Eye, Clock, Users, MapPin, Filter, Calendar, Loader2, Info, EyeOff, XCircle, ClipboardList } from 'lucide-react';
+import EmptyState from '@/components/admin/EmptyState';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useTenantId } from '@/lib/hooks/useTenantId';
 import type { Location, MembershipType } from '@/lib/types';
@@ -618,10 +619,20 @@ export default function AdminMembersPage() {
             <div className="card">
                 <div className="card-body" style={{ padding: 0 }}>
                     {filteredMembers.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
-                            <User size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                            <p style={{ color: 'var(--text-secondary)' }}>No members found matching your criteria.</p>
-                        </div>
+                        members.length === 0 ? (
+                            <EmptyState
+                                icon={Users}
+                                title="No members yet"
+                                description="Share your registration link with your community to get your first member signed up."
+                                actionLabel="Share Registration Link"
+                                actionHref="/admin/invite"
+                            />
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                                <User size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
+                                <p style={{ color: 'var(--text-secondary)' }}>No members found matching your criteria.</p>
+                            </div>
+                        )
                     ) : (
                         <div>
                             {filteredMembers.map((member, index) => (

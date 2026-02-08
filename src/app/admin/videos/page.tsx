@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Video, Play, Clock, Award, Edit, Trash2, AlertCircle, CheckCircle, ExternalLink, Upload, Link, Loader2 } from 'lucide-react';
+import EmptyState from '@/components/admin/EmptyState';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface VideoItem {
@@ -296,17 +297,13 @@ export default function AdminVideosPage() {
             )}
 
             {videos.length === 0 ? (
-                <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
-                    <Video size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Videos</h3>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
-                        Add training videos for your members to watch.
-                    </p>
-                    <button onClick={() => openModal()} className="btn btn-primary">
-                        <Plus size={18} />
-                        Add First Video
-                    </button>
-                </div>
+                <EmptyState
+                    icon={Video}
+                    title="No videos yet"
+                    description="Upload technique videos to help your members train between sessions."
+                    actionLabel="Upload First Video"
+                    onAction={() => openModal()}
+                />
             ) : (
                 <div style={{
                     display: 'grid',

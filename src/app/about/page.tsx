@@ -164,7 +164,7 @@ export default async function AboutPage() {
                             We&apos;re building the operating system for clubs worldwide. Start your free trial and be part of it.
                         </p>
                         <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Link href="/register" className="btn btn-primary btn-lg">
+                            <Link href="/get-started" className="btn btn-primary btn-lg">
                                 Start Free Trial
                                 <ArrowRight size={20} />
                             </Link>

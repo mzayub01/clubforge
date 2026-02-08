@@ -127,7 +127,7 @@ export default function Navbar({ user }: NavbarProps) {
                                 Log In
                             </Link>
                             <style>{`@media (min-width: 768px) { #desktop-login { display: inline-flex !important; } }`}</style>
-                            <Link href="/register" className="btn btn-primary btn-sm">
+                            <Link href="/get-started" className="btn btn-primary btn-sm">
                                 Start Free Trial
                                 <ChevronRight size={16} />
                             </Link>
@@ -185,7 +185,7 @@ export default function Navbar({ user }: NavbarProps) {
                                 <Link href="/login" className="btn btn-outline" style={{ flex: 1 }}>
                                     Log In
                                 </Link>
-                                <Link href="/register" className="btn btn-primary" style={{ flex: 1 }}>
+                                <Link href="/get-started" className="btn btn-primary" style={{ flex: 1 }}>
                                     Start Free Trial
                                 </Link>
                             </>

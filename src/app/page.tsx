@@ -161,7 +161,7 @@ export default async function HomePage() {
 
               {/* CTAs */}
               <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-10)' }}>
-                <Link href="/register" className="btn btn-primary btn-lg" style={{ fontSize: 'var(--text-lg)', padding: 'var(--space-5) var(--space-10)' }}>
+                <Link href="/get-started" className="btn btn-primary btn-lg" style={{ fontSize: 'var(--text-lg)', padding: 'var(--space-5) var(--space-10)' }}>
                   Start Free Trial
                   <ArrowRight size={20} />
                 </Link>
@@ -382,7 +382,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/register" className="btn btn-outline" style={{ width: '100%', borderColor: 'rgba(255,255,255,0.2)', color: 'var(--color-white)' }}>
+                <Link href="/get-started" className="btn btn-outline" style={{ width: '100%', borderColor: 'rgba(255,255,255,0.2)', color: 'var(--color-white)' }}>
                   Start Free Trial
                 </Link>
               </div>
@@ -418,7 +418,7 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/register" className="btn btn-primary" style={{ width: '100%' }}>
+                <Link href="/get-started" className="btn btn-primary" style={{ width: '100%' }}>
                   Start Free Trial
                   <ArrowRight size={16} />
                 </Link>
@@ -536,7 +536,7 @@ export default async function HomePage() {
               Join club owners who stopped duct-taping their admin together and started running their club with structure, clarity, and confidence.
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/register" className="btn btn-lg" style={{
+              <Link href="/get-started" className="btn btn-lg" style={{
                 background: 'var(--color-black)', color: 'var(--color-white)',
                 padding: 'var(--space-5) var(--space-10)', fontSize: 'var(--text-lg)',
               }}>

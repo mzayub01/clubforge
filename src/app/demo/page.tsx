@@ -154,7 +154,7 @@ export default async function DemoPage() {
                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-6)' }}>
                             Skip the call. Start a 14-day free trial with full Pro features and see everything for yourself. No credit card required.
                         </p>
-                        <Link href="/register" className="btn btn-primary btn-lg">
+                        <Link href="/get-started" className="btn btn-primary btn-lg">
                             Start Free Trial
                             <ArrowRight size={20} />
                         </Link>

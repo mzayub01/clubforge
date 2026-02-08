@@ -198,7 +198,7 @@ export default function FAQPage() {
                             Book a demo with our team or start a free trial and explore for yourself.
                         </p>
                         <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Link href="/register" className="btn btn-primary btn-lg">
+                            <Link href="/get-started" className="btn btn-primary btn-lg">
                                 Start Free Trial
                                 <ArrowRight size={20} />
                             </Link>

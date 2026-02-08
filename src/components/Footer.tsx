@@ -53,7 +53,7 @@ export default function Footer() {
                         <li><Link href="/#features" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Features</Link></li>
                         <li><Link href="/pricing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Pricing</Link></li>
                         <li><Link href="/demo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Book a Demo</Link></li>
-                        <li><Link href="/register" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Start Free Trial</Link></li>
+                        <li><Link href="/get-started" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Start Free Trial</Link></li>
                     </ul>
                 </div>
 

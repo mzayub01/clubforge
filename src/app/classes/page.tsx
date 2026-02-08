@@ -322,7 +322,7 @@ export default async function ClassesPage() {
                             justifyContent: 'center',
                             flexWrap: 'wrap',
                         }}>
-                            <Link href="/register" className="btn btn-primary btn-lg">
+                            <Link href="/get-started" className="btn btn-primary btn-lg">
                                 Register Now
                                 <ChevronRight size={20} />
                             </Link>

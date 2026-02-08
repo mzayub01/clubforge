@@ -22,7 +22,7 @@ const tiers = [
         description: 'For new and small clubs getting started.',
         highlighted: false,
         cta: 'Start Free Trial',
-        ctaHref: '/register',
+        ctaHref: '/get-started',
         features: [
             { name: 'Members', value: 'Up to 150' },
             { name: 'Locations', value: '1' },
@@ -48,7 +48,7 @@ const tiers = [
         description: 'For established clubs ready to scale.',
         highlighted: true,
         cta: 'Start Free Trial',
-        ctaHref: '/register',
+        ctaHref: '/get-started',
         features: [
             { name: 'Members', value: 'Up to 750' },
             { name: 'Locations', value: 'Up to 3' },

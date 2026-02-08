@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
     LayoutDashboard,
     Calendar,
@@ -22,6 +22,7 @@ import {
     CreditCard,
     MapPin,
     ChevronRight,
+    ChevronDown,
     Crown,
     ClipboardList,
     UserPlus,
@@ -30,21 +31,28 @@ import {
     PoundSterling,
     Receipt,
     Tag,
-    Mail
+    Mail,
+    MessageSquare
 } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import Avatar from '@/components/Avatar';
 import ChildSwitcher from '@/components/dashboard/ChildSwitcher';
 import { useDashboard } from '@/components/dashboard/DashboardProvider';
 
 interface SidebarProps {
     role: 'member' | 'instructor' | 'professor' | 'admin';
-    userRole?: string; // The actual role from the profile
+    userRole?: string;
     userName?: string;
     profileImageUrl?: string;
     hasChildren?: boolean;
+}
+
+interface SidebarSection {
+    id: string;
+    title: string;
+    links: { href: string; label: string; icon: React.ComponentType<{ size?: number }> }[];
+    defaultOpen?: boolean;
 }
 
 // Wrapper component to connect ChildSwitcher with dashboard state
@@ -62,6 +70,124 @@ function ChildSwitcherWrapper() {
                 selectedProfileId={selectedProfileId}
                 onProfileChange={setSelectedProfileId}
             />
+        </div>
+    );
+}
+
+function CollapsibleSection({
+    section,
+    pathname,
+    onLinkClick,
+}: {
+    section: SidebarSection;
+    pathname: string;
+    onLinkClick: () => void;
+}) {
+    const STORAGE_KEY = `sidebar-section-${section.id}`;
+    const hasActiveLink = section.links.some(link => pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href)));
+
+    const [isOpen, setIsOpen] = useState(() => {
+        if (typeof window === 'undefined') return section.defaultOpen ?? false;
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored !== null) return stored === 'true';
+        // Auto-open if section has the active link
+        return hasActiveLink || (section.defaultOpen ?? false);
+    });
+
+    // Auto-open when navigating to a link in this section
+    useEffect(() => {
+        if (hasActiveLink && !isOpen) {
+            setIsOpen(true);
+        }
+    }, [hasActiveLink]);
+
+    const toggleOpen = useCallback(() => {
+        setIsOpen(prev => {
+            const next = !prev;
+            localStorage.setItem(STORAGE_KEY, String(next));
+            return next;
+        });
+    }, [STORAGE_KEY]);
+
+    // Single link section (no collapsing needed)
+    if (section.links.length === 1) {
+        const link = section.links[0];
+        return (
+            <div className="sidebar-section" style={{ marginBottom: 'var(--space-1)' }}>
+                <Link
+                    href={link.href}
+                    className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
+                    onClick={onLinkClick}
+                >
+                    <link.icon size={20} />
+                    <span style={{ flex: 1 }}>{link.label}</span>
+                </Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className="sidebar-section" style={{ marginBottom: 'var(--space-1)' }}>
+            <button
+                onClick={toggleOpen}
+                className="sidebar-section-header"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    padding: 'var(--space-2) var(--space-3)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.8px',
+                    borderRadius: 'var(--radius-md)',
+                    transition: 'color 0.2s ease',
+                }}
+            >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    {section.title}
+                    {hasActiveLink && !isOpen && (
+                        <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: 'var(--color-gold)',
+                            display: 'inline-block',
+                        }} />
+                    )}
+                </span>
+                <ChevronDown
+                    size={14}
+                    style={{
+                        transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
+                        transition: 'transform 0.2s ease',
+                        opacity: 0.5,
+                    }}
+                />
+            </button>
+            <div style={{
+                overflow: 'hidden',
+                maxHeight: isOpen ? `${section.links.length * 48}px` : '0',
+                transition: 'max-height 0.25s ease',
+            }}>
+                {section.links.map((link) => (
+                    <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
+                        onClick={onLinkClick}
+                    >
+                        <link.icon size={20} />
+                        <span style={{ flex: 1 }}>{link.label}</span>
+                        <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
+                    </Link>
+                ))}
+            </div>
         </div>
     );
 }
@@ -93,6 +219,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
 
     const { hasParentMembership } = useDashboard();
 
+    // ---- MEMBER LINKS (flat like before) ----
     const memberLinks = [
         { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         ...(hasParentMembership ? [
@@ -122,30 +249,62 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         { href: '/professor', label: 'Grading', icon: Award },
     ];
 
-    const adminLinks = [
-        { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/admin/finance', label: 'Finance', icon: PoundSterling },
-        { href: '/admin/members', label: 'Members', icon: User },
-        { href: '/admin/memberships', label: 'Memberships', icon: CreditCard },
-        { href: '/admin/waitlist', label: 'Waitlist', icon: Users },
-        { href: '/admin/locations', label: 'Locations', icon: MapPin },
-        { href: '/admin/membership-types', label: 'Membership Types', icon: CreditCard },
-        { href: '/admin/classes', label: 'Classes', icon: Calendar },
-        { href: '/admin/class-roster', label: 'Class Roster', icon: ClipboardList },
-        { href: '/professor', label: 'Grading', icon: Award },
-        { href: '/admin/professor-access', label: 'Professor Access', icon: Users },
-        { href: '/admin/instructors', label: 'Instructors', icon: Award },
-        { href: '/admin/attendance', label: 'Attendance', icon: CheckCircle },
-        { href: '/admin/videos', label: 'Videos', icon: Video },
-        { href: '/admin/events', label: 'Events', icon: PartyPopper },
-        { href: '/admin/naseeha', label: 'Naseeha', icon: BookOpen },
-        { href: '/admin/announcements', label: 'Announcements', icon: Bell },
-        { href: '/admin/email-templates', label: 'Email Templates', icon: Mail },
-        { href: '/admin/promo-codes', label: 'Promo Codes', icon: Tag },
-        { href: '/admin/settings', label: 'Settings', icon: Settings },
+    // ---- ADMIN SECTIONS (new grouped layout) ----
+    const adminSections: SidebarSection[] = [
+        {
+            id: 'overview',
+            title: 'Overview',
+            links: [{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard }],
+            defaultOpen: true,
+        },
+        {
+            id: 'members',
+            title: 'Members',
+            links: [
+                { href: '/admin/members', label: 'All Members', icon: Users },
+                { href: '/admin/memberships', label: 'Memberships', icon: CreditCard },
+                { href: '/admin/waitlist', label: 'Waitlist', icon: Users },
+                { href: '/admin/instructors', label: 'Instructors', icon: Award },
+                { href: '/admin/professor-access', label: 'Professor Access', icon: GraduationCap },
+                { href: '/admin/invite', label: 'Invite Members', icon: UserPlus },
+            ],
+            defaultOpen: false,
+        },
+        {
+            id: 'club',
+            title: 'Your Club',
+            links: [
+                { href: '/admin/locations', label: 'Locations', icon: MapPin },
+                { href: '/admin/membership-types', label: 'Membership Plans', icon: CreditCard },
+                { href: '/admin/classes', label: 'Classes', icon: Calendar },
+                { href: '/admin/class-roster', label: 'Class Roster', icon: ClipboardList },
+                { href: '/professor', label: 'Grading', icon: Award },
+            ],
+            defaultOpen: true,
+        },
+        {
+            id: 'engagement',
+            title: 'Engagement',
+            links: [
+                { href: '/admin/announcements', label: 'Announcements', icon: Bell },
+                { href: '/admin/events', label: 'Events', icon: PartyPopper },
+                { href: '/admin/videos', label: 'Videos', icon: Video },
+                { href: '/admin/naseeha', label: 'Naseeha', icon: BookOpen },
+                { href: '/admin/email-templates', label: 'Email Templates', icon: Mail },
+                { href: '/admin/promo-codes', label: 'Promo Codes', icon: Tag },
+            ],
+            defaultOpen: false,
+        },
+        {
+            id: 'money',
+            title: 'Money',
+            links: [
+                { href: '/admin/finance', label: 'Finance', icon: PoundSterling },
+                { href: '/admin/attendance', label: 'Attendance', icon: CheckCircle },
+            ],
+            defaultOpen: false,
+        },
     ];
-
-    const links = role === 'admin' ? adminLinks : role === 'instructor' ? instructorLinks : role === 'professor' ? professorLinks : memberLinks;
 
     // Quick access links based on user's actual role (only shown in member dashboard)
     const quickAccessLinks = role === 'member' ? [
@@ -153,6 +312,12 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         ...(userRole === 'admin' || userRole === 'professor' ? [{ href: '/professor', label: 'Professor Grading', icon: GraduationCap }] : []),
         ...(userRole === 'instructor' ? [{ href: '/instructor', label: 'Instructor Dashboard', icon: Award }] : []),
     ] : [];
+
+    const closeSidebar = () => setIsOpen(false);
+
+    // Determine if we should use grouped admin layout
+    const useGroupedLayout = role === 'admin';
+    const flatLinks = role === 'instructor' ? instructorLinks : role === 'professor' ? professorLinks : memberLinks;
 
     return (
         <>
@@ -225,7 +390,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                         <div>
                             <p style={{ fontWeight: '600', fontSize: 'var(--text-sm)', margin: 0 }}>{userName}</p>
                             <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', margin: 0, textTransform: 'capitalize' }}>
-                                {role}
+                                {role === 'admin' ? '👑 Club Owner' : role}
                             </p>
                         </div>
                     </div>
@@ -235,56 +400,70 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                 </div>
 
                 <nav className="sidebar-nav">
-                    <div className="sidebar-section">
-                        <span className="sidebar-section-title">Menu</span>
-                        {links.slice(0, 8).map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
-                                onClick={() => setIsOpen(false)}
-                            >
-                                <link.icon size={20} />
-                                <span style={{ flex: 1 }}>{link.label}</span>
-                                <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
-                            </Link>
-                        ))}
-                    </div>
-
-                    {links.length > 8 && (
-                        <div className="sidebar-section">
-                            <span className="sidebar-section-title">More</span>
-                            {links.slice(8).map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <link.icon size={20} />
-                                    <span style={{ flex: 1 }}>{link.label}</span>
-                                    <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
-                                </Link>
+                    {useGroupedLayout ? (
+                        /* ===== ADMIN: Grouped collapsible sections ===== */
+                        <>
+                            {adminSections.map((section) => (
+                                <CollapsibleSection
+                                    key={section.id}
+                                    section={section}
+                                    pathname={pathname}
+                                    onLinkClick={closeSidebar}
+                                />
                             ))}
-                        </div>
+                        </>
+                    ) : (
+                        /* ===== NON-ADMIN: Flat link list ===== */
+                        <>
+                            <div className="sidebar-section">
+                                <span className="sidebar-section-title">Menu</span>
+                                {flatLinks.map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
+                                        onClick={closeSidebar}
+                                    >
+                                        <link.icon size={20} />
+                                        <span style={{ flex: 1 }}>{link.label}</span>
+                                        <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {quickAccessLinks.length > 0 && (
+                                <div className="sidebar-section">
+                                    <span className="sidebar-section-title">Quick Access</span>
+                                    {quickAccessLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
+                                            onClick={closeSidebar}
+                                            style={{ background: 'rgba(197, 164, 86, 0.08)' }}
+                                        >
+                                            <link.icon size={20} color="var(--color-gold)" />
+                                            <span style={{ flex: 1 }}>{link.label}</span>
+                                            <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    {quickAccessLinks.length > 0 && (
-                        <div className="sidebar-section">
-                            <span className="sidebar-section-title">Quick Access</span>
-                            {quickAccessLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
-                                    onClick={() => setIsOpen(false)}
-                                    style={{ background: 'rgba(197, 164, 86, 0.08)' }}
-                                >
-                                    <link.icon size={20} color="var(--color-gold)" />
-                                    <span style={{ flex: 1 }}>{link.label}</span>
-                                    <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
-                                </Link>
-                            ))}
+                    {/* Settings link for admin */}
+                    {useGroupedLayout && (
+                        <div className="sidebar-section" style={{ marginTop: 'var(--space-2)' }}>
+                            <Link
+                                href="/admin/settings"
+                                className={`sidebar-link ${pathname === '/admin/settings' ? 'active' : ''}`}
+                                onClick={closeSidebar}
+                            >
+                                <Settings size={20} />
+                                <span style={{ flex: 1 }}>Settings</span>
+                                <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
+                            </Link>
                         </div>
                     )}
 
@@ -293,7 +472,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                         <Link
                             href="/dashboard/profile"
                             className={`sidebar-link ${pathname === '/dashboard/profile' ? 'active' : ''}`}
-                            onClick={() => setIsOpen(false)}
+                            onClick={closeSidebar}
                         >
                             <User size={20} />
                             <span style={{ flex: 1 }}>Profile</span>

@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
             // -----------------------------------------------
             const { error: profileError } = await supabase
                 .from('profiles')
-                .insert({
+                .upsert({
                     user_id: userId,
                     tenant_id: tenant.id,
                     first_name: body.firstName,
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
                     belt_rank: 'white',
                     best_practice_accepted: true,
                     waiver_accepted: true,
-                });
+                }, { onConflict: 'user_id' });
 
             if (profileError) {
                 throw new Error(`Failed to create profile: ${profileError.message}`);

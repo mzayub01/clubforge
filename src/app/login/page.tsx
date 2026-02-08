@@ -32,18 +32,19 @@ export default function LoginPage() {
                 return;
             }
 
-            // Get user role and redirect accordingly
+            // Get user role from tenant_members and redirect accordingly
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
+                const { data: tenantMember } = await supabase
+                    .from('tenant_members')
                     .select('role')
                     .eq('user_id', user.id)
+                    .eq('is_active', true)
                     .single();
 
-                if (profile?.role === 'admin') {
+                if (tenantMember?.role === 'admin') {
                     router.push('/admin');
-                } else if (profile?.role === 'instructor') {
+                } else if (tenantMember?.role === 'instructor' || tenantMember?.role === 'professor') {
                     router.push('/instructor');
                 } else {
                     router.push('/dashboard');

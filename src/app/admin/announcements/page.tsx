@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Bell, Edit, Trash2, Calendar, MapPin, Users, AlertCircle, CheckCircle, Mail, Loader2 } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 
 interface Location {
     id: string;
@@ -42,7 +42,6 @@ export default function AdminAnnouncementsPage() {
         sendEmailNotifications: false,
     });
 
-    const supabase = getSupabaseClient();
 
     useEffect(() => {
         fetchData();
@@ -51,15 +50,14 @@ export default function AdminAnnouncementsPage() {
     const fetchData = async () => {
         try {
             const [announcementsRes, locationsRes] = await Promise.all([
-                supabase
-                    .from('announcements')
-                    .select(`*, location:locations(name)`)
-                    .order('created_at', { ascending: false }),
-                supabase
-                    .from('locations')
-                    .select('id, name')
-                    .eq('is_active', true)
-                    .order('name'),
+                adminFetch<Announcement>('announcements', {
+                    select: '*, location:locations(name)',
+                    order: [{ column: 'created_at', ascending: false }],
+                }),
+                adminFetch<Location>('locations', {
+                    filters: [{ column: 'is_active', value: true }],
+                    order: [{ column: 'name' }],
+                }),
             ]);
 
             setAnnouncements(announcementsRes.data || []);
@@ -113,17 +111,12 @@ export default function AdminAnnouncementsPage() {
 
         try {
             if (editingAnnouncement) {
-                const { error } = await supabase
-                    .from('announcements')
-                    .update(payload)
-                    .eq('id', editingAnnouncement.id);
-                if (error) throw error;
+                const { error } = await adminUpdateById('announcements', editingAnnouncement.id, payload);
+                if (error) { setError(error); return; }
                 setSuccess('Announcement updated successfully!');
             } else {
-                const { error } = await supabase
-                    .from('announcements')
-                    .insert(payload);
-                if (error) throw error;
+                const { error } = await adminInsert('announcements', payload);
+                if (error) { setError(error); return; }
 
                 // Send email notifications if checkbox was checked
                 if (formData.sendEmailNotifications) {
@@ -169,10 +162,7 @@ export default function AdminAnnouncementsPage() {
 
     const toggleAnnouncementStatus = async (announcement: Announcement) => {
         try {
-            await supabase
-                .from('announcements')
-                .update({ is_active: !announcement.is_active })
-                .eq('id', announcement.id);
+            await adminUpdateById('announcements', announcement.id, { is_active: !announcement.is_active });
             fetchData();
         } catch (err) {
             console.error('Error toggling status:', err);
@@ -183,10 +173,7 @@ export default function AdminAnnouncementsPage() {
         if (!confirm('Are you sure you want to delete this announcement?')) return;
 
         try {
-            await supabase
-                .from('announcements')
-                .delete()
-                .eq('id', id);
+            await adminDeleteById('announcements', id);
             fetchData();
             setSuccess('Announcement deleted successfully!');
         } catch (err) {

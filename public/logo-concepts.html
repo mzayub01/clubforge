@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClubForge — Logo Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+  }
+  .header {
+    background: #0F172A;
+    padding: 48px 32px;
+    text-align: center;
+    color: #FFFFFF;
+  }
+  .header h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+  .header p { color: #94A3B8; font-size: 15px; }
+  .concepts { max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
+  .concept {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid #E2E8F0;
+    padding: 48px;
+    margin-bottom: 40px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+  }
+  .concept-label {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: #C5A456; margin-bottom: 24px;
+  }
+  .concept h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .concept .sub { color: #64748B; font-size: 15px; margin-bottom: 32px; line-height: 1.7; }
+  .logo-display {
+    display: flex; gap: 48px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 32px;
+  }
+  .logo-display .on-light {
+    background: #FAFBFC; border: 1px solid #F1F5F9;
+    border-radius: 16px; padding: 48px 64px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo-display .on-dark {
+    background: #0F172A; border-radius: 16px; padding: 48px 64px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo-display .icon-only {
+    background: #FAFBFC; border: 1px solid #F1F5F9;
+    border-radius: 16px; padding: 32px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-display .favicon {
+    background: #0F172A; border-radius: 12px; padding: 12px;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .details { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .detail-box {
+    background: #F8FAFC; border-radius: 12px; padding: 20px;
+    border: 1px solid #F1F5F9;
+  }
+  .detail-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #0F172A; }
+  .detail-box p { font-size: 13px; color: #64748B; line-height: 1.7; }
+  .wordmark { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .wordmark-light { color: #0F172A; }
+  .wordmark-dark { color: #FFFFFF; }
+  .colors {
+    display: flex; gap: 16px; margin: 40px 0;
+  }
+  .color-swatch {
+    width: 80px; height: 80px; border-radius: 16px;
+    display: flex; align-items: flex-end;
+    padding: 8px;
+  }
+  .color-swatch span { font-size: 10px; font-weight: 600; }
+  .recommend {
+    background: linear-gradient(135deg, rgba(197,164,86,0.08), rgba(197,164,86,0.03));
+    border: 2px solid rgba(197,164,86,0.3);
+  }
+  @media (max-width: 768px) {
+    .logo-display { flex-direction: column; gap: 24px; }
+    .details { grid-template-columns: 1fr; }
+    .concept { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ClubForge — Logo Concepts</h1>
+  <p>3 concept directions · Deep Navy + Gold · Premium SaaS</p>
+</div>
+
+<div class="concepts">
+
+  <!-- CONCEPT A -->
+  <div class="concept recommend">
+    <div class="concept-label">⭐ Concept A — Recommended</div>
+    <h2>The CF Monogram</h2>
+    <p class="sub">
+      A geometric interlock of C and F. The C arc wraps around the F's vertical stem — the club containing and supporting its structural backbone. 
+      The gold accent on the F's middle bar is the "forge point" — where components connect and value is created.
+      This is the strongest concept: it scales from favicon to billboard, reads as a mark and initials simultaneously, and feels premium without being decorative.
+    </p>
+    <div class="logo-display">
+      <div class="on-light">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28 8C15.85 8 6 17.85 6 30s9.85 22 22 22c5.5 0 10.55-2.02 14.42-5.36" stroke="#0F172A" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <rect x="34" y="12" width="7" height="40" rx="3.5" fill="#0F172A"/>
+          <rect x="34" y="12" width="22" height="7" rx="3.5" fill="#0F172A"/>
+          <rect x="34" y="28" width="16" height="7" rx="3.5" fill="#C5A456"/>
+        </svg>
+        <span class="wordmark wordmark-light">ClubForge</span>
+      </div>
+      <div class="on-dark">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28 8C15.85 8 6 17.85 6 30s9.85 22 22 22c5.5 0 10.55-2.02 14.42-5.36" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <rect x="34" y="12" width="7" height="40" rx="3.5" fill="#FFFFFF"/>
+          <rect x="34" y="12" width="22" height="7" rx="3.5" fill="#FFFFFF"/>
+          <rect x="34" y="28" width="16" height="7" rx="3.5" fill="#C5A456"/>
+        </svg>
+        <span class="wordmark wordmark-dark">ClubForge</span>
+      </div>
+      <div class="icon-only">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28 8C15.85 8 6 17.85 6 30s9.85 22 22 22c5.5 0 10.55-2.02 14.42-5.36" stroke="#0F172A" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <rect x="34" y="12" width="7" height="40" rx="3.5" fill="#0F172A"/>
+          <rect x="34" y="12" width="22" height="7" rx="3.5" fill="#0F172A"/>
+          <rect x="34" y="28" width="16" height="7" rx="3.5" fill="#C5A456"/>
+        </svg>
+      </div>
+      <div class="favicon">
+        <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M28 8C15.85 8 6 17.85 6 30s9.85 22 22 22c5.5 0 10.55-2.02 14.42-5.36" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <rect x="34" y="12" width="7" height="40" rx="3.5" fill="#FFFFFF"/>
+          <rect x="34" y="12" width="22" height="7" rx="3.5" fill="#FFFFFF"/>
+          <rect x="34" y="28" width="16" height="7" rx="3.5" fill="#C5A456"/>
+        </svg>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail-box">
+        <h4>Symbol Logic</h4>
+        <p>C = Club (the container/community). F = Forge (the structural backbone). The C wraps around the F, showing a system that holds and supports. The gold bar = the forge point where value is created.</p>
+      </div>
+      <div class="detail-box">
+        <h4>Why It's Strongest</h4>
+        <p>Reads as initials and abstract mark simultaneously. Works at 16px favicon and 200px hero. The interlocking geometry implies infrastructure without being literal. Timeless — won't date.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT B -->
+  <div class="concept">
+    <div class="concept-label">Concept B</div>
+    <h2>The Structural Foundation</h2>
+    <p class="sub">
+      Four blocks ascending — a foundation being built, layer by layer. The gold "keystone" block represents the forge, 
+      the critical connection point that makes the structure whole. This concept communicates infrastructure, building, 
+      and structured growth more literally than Concept A.
+    </p>
+    <div class="logo-display">
+      <div class="on-light">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="42" width="52" height="14" rx="4" fill="#0F172A"/>
+          <rect x="6" y="24" width="24" height="14" rx="4" fill="#0F172A"/>
+          <rect x="34" y="24" width="24" height="14" rx="4" fill="#C5A456"/>
+          <rect x="16" y="6" width="32" height="14" rx="4" fill="#0F172A"/>
+        </svg>
+        <span class="wordmark wordmark-light">ClubForge</span>
+      </div>
+      <div class="on-dark">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="42" width="52" height="14" rx="4" fill="#FFFFFF"/>
+          <rect x="6" y="24" width="24" height="14" rx="4" fill="#FFFFFF"/>
+          <rect x="34" y="24" width="24" height="14" rx="4" fill="#C5A456"/>
+          <rect x="16" y="6" width="32" height="14" rx="4" fill="#FFFFFF"/>
+        </svg>
+        <span class="wordmark wordmark-dark">ClubForge</span>
+      </div>
+      <div class="favicon">
+        <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="42" width="52" height="14" rx="4" fill="#FFFFFF"/>
+          <rect x="6" y="24" width="24" height="14" rx="4" fill="#FFFFFF"/>
+          <rect x="34" y="24" width="24" height="14" rx="4" fill="#C5A456"/>
+          <rect x="16" y="6" width="32" height="14" rx="4" fill="#FFFFFF"/>
+        </svg>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail-box">
+        <h4>Symbol Logic</h4>
+        <p>Stacking blocks = building something structured. The ascending form implies growth and scaling. The gold keystone = the forge, the critical piece that holds everything together.</p>
+      </div>
+      <div class="detail-box">
+        <h4>Strengths & Trade-offs</h4>
+        <p>Strong "building/structure" metaphor. Works well at larger sizes. At very small sizes (favicon), the 4 blocks may lose definition. More abstract than Concept A — less immediately identifiable as "CF".</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT C -->
+  <div class="concept">
+    <div class="concept-label">Concept C</div>
+    <h2>The Modern Shield</h2>
+    <p class="sub">
+      An abstract, modern shield form — NOT heraldic or medieval — split into two navy tones to create depth and dimension. 
+      A gold vertical "spine" runs through the centre as the backbone of the system. A subtle cross beam adds structural integrity. 
+      Communicates protection, reliability, and systematic strength.
+    </p>
+    <div class="logo-display">
+      <div class="on-light">
+        <svg width="42" height="48" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 4L6 16v24c0 12 10 22 26 28" fill="#0F172A"/>
+          <path d="M32 4l26 12v24c0 12-10 22-26 28" fill="#1E293B"/>
+          <rect x="29" y="14" width="6" height="44" rx="3" fill="#C5A456"/>
+          <rect x="18" y="30" width="28" height="5" rx="2.5" fill="#C5A456" opacity="0.6"/>
+        </svg>
+        <span class="wordmark wordmark-light">ClubForge</span>
+      </div>
+      <div class="on-dark">
+        <svg width="42" height="48" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 4L6 16v24c0 12 10 22 26 28" fill="#CBD5E1"/>
+          <path d="M32 4l26 12v24c0 12-10 22-26 28" fill="#94A3B8"/>
+          <rect x="29" y="14" width="6" height="44" rx="3" fill="#C5A456"/>
+          <rect x="18" y="30" width="28" height="5" rx="2.5" fill="#C5A456" opacity="0.6"/>
+        </svg>
+        <span class="wordmark wordmark-dark">ClubForge</span>
+      </div>
+      <div class="favicon">
+        <svg width="24" height="28" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 4L6 16v24c0 12 10 22 26 28" fill="#CBD5E1"/>
+          <path d="M32 4l26 12v24c0 12-10 22-26 28" fill="#94A3B8"/>
+          <rect x="29" y="14" width="6" height="44" rx="3" fill="#C5A456"/>
+          <rect x="18" y="30" width="28" height="5" rx="2.5" fill="#C5A456" opacity="0.6"/>
+        </svg>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail-box">
+        <h4>Symbol Logic</h4>
+        <p>Shield = protection and reliability. The two-tone split adds modern depth (not flat). The gold spine = the backbone of the system. Cross beam = structural integrity and connection.</p>
+      </div>
+      <div class="detail-box">
+        <h4>Strengths & Trade-offs</h4>
+        <p>Strong "protection/trust" feel. Instantly communicates reliability. Risk: shields can feel security-software or heraldic if not careful. This version is sufficiently abstract to avoid that.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLOUR PALETTE -->
+  <div class="concept">
+    <div class="concept-label">Colour Palette</div>
+    <h2>Brand Colours</h2>
+    <p class="sub">All concepts use the same core palette. These colours work in monochrome (navy or black) and with the gold accent.</p>
+    <div class="colors">
+      <div class="color-swatch" style="background: #0F172A;">
+        <span style="color: #94A3B8;">#0F172A</span>
+      </div>
+      <div class="color-swatch" style="background: #1E293B;">
+        <span style="color: #94A3B8;">#1E293B</span>
+      </div>
+      <div class="color-swatch" style="background: #C5A456;">
+        <span style="color: #0F172A;">#C5A456</span>
+      </div>
+      <div class="color-swatch" style="background: #D4B86A;">
+        <span style="color: #0F172A;">#D4B86A</span>
+      </div>
+      <div class="color-swatch" style="background: #FFFFFF; border: 1px solid #E2E8F0;">
+        <span style="color: #64748B;">#FFFFFF</span>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail-box">
+        <h4>Typography</h4>
+        <p><strong>Inter</strong> (800 weight) for the wordmark. Clean, geometric, modern SaaS standard. Alternatives: Outfit, General Sans, or Satoshi for a slightly warmer feel. Avoid decorative or serif fonts.</p>
+      </div>
+      <div class="detail-box">
+        <h4>Usage Rules</h4>
+        <p>Symbol can be used standalone (favicon, app icon). Full logo (symbol + wordmark) for headers and marketing. Gold accent should never be used as a background — only as an accent element. Monochrome: use pure black or pure white.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

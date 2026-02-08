@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubForge — Final Logo (E2 Twin Cubes)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F1F5F9;
+            color: #0F172A;
+            padding: 40px 24px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748B;
+            font-size: 13px;
+            margin-bottom: 48px;
+        }
+
+        .gold {
+            color: #C5A456;
+        }
+
+        .grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            border-radius: 16px;
+            padding: 48px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #E2E8F0;
+        }
+
+        .card.light {
+            background: #FFFFFF;
+        }
+
+        .card.dark {
+            background: #0F172A;
+        }
+
+        .card.slate {
+            background: #1E293B;
+        }
+
+        .card.full {
+            grid-column: 1 / -1;
+        }
+
+        .card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .card.light .label {
+            color: #94A3B8;
+        }
+
+        .card.dark .label,
+        .card.slate .label {
+            color: #475569;
+        }
+
+        .full-logo {
+            width: 380px;
+        }
+
+        .icon-mark {
+            width: 80px;
+        }
+
+        .icon-sm {
+            width: 48px;
+        }
+
+        .icon-xs {
+            width: 32px;
+        }
+
+        .sizes {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .info-grid {
+            max-width: 1000px;
+            margin: 32px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .info-box {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .info-box h4 {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            color: #64748B;
+            line-height: 1.7;
+        }
+
+        .swatches {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .sw {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            padding: 4px;
+        }
+
+        .sw span {
+            font-size: 7px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>ClubForge — Final Logo <span class="gold">✓</span></h1>
+    <p class="subtitle">E2 Twin Cubes · Navy + Gold · Premium SaaS</p>
+
+    <div class="grid">
+        <!-- Full logo — light -->
+        <div class="card light full">
+            <img class="full-logo" src="./logo-clubforge-final.svg" alt="ClubForge Logo">
+            <div class="label">Primary — Light Background</div>
+        </div>
+
+        <!-- Full logo — dark -->
+        <div class="card dark full">
+            <img class="full-logo" src="./logo-clubforge-final-dark.svg" alt="ClubForge Logo Dark">
+            <div class="label">Primary — Dark Background</div>
+        </div>
+
+        <!-- Monochrome -->
+        <div class="card light">
+            <img class="full-logo" src="./logo-clubforge-mono.svg" alt="ClubForge Mono" style="width:300px;">
+            <div class="label">Monochrome</div>
+        </div>
+
+        <!-- Icon sizes -->
+        <div class="card light">
+            <div class="sizes">
+                <img class="icon-mark" src="./logo-clubforge-icon.svg" alt="Icon 80px">
+                <img class="icon-sm" src="./logo-clubforge-icon.svg" alt="Icon 48px">
+                <img class="icon-xs" src="./logo-clubforge-icon.svg" alt="Icon 32px">
+                <div
+                    style="width:24px;height:24px;background:#0F172A;border-radius:6px;padding:3px;display:flex;align-items:center;">
+                    <img src="./logo-clubforge-icon.svg" alt="Favicon"
+                        style="width:100%;filter:brightness(0) invert(1);">
+                </div>
+            </div>
+            <div class="label">Icon at Multiple Sizes</div>
+        </div>
+
+        <!-- Navbar simulation light -->
+        <div class="card light full" style="padding: 16px 32px; flex-direction: row; justify-content: space-between;">
+            <img src="./logo-clubforge-final.svg" alt="Nav Logo" style="height: 32px;">
+            <div style="display:flex;gap:24px;font-size:13px;color:#64748B;font-weight:600;">
+                <span>Features</span><span>Pricing</span><span>About</span>
+                <span style="background:#0F172A;color:white;padding:6px 16px;border-radius:8px;font-size:12px;">Get
+                    Started</span>
+            </div>
+        </div>
+
+        <!-- Navbar simulation dark -->
+        <div class="card dark full" style="padding: 16px 32px; flex-direction: row; justify-content: space-between;">
+            <img src="./logo-clubforge-final-dark.svg" alt="Nav Logo Dark" style="height: 32px;">
+            <div style="display:flex;gap:24px;font-size:13px;color:#94A3B8;font-weight:600;">
+                <span>Features</span><span>Pricing</span><span>About</span>
+                <span
+                    style="background:#C5A456;color:#0F172A;padding:6px 16px;border-radius:8px;font-size:12px;font-weight:700;">Get
+                    Started</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-box">
+            <h4>Symbol Logic</h4>
+            <p>Two isometric cubes interlocking — the <strong>navy cube</strong> represents the club (structure, system,
+                foundation) and the <strong>gold cube</strong> represents the forge (creation, value, the active process
+                of building). Together they communicate two elements being forged into one unified system.</p>
+        </div>
+        <div class="info-box">
+            <h4>Brand Colours</h4>
+            <div class="swatches">
+                <div class="sw" style="background:#0F172A;"><span style="color:#64748B;">#0F172A</span></div>
+                <div class="sw" style="background:#1E293B;"><span style="color:#64748B;">#1E293B</span></div>
+                <div class="sw" style="background:#C5A456;"><span style="color:#0F172A;">#C5A456</span></div>
+                <div class="sw" style="background:#D4B86A;"><span style="color:#0F172A;">#D4B86A</span></div>
+                <div class="sw" style="background:#B8943D;"><span style="color:#FFF;">#B8943D</span></div>
+            </div>
+            <p style="margin-top:8px;">Deep navy for authority. Two gold tones for the forge. Darker gold for shadow,
+                lighter for highlights.</p>
+        </div>
+        <div class="info-box">
+            <h4>Files</h4>
+            <p>
+                <strong>logo-clubforge-final.svg</strong> — Full logo, light bg<br>
+                <strong>logo-clubforge-final-dark.svg</strong> — Full logo, dark bg<br>
+                <strong>logo-clubforge-icon.svg</strong> — Icon mark only<br>
+                <strong>logo-clubforge-mono.svg</strong> — Monochrome version
+            </p>
+        </div>
+        <div class="info-box">
+            <h4>Usage</h4>
+            <p>
+                <strong>Primary logo</strong> for website headers, marketing<br>
+                <strong>Icon mark</strong> for favicon, app icon, social media avatar<br>
+                <strong>Monochrome</strong> for print, watermarks, single-color contexts<br>
+                Gold accent should never be used as a background colour.
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>

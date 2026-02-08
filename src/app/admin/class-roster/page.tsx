@@ -16,7 +16,7 @@ import {
     Loader2,
     Download
 } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import Avatar from '@/components/Avatar';
 
 interface ClassInfo {
@@ -55,7 +55,7 @@ export default function ClassRosterPage() {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchClasses();
@@ -68,11 +68,11 @@ export default function ClassRosterPage() {
     }, [selectedClass, selectedDate]);
 
     const fetchClasses = async () => {
-        const { data, error } = await supabase
-            .from('classes')
-            .select('id, name, day_of_week, start_time, end_time, location:locations(id, name), membership_type_id')
-            .eq('is_active', true)
-            .order('day_of_week');
+        const { data, error } = await adminFetch<ClassInfo>('classes', {
+            select: 'id, name, day_of_week, start_time, end_time, location:locations(id, name), membership_type_id',
+            filters: [{ column: 'is_active', value: true }],
+            order: [{ column: 'day_of_week' }],
+        });
 
         if (error) {
             console.error('Error fetching classes:', error);
@@ -94,10 +94,10 @@ export default function ClassRosterPage() {
         }
 
         // First, fetch the allowed membership types for this class from the junction table
-        const { data: classMembershipTypes, error: cmtError } = await supabase
-            .from('class_membership_types')
-            .select('membership_type_id')
-            .eq('class_id', selectedClass);
+        const { data: classMembershipTypes, error: cmtError } = await adminFetch('class_membership_types', {
+            select: 'membership_type_id',
+            filters: [{ column: 'class_id', value: selectedClass }],
+        });
 
         if (cmtError) {
             console.error('Error fetching class membership types:', cmtError);
@@ -105,27 +105,26 @@ export default function ClassRosterPage() {
 
         // Get array of allowed membership type IDs
         const allowedMembershipTypeIds = (classMembershipTypes || []).map(
-            (cmt: { membership_type_id: string }) => cmt.membership_type_id
+            (cmt: any) => cmt.membership_type_id as string
         );
 
-        // Build memberships query - filter by location and status
-        let membershipsQuery = supabase
-            .from('memberships')
-            .select('user_id, membership_type_id, profile:profiles(user_id, first_name, last_name, email, belt_rank, is_child, profile_image_url)')
-            .eq('location_id', (classInfo.location as { id: string }).id)
-            .eq('status', 'active');
+        // Build memberships query filters
+        const membershipFilters: { column: string; operator?: string; value: unknown }[] = [
+            { column: 'location_id', value: (classInfo.location as { id: string }).id },
+            { column: 'status', value: 'active' },
+        ];
 
         // If class has specific membership types in the junction table, filter by those
-        // Otherwise, fall back to the legacy single membership_type_id field
         if (allowedMembershipTypeIds.length > 0) {
-            membershipsQuery = membershipsQuery.in('membership_type_id', allowedMembershipTypeIds);
+            membershipFilters.push({ column: 'membership_type_id', operator: 'in', value: allowedMembershipTypeIds });
         } else if (classInfo.membership_type_id) {
-            // Legacy fallback: use single membership_type_id if no junction entries exist
-            membershipsQuery = membershipsQuery.eq('membership_type_id', classInfo.membership_type_id);
+            membershipFilters.push({ column: 'membership_type_id', value: classInfo.membership_type_id });
         }
-        // If neither exists, show all members at the location (no membership type filter)
 
-        const { data: memberships, error: membershipError } = await membershipsQuery;
+        const { data: memberships, error: membershipError } = await adminFetch('memberships', {
+            select: 'user_id, membership_type_id, profile:profiles(user_id, first_name, last_name, email, belt_rank, is_child, profile_image_url)',
+            filters: membershipFilters,
+        });
 
         if (membershipError) {
             console.error('Error fetching memberships:', membershipError);
@@ -135,11 +134,13 @@ export default function ClassRosterPage() {
         }
 
         // Fetch attendance for this class and date
-        const { data: attendance, error: attendanceError } = await supabase
-            .from('attendance')
-            .select('id, user_id, check_in_time')
-            .eq('class_id', selectedClass)
-            .eq('class_date', selectedDate);
+        const { data: attendance, error: attendanceError } = await adminFetch('attendance', {
+            select: 'id, user_id, check_in_time',
+            filters: [
+                { column: 'class_id', value: selectedClass },
+                { column: 'class_date', value: selectedDate },
+            ],
+        });
 
         if (attendanceError) {
             console.error('Error fetching attendance:', attendanceError);
@@ -147,14 +148,14 @@ export default function ClassRosterPage() {
 
         // Create attendance lookup
         const attendanceLookup = new Map<string, { id: string; check_in_time: string }>();
-        (attendance || []).forEach((a: { id: string; user_id: string; check_in_time: string }) => {
+        (attendance || []).forEach((a: any) => {
             attendanceLookup.set(a.user_id, { id: a.id, check_in_time: a.check_in_time });
         });
 
         // Build roster with check-in status
         const rosterData: MemberStatus[] = (memberships || [])
-            .filter((m: { profile: unknown }) => m.profile)
-            .map((m: { user_id: string; profile: { user_id: string; first_name: string; last_name: string; email: string; belt_rank: string; is_child: boolean; profile_image_url?: string } }) => {
+            .filter((m: any) => m.profile)
+            .map((m: any) => {
                 const profile = m.profile;
                 const att = attendanceLookup.get(profile.user_id);
                 return {
@@ -186,10 +187,7 @@ export default function ClassRosterPage() {
 
         if (member.checked_in && member.attendance_id) {
             // Remove check-in
-            const { error } = await supabase
-                .from('attendance')
-                .delete()
-                .eq('id', member.attendance_id);
+            const { error } = await adminDeleteById('attendance', member.attendance_id);
 
             if (error) {
                 setError('Failed to remove check-in');
@@ -199,23 +197,19 @@ export default function ClassRosterPage() {
             }
         } else {
             // Add check-in
-            const { data: { user } } = await supabase.auth.getUser();
-
-            const { error } = await supabase
-                .from('attendance')
-                .insert({
-                    class_id: selectedClass,
-                    user_id: member.user_id,
-                    class_date: selectedDate,
-                    check_in_time: new Date().toISOString(),
-                    checked_in_by: user?.id,
-                });
+            const { error } = await adminInsert('attendance', {
+                class_id: selectedClass,
+                user_id: member.user_id,
+                class_date: selectedDate,
+                check_in_time: new Date().toISOString(),
+                checked_in_by: '__CURRENT_USER__',
+            });
 
             if (error) {
-                if (error.code === '23505') {
+                if (error.includes('23505') || error.includes('unique') || error.includes('duplicate')) {
                     setError('Already checked in');
                 } else {
-                    setError(error.message);
+                    setError(error);
                 }
             } else {
                 setSuccess(`${member.first_name} checked in!`);

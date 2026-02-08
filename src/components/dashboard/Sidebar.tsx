@@ -46,6 +46,8 @@ interface SidebarProps {
     userName?: string;
     profileImageUrl?: string;
     hasChildren?: boolean;
+    tenantLogoUrl?: string;
+    tenantName?: string;
 }
 
 interface SidebarSection {
@@ -192,7 +194,7 @@ function CollapsibleSection({
     );
 }
 
-export default function DashboardSidebar({ role, userRole, userName = 'Member', profileImageUrl, hasChildren = false }: SidebarProps) {
+export default function DashboardSidebar({ role, userRole, userName = 'Member', profileImageUrl, hasChildren = false, tenantLogoUrl, tenantName }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const supabase = getSupabaseClient();
@@ -222,13 +224,11 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
     // ---- MEMBER LINKS (flat like before) ----
     const memberLinks = [
         { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        ...(hasParentMembership ? [
-            { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
-            { href: '/dashboard/attendance', label: 'Attendance', icon: CheckCircle },
-            { href: '/dashboard/progress', label: 'Belt Progress', icon: Award },
-            { href: '/dashboard/videos', label: 'Video Library', icon: Video },
-            { href: '/dashboard/naseeha', label: 'Naseeha', icon: BookOpen },
-        ] : []),
+        { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
+        { href: '/dashboard/attendance', label: 'Attendance', icon: CheckCircle },
+        { href: '/dashboard/progress', label: 'Belt Progress', icon: Award },
+        { href: '/dashboard/videos', label: 'Video Library', icon: Video },
+        { href: '/dashboard/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
         { href: '/dashboard/events', label: 'Events', icon: PartyPopper },
         { href: '/dashboard/announcements', label: 'Announcements', icon: Bell },
         { href: '/dashboard/membership', label: 'Membership', icon: CreditCard },
@@ -242,7 +242,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         { href: '/admin/class-roster', label: 'Class Roster', icon: ClipboardList },
         { href: '/instructor/attendance', label: 'Attendance', icon: CheckCircle },
         { href: '/instructor/students', label: 'Students', icon: User },
-        { href: '/instructor/naseeha', label: 'Weekly Naseeha', icon: BookOpen },
+        { href: '/instructor/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
     ];
 
     const professorLinks = [
@@ -289,7 +289,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                 { href: '/admin/announcements', label: 'Announcements', icon: Bell },
                 { href: '/admin/events', label: 'Events', icon: PartyPopper },
                 { href: '/admin/videos', label: 'Videos', icon: Video },
-                { href: '/admin/naseeha', label: 'Naseeha', icon: BookOpen },
+                { href: '/admin/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
                 { href: '/admin/email-templates', label: 'Email Templates', icon: Mail },
                 { href: '/admin/promo-codes', label: 'Promo Codes', icon: Tag },
             ],
@@ -331,13 +331,21 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                     <Menu size={24} />
                 </button>
                 <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                    <Image
-                        src="/logo-full.png"
-                        alt="ClubForge"
-                        width={120}
-                        height={36}
-                        style={{ height: '32px', width: 'auto' }}
-                    />
+                    {tenantLogoUrl ? (
+                        <img
+                            src={tenantLogoUrl}
+                            alt={tenantName || 'Club'}
+                            style={{ height: '32px', width: 'auto', borderRadius: '6px' }}
+                        />
+                    ) : (
+                        <Image
+                            src="/logo-clubforge-final.svg"
+                            alt="ClubForge"
+                            width={200}
+                            height={52}
+                            style={{ height: '32px', width: 'auto' }}
+                        />
+                    )}
                 </Link>
                 <Link href="/dashboard/profile" className="dashboard-mobile-profile-btn">
                     <User size={20} />
@@ -356,13 +364,21 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                 <div className="sidebar-header">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                            <Image
-                                src="/logo-full.png"
-                                alt="ClubForge"
-                                width={140}
-                                height={40}
-                                style={{ height: '36px', width: 'auto' }}
-                            />
+                            {tenantLogoUrl ? (
+                                <img
+                                    src={tenantLogoUrl}
+                                    alt={tenantName || 'Club'}
+                                    style={{ height: '36px', width: 'auto', borderRadius: '8px' }}
+                                />
+                            ) : (
+                                <Image
+                                    src="/logo-clubforge-final.svg"
+                                    alt="ClubForge"
+                                    width={200}
+                                    height={52}
+                                    style={{ height: '36px', width: 'auto' }}
+                                />
+                            )}
                         </Link>
                         <button
                             onClick={() => setIsOpen(false)}

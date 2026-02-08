@@ -21,15 +21,12 @@ export default function Footer() {
                 <div style={{ gridColumn: 'span 1' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
                         <Image
-                            src="/logo-simple.png"
+                            src="/logo-clubforge-final-dark.svg"
                             alt="ClubForge"
-                            width={120}
-                            height={40}
-                            style={{ height: '32px', width: 'auto', filter: 'brightness(0) invert(1)' }}
+                            width={200}
+                            height={52}
+                            style={{ height: '36px', width: 'auto' }}
                         />
-                        <span style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--color-white)' }}>
-                            ClubForge
-                        </span>
                     </div>
                     <p style={{ fontSize: 'var(--text-sm)', lineHeight: '1.7', color: 'var(--color-gray-400)', marginBottom: 'var(--space-4)' }}>
                         The operating system for clubs. Build, run, and grow your gym, dojo, or academy with one powerful platform.

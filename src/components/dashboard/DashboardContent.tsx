@@ -135,7 +135,7 @@ export default function DashboardContent() {
             {/* Header */}
             <div className="dashboard-header">
                 <h1 className="dashboard-title">
-                    Assalamu Alaikum, {displayName}! 👋
+                    Welcome, {displayName}! 👋
                 </h1>
                 <p className="dashboard-subtitle">
                     {isViewingParent ? "Here's your training overview." : `Viewing ${displayName}'s training progress.`}

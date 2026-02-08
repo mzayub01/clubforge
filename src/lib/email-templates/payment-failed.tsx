@@ -28,7 +28,7 @@ export function PaymentFailedEmail({
             </Text>
 
             <Text style={baseStyles.text}>
-                Assalamu Alaikum {firstName},
+                Hi {firstName},
             </Text>
 
             <Text style={baseStyles.text}>

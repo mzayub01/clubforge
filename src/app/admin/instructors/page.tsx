@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, User, Award, Edit, CheckCircle, AlertCircle, Mail, Calendar, BookOpen } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminUpdateById, adminUpdate } from '@/lib/admin-api';
 
 interface Member {
     id: string;
@@ -47,7 +47,7 @@ export default function AdminInstructorsPage() {
 
     const [selectedMember, setSelectedMember] = useState('');
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchData();
@@ -56,15 +56,14 @@ export default function AdminInstructorsPage() {
     const fetchData = async () => {
         try {
             const [instructorsRes, membersRes] = await Promise.all([
-                supabase
-                    .from('instructors')
-                    .select('*, profile:profiles(first_name, last_name, email, belt_rank)')
-                    .order('created_at', { ascending: false }),
-                supabase
-                    .from('profiles')
-                    .select('*')
-                    .in('role', ['member', 'instructor'])
-                    .order('first_name'),
+                adminFetch<Instructor>('instructors', {
+                    select: '*, profile:profiles(first_name, last_name, email, belt_rank)',
+                    order: [{ column: 'created_at', ascending: false }],
+                }),
+                adminFetch<Member>('profiles', {
+                    filters: [{ column: 'role', operator: 'in', value: ['member', 'instructor'] }],
+                    order: [{ column: 'first_name' }],
+                }),
             ]);
 
             setInstructors(instructorsRes.data || []);
@@ -94,17 +93,14 @@ export default function AdminInstructorsPage() {
         setSuccess('');
 
         try {
-            const { error } = await supabase
-                .from('instructors')
-                .update({
-                    bio: formData.bio || null,
-                    specializations: formData.specializations
-                        ? formData.specializations.split(',').map(s => s.trim()).filter(Boolean)
-                        : null,
-                })
-                .eq('id', editingInstructor.id);
+            const { error } = await adminUpdateById('instructors', editingInstructor.id, {
+                bio: formData.bio || null,
+                specializations: formData.specializations
+                    ? formData.specializations.split(',').map(s => s.trim()).filter(Boolean)
+                    : null,
+            });
 
-            if (error) throw error;
+            if (error) throw new Error(error);
 
             setSuccess('Instructor updated successfully!');
             setShowModal(false);
@@ -125,20 +121,17 @@ export default function AdminInstructorsPage() {
             if (!member) throw new Error('Member not found');
 
             // Create instructor record
-            const { error: instructorError } = await supabase
-                .from('instructors')
-                .insert({
-                    user_id: member.user_id,
-                    is_active: true,
-                });
+            const { error: instructorError } = await adminInsert('instructors', {
+                user_id: member.user_id,
+                is_active: true,
+            });
 
-            if (instructorError) throw instructorError;
+            if (instructorError) throw new Error(instructorError);
 
             // Update profile role
-            await supabase
-                .from('profiles')
-                .update({ role: 'instructor' })
-                .eq('id', selectedMember);
+            await adminUpdate('profiles', { role: 'instructor' }, [
+                { column: 'id', value: selectedMember },
+            ]);
 
             setSuccess(`${member.first_name} ${member.last_name} is now an instructor!`);
             setShowPromoteModal(false);
@@ -151,10 +144,9 @@ export default function AdminInstructorsPage() {
 
     const toggleInstructorStatus = async (instructor: Instructor) => {
         try {
-            await supabase
-                .from('instructors')
-                .update({ is_active: !instructor.is_active })
-                .eq('id', instructor.id);
+            await adminUpdateById('instructors', instructor.id, {
+                is_active: !instructor.is_active,
+            });
             fetchData();
         } catch (err) {
             console.error('Error toggling status:', err);

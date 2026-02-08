@@ -102,14 +102,14 @@ export default async function DemoPage() {
                                         className="form-input"
                                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
                                     >
-                                        <option value="">Select...</option>
-                                        <option value="bjj">BJJ / Jiu-Jitsu</option>
-                                        <option value="mma">MMA / Boxing</option>
-                                        <option value="karate">Karate / Taekwondo</option>
-                                        <option value="crossfit">CrossFit</option>
-                                        <option value="dance">Dance / Gymnastics</option>
-                                        <option value="youth">Youth Sports</option>
-                                        <option value="other">Other</option>
+                                        <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
+                                        <option value="bjj" style={{ background: '#1E293B', color: '#FFFFFF' }}>BJJ / Jiu-Jitsu</option>
+                                        <option value="mma" style={{ background: '#1E293B', color: '#FFFFFF' }}>MMA / Boxing</option>
+                                        <option value="karate" style={{ background: '#1E293B', color: '#FFFFFF' }}>Karate / Taekwondo</option>
+                                        <option value="crossfit" style={{ background: '#1E293B', color: '#FFFFFF' }}>CrossFit</option>
+                                        <option value="dance" style={{ background: '#1E293B', color: '#FFFFFF' }}>Dance / Gymnastics</option>
+                                        <option value="youth" style={{ background: '#1E293B', color: '#FFFFFF' }}>Youth Sports</option>
+                                        <option value="other" style={{ background: '#1E293B', color: '#FFFFFF' }}>Other</option>
                                     </select>
                                 </div>
                                 <div>
@@ -120,11 +120,11 @@ export default async function DemoPage() {
                                         className="form-input"
                                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
                                     >
-                                        <option value="">Select...</option>
-                                        <option value="1-50">1-50</option>
-                                        <option value="51-150">51-150</option>
-                                        <option value="151-500">151-500</option>
-                                        <option value="500+">500+</option>
+                                        <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
+                                        <option value="1-50" style={{ background: '#1E293B', color: '#FFFFFF' }}>1-50</option>
+                                        <option value="51-150" style={{ background: '#1E293B', color: '#FFFFFF' }}>51-150</option>
+                                        <option value="151-500" style={{ background: '#1E293B', color: '#FFFFFF' }}>151-500</option>
+                                        <option value="500+" style={{ background: '#1E293B', color: '#FFFFFF' }}>500+</option>
                                     </select>
                                 </div>
                                 <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 'var(--space-2)' }}>

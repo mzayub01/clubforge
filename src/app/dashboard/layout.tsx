@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
 import { DashboardProvider } from '@/components/dashboard/DashboardProvider';
+import { getTenantId } from '@/lib/tenant';
 
 export default async function DashboardLayout({
     children,
@@ -38,6 +39,20 @@ export default async function DashboardLayout({
         .eq('status', 'active')
         .single();
 
+    // Get tenant logo for the sidebar
+    const tenantId = await getTenantId();
+    let tenantLogoUrl: string | undefined;
+    let tenantName: string | undefined;
+    if (tenantId) {
+        const { data: tenant } = await supabase
+            .from('tenants')
+            .select('logo_url, name')
+            .eq('id', tenantId)
+            .single();
+        tenantLogoUrl = tenant?.logo_url || undefined;
+        tenantName = tenant?.name || undefined;
+    }
+
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
     const profileImageUrl = profile?.profile_image_url || undefined;
     const hasParentMembership = !!parentMembership;
@@ -61,6 +76,8 @@ export default async function DashboardLayout({
                     userName={userName}
                     profileImageUrl={profileImageUrl}
                     hasChildren={(childProfiles?.length || 0) > 0}
+                    tenantLogoUrl={tenantLogoUrl}
+                    tenantName={tenantName}
                 />
                 <main className="dashboard-main">
                     {children}

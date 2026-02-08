@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Video, Play, Clock, Award, Edit, Trash2, AlertCircle, CheckCircle, ExternalLink, Upload, Link, Loader2 } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client'; // Kept for Storage only
+import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 
 interface VideoItem {
     id: string;
@@ -45,7 +46,7 @@ export default function AdminVideosPage() {
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchVideos();
@@ -53,12 +54,11 @@ export default function AdminVideosPage() {
 
     const fetchVideos = async () => {
         try {
-            const { data, error } = await supabase
-                .from('videos')
-                .select('*')
-                .order('created_at', { ascending: false });
+            const { data, error } = await adminFetch<VideoItem>('videos', {
+                order: [{ column: 'created_at', ascending: false }],
+            });
 
-            if (error) throw error;
+            if (error) throw new Error(error);
             setVideos(data || []);
         } catch (err) {
             console.error('Error fetching videos:', err);
@@ -124,6 +124,7 @@ export default function AdminVideosPage() {
     };
 
     const uploadVideo = async (file: File): Promise<string> => {
+        const supabase = getSupabaseClient(); // Storage only
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `videos/${fileName}`;
@@ -194,17 +195,12 @@ export default function AdminVideosPage() {
 
         try {
             if (editingVideo) {
-                const { error } = await supabase
-                    .from('videos')
-                    .update(payload)
-                    .eq('id', editingVideo.id);
-                if (error) throw error;
+                const { error } = await adminUpdateById('videos', editingVideo.id, payload);
+                if (error) throw new Error(error);
                 setSuccess('Video updated successfully!');
             } else {
-                const { error } = await supabase
-                    .from('videos')
-                    .insert(payload);
-                if (error) throw error;
+                const { error } = await adminInsert('videos', payload);
+                if (error) throw new Error(error);
                 setSuccess('Video added successfully!');
             }
             setShowModal(false);
@@ -217,10 +213,7 @@ export default function AdminVideosPage() {
 
     const toggleVideoStatus = async (video: VideoItem) => {
         try {
-            await supabase
-                .from('videos')
-                .update({ is_active: !video.is_active })
-                .eq('id', video.id);
+            await adminUpdateById('videos', video.id, { is_active: !video.is_active });
             fetchVideos();
         } catch (err) {
             console.error('Error toggling status:', err);
@@ -235,10 +228,11 @@ export default function AdminVideosPage() {
             const video = videos.find(v => v.id === id);
 
             // Delete from database
-            await supabase.from('videos').delete().eq('id', id);
+            await adminDeleteById('videos', id);
 
             // If it's a storage URL, delete from storage too
             if (video?.url.includes('supabase')) {
+                const supabase = getSupabaseClient(); // Storage only
                 const path = video.url.split('/').pop();
                 if (path) {
                     await supabase.storage.from('videos').remove([`videos/${path}`]);

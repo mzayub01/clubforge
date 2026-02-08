@@ -2,17 +2,17 @@
 
 // ===============================================
 // ClubForge - Tenant Welcome Page
-// The branded landing page for a club's subdomain
+// Premium light-theme branded landing page for a club's subdomain
 // Shows club branding, "Join" + "Log in" CTAs, and public class schedule
 // ===============================================
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
     Calendar, MapPin, Clock, Users, ChevronRight,
     Shield, Loader2, ExternalLink, Mail, Phone
 } from 'lucide-react';
+import styles from './tenant-home.module.css';
 
 // -----------------------------------------------
 // Types
@@ -46,7 +46,6 @@ interface LocationInfo {
 }
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const DAY_NAMES_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function formatTime(time: string): string {
     const [hours, minutes] = time.split(':');
@@ -80,56 +79,32 @@ export default function TenantHomePage() {
             .finally(() => setLoading(false));
     }, []);
 
+    // ── Loading State ──
     if (loading) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'var(--color-bg-primary, #0a0a0a)',
-            }}>
-                <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: '#c5a456' }} />
+            <div className={styles.loadingScreen}>
+                <Loader2 size={32} className={styles.spinner} />
             </div>
         );
     }
 
+    // ── Error State ──
     if (error || !tenant) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'var(--color-bg-primary, #0a0a0a)',
-                color: '#fff',
-                padding: '2rem',
-                textAlign: 'center',
-            }}>
-                <Shield size={48} style={{ color: '#c5a456', marginBottom: '1rem' }} />
-                <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Club Not Found</h1>
-                <p style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <div className={styles.errorScreen}>
+                <Shield size={48} className={styles.errorIcon} />
+                <h1 className={styles.errorTitle}>Club Not Found</h1>
+                <p className={styles.errorMessage}>
                     This club doesn&apos;t exist or is no longer active.
                 </p>
-                <a
-                    href="https://clubforgehq.com"
-                    style={{
-                        marginTop: '1.5rem',
-                        color: '#c5a456',
-                        textDecoration: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                    }}
-                >
+                <a href="https://clubforgehq.com" className={styles.errorLink}>
                     Visit ClubForge <ExternalLink size={14} />
                 </a>
             </div>
         );
     }
 
-    const primaryColor = tenant.primaryColor || '#c5a456';
+    const primaryColor = tenant.primaryColor || '#C5A456';
 
     // Group classes by day
     const classesByDay: Record<number, ClassInfo[]> = {};
@@ -142,167 +117,68 @@ export default function TenantHomePage() {
     const locationMap: Record<string, LocationInfo> = {};
     locations.forEach(l => { locationMap[l.id] = l; });
 
+    // Apply club's primary color as CSS custom property
+    const pageStyle = {
+        '--club-color': primaryColor,
+        '--club-glow': `${primaryColor}40`,
+        '--club-glow-pale': `${primaryColor}18`,
+    } as React.CSSProperties;
+
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: '#0a0a0a',
-            color: '#fff',
-            fontFamily: 'var(--font-sans)',
-        }}>
+        <div className={styles.page} style={pageStyle}>
+
             {/* ============== HERO SECTION ============== */}
-            <section style={{
-                minHeight: '75vh',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '3rem 1.5rem',
-                textAlign: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-            }}>
-                {/* Background accent */}
-                <div style={{
-                    position: 'absolute',
-                    top: '-30%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '600px',
-                    height: '600px',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${primaryColor}15 0%, transparent 70%)`,
-                    pointerEvents: 'none',
-                }} />
+            <section className={styles.hero}>
+                {/* Background decorations */}
+                <div className={styles.heroBgGlow} />
+                <div className={styles.heroAccentTopRight} />
+                <div className={styles.heroAccentBottomLeft} />
+                <div className={styles.heroDecorLine} />
 
                 {/* Club Logo */}
                 {tenant.logoUrl ? (
-                    <div style={{
-                        width: '120px',
-                        height: '120px',
-                        borderRadius: '24px',
-                        overflow: 'hidden',
-                        marginBottom: '1.5rem',
-                        border: `2px solid ${primaryColor}40`,
-                        boxShadow: `0 0 40px ${primaryColor}20`,
-                        position: 'relative',
-                    }}>
-                        <Image
+                    <div className={styles.logoContainer}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                             src={tenant.logoUrl}
                             alt={`${tenant.name} logo`}
-                            fill
-                            style={{ objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                         />
                     </div>
                 ) : (
-                    <div style={{
-                        width: '120px',
-                        height: '120px',
-                        borderRadius: '24px',
-                        marginBottom: '1.5rem',
-                        background: `linear-gradient(135deg, ${primaryColor}30, ${primaryColor}10)`,
-                        border: `2px solid ${primaryColor}40`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '3rem',
-                        fontWeight: 700,
-                        color: primaryColor,
-                    }}>
+                    <div className={styles.logoPlaceholder}>
                         {tenant.name.charAt(0)}
                     </div>
                 )}
 
                 {/* Club Name */}
-                <h1 style={{
-                    fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-                    fontWeight: 800,
-                    marginBottom: '0.75rem',
-                    fontFamily: 'var(--font-heading)',
-                    letterSpacing: '-0.02em',
-                    position: 'relative',
-                }}>
+                <h1 className={styles.clubName}>
                     {tenant.name}
                 </h1>
 
                 {/* Tagline */}
                 {tenant.tagline && (
-                    <p style={{
-                        fontSize: '1.15rem',
-                        color: 'rgba(255,255,255,0.6)',
-                        maxWidth: '500px',
-                        lineHeight: 1.6,
-                        marginBottom: '0.5rem',
-                    }}>
+                    <p className={styles.tagline}>
                         {tenant.tagline}
                     </p>
                 )}
 
-                {/* Social proof */}
+                {/* Social proof - member count */}
                 {memberCount > 0 && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'rgba(255,255,255,0.5)',
-                        fontSize: '0.9rem',
-                        marginBottom: '2rem',
-                        marginTop: '0.5rem',
-                    }}>
+                    <div className={styles.memberBadge}>
                         <Users size={16} />
                         <span>{memberCount} member{memberCount !== 1 ? 's' : ''}</span>
                     </div>
                 )}
 
-                {/* CTAs */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
-                    width: '100%',
-                    maxWidth: '360px',
-                    marginTop: memberCount > 0 ? '0' : '2rem',
-                    position: 'relative',
-                }}>
-                    <Link
-                        href="/register"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.75rem',
-                            padding: '1rem 2rem',
-                            background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc)`,
-                            color: '#000',
-                            borderRadius: '14px',
-                            fontSize: '1.1rem',
-                            fontWeight: 700,
-                            textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                            boxShadow: `0 4px 20px ${primaryColor}40`,
-                        }}
-                    >
+                {/* CTA Buttons */}
+                <div className={styles.ctaGroup} style={{ marginTop: memberCount > 0 ? '0' : '2rem' }}>
+                    <Link href="/register" className={styles.ctaPrimary}>
                         Join {tenant.name}
                         <ChevronRight size={20} />
                     </Link>
 
-                    <Link
-                        href="/login"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.5rem',
-                            padding: '0.875rem 2rem',
-                            background: 'rgba(255,255,255,0.06)',
-                            color: '#fff',
-                            borderRadius: '14px',
-                            fontSize: '1rem',
-                            fontWeight: 500,
-                            textDecoration: 'none',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
+                    <Link href="/login" className={styles.ctaSecondary}>
                         Already a member? Log in
                     </Link>
                 </div>
@@ -310,78 +186,35 @@ export default function TenantHomePage() {
 
             {/* ============== CLASS SCHEDULE ============== */}
             {classes.length > 0 && (
-                <section style={{
-                    padding: '3rem 1.5rem',
-                    maxWidth: '700px',
-                    margin: '0 auto',
-                }}>
-                    <h2 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 700,
-                        marginBottom: '1.5rem',
-                        textAlign: 'center',
-                        fontFamily: 'var(--font-heading)',
-                    }}>
-                        <Calendar size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle', color: primaryColor }} />
+                <section className={styles.scheduleSection}>
+                    <h2 className={styles.sectionTitle}>
+                        <Calendar size={22} className={styles.sectionIcon} />
                         Class Schedule
                     </h2>
 
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '1rem',
-                    }}>
+                    <div className={styles.scheduleList}>
                         {Object.entries(classesByDay)
                             .sort(([a], [b]) => Number(a) - Number(b))
                             .map(([day, dayClasses]) => (
-                                <div key={day} style={{
-                                    background: 'rgba(255,255,255,0.04)',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                }}>
-                                    <div style={{
-                                        padding: '0.75rem 1rem',
-                                        background: `${primaryColor}12`,
-                                        borderBottom: '1px solid rgba(255,255,255,0.06)',
-                                        fontWeight: 600,
-                                        fontSize: '0.95rem',
-                                        color: primaryColor,
-                                    }}>
+                                <div key={day} className={styles.dayCard}>
+                                    <div className={styles.dayHeader}>
                                         {DAY_NAMES[Number(day)]}
                                     </div>
                                     {dayClasses.map((cls, idx) => (
-                                        <div key={cls.id} style={{
-                                            padding: '0.75rem 1rem',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            borderBottom: idx < dayClasses.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                                        }}>
+                                        <div
+                                            key={cls.id}
+                                            className={idx < dayClasses.length - 1 ? styles.classRowBorder : styles.classRow}
+                                        >
                                             <div>
-                                                <div style={{ fontWeight: 500, fontSize: '0.95rem' }}>{cls.name}</div>
+                                                <div className={styles.className}>{cls.name}</div>
                                                 {locationMap[cls.locationId] && (
-                                                    <div style={{
-                                                        fontSize: '0.8rem',
-                                                        color: 'rgba(255,255,255,0.45)',
-                                                        marginTop: '2px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.25rem',
-                                                    }}>
+                                                    <div className={styles.classLocation}>
                                                         <MapPin size={11} />
                                                         {locationMap[cls.locationId].name}
                                                     </div>
                                                 )}
                                             </div>
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.35rem',
-                                                fontSize: '0.85rem',
-                                                color: 'rgba(255,255,255,0.6)',
-                                                whiteSpace: 'nowrap',
-                                            }}>
+                                            <div className={styles.classTime}>
                                                 <Clock size={13} />
                                                 {formatTime(cls.startTime)} – {formatTime(cls.endTime)}
                                             </div>
@@ -395,40 +228,17 @@ export default function TenantHomePage() {
 
             {/* ============== LOCATIONS ============== */}
             {locations.length > 0 && (
-                <section style={{
-                    padding: '2rem 1.5rem 3rem',
-                    maxWidth: '700px',
-                    margin: '0 auto',
-                }}>
-                    <h2 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 700,
-                        marginBottom: '1.5rem',
-                        textAlign: 'center',
-                        fontFamily: 'var(--font-heading)',
-                    }}>
-                        <MapPin size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle', color: primaryColor }} />
+                <section className={styles.locationsSection}>
+                    <h2 className={styles.sectionTitle}>
+                        <MapPin size={22} className={styles.sectionIcon} />
                         {locations.length === 1 ? 'Our Location' : 'Our Locations'}
                     </h2>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: locations.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
-                        gap: '1rem',
-                    }}>
+                    <div className={locations.length === 1 ? styles.locationGridSingle : styles.locationGridMulti}>
                         {locations.map(loc => (
-                            <div key={loc.id} style={{
-                                background: 'rgba(255,255,255,0.04)',
-                                borderRadius: '12px',
-                                padding: '1.25rem',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                            }}>
-                                <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{loc.name}</div>
-                                <div style={{
-                                    fontSize: '0.9rem',
-                                    color: 'rgba(255,255,255,0.5)',
-                                    lineHeight: 1.6,
-                                }}>
+                            <div key={loc.id} className={styles.locationCard}>
+                                <div className={styles.locationName}>{loc.name}</div>
+                                <div className={styles.locationAddress}>
                                     {loc.address && <div>{loc.address}</div>}
                                     {(loc.city || loc.postcode) && (
                                         <div>{[loc.city, loc.postcode].filter(Boolean).join(', ')}</div>
@@ -442,48 +252,16 @@ export default function TenantHomePage() {
 
             {/* ============== CONTACT ============== */}
             {(tenant.contactEmail || tenant.contactPhone) && (
-                <section style={{
-                    padding: '2rem 1.5rem',
-                    maxWidth: '700px',
-                    margin: '0 auto',
-                    textAlign: 'center',
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '2rem',
-                        flexWrap: 'wrap',
-                    }}>
+                <section className={styles.contactSection}>
+                    <div className={styles.contactLinks}>
                         {tenant.contactEmail && (
-                            <a
-                                href={`mailto:${tenant.contactEmail}`}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    color: 'rgba(255,255,255,0.6)',
-                                    textDecoration: 'none',
-                                    fontSize: '0.9rem',
-                                    transition: 'color 0.2s',
-                                }}
-                            >
+                            <a href={`mailto:${tenant.contactEmail}`} className={styles.contactLink}>
                                 <Mail size={16} />
                                 {tenant.contactEmail}
                             </a>
                         )}
                         {tenant.contactPhone && (
-                            <a
-                                href={`tel:${tenant.contactPhone}`}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    color: 'rgba(255,255,255,0.6)',
-                                    textDecoration: 'none',
-                                    fontSize: '0.9rem',
-                                    transition: 'color 0.2s',
-                                }}
-                            >
+                            <a href={`tel:${tenant.contactPhone}`} className={styles.contactLink}>
                                 <Phone size={16} />
                                 {tenant.contactPhone}
                             </a>
@@ -493,37 +271,17 @@ export default function TenantHomePage() {
             )}
 
             {/* ============== FOOTER ============== */}
-            <footer style={{
-                padding: '2rem 1.5rem',
-                textAlign: 'center',
-                borderTop: '1px solid rgba(255,255,255,0.06)',
-                marginTop: '2rem',
-            }}>
+            <footer className={styles.footer}>
                 <a
                     href="https://clubforgehq.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'rgba(255,255,255,0.3)',
-                        textDecoration: 'none',
-                        fontSize: '0.8rem',
-                        transition: 'color 0.2s',
-                    }}
+                    className={styles.footerLink}
                 >
-                    Powered by <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>ClubForge</span>
+                    Powered by{' '}
+                    <span className={styles.footerBrand}>ClubForge</span>
                 </a>
             </footer>
-
-            {/* Spin animation for loader */}
-            <style jsx global>{`
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
         </div>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, CheckCircle, AlertCircle, Filter, Download } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import type { Event, Location } from '@/lib/types';
 
 const EVENT_TYPES = [
@@ -24,7 +24,6 @@ export default function AdminEventsPage() {
     const [success, setSuccess] = useState('');
     const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('upcoming');
 
-    const supabase = getSupabaseClient();
 
     const [formData, setFormData] = useState({
         title: '',
@@ -53,8 +52,13 @@ export default function AdminEventsPage() {
 
     const fetchData = async () => {
         const [eventsRes, locationsRes] = await Promise.all([
-            supabase.from('events').select('*, location:locations(name)').order('start_date', { ascending: false }),
-            supabase.from('locations').select('*').eq('is_active', true),
+            adminFetch<Event>('events', {
+                select: '*, location:locations(name)',
+                order: [{ column: 'start_date', ascending: false }],
+            }),
+            adminFetch<Location>('locations', {
+                filters: [{ column: 'is_active', value: true }],
+            }),
         ]);
 
         setEvents(eventsRes.data || []);
@@ -74,11 +78,10 @@ export default function AdminEventsPage() {
         setAttendeesLoading(true);
         setShowAttendeesModal(true);
 
-        const { data, error } = await supabase
-            .from('event_rsvps')
-            .select('*')
-            .eq('event_id', event.id)
-            .order('created_at', { ascending: false });
+        const { data, error } = await adminFetch('event_rsvps', {
+            filters: [{ column: 'event_id', value: event.id }],
+            order: [{ column: 'created_at', ascending: false }],
+        });
 
         if (error) {
             console.error('Error fetching attendees:', error);
@@ -156,26 +159,25 @@ export default function AdminEventsPage() {
             };
 
             if (editEvent) {
-                const { error } = await supabase.from('events').update(payload).eq('id', editEvent.id);
-                if (error) throw error;
+                const { error } = await adminUpdateById('events', editEvent.id, payload);
+                if (error) { setError(error); return; }
                 setSuccess('Event updated successfully');
             } else {
-                const { error } = await supabase.from('events').insert(payload);
-                if (error) throw error;
+                const { error } = await adminInsert('events', payload);
+                if (error) { setError(error); return; }
                 setSuccess('Event created successfully');
             }
 
             setShowModal(false);
             fetchData();
         } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-            setError(errorMessage);
+            setError(err instanceof Error ? err.message : 'An error occurred');
         }
     };
 
     const deleteEvent = async (eventId: string) => {
         if (!confirm('Are you sure you want to delete this event?')) return;
-        await supabase.from('events').delete().eq('id', eventId);
+        await adminDeleteById('events', eventId);
         fetchData();
     };
 

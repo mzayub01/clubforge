@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 100" fill="none">
+  <!-- ClubForge Final Logo — Dark Background Variant -->
+  <!-- White cube (back) + Gold cube (front) -->
+  <!-- Wordmark: "Club" white, "Forge" gold -->
+
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@800&amp;display=swap');
+    </style>
+  </defs>
+
+  <!-- ========== TWIN CUBES MARK ========== -->
+  <g transform="translate(4, 2)">
+    <!-- Back cube (WHITE) -->
+    <polygon points="52,4 86,24 52,44 18,24" fill="#E2E8F0"/>
+    <polygon points="18,24 52,44 52,72 18,52" fill="#FFFFFF"/>
+    <polygon points="52,44 86,24 86,52 52,72" fill="#CBD5E1"/>
+
+    <!-- Front cube (GOLD) -->
+    <polygon points="34,26 68,46 34,66 0,46" fill="#D4B86A"/>
+    <polygon points="0,46 34,66 34,92 0,72" fill="#C5A456"/>
+    <polygon points="34,66 68,46 68,72 34,92" fill="#B8943D"/>
+  </g>
+
+  <!-- ========== WORDMARK ========== -->
+  <text x="116" y="64" font-family="'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="40" letter-spacing="-0.02em">
+    <tspan fill="#FFFFFF">Club</tspan><tspan fill="#C5A456">Forge</tspan>
+  </text>
+</svg>

@@ -38,6 +38,7 @@ const mockClient = {
         update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
         delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
     }),
+    rpc: async () => ({ data: null, error: null }),
 };
 
 type BrowserClient = ReturnType<typeof createBrowserClient>;

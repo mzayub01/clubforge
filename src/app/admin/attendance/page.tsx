@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CheckCircle, Search, Calendar, Clock, User, UserPlus, AlertCircle } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import type { Class, Profile, Attendance } from '@/lib/types';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -18,7 +18,7 @@ export default function AdminAttendancePage() {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchData();
@@ -32,8 +32,14 @@ export default function AdminAttendancePage() {
 
     const fetchData = async () => {
         const [classesRes, membersRes] = await Promise.all([
-            supabase.from('classes').select('*, location:locations(name)').eq('is_active', true).order('day_of_week'),
-            supabase.from('profiles').select('*').order('first_name'),
+            adminFetch<Class>('classes', {
+                select: '*, location:locations(name)',
+                filters: [{ column: 'is_active', value: true }],
+                order: [{ column: 'day_of_week' }],
+            }),
+            adminFetch<Profile>('profiles', {
+                order: [{ column: 'first_name' }],
+            }),
         ]);
 
         setClasses(classesRes.data || []);
@@ -44,11 +50,13 @@ export default function AdminAttendancePage() {
     const fetchAttendance = async () => {
         console.log('Fetching attendance for class:', selectedClass, 'date:', selectedDate);
 
-        const { data, error } = await supabase
-            .from('attendance')
-            .select('*, profile:profiles(*)')
-            .eq('class_id', selectedClass)
-            .eq('class_date', selectedDate);
+        const { data, error } = await adminFetch<Attendance>('attendance', {
+            select: '*, profile:profiles(*)',
+            filters: [
+                { column: 'class_id', value: selectedClass },
+                { column: 'class_date', value: selectedDate },
+            ],
+        });
 
         console.log('Fetch attendance result:', { data, error });
 
@@ -64,28 +72,26 @@ export default function AdminAttendancePage() {
             return;
         }
 
-        const { data: { user } } = await supabase.auth.getUser();
-
         const insertData = {
             class_id: selectedClass,
             user_id: memberId,
             class_date: selectedDate,
             check_in_time: new Date().toISOString(),
-            checked_in_by: user?.id,
+            checked_in_by: '__CURRENT_USER__',
         };
 
         console.log('Inserting attendance:', insertData);
 
-        const { data, error } = await supabase.from('attendance').insert(insertData).select();
+        const { data, error } = await adminInsert('attendance', insertData);
 
         console.log('Insert result:', { data, error });
 
         if (error) {
-            if (error.code === '23505') {
+            if (error.includes('23505') || error.includes('unique') || error.includes('duplicate')) {
                 setError('This member is already checked in for this class');
             } else {
                 console.error('Attendance insert error:', error);
-                setError(error.message);
+                setError(error);
             }
         } else {
             setSuccess('Member checked in successfully');
@@ -94,7 +100,7 @@ export default function AdminAttendancePage() {
     };
 
     const removeCheckIn = async (attendanceId: string) => {
-        await supabase.from('attendance').delete().eq('id', attendanceId);
+        await adminDeleteById('attendance', attendanceId);
         fetchAttendance();
     };
 

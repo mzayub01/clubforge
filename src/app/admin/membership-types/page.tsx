@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, CreditCard, Edit, Trash2, CheckCircle, AlertCircle, MapPin, Tag } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useTenantId } from '@/lib/hooks/useTenantId';
+import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 
 interface Location {
     id: string;
@@ -46,8 +45,7 @@ export default function AdminMembershipTypesPage() {
     const [filterLocation, setFilterLocation] = useState<string>('all');
     const [filterMultisite, setFilterMultisite] = useState<string>('all');
 
-    const supabase = getSupabaseClient();
-    const tenantId = useTenantId();
+
 
     const [formData, setFormData] = useState({
         location_id: '',
@@ -67,22 +65,21 @@ export default function AdminMembershipTypesPage() {
 
     const fetchData = async () => {
         // Fetch locations
-        const { data: locationsData } = await supabase
-            .from('locations')
-            .select('id, name')
-            .eq('is_active', true)
-            .order('name');
+        const { data: locationsData } = await adminFetch<Location>('locations', {
+            select: 'id, name',
+            filters: [{ column: 'is_active', value: true }],
+            order: [{ column: 'name' }],
+        });
 
         if (locationsData) {
             setLocations(locationsData);
         }
 
         // Fetch membership types with location info
-        const { data, error } = await supabase
-            .from('membership_types')
-            .select('*, location:locations(id, name)')
-            .order('location_id')
-            .order('price');
+        const { data, error } = await adminFetch<MembershipType>('membership_types', {
+            select: '*, location:locations(id, name)',
+            order: [{ column: 'location_id' }, { column: 'price' }],
+        });
 
         if (error) {
             console.error('Error fetching membership types:', error);
@@ -91,21 +88,19 @@ export default function AdminMembershipTypesPage() {
         }
 
         // Fetch capacity configs
-        const { data: configsData } = await supabase
-            .from('location_membership_configs')
-            .select('*');
+        const { data: configsData } = await adminFetch<LocationMembershipConfig>('location_membership_configs');
 
         setConfigs(configsData || []);
 
         // Fetch member counts for each membership type
-        const { data: membershipsData } = await supabase
-            .from('memberships')
-            .select('location_id, membership_type_id')
-            .in('status', ['active', 'pending']);
+        const { data: membershipsData } = await adminFetch('memberships', {
+            select: 'location_id, membership_type_id',
+            filters: [{ column: 'status', operator: 'in', value: ['active', 'pending'] }],
+        });
 
         // Count members per location + membership_type combo
         const counts: Record<string, number> = {};
-        (membershipsData || []).forEach((m: { location_id: string; membership_type_id: string }) => {
+        (membershipsData || []).forEach((m: any) => {
             const key = `${m.location_id}_${m.membership_type_id}`;
             counts[key] = (counts[key] || 0) + 1;
         });
@@ -125,19 +120,16 @@ export default function AdminMembershipTypesPage() {
 
         try {
             if (existingConfig) {
-                await supabase
-                    .from('location_membership_configs')
-                    .update({ capacity: newCapacity })
-                    .eq('id', existingConfig.id);
+                await adminUpdateById('location_membership_configs', existingConfig.id, {
+                    capacity: newCapacity,
+                });
             } else {
-                await supabase
-                    .from('location_membership_configs')
-                    .insert({
-                        location_id: locationId,
-                        membership_type_id: membershipTypeId,
-                        capacity: newCapacity,
-                        is_available: true,
-                    });
+                await adminInsert('location_membership_configs', {
+                    location_id: locationId,
+                    membership_type_id: membershipTypeId,
+                    capacity: newCapacity,
+                    is_available: true,
+                });
             }
             setSuccess('Capacity updated');
             fetchData();
@@ -189,7 +181,6 @@ export default function AdminMembershipTypesPage() {
         }
 
         const payload = {
-            tenant_id: tenantId,
             location_id: formData.location_id,
             name: formData.name,
             description: formData.description || null,
@@ -203,19 +194,12 @@ export default function AdminMembershipTypesPage() {
 
         try {
             if (editItem) {
-                const { error } = await supabase
-                    .from('membership_types')
-                    .update(payload)
-                    .eq('id', editItem.id);
-
-                if (error) throw error;
+                const { error } = await adminUpdateById('membership_types', editItem.id, payload);
+                if (error) throw new Error(error);
                 setSuccess('Membership type updated successfully');
             } else {
-                const { error } = await supabase
-                    .from('membership_types')
-                    .insert(payload);
-
-                if (error) throw error;
+                const { error } = await adminInsert('membership_types', payload);
+                if (error) throw new Error(error);
                 setSuccess('Membership type created successfully');
             }
 
@@ -228,10 +212,9 @@ export default function AdminMembershipTypesPage() {
     };
 
     const toggleStatus = async (item: MembershipType) => {
-        const { error } = await supabase
-            .from('membership_types')
-            .update({ is_active: !item.is_active })
-            .eq('id', item.id);
+        const { error } = await adminUpdateById('membership_types', item.id, {
+            is_active: !item.is_active,
+        });
 
         if (!error) {
             fetchData();
@@ -241,10 +224,7 @@ export default function AdminMembershipTypesPage() {
     const deleteItem = async (item: MembershipType) => {
         if (!confirm(`Are you sure you want to delete "${item.name}"?`)) return;
 
-        const { error } = await supabase
-            .from('membership_types')
-            .delete()
-            .eq('id', item.id);
+        const { error } = await adminDeleteById('membership_types', item.id);
 
         if (!error) {
             fetchData();

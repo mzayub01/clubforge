@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
                     // Fallback if template not in database
                     const fallbackSubject = `📢 ${announcementTitle}`;
                     const fallbackHtml = `
-                        <p>Assalamu Alaikum ${recipient.firstName},</p>
+                        <p>Hi ${recipient.firstName},</p>
                         <p>We have an important announcement:</p>
                         <h2>${announcementTitle}</h2>
                         <p>${announcementMessage.replace(/\n/g, '<br>')}</p>

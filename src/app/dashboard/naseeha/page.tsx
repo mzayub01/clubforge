@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { BookOpen, Calendar, Heart } from 'lucide-react';
 
 export const metadata = {
-    title: 'Naseeha | ClubForge',
-    description: 'Weekly Islamic advice and spiritual guidance',
+    title: 'Weekly Wisdom | DojoHub',
+    description: 'Weekly wisdom and guidance from your coaches',
 };
 
 interface NaseehaItem {
@@ -44,9 +44,9 @@ export default async function DashboardNaseehaPage() {
     return (
         <div style={{ paddingBottom: '120px', overflowY: 'auto' }}>
             <div className="dashboard-header">
-                <h1 className="dashboard-title">Naseeha</h1>
+                <h1 className="dashboard-title">Weekly Wisdom</h1>
                 <p className="dashboard-subtitle">
-                    Weekly Islamic advice and spiritual guidance from our classes
+                    Weekly wisdom and guidance from your coaches
                 </p>
             </div>
 
@@ -55,7 +55,7 @@ export default async function DashboardNaseehaPage() {
                     <Heart size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
                     <h3 style={{ marginBottom: 'var(--space-2)' }}>Coming Soon</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: 0 }}>
-                        Weekly naseeha will be shared here soon. Check back after your next class!
+                        Weekly wisdom will be shared here soon. Check back after your next class!
                     </p>
                 </div>
             ) : (

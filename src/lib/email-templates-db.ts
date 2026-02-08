@@ -57,7 +57,7 @@ export function replacePlaceholders(text: string, data: Record<string, string>):
 export function renderTemplateToHtml(
     template: EmailTemplateData,
     data: Record<string, string>,
-    logoUrl: string = 'https://clubforgehq.com/logo-full.png'
+    logoUrl: string = 'https://clubforgehq.com/logo-clubforge-final.svg'
 ): string {
     const subject = replacePlaceholders(template.subject, data);
     const greeting = replacePlaceholders(template.greeting, data);

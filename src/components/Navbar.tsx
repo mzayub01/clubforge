@@ -41,8 +41,9 @@ export default function Navbar({ user }: NavbarProps) {
         return pathname?.startsWith(href);
     };
 
-    // Determine if we're on a dark hero page (homepage)
-    const isDarkHero = pathname === '/' && !isScrolled;
+    // Homepage uses light hero, other pages use dark
+    const isHomepage = pathname === '/';
+    const isLightHero = isHomepage && !isScrolled;
 
     const navLinks = user
         ? [
@@ -61,35 +62,30 @@ export default function Navbar({ user }: NavbarProps) {
             className="navbar"
             style={{
                 background: isScrolled
-                    ? 'var(--bg-glass-dark)'
-                    : isDarkHero
+                    ? 'rgba(255, 255, 255, 0.85)'
+                    : isLightHero
                         ? 'transparent'
-                        : 'var(--bg-glass-dark)',
-                borderBottom: isScrolled ? 'var(--glass-border)' : 'none',
+                        : 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: isScrolled ? 'blur(20px) saturate(180%)' : 'none',
+                WebkitBackdropFilter: isScrolled ? 'blur(20px) saturate(180%)' : 'none',
+                borderBottom: isScrolled ? '1px solid rgba(15, 23, 42, 0.08)' : 'none',
                 transition: 'all 0.3s ease',
+                boxShadow: isScrolled ? '0 1px 12px rgba(15, 23, 42, 0.06)' : 'none',
             }}
         >
             <div className="navbar-container">
                 {/* Logo */}
                 <Link href="/" className="navbar-logo" style={{ textDecoration: 'none' }}>
                     <Image
-                        src="/logo-simple.png"
+                        src="/logo-clubforge-final.svg"
                         alt="ClubForge"
-                        width={120}
-                        height={48}
-                        style={{ height: '40px', width: 'auto' }}
+                        width={200}
+                        height={52}
+                        style={{
+                            height: '36px', width: 'auto',
+                        }}
                         priority
                     />
-                    <span
-                        style={{
-                            fontSize: 'var(--text-xl)',
-                            fontWeight: '700',
-                            fontFamily: 'var(--font-display)',
-                            color: 'var(--color-gold)',
-                        }}
-                    >
-                        ClubForge
-                    </span>
                 </Link>
 
                 {/* Desktop Nav Links */}
@@ -99,6 +95,10 @@ export default function Navbar({ user }: NavbarProps) {
                             key={link.href}
                             href={link.href}
                             className={`navbar-link ${isActive(link.href) ? 'active' : ''}`}
+                            style={{
+                                color: isActive(link.href) ? '#C5A456' : '#334155',
+                                fontWeight: '500',
+                            }}
                         >
                             {link.label}
                         </Link>
@@ -109,10 +109,12 @@ export default function Navbar({ user }: NavbarProps) {
                 <div className="navbar-actions">
                     {user ? (
                         <>
-                            <Link href="/dashboard" className="btn btn-ghost btn-sm">
+                            <Link href="/dashboard" className="btn btn-ghost btn-sm" style={{ color: '#334155' }}>
                                 Dashboard
                             </Link>
-                            <button onClick={handleSignOut} className="btn btn-outline btn-sm">
+                            <button onClick={handleSignOut} className="btn btn-outline btn-sm" style={{
+                                borderColor: '#E2E8F0', color: '#334155',
+                            }}>
                                 Sign Out
                             </button>
                         </>
@@ -121,13 +123,18 @@ export default function Navbar({ user }: NavbarProps) {
                             <Link
                                 href="/login"
                                 className="btn btn-ghost btn-sm"
-                                style={{ display: 'none' }}
+                                style={{ display: 'none', color: '#334155' }}
                                 id="desktop-login"
                             >
                                 Log In
                             </Link>
                             <style>{`@media (min-width: 768px) { #desktop-login { display: inline-flex !important; } }`}</style>
-                            <Link href="/get-started" className="btn btn-primary btn-sm">
+                            <Link href="/get-started" style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
+                                color: '#0F172A', padding: '8px 20px', borderRadius: '10px',
+                                fontSize: '14px', fontWeight: '700', textDecoration: 'none',
+                            }}>
                                 Start Free Trial
                                 <ChevronRight size={16} />
                             </Link>
@@ -139,6 +146,9 @@ export default function Navbar({ user }: NavbarProps) {
                         className="mobile-menu-btn"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Toggle menu"
+                        style={{
+                            color: '#334155',
+                        }}
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -153,10 +163,10 @@ export default function Navbar({ user }: NavbarProps) {
                         top: '100%',
                         left: 0,
                         right: 0,
-                        background: 'var(--bg-primary)',
-                        borderBottom: '1px solid var(--border-light)',
-                        padding: 'var(--space-4) var(--space-6)',
-                        boxShadow: 'var(--shadow-lg)',
+                        background: '#FFFFFF',
+                        borderBottom: '1px solid #F1F5F9',
+                        padding: '16px 24px',
+                        boxShadow: '0 8px 32px rgba(15, 23, 42, 0.08)',
                     }}
                 >
                     {navLinks.map((link) => (
@@ -166,26 +176,37 @@ export default function Navbar({ user }: NavbarProps) {
                             onClick={() => setIsMenuOpen(false)}
                             style={{
                                 display: 'block',
-                                padding: 'var(--space-3) 0',
-                                color: isActive(link.href) ? 'var(--color-gold)' : 'var(--text-primary)',
+                                padding: '12px 0',
+                                color: isActive(link.href) ? '#C5A456' : '#334155',
                                 fontWeight: '500',
-                                borderBottom: '1px solid var(--border-light)',
+                                borderBottom: '1px solid #F1F5F9',
+                                textDecoration: 'none',
                             }}
                         >
                             {link.label}
                         </Link>
                     ))}
-                    <div style={{ paddingTop: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
+                    <div style={{ paddingTop: '16px', display: 'flex', gap: '12px' }}>
                         {user ? (
                             <button onClick={handleSignOut} className="btn btn-outline" style={{ width: '100%' }}>
                                 Sign Out
                             </button>
                         ) : (
                             <>
-                                <Link href="/login" className="btn btn-outline" style={{ flex: 1 }}>
+                                <Link href="/login" style={{
+                                    flex: 1, textAlign: 'center', textDecoration: 'none',
+                                    padding: '12px', borderRadius: '10px',
+                                    border: '1px solid #E2E8F0', color: '#334155',
+                                    fontWeight: '600', fontSize: '14px',
+                                }}>
                                     Log In
                                 </Link>
-                                <Link href="/get-started" className="btn btn-primary" style={{ flex: 1 }}>
+                                <Link href="/get-started" style={{
+                                    flex: 1, textAlign: 'center', textDecoration: 'none',
+                                    padding: '12px', borderRadius: '10px',
+                                    background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
+                                    color: '#0F172A', fontWeight: '700', fontSize: '14px',
+                                }}>
                                     Start Free Trial
                                 </Link>
                             </>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, BookOpen, Calendar, Edit, Trash2, CheckCircle, AlertCircle, Search } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import type { Naseeha } from '@/lib/types';
 
 export default function AdminNaseehaPage() {
@@ -13,8 +13,6 @@ export default function AdminNaseehaPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [searchYear, setSearchYear] = useState(new Date().getFullYear());
-
-    const supabase = getSupabaseClient();
 
     const currentWeek = Math.ceil((new Date().getTime() - new Date(new Date().getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
 
@@ -30,11 +28,10 @@ export default function AdminNaseehaPage() {
     }, [searchYear]);
 
     const fetchNaseeha = async () => {
-        const { data, error } = await supabase
-            .from('naseeha')
-            .select('*')
-            .eq('year', searchYear)
-            .order('week_number', { ascending: false });
+        const { data, error } = await adminFetch<Naseeha>('naseeha', {
+            filters: [{ column: 'year', value: searchYear }],
+            order: [{ column: 'week_number', ascending: false }],
+        });
 
         if (error) {
             console.error('Error fetching naseeha:', error);
@@ -77,54 +74,42 @@ export default function AdminNaseehaPage() {
         }
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-
             if (editNaseeha) {
-                const { error } = await supabase
-                    .from('naseeha')
-                    .update({
-                        title: formData.title,
-                        content: formData.content,
-                        week_number: formData.week_number,
-                        year: formData.year,
-                    })
-                    .eq('id', editNaseeha.id);
+                const { error } = await adminUpdateById('naseeha', editNaseeha.id, {
+                    title: formData.title,
+                    content: formData.content,
+                    week_number: formData.week_number,
+                    year: formData.year,
+                });
 
-                if (error) throw error;
-                setSuccess('Naseeha updated successfully');
+                if (error) { setError(error); return; }
+                setSuccess('Entry updated successfully');
             } else {
-                const { error } = await supabase
-                    .from('naseeha')
-                    .insert({
-                        title: formData.title,
-                        content: formData.content,
-                        week_number: formData.week_number,
-                        year: formData.year,
-                        author_id: user?.id,
-                    });
+                const { error } = await adminInsert('naseeha', {
+                    title: formData.title,
+                    content: formData.content,
+                    week_number: formData.week_number,
+                    year: formData.year,
+                });
 
-                if (error) throw error;
-                setSuccess('Naseeha created successfully');
+                if (error) { setError(error); return; }
+                setSuccess('Entry created successfully');
             }
 
             setShowModal(false);
             fetchNaseeha();
         } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-            setError(errorMessage);
+            setError(err instanceof Error ? err.message : 'An error occurred');
         }
     };
 
     const deleteNaseeha = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this naseeha?')) return;
+        if (!confirm('Are you sure you want to delete this entry?')) return;
 
-        const { error } = await supabase
-            .from('naseeha')
-            .delete()
-            .eq('id', id);
+        const { error } = await adminDeleteById('naseeha', id);
 
         if (!error) {
-            setSuccess('Naseeha deleted');
+            setSuccess('Entry deleted');
             fetchNaseeha();
         }
     };
@@ -133,12 +118,12 @@ export default function AdminNaseehaPage() {
         <div>
             <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <h1 className="dashboard-title">Naseeha</h1>
-                    <p className="dashboard-subtitle">Weekly Islamic advice for instructors to share during classes</p>
+                    <h1 className="dashboard-title">Weekly Wisdom</h1>
+                    <p className="dashboard-subtitle">Weekly wisdom and guidance for coaches to share during classes</p>
                 </div>
                 <button className="btn btn-primary" onClick={() => openModal()}>
                     <Plus size={18} />
-                    Add Naseeha
+                    Add Entry
                 </button>
             </div>
 
@@ -182,13 +167,13 @@ export default function AdminNaseehaPage() {
             ) : naseehaList.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
                     <BookOpen size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Naseeha for {searchYear}</h3>
+                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Entries for {searchYear}</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                        Add weekly Islamic advice for instructors to share during classes.
+                        Add weekly wisdom for coaches to share during classes.
                     </p>
                     <button className="btn btn-primary" onClick={() => openModal()}>
                         <Plus size={18} />
-                        Add Naseeha
+                        Add Entry
                     </button>
                 </div>
             ) : (
@@ -238,7 +223,7 @@ export default function AdminNaseehaPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">
-                                {editNaseeha ? 'Edit Naseeha' : 'Add New Naseeha'}
+                                {editNaseeha ? 'Edit Entry' : 'Add New Entry'}
                             </h2>
                             <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
                         </div>
@@ -297,7 +282,7 @@ export default function AdminNaseehaPage() {
                                         rows={10}
                                         value={formData.content}
                                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                        placeholder="Write the naseeha content here. Include relevant Quranic verses and hadith if applicable..."
+                                        placeholder="Write the wisdom content here..."
                                         required
                                         style={{ minHeight: '250px' }}
                                     />
@@ -311,7 +296,7 @@ export default function AdminNaseehaPage() {
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn btn-primary">
-                                    {editNaseeha ? 'Save Changes' : 'Create Naseeha'}
+                                    {editNaseeha ? 'Save Changes' : 'Create Entry'}
                                 </button>
                             </div>
                         </form>

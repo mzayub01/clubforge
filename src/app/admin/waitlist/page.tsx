@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Clock, CheckCircle, XCircle, AlertCircle, UserPlus, Trash2, Info, ChevronDown, ChevronUp } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 
 interface WaitlistEntry {
     id: string;
@@ -47,7 +47,7 @@ export default function AdminWaitlistPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchData();
@@ -57,35 +57,34 @@ export default function AdminWaitlistPage() {
         try {
             // Fetch all data separately to avoid relationship issues
             const [waitlistRes, locationsRes, membershipTypesRes, profilesRes] = await Promise.all([
-                supabase
-                    .from('waitlist')
-                    .select('*')
-                    .order('position'),
-                supabase
-                    .from('locations')
-                    .select('id, name')
-                    .eq('is_active', true),
-                supabase
-                    .from('membership_types')
-                    .select('id, name'),
-                supabase
-                    .from('profiles')
-                    .select('user_id, first_name, last_name, email, phone, date_of_birth, address, city, postcode, emergency_contact_name, emergency_contact_phone, medical_info'),
+                adminFetch('waitlist', {
+                    order: [{ column: 'position' }],
+                }),
+                adminFetch<Location>('locations', {
+                    select: 'id, name',
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+                adminFetch('membership_types', {
+                    select: 'id, name',
+                }),
+                adminFetch('profiles', {
+                    select: 'user_id, first_name, last_name, email, phone, date_of_birth, address, city, postcode, emergency_contact_name, emergency_contact_phone, medical_info',
+                }),
             ]);
 
             // Create lookup maps
             const locationsMap = new Map(
-                (locationsRes.data || []).map((loc: { id: string; name: string }) => [loc.id, loc])
+                (locationsRes.data || []).map((loc: any) => [loc.id, loc])
             );
             const membershipTypesMap = new Map(
-                (membershipTypesRes.data || []).map((mt: { id: string; name: string }) => [mt.id, mt])
+                (membershipTypesRes.data || []).map((mt: any) => [mt.id, mt])
             );
             const profilesMap = new Map(
                 (profilesRes.data || []).map((p: any) => [p.user_id, p])
             );
 
             // Manually join all data
-            const waitlistWithJoins = (waitlistRes.data || []).map((entry: { user_id: string; location_id: string; membership_type_id?: string; created_at?: string }) => ({
+            const waitlistWithJoins = (waitlistRes.data || []).map((entry: any) => ({
                 ...entry,
                 created_at: entry.created_at || new Date().toISOString(),
                 profile: profilesMap.get(entry.user_id) || null,
@@ -111,23 +110,18 @@ export default function AdminWaitlistPage() {
 
         try {
             // Create membership for this user
-            const { error: membershipError } = await supabase
-                .from('memberships')
-                .insert({
-                    user_id: entry.user_id,
-                    location_id: entry.location_id,
-                    membership_type_id: entry.membership_type_id,
-                    status: 'active',
-                    start_date: new Date().toISOString().split('T')[0],
-                });
+            const { error: membershipError } = await adminInsert('memberships', {
+                user_id: entry.user_id,
+                location_id: entry.location_id,
+                membership_type_id: entry.membership_type_id,
+                status: 'active',
+                start_date: new Date().toISOString().split('T')[0],
+            });
 
-            if (membershipError) throw membershipError;
+            if (membershipError) throw new Error(membershipError);
 
             // Remove from waitlist
-            await supabase
-                .from('waitlist')
-                .delete()
-                .eq('id', entry.id);
+            await adminDeleteById('waitlist', entry.id);
 
             setSuccess(`${entry.profile?.first_name} ${entry.profile?.last_name} has been added as a member!`);
             fetchData();
@@ -143,7 +137,7 @@ export default function AdminWaitlistPage() {
 
         setProcessingId(id);
         try {
-            await supabase.from('waitlist').delete().eq('id', id);
+            await adminDeleteById('waitlist', id);
             fetchData();
             setSuccess('Removed from waitlist');
         } catch (err) {

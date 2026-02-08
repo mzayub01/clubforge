@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useTenantId } from '@/lib/hooks/useTenantId';
+import { adminFetch, adminFetchOne, adminInsert, adminUpdateById } from '@/lib/admin-api';
 
 interface Membership {
     id: string;
@@ -68,8 +67,7 @@ export default function AdminMembershipsPage() {
         status: 'active',
     });
 
-    const supabase = getSupabaseClient();
-    const tenantId = useTenantId();
+
 
     useEffect(() => {
         fetchData();
@@ -78,18 +76,18 @@ export default function AdminMembershipsPage() {
     const fetchData = async () => {
         try {
             const [membershipsRes, locationsRes, membersRes] = await Promise.all([
-                supabase
-                    .from('memberships')
-                    .select('*, stripe_subscription_id, profile:profiles(id, first_name, last_name, email, is_child, parent_guardian_id, stripe_customer_id), location:locations(name), membership_type:membership_types(name, is_multisite)')
-                    .order('created_at', { ascending: false }),
-                supabase
-                    .from('locations')
-                    .select('id, name')
-                    .eq('is_active', true),
-                supabase
-                    .from('profiles')
-                    .select('id, user_id, first_name, last_name, email')
-                    .order('first_name'),
+                adminFetch<Membership>('memberships', {
+                    select: '*, stripe_subscription_id, profile:profiles(id, first_name, last_name, email, is_child, parent_guardian_id, stripe_customer_id), location:locations(name), membership_type:membership_types(name, is_multisite)',
+                    order: [{ column: 'created_at', ascending: false }],
+                }),
+                adminFetch<Location>('locations', {
+                    select: 'id, name',
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+                adminFetch<Member>('profiles', {
+                    select: 'id, user_id, first_name, last_name, email',
+                    order: [{ column: 'first_name' }],
+                }),
             ]);
 
             const membershipsData = membershipsRes.data || [];
@@ -168,41 +166,36 @@ export default function AdminMembershipsPage() {
 
         try {
             if (editingMembership) {
-                const { error } = await supabase
-                    .from('memberships')
-                    .update({
-                        location_id: formData.location_id,
-                        status: formData.status,
-                    })
-                    .eq('id', editingMembership.id);
+                const { error } = await adminUpdateById('memberships', editingMembership.id, {
+                    location_id: formData.location_id,
+                    status: formData.status,
+                });
 
-                if (error) throw error;
+                if (error) throw new Error(error);
                 setSuccess('Membership updated successfully!');
             } else {
                 // Check if membership already exists
-                const { data: existing } = await supabase
-                    .from('memberships')
-                    .select('id')
-                    .eq('user_id', formData.user_id)
-                    .eq('location_id', formData.location_id)
-                    .single();
+                const { data: existing } = await adminFetchOne('memberships', {
+                    select: 'id',
+                    filters: [
+                        { column: 'user_id', value: formData.user_id },
+                        { column: 'location_id', value: formData.location_id },
+                    ],
+                });
 
                 if (existing) {
                     setError('This member already has a membership at this location');
                     return;
                 }
 
-                const { error } = await supabase
-                    .from('memberships')
-                    .insert({
-                        tenant_id: tenantId,
-                        user_id: formData.user_id,
-                        location_id: formData.location_id,
-                        status: formData.status,
-                        start_date: new Date().toISOString().split('T')[0],
-                    });
+                const { error } = await adminInsert('memberships', {
+                    user_id: formData.user_id,
+                    location_id: formData.location_id,
+                    status: formData.status,
+                    start_date: new Date().toISOString().split('T')[0],
+                });
 
-                if (error) throw error;
+                if (error) throw new Error(error);
                 setSuccess('Membership created successfully!');
             }
 
@@ -215,10 +208,7 @@ export default function AdminMembershipsPage() {
 
     const updateStatus = async (membershipId: string, newStatus: string) => {
         try {
-            await supabase
-                .from('memberships')
-                .update({ status: newStatus })
-                .eq('id', membershipId);
+            await adminUpdateById('memberships', membershipId, { status: newStatus });
             fetchData();
         } catch (err) {
             console.error('Error updating status:', err);

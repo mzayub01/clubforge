@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 72" fill="none">
+  <!-- Concept C: Modern Abstract Shield — Protection + backbone -->
+  <!-- Clean angular shield with a vertical gold spine running through it -->
+  
+  <!-- Shield body — two halves creating a chevron/shield form -->
+  <!-- Left half -->
+  <path d="M32 4L6 16v24c0 12 10 22 26 28" fill="#0F172A"/>
+  <!-- Right half — slightly lighter to show structure -->
+  <path d="M32 4l26 12v24c0 12-10 22-26 28" fill="#1E293B"/>
+  
+  <!-- Central spine — gold backbone running vertically -->
+  <rect x="29" y="14" width="6" height="44" rx="3" fill="#C5A456"/>
+  
+  <!-- Cross beam — structural integrity -->
+  <rect x="18" y="30" width="28" height="5" rx="2.5" fill="#C5A456" opacity="0.6"/>
+</svg>

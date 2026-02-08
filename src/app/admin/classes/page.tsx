@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Calendar, Clock, MapPin, User, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useTenantId } from '@/lib/hooks/useTenantId';
+import { adminFetch, adminInsert, adminUpdateById, adminDelete } from '@/lib/admin-api';
 import type { Class, Location, Instructor } from '@/lib/types';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -27,8 +26,7 @@ export default function AdminClassesPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const supabase = getSupabaseClient();
-    const tenantId = useTenantId();
+
 
     const [formData, setFormData] = useState({
         name: '',
@@ -50,10 +48,21 @@ export default function AdminClassesPage() {
 
     const fetchData = async () => {
         const [classesRes, locationsRes, instructorsRes, membershipTypesRes] = await Promise.all([
-            supabase.from('classes').select('*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)').order('day_of_week'),
-            supabase.from('locations').select('*').eq('is_active', true),
-            supabase.from('instructors').select('*, profile:profiles(*)').eq('is_active', true),
-            supabase.from('membership_types').select('id, name, location_id').eq('is_active', true),
+            adminFetch<Class>('classes', {
+                select: '*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)',
+                order: [{ column: 'day_of_week' }],
+            }),
+            adminFetch<Location>('locations', {
+                filters: [{ column: 'is_active', value: true }],
+            }),
+            adminFetch<Instructor>('instructors', {
+                select: '*, profile:profiles(*)',
+                filters: [{ column: 'is_active', value: true }],
+            }),
+            adminFetch<{ id: string; name: string; location_id: string }>('membership_types', {
+                select: 'id, name, location_id',
+                filters: [{ column: 'is_active', value: true }],
+            }),
         ]);
 
         setClasses(classesRes.data || []);
@@ -115,7 +124,6 @@ export default function AdminClassesPage() {
 
         try {
             const payload = {
-                tenant_id: tenantId,
                 name: formData.name,
                 description: formData.description || null,
                 class_type: formData.class_type,
@@ -131,30 +139,31 @@ export default function AdminClassesPage() {
             let classId: string;
 
             if (editClass) {
-                const { error } = await supabase.from('classes').update(payload).eq('id', editClass.id);
-                if (error) throw error;
+                const { error } = await adminUpdateById('classes', editClass.id, payload);
+                if (error) throw new Error(error);
                 classId = editClass.id;
                 setSuccess('Class updated successfully');
             } else {
-                const { data, error } = await supabase.from('classes').insert(payload).select('id').single();
-                if (error) throw error;
-                classId = data.id;
+                const { data, error } = await adminInsert<{ id: string }>('classes', payload);
+                if (error) throw new Error(error);
+                classId = data!.id;
                 setSuccess('Class created successfully');
             }
 
             // Update membership type associations in junction table
             // First, delete existing associations for this class
-            await supabase.from('class_membership_types').delete().eq('class_id', classId);
+            await adminDelete('class_membership_types', [
+                { column: 'class_id', value: classId },
+            ]);
 
             // Then, insert new associations
             if (formData.membership_type_ids.length > 0) {
-                const associations = formData.membership_type_ids.map(typeId => ({
-                    tenant_id: tenantId,
-                    class_id: classId,
-                    membership_type_id: typeId,
-                }));
-                const { error: assocError } = await supabase.from('class_membership_types').insert(associations);
-                if (assocError) throw assocError;
+                for (const typeId of formData.membership_type_ids) {
+                    await adminInsert('class_membership_types', {
+                        class_id: classId,
+                        membership_type_id: typeId,
+                    });
+                }
             }
 
             setShowModal(false);
@@ -166,7 +175,7 @@ export default function AdminClassesPage() {
     };
 
     const toggleClassStatus = async (classItem: Class) => {
-        await supabase.from('classes').update({ is_active: !classItem.is_active }).eq('id', classItem.id);
+        await adminUpdateById('classes', classItem.id, { is_active: !classItem.is_active });
         fetchData();
     };
 

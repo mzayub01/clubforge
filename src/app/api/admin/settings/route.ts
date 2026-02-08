@@ -90,6 +90,7 @@ export async function PUT(request: NextRequest) {
                 etiquette_text: data.etiquetteText || undefined,
                 registration_message: data.registrationMessage || undefined,
                 require_profile_photo: data.requireProfilePhoto,
+                membership_location_mode: data.membershipLocationMode || 'per_location',
             };
 
             updatePayload = {

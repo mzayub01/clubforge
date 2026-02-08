@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
@@ -103,12 +102,9 @@ export default function LoginPage() {
                         <>
                             <Link href="/">
                                 {tenantInfo.logoUrl ? (
-                                    <Image
+                                    <img
                                         src={tenantInfo.logoUrl}
                                         alt={tenantInfo.name}
-                                        width={100}
-                                        height={100}
-                                        priority
                                         style={{ height: '80px', width: 'auto', margin: '0 auto', borderRadius: '16px' }}
                                     />
                                 ) : (
@@ -143,12 +139,10 @@ export default function LoginPage() {
                     ) : (
                         <>
                             <Link href="/">
-                                <Image
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
                                     src="/logo-full.png"
-                                    alt="ClubForge"
-                                    width={160}
-                                    height={80}
-                                    priority
+                                    alt="DojoHub"
                                     style={{ height: '70px', width: 'auto', margin: '0 auto' }}
                                 />
                             </Link>

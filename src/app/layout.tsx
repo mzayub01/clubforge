@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     locale: "en_GB",
   },
   icons: {
-    icon: '/favicon.jpg',
-    shortcut: '/favicon.jpg',
-    apple: '/favicon.jpg',
+    icon: '/logo-clubforge-icon.svg',
+    shortcut: '/logo-clubforge-icon.svg',
+    apple: '/logo-clubforge-icon.svg',
   },
 };
 
@@ -62,7 +62,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/favicon.jpg" />
+        <link rel="apple-touch-icon" href="/logo-clubforge-icon.svg" />
       </head>
       <body style={{ fontFamily: 'var(--font-sans)' }}>
         {children}

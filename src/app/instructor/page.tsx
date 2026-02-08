@@ -264,7 +264,7 @@ export default async function InstructorDashboard() {
                                     <BookOpen size={20} color="var(--color-gold)" />
                                 </div>
                                 <div>
-                                    <p style={{ fontWeight: '600', margin: 0 }}>Weekly Naseeha</p>
+                                    <p style={{ fontWeight: '600', margin: 0 }}>Weekly Wisdom</p>
                                     <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
                                         Add this week's advice
                                     </p>

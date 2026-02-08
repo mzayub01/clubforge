@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, MapPin, Users, Settings, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useTenantId } from '@/lib/hooks/useTenantId';
+import { Plus, MapPin, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import type { Location } from '@/lib/types';
 
 export default function AdminLocationsPage() {
@@ -13,9 +11,7 @@ export default function AdminLocationsPage() {
     const [editLocation, setEditLocation] = useState<Location | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-
-    const supabase = getSupabaseClient();
-    const tenantId = useTenantId();
+    const [saving, setSaving] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -33,15 +29,20 @@ export default function AdminLocationsPage() {
     }, []);
 
     const fetchLocations = async () => {
-        const { data, error } = await supabase
-            .from('locations')
-            .select('*')
-            .order('name');
+        try {
+            const res = await fetch('/api/admin/locations');
+            const data = await res.json();
 
-        if (error) {
-            console.error('Error fetching locations:', error);
-        } else {
-            setLocations(data || []);
+            if (!res.ok) {
+                console.error('Error fetching locations:', data.error);
+                setError(data.error || 'Failed to load locations');
+                setLocations([]);
+            } else {
+                setLocations(data.locations || []);
+            }
+        } catch (err) {
+            console.error('Network error fetching locations:', err);
+            setError('Failed to connect to server');
         }
         setLoading(false);
     };
@@ -86,59 +87,69 @@ export default function AdminLocationsPage() {
             return;
         }
 
+        setSaving(true);
+
         try {
+            let res: Response;
             if (editLocation) {
-                const { error } = await supabase
-                    .from('locations')
-                    .update({
-                        name: formData.name,
-                        address: formData.address,
-                        city: formData.city,
-                        postcode: formData.postcode,
-                        description: formData.description || null,
-                        contact_email: formData.contact_email || null,
-                        contact_phone: formData.contact_phone || null,
-                        allow_multisite: formData.allow_multisite,
-                    })
-                    .eq('id', editLocation.id);
-
-                if (error) throw error;
-                setSuccess('Location updated successfully');
+                res = await fetch('/api/admin/locations', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: editLocation.id,
+                        ...formData,
+                    }),
+                });
             } else {
-                const { error } = await supabase
-                    .from('locations')
-                    .insert({
-                        tenant_id: tenantId,
-                        name: formData.name,
-                        address: formData.address,
-                        city: formData.city,
-                        postcode: formData.postcode,
-                        description: formData.description || null,
-                        contact_email: formData.contact_email || null,
-                        contact_phone: formData.contact_phone || null,
-                        allow_multisite: formData.allow_multisite,
-                    });
-
-                if (error) throw error;
-                setSuccess('Location created successfully');
+                res = await fetch('/api/admin/locations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
             }
 
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || 'Failed to save location');
+                return;
+            }
+
+            setSuccess(editLocation ? 'Location updated successfully' : 'Location created successfully');
             setShowModal(false);
             fetchLocations();
-        } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-            setError(errorMessage);
+        } catch (err) {
+            console.error('Location save error:', err);
+            setError('Failed to connect to server. Please try again.');
+        } finally {
+            setSaving(false);
         }
     };
 
     const toggleLocationStatus = async (location: Location) => {
-        const { error } = await supabase
-            .from('locations')
-            .update({ is_active: !location.is_active })
-            .eq('id', location.id);
+        try {
+            const res = await fetch('/api/admin/locations', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: location.id,
+                    name: location.name,
+                    address: location.address,
+                    city: location.city,
+                    postcode: location.postcode,
+                    description: location.description,
+                    contact_email: location.contact_email,
+                    contact_phone: location.contact_phone,
+                    allow_multisite: location.allow_multisite,
+                    is_active: !location.is_active,
+                }),
+            });
 
-        if (!error) {
-            fetchLocations();
+            if (res.ok) {
+                fetchLocations();
+            }
+        } catch (err) {
+            console.error('Toggle status error:', err);
         }
     };
 
@@ -349,8 +360,8 @@ export default function AdminLocationsPage() {
                                 <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>
                                     Cancel
                                 </button>
-                                <button type="submit" className="btn btn-primary">
-                                    {editLocation ? 'Save Changes' : 'Create Location'}
+                                <button type="submit" className="btn btn-primary" disabled={saving}>
+                                    {saving ? 'Saving...' : editLocation ? 'Save Changes' : 'Create Location'}
                                 </button>
                             </div>
                         </form>

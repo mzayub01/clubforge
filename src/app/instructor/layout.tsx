@@ -39,9 +39,22 @@ export default async function InstructorLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Instructor';
 
+    // Get tenant logo for the sidebar
+    let tenantLogoUrl: string | undefined;
+    let tenantName: string | undefined;
+    if (tenantMember?.tenant_id) {
+        const { data: tenant } = await adminSupabase
+            .from('tenants')
+            .select('logo_url, name')
+            .eq('id', tenantMember.tenant_id)
+            .single();
+        tenantLogoUrl = tenant?.logo_url || undefined;
+        tenantName = tenant?.name || undefined;
+    }
+
     return (
         <div className="dashboard-layout">
-            <DashboardSidebar role="instructor" userName={userName} />
+            <DashboardSidebar role="instructor" userName={userName} tenantLogoUrl={tenantLogoUrl} tenantName={tenantName} />
             <main className="dashboard-main">
                 {children}
             </main>

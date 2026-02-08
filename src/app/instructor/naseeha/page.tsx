@@ -102,19 +102,19 @@ export default function InstructorNaseehaPage() {
                     .update(payload)
                     .eq('id', editing.id);
                 if (error) throw error;
-                setSuccess('Naseeha updated successfully!');
+                setSuccess('Entry updated successfully!');
             } else {
                 const { error } = await supabase
                     .from('naseeha')
                     .insert(payload);
                 if (error) throw error;
-                setSuccess('Naseeha added successfully!');
+                setSuccess('Entry added successfully!');
             }
 
             setShowModal(false);
             fetchNaseeha();
         } catch (err: any) {
-            setError(err.message || 'Failed to save naseeha');
+            setError(err.message || 'Failed to save entry');
         }
     };
 
@@ -130,14 +130,14 @@ export default function InstructorNaseehaPage() {
         <div>
             <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
                 <div>
-                    <h1 className="dashboard-title">Weekly Naseeha</h1>
+                    <h1 className="dashboard-title">Weekly Wisdom</h1>
                     <p className="dashboard-subtitle">
-                        Share weekly advice and spiritual guidance with students
+                        Share weekly wisdom and guidance with students
                     </p>
                 </div>
                 <button onClick={() => openModal()} className="btn btn-primary">
                     <Plus size={18} />
-                    Add Naseeha
+                    Add Entry
                 </button>
             </div>
 
@@ -158,13 +158,13 @@ export default function InstructorNaseehaPage() {
             {naseehaList.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
                     <BookOpen size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Naseeha Yet</h3>
+                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Entries Yet</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
-                        Start sharing weekly naseeha with your students.
+                        Start sharing weekly wisdom with your students.
                     </p>
                     <button onClick={() => openModal()} className="btn btn-primary">
                         <Plus size={18} />
-                        Add First Naseeha
+                        Add First Entry
                     </button>
                 </div>
             ) : (
@@ -214,7 +214,7 @@ export default function InstructorNaseehaPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">
-                                {editing ? 'Edit Naseeha' : 'Add Naseeha'}
+                                {editing ? 'Edit Entry' : 'Add Entry'}
                             </h2>
                         </div>
 
@@ -263,7 +263,7 @@ export default function InstructorNaseehaPage() {
                                         rows={10}
                                         value={formData.content}
                                         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                        placeholder="Write the naseeha content here..."
+                                        placeholder="Write the wisdom content here..."
                                         required
                                     />
                                 </div>
@@ -274,7 +274,7 @@ export default function InstructorNaseehaPage() {
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn btn-primary">
-                                    {editing ? 'Save Changes' : 'Add Naseeha'}
+                                    {editing ? 'Save Changes' : 'Add Entry'}
                                 </button>
                             </div>
                         </form>

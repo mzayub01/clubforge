@@ -22,7 +22,7 @@ export function WelcomeEmail({
             </Text>
 
             <Text style={baseStyles.text}>
-                Assalamu Alaikum {firstName},
+                Welcome {firstName},
             </Text>
 
             <Text style={baseStyles.text}>

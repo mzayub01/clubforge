@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Award, Users, Plus, Trash2, Loader2, MapPin, CheckCircle, Search } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 
 interface Professor {
     user_id: string;
@@ -35,7 +35,7 @@ export default function ProfessorAccessPage() {
     const [selectedClassToAdd, setSelectedClassToAdd] = useState<string>('');
     const [message, setMessage] = useState('');
 
-    const supabase = getSupabaseClient();
+
 
     useEffect(() => {
         fetchProfessorsAndClasses();
@@ -52,22 +52,22 @@ export default function ProfessorAccessPage() {
     const fetchProfessorsAndClasses = async () => {
         try {
             // Fetch all professors
-            const { data: profs } = await supabase
-                .from('profiles')
-                .select('user_id, first_name, last_name, email')
-                .eq('role', 'professor')
-                .order('first_name');
+            const { data: profs } = await adminFetch<Professor>('profiles', {
+                select: 'user_id, first_name, last_name, email',
+                filters: [{ column: 'role', value: 'professor' }],
+                order: [{ column: 'first_name' }],
+            });
 
             // Fetch all active classes
-            const { data: cls } = await supabase
-                .from('classes')
-                .select('id, name, location:locations(name)')
-                .eq('is_active', true)
-                .order('name');
+            const { data: cls } = await adminFetch('classes', {
+                select: 'id, name, location:locations(name)',
+                filters: [{ column: 'is_active', value: true }],
+                order: [{ column: 'name' }],
+            });
 
             setProfessors(profs || []);
             setClasses(
-                (cls || []).map((c: { id: string; name: string; location: { name: string } | null }) => ({
+                (cls || []).map((c: any) => ({
                     id: c.id,
                     name: c.name,
                     location_name: c.location?.name || '',
@@ -83,17 +83,13 @@ export default function ProfessorAccessPage() {
     const fetchProfessorAccess = async () => {
         setAccessLoading(true);
         try {
-            const { data } = await supabase
-                .from('professor_class_access')
-                .select('id, class_id, class:classes(name, location:locations(name))')
-                .eq('professor_user_id', selectedProfessor);
+            const { data } = await adminFetch('professor_class_access', {
+                select: 'id, class_id, class:classes(name, location:locations(name))',
+                filters: [{ column: 'professor_user_id', value: selectedProfessor }],
+            });
 
             setProfessorAccess(
-                (data || []).map((a: {
-                    id: string;
-                    class_id: string;
-                    class: { name: string; location: { name: string } | null } | null
-                }) => ({
+                (data || []).map((a: any) => ({
                     id: a.id,
                     class_id: a.class_id,
                     class_name: a.class?.name || '',
@@ -120,14 +116,12 @@ export default function ProfessorAccessPage() {
         setMessage('');
 
         try {
-            const { error } = await supabase
-                .from('professor_class_access')
-                .insert({
-                    professor_user_id: selectedProfessor,
-                    class_id: selectedClassToAdd,
-                });
+            const { error } = await adminInsert('professor_class_access', {
+                professor_user_id: selectedProfessor,
+                class_id: selectedClassToAdd,
+            });
 
-            if (error) throw error;
+            if (error) throw new Error(error);
 
             setMessage('Access granted!');
             setSelectedClassToAdd('');
@@ -144,12 +138,9 @@ export default function ProfessorAccessPage() {
         if (!confirm('Remove access to this class?')) return;
 
         try {
-            const { error } = await supabase
-                .from('professor_class_access')
-                .delete()
-                .eq('id', accessId);
+            const { error } = await adminDeleteById('professor_class_access', accessId);
 
-            if (error) throw error;
+            if (error) throw new Error(error);
 
             setProfessorAccess(prev => prev.filter(a => a.id !== accessId));
             setMessage('Access removed');

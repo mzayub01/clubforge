@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Download, Edit, Trash2, AlertCircle, CheckCircle, User, Phone, Mail, Award, Shield, ChevronDown, ChevronUp, CreditCard, MoreHorizontal, Send, X, Eye, Clock, Users, MapPin, Filter, Calendar, Loader2, Info, EyeOff, XCircle, ClipboardList } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useTenantId } from '@/lib/hooks/useTenantId';
+import { adminFetch, adminFetchOne, adminInsert, adminUpdate, adminUpdateById } from '@/lib/admin-api';
 import type { Location, MembershipType } from '@/lib/types';
 import MemberAttendanceModal from '@/components/admin/MemberAttendanceModal';
 import Avatar from '@/components/Avatar';
@@ -92,8 +91,7 @@ export default function AdminMembersPage() {
     // Payment reminder state
     const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
 
-    const supabase = getSupabaseClient();
-    const tenantId = useTenantId();
+
 
     useEffect(() => {
         fetchData();
@@ -106,19 +104,31 @@ export default function AdminMembersPage() {
     const fetchData = async () => {
         try {
             const [profilesRes, membershipsRes, locationsRes, typesRes, waitlistRes] = await Promise.all([
-                supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-                supabase.from('memberships').select('*, location:locations(name), membership_type:membership_types(name)'),
-                supabase.from('locations').select('*').eq('is_active', true).order('name'),
-                supabase.from('membership_types').select('*').eq('is_active', true).order('name'),
-                supabase.from('waitlist').select('user_id'),
+                adminFetch('profiles', {
+                    order: [{ column: 'created_at', ascending: false }],
+                }),
+                adminFetch('memberships', {
+                    select: '*, location:locations(name), membership_type:membership_types(name)',
+                }),
+                adminFetch<Location>('locations', {
+                    filters: [{ column: 'is_active', value: true }],
+                    order: [{ column: 'name' }],
+                }),
+                adminFetch<MembershipType>('membership_types', {
+                    filters: [{ column: 'is_active', value: true }],
+                    order: [{ column: 'name' }],
+                }),
+                adminFetch('waitlist', {
+                    select: 'user_id',
+                }),
             ]);
 
-            if (profilesRes.error) throw profilesRes.error;
+            if (profilesRes.error) throw new Error(profilesRes.error);
 
             const profiles = profilesRes.data || [];
             const memberships = membershipsRes.data || [];
 
-            const waitlistUserIds = new Set((waitlistRes.data || []).map((w: { user_id: string }) => w.user_id));
+            const waitlistUserIds = new Set((waitlistRes.data || []).map((w: any) => w.user_id));
 
             // Create a map of profile IDs to emails for guardian lookup
             const profileIdToEmail: Record<string, string> = {};
@@ -129,7 +139,7 @@ export default function AdminMembersPage() {
             // Attach memberships, guardian email, and waitlist status to profiles
             const membersWithData = profiles.map((profile: any) => ({
                 ...profile,
-                memberships: memberships.filter((m: { user_id: string }) => m.user_id === profile.user_id),
+                memberships: memberships.filter((m: any) => m.user_id === profile.user_id),
                 guardian_email: profile.is_child && profile.parent_guardian_id
                     ? profileIdToEmail[profile.parent_guardian_id]
                     : undefined,
@@ -229,63 +239,50 @@ export default function AdminMembersPage() {
         setSuccess('');
 
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    role: formData.role,
-                    belt_rank: formData.belt_rank,
-                    stripes: formData.stripes,
-                })
-                .eq('id', editingMember.id);
+            const { error } = await adminUpdateById('profiles', editingMember.id, {
+                role: formData.role,
+                belt_rank: formData.belt_rank,
+                stripes: formData.stripes,
+            });
 
-            if (error) throw error;
+            if (error) throw new Error(error);
 
             // Handle instructor record creation/management
             if (formData.role === 'instructor' && editingMember.role !== 'instructor') {
                 // Check if instructor record already exists
-                const { data: existingInstructor } = await supabase
-                    .from('instructors')
-                    .select('id')
-                    .eq('user_id', editingMember.user_id)
-                    .single();
+                const { data: existingInstructor } = await adminFetchOne('instructors', {
+                    select: 'id',
+                    filters: [{ column: 'user_id', value: editingMember.user_id }],
+                });
 
                 if (!existingInstructor) {
                     // Create new instructor record
-                    await supabase
-                        .from('instructors')
-                        .insert({
-                            tenant_id: tenantId,
-                            user_id: editingMember.user_id,
-                            is_active: true,
-                        });
+                    await adminInsert('instructors', {
+                        user_id: editingMember.user_id,
+                        is_active: true,
+                    });
                 } else {
                     // Reactivate existing instructor record
-                    await supabase
-                        .from('instructors')
-                        .update({ is_active: true })
-                        .eq('user_id', editingMember.user_id);
+                    await adminUpdate('instructors', { is_active: true }, [
+                        { column: 'user_id', value: editingMember.user_id },
+                    ]);
                 }
             } else if (formData.role !== 'instructor' && editingMember.role === 'instructor') {
                 // Deactivate instructor record when role changed from instructor
-                await supabase
-                    .from('instructors')
-                    .update({ is_active: false })
-                    .eq('user_id', editingMember.user_id);
+                await adminUpdate('instructors', { is_active: false }, [
+                    { column: 'user_id', value: editingMember.user_id },
+                ]);
             }
 
             // Also record belt progression if belt changed
             if (formData.belt_rank !== editingMember.belt_rank || formData.stripes !== editingMember.stripes) {
-                const { data: { user } } = await supabase.auth.getUser();
-                await supabase
-                    .from('belt_progression')
-                    .insert({
-                        tenant_id: tenantId,
-                        user_id: editingMember.user_id,
-                        belt_rank: formData.belt_rank,
-                        stripes: formData.stripes,
-                        awarded_by: user?.id,
-                        awarded_date: new Date().toISOString().split('T')[0],
-                    });
+                await adminInsert('belt_progression', {
+                    user_id: editingMember.user_id,
+                    belt_rank: formData.belt_rank,
+                    stripes: formData.stripes,
+                    awarded_by: '__CURRENT_USER__',
+                    awarded_date: new Date().toISOString().split('T')[0],
+                });
             }
 
             setSuccess(`${editingMember.first_name}'s profile updated successfully!`);

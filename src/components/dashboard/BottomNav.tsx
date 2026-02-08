@@ -33,7 +33,7 @@ export default function BottomNav({ role = 'member' }: BottomNavProps) {
         { href: '/instructor/classes', label: 'Classes', icon: Calendar, isCheckIn: false },
         { href: '/admin/class-roster', label: 'Check-in', icon: CheckCircle, isCheckIn: true },
         { href: '/instructor/students', label: 'Students', icon: User, isCheckIn: false },
-        { href: '/instructor/naseeha', label: 'Naseeha', icon: Award, isCheckIn: false },
+        { href: '/instructor/naseeha', label: 'Wisdom', icon: Award, isCheckIn: false },
     ];
 
     const professorLinks = [

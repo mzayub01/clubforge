@@ -623,7 +623,7 @@ export default function GetStartedPage() {
         }}>
             {/* Logo */}
             <Link href="/" style={{ marginBottom: 'var(--space-6)' }}>
-                <Image src="/logo-full.png" alt="ClubForge" width={160} height={80}
+                <Image src="/logo-clubforge-final-dark.svg" alt="ClubForge" width={200} height={52}
                     style={{ height: '50px', width: 'auto' }} priority />
             </Link>
 

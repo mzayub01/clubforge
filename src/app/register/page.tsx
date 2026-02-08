@@ -50,6 +50,7 @@ interface MembershipType {
     name: string;
     price: number;
     description: string | null;
+    location_id: string;
 }
 
 interface CapacityConfig {
@@ -130,38 +131,51 @@ function RegisterPageContent() {
     // Determine number of steps based on tenant settings
     const hasEtiquette = Boolean(tenant?.settings?.etiquette_text);
     const totalSteps = hasEtiquette ? 5 : 4;
+    const locationMode = (tenant?.settings?.membership_location_mode as string) || 'per_location';
 
     useEffect(() => {
         fetchTenantAndData();
     }, []);
 
+    // Store all data fetched from the server
+    const [allMembershipTypes, setAllMembershipTypes] = useState<MembershipType[]>([]);
+    const [allCapacityConfigs, setAllCapacityConfigs] = useState<CapacityConfig[]>([]);
+    const [allMembershipCounts, setAllMembershipCounts] = useState<{ location_id: string; membership_type_id: string; count: number }[]>([]);
+
     const fetchTenantAndData = async () => {
         try {
-            // Resolve tenant from current subdomain by checking tenant_members or URL
-            // For now, fetch first active tenant (in production, middleware provides this)
-            const { data: tenants } = await supabase
-                .from('tenants')
-                .select('id, name, slug, logo_url, primary_color, tagline, stripe_account_id, stripe_connect_enabled, settings')
-                .eq('is_active', true)
-                .limit(1);
+            // Fetch all registration data from server-side API (bypasses RLS)
+            const res = await fetch('/api/tenant/register');
+            if (!res.ok) {
+                console.error('Failed to load registration data:', res.status);
+                return;
+            }
+            const data = await res.json();
 
-            if (tenants && tenants.length > 0) {
-                setTenant(tenants[0] as TenantInfo);
+            if (data.tenant) {
+                setTenant(data.tenant as TenantInfo);
             }
 
-            // Fetch locations for this tenant
-            const { data: locs } = await supabase
-                .from('locations')
-                .select('id, name, settings')
-                .eq('is_active', true);
-            setLocations(locs || []);
+            const locs = data.locations || [];
+            setLocations(locs);
+            setAllMembershipTypes(data.membershipTypes || []);
+            setAllCapacityConfigs(data.capacityConfigs || []);
+            setAllMembershipCounts(data.membershipCounts || []);
 
-            // If a location is preselected, load its membership types
+            // Determine the effective location mode
+            const tenantSettings = (data.tenant?.settings || {}) as Record<string, unknown>;
+            const effectiveMode = (tenantSettings.membership_location_mode as string) || 'per_location';
+
+            // Auto-select location and load membership types
             if (preselectedLocation) {
-                await loadMembershipTypes(preselectedLocation);
-            } else if (locs && locs.length === 1) {
-                // Auto-select if only one location
-                await loadMembershipTypes(locs[0].id);
+                setFormData(prev => ({ ...prev, selectedLocationId: preselectedLocation }));
+                filterMembershipTypes(preselectedLocation, effectiveMode, data.membershipTypes || [], data.capacityConfigs || [], data.membershipCounts || []);
+            } else if (effectiveMode === 'all_locations' && locs.length > 0) {
+                setFormData(prev => ({ ...prev, selectedLocationId: locs[0].id }));
+                filterMembershipTypes(locs[0].id, effectiveMode, data.membershipTypes || [], data.capacityConfigs || [], data.membershipCounts || []);
+            } else if (locs.length === 1) {
+                setFormData(prev => ({ ...prev, selectedLocationId: locs[0].id }));
+                filterMembershipTypes(locs[0].id, effectiveMode, data.membershipTypes || [], data.capacityConfigs || [], data.membershipCounts || []);
             }
         } catch (err) {
             console.error('Error loading registration data:', err);
@@ -170,27 +184,36 @@ function RegisterPageContent() {
         }
     };
 
-    const loadMembershipTypes = async (locationId: string) => {
-        const [typesRes, configsRes] = await Promise.all([
-            supabase.from('membership_types').select('*').eq('location_id', locationId).eq('is_active', true),
-            supabase.from('location_membership_configs').select('*').eq('location_id', locationId),
-        ]);
+    // Filter membership types from the already-fetched data (no extra API calls)
+    const filterMembershipTypes = (
+        locationId: string,
+        mode: string,
+        types: MembershipType[],
+        configs: CapacityConfig[],
+        counts: { location_id: string; membership_type_id: string; count: number }[],
+    ) => {
+        // In all_locations mode, show all types; in per_location, filter by location
+        const filtered = mode === 'all_locations'
+            ? types
+            : types.filter(t => t.location_id === locationId);
+        setMembershipTypes(filtered);
 
-        setMembershipTypes(typesRes.data || []);
+        // Filter capacity configs for this location
+        const locConfigs = configs
+            .filter((c: CapacityConfig) => c.location_id === locationId)
+            .map((config: CapacityConfig) => {
+                const match = counts.find(
+                    m => m.location_id === locationId && m.membership_type_id === config.membership_type_id
+                );
+                return { ...config, current_count: match?.count || 0 };
+            });
+        setCapacityConfigs(locConfigs);
+    };
 
-        const configs = configsRes.data || [];
-        const configsWithCounts = await Promise.all(
-            configs.map(async (config: CapacityConfig) => {
-                const { count } = await supabase
-                    .from('memberships')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('location_id', locationId)
-                    .eq('membership_type_id', config.membership_type_id)
-                    .in('status', ['active', 'pending']);
-                return { ...config, current_count: count || 0 };
-            })
-        );
-        setCapacityConfigs(configsWithCounts);
+    // Legacy wrapper for handleLocationChange compatibility
+    const loadMembershipTypes = async (locationId: string, mode?: string) => {
+        const effectiveMode = mode || locationMode;
+        filterMembershipTypes(locationId, effectiveMode, allMembershipTypes, allCapacityConfigs, allMembershipCounts);
     };
 
     const hasCapacity = (membershipTypeId: string): boolean => {
@@ -319,7 +342,7 @@ function RegisterPageContent() {
 
             case 4: // Membership Selection (or final step)
             case 5:
-                if (!formData.selectedLocationId) {
+                if (locationMode === 'per_location' && !formData.selectedLocationId) {
                     setError('Please select a location');
                     return false;
                 }
@@ -348,7 +371,7 @@ function RegisterPageContent() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateStep(totalSteps)) return;
-        if (!formData.selectedLocationId) {
+        if (locationMode === 'per_location' && !formData.selectedLocationId) {
             setError('Location is required');
             return;
         }
@@ -1026,8 +1049,8 @@ function RegisterPageContent() {
                                     Choose Your Membership
                                 </h2>
 
-                                {/* Location selector (if multiple) */}
-                                {locations.length > 1 && (
+                                {/* Location selector — only in per_location mode with multiple locations */}
+                                {locationMode === 'per_location' && locations.length > 1 && (
                                     <div className="form-group">
                                         <label className="form-label"><MapPin size={14} /> Location *</label>
                                         <select
@@ -1043,8 +1066,8 @@ function RegisterPageContent() {
                                     </div>
                                 )}
 
-                                {/* Hidden location for single-location clubs */}
-                                {locations.length === 1 && (
+                                {/* Show location badge for single-location (per_location mode) */}
+                                {locationMode === 'per_location' && locations.length === 1 && (
                                     <div style={{
                                         padding: 'var(--space-3)',
                                         background: `${accentColor}15`,
@@ -1056,6 +1079,22 @@ function RegisterPageContent() {
                                     }}>
                                         <MapPin size={16} color={accentColor} />
                                         <span style={{ fontWeight: '500' }}>{locations[0].name}</span>
+                                    </div>
+                                )}
+
+                                {/* All-locations mode: show info badge */}
+                                {locationMode === 'all_locations' && (
+                                    <div style={{
+                                        padding: 'var(--space-3)',
+                                        background: `${accentColor}15`,
+                                        borderRadius: 'var(--radius-md)',
+                                        marginBottom: 'var(--space-4)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-2)',
+                                    }}>
+                                        <MapPin size={16} color={accentColor} />
+                                        <span style={{ fontWeight: '500' }}>Membership covers all locations</span>
                                     </div>
                                 )}
 

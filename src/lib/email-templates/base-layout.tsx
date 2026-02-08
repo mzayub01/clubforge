@@ -94,7 +94,7 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                 <Container style={baseStyles.container}>
                     <Section style={baseStyles.card}>
                         <Img
-                            src="https://clubforgehq.com/logo-full.png"
+                            src="https://clubforgehq.com/logo-clubforge-final.svg"
                             alt="ClubForge"
                             style={baseStyles.logo}
                             height={60}

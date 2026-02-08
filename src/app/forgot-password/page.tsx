@@ -57,10 +57,10 @@ export default function ForgotPasswordPage() {
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
                     <Link href="/">
                         <Image
-                            src="/logo-full.png"
+                            src="/logo-clubforge-final.svg"
                             alt="ClubForge"
-                            width={160}
-                            height={80}
+                            width={200}
+                            height={52}
                             priority
                             style={{ height: '70px', width: 'auto', margin: '0 auto' }}
                         />

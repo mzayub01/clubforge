@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Concept A: Geometric CF Monogram — Interlocking structure -->
+  <!-- The C wraps around the F's vertical stem, symbolizing a system enclosing/supporting its parts -->
+  
+  <!-- C shape — open arc representing the club/community container -->
+  <path d="M28 8C15.85 8 6 17.85 6 30s9.85 22 22 22c5.5 0 10.55-2.02 14.42-5.36" 
+        stroke="#0F172A" stroke-width="7" stroke-linecap="round" fill="none"/>
+  
+  <!-- F vertical stem — the backbone/forge/infrastructure -->
+  <rect x="34" y="12" width="7" height="40" rx="3.5" fill="#0F172A"/>
+  
+  <!-- F top horizontal bar -->
+  <rect x="34" y="12" width="22" height="7" rx="3.5" fill="#0F172A"/>
+  
+  <!-- F middle bar — gold accent = the forging point, the value connector -->
+  <rect x="34" y="28" width="16" height="7" rx="3.5" fill="#C5A456"/>
+</svg>

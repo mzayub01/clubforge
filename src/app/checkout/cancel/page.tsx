@@ -21,10 +21,10 @@ export default function CheckoutCancelPage() {
             }}>
                 <Link href="/">
                     <Image
-                        src="/logo-full.png"
+                        src="/logo-clubforge-final.svg"
                         alt="ClubForge"
-                        width={140}
-                        height={70}
+                        width={200}
+                        height={52}
                         style={{ height: '50px', width: 'auto', margin: '0 auto var(--space-6)' }}
                     />
                 </Link>

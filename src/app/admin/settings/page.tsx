@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import {
     Settings, Palette, CreditCard, Crown, Save, CheckCircle, AlertCircle,
     Upload, ExternalLink, Loader2, Database, Mail, Phone, Globe, Tag,
-    Shield, Zap
+    Shield, Zap, MapPin
 } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
@@ -63,6 +63,7 @@ export default function AdminSettingsPage() {
     const [etiquetteText, setEtiquetteText] = useState('');
     const [registrationMessage, setRegistrationMessage] = useState('');
     const [requireProfilePhoto, setRequireProfilePhoto] = useState(false);
+    const [membershipLocationMode, setMembershipLocationMode] = useState<'per_location' | 'all_locations'>('per_location');
     const logoInputRef = useRef<HTMLInputElement>(null);
 
     const supabase = getSupabaseClient();
@@ -103,6 +104,7 @@ export default function AdminSettingsPage() {
                 setEtiquetteText((settings.etiquette_text as string) || '');
                 setRegistrationMessage((settings.registration_message as string) || '');
                 setRequireProfilePhoto((settings.require_profile_photo as boolean) || false);
+                setMembershipLocationMode((settings.membership_location_mode as 'per_location' | 'all_locations') || 'per_location');
             }
 
             if (result.stats) {
@@ -161,6 +163,7 @@ export default function AdminSettingsPage() {
                         etiquetteText,
                         registrationMessage,
                         requireProfilePhoto,
+                        membershipLocationMode,
                     },
                 }),
             });
@@ -547,6 +550,55 @@ export default function AdminSettingsPage() {
                                         />
                                         <span>Require profile photo during member registration</span>
                                     </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Membership Settings */}
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                <MapPin size={20} color="var(--color-gold)" />
+                                Membership Settings
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <div className="form-group">
+                                <label className="form-label">Location Mode</label>
+                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-xs)', margin: '0 0 var(--space-3) 0' }}>
+                                    Controls how memberships relate to your locations during registration
+                                </p>
+                                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                                    {(['per_location', 'all_locations'] as const).map(mode => (
+                                        <label key={mode} style={{
+                                            flex: 1,
+                                            padding: 'var(--space-4)',
+                                            background: membershipLocationMode === mode ? 'var(--color-gold-bg, rgba(197,164,86,0.1))' : 'var(--bg-secondary)',
+                                            borderRadius: 'var(--radius-lg)',
+                                            border: `2px solid ${membershipLocationMode === mode ? 'var(--color-gold)' : 'var(--border-light)'}`,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                                                <input
+                                                    type="radio"
+                                                    name="locationMode"
+                                                    checked={membershipLocationMode === mode}
+                                                    onChange={() => setMembershipLocationMode(mode)}
+                                                    style={{ accentColor: 'var(--color-gold)' }}
+                                                />
+                                                <strong style={{ fontSize: 'var(--text-sm)' }}>
+                                                    {mode === 'per_location' ? 'Per Location' : 'All Locations'}
+                                                </strong>
+                                            </div>
+                                            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: 0 }}>
+                                                {mode === 'per_location'
+                                                    ? 'Members choose a specific location when registering. Best for clubs with distinct branches.'
+                                                    : 'One membership covers all locations. Members can attend any location.'}
+                                            </p>
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
                         </div>

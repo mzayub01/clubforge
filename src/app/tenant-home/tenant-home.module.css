@@ -1,0 +1,586 @@
+/* =============================================
+   ClubForge — Tenant Club Landing Page
+   Premium light-theme with glassmorphism
+   ============================================= */
+
+/* ---------- Keyframes ---------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px var(--club-glow); }
+  50% { box-shadow: 0 0 40px var(--club-glow), 0 0 60px var(--club-glow-pale); }
+}
+
+/* ---------- Page Container ---------- */
+.page {
+  --club-color: #C5A456;
+  --club-glow: rgba(197, 164, 86, 0.25);
+  --club-glow-pale: rgba(197, 164, 86, 0.10);
+
+  min-height: 100vh;
+  background: #FAFBFC;
+  color: var(--text-primary, #111827);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  overflow-x: hidden;
+}
+
+/* ---------- Loading & Error States ---------- */
+.loadingScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FAFBFC;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--club-color);
+}
+
+.errorScreen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FAFBFC;
+  color: var(--text-primary, #111827);
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorIcon {
+  color: var(--color-gray-400, #9CA3AF);
+  margin-bottom: 1rem;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #111827);
+}
+
+.errorMessage {
+  color: var(--text-secondary, #6B7280);
+  margin-bottom: 1.5rem;
+}
+
+.errorLink {
+  color: var(--club-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.errorLink:hover {
+  opacity: 0.8;
+}
+
+/* ==========================================
+   HERO SECTION
+   ========================================== */
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
+}
+
+/* Decorative background elements */
+.heroBgGlow {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--club-glow-pale) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroAccentTopRight {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: var(--club-glow-pale);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroAccentBottomLeft {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(197, 164, 86, 0.06);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Geometric line decoration */
+.heroDecorLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--club-glow) 50%, transparent 100%);
+  z-index: 1;
+}
+
+/* Logo */
+.logoContainer {
+  position: relative;
+  z-index: 2;
+  width: 130px;
+  height: 130px;
+  border-radius: 28px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  border: 2px solid rgba(197, 164, 86, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  background: #fff;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.logoPlaceholder {
+  position: relative;
+  z-index: 2;
+  width: 130px;
+  height: 130px;
+  border-radius: 28px;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, rgba(197, 164, 86, 0.12), rgba(197, 164, 86, 0.04));
+  border: 2px solid rgba(197, 164, 86, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.25rem;
+  font-weight: 800;
+  color: var(--club-color);
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+/* Club Name */
+.clubName {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--text-primary, #111827);
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Tagline */
+.tagline {
+  position: relative;
+  z-index: 2;
+  font-size: 1.15rem;
+  color: var(--text-secondary, #6B7280);
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* Member Count Badge */
+.memberBadge {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(197, 164, 86, 0.08);
+  border: 1px solid rgba(197, 164, 86, 0.15);
+  border-radius: 100px;
+  color: var(--text-secondary, #6B7280);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  margin-top: 0.75rem;
+  animation: fadeInUp 0.6s ease-out 0.25s both;
+}
+
+.memberBadge svg {
+  color: var(--club-color);
+}
+
+/* CTA Section */
+.ctaGroup {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  width: 100%;
+  max-width: 380px;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.ctaPrimary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #D4B86A 0%, #C5A456 50%, #A88B3D 100%);
+  color: #1A1A1A;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 4px 16px rgba(197, 164, 86, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 28px rgba(197, 164, 86, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ctaPrimary:active {
+  transform: translateY(0);
+}
+
+.ctaSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: #FFFFFF;
+  color: var(--text-primary, #111827);
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1.5px solid var(--border-light, #E5E7EB);
+  transition: all 0.2s ease;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+.ctaSecondary:hover {
+  border-color: var(--club-color);
+  color: var(--club-color);
+  background: rgba(197, 164, 86, 0.03);
+}
+
+/* ==========================================
+   SECTION SHARED STYLES
+   ========================================== */
+.section {
+  padding: 3.5rem 1.5rem;
+  max-width: 780px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.75rem;
+  text-align: center;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  color: var(--text-primary, #111827);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.sectionIcon {
+  color: var(--club-color);
+}
+
+/* ==========================================
+   CLASS SCHEDULE
+   ========================================== */
+.scheduleSection {
+  composes: section;
+  padding-top: 4rem;
+}
+
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dayCard {
+  background: #FFFFFF;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-light, #E5E7EB);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.dayCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+.dayHeader {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, rgba(197, 164, 86, 0.08), rgba(197, 164, 86, 0.03));
+  border-bottom: 1px solid rgba(197, 164, 86, 0.1);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--club-color);
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  letter-spacing: 0.01em;
+}
+
+.classRow {
+  padding: 0.875rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.classRowBorder {
+  composes: classRow;
+  border-bottom: 1px solid var(--border-light, #F3F4F6);
+}
+
+.className {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-primary, #111827);
+}
+
+.classLocation {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--text-tertiary, #9CA3AF);
+  margin-top: 3px;
+}
+
+.classTime {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #6B7280);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ==========================================
+   LOCATIONS
+   ========================================== */
+.locationsSection {
+  composes: section;
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+.locationGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.locationGridSingle {
+  composes: locationGrid;
+  grid-template-columns: 1fr;
+}
+
+.locationGridMulti {
+  composes: locationGrid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.locationCard {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-light, #E5E7EB);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.locationCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
+}
+
+.locationName {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary, #111827);
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+}
+
+.locationAddress {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #6B7280);
+  line-height: 1.6;
+}
+
+/* ==========================================
+   CONTACT
+   ========================================== */
+.contactSection {
+  padding: 2rem 1.5rem;
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contactLinks {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.contactLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary, #6B7280);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.5rem 0;
+}
+
+.contactLink:hover {
+  color: var(--club-color);
+}
+
+.contactLink svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+.footer {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid var(--border-light, #E5E7EB);
+  margin-top: 2rem;
+}
+
+.footerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-tertiary, #9CA3AF);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.footerLink:hover {
+  color: var(--text-secondary, #6B7280);
+}
+
+.footerBrand {
+  font-weight: 600;
+  color: var(--text-secondary, #6B7280);
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (min-width: 768px) {
+  .hero {
+    min-height: 75vh;
+    padding: 5rem 2rem 4rem;
+  }
+
+  .ctaGroup {
+    flex-direction: row;
+    max-width: 500px;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    flex: 1;
+  }
+
+  .section {
+    padding: 4rem 2rem;
+  }
+
+  .scheduleSection {
+    padding-top: 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    padding: 6rem 2rem 5rem;
+  }
+
+  .heroBgGlow {
+    width: 900px;
+    height: 900px;
+  }
+}

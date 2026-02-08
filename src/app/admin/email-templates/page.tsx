@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Mail, Edit, Eye, Save, X, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { adminFetch, adminUpdateById } from '@/lib/admin-api';
 
 interface EmailTemplate {
     id: string;
@@ -39,7 +39,6 @@ export default function AdminEmailTemplatesPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const supabase = getSupabaseClient();
 
     useEffect(() => {
         fetchTemplates();
@@ -47,10 +46,9 @@ export default function AdminEmailTemplatesPage() {
 
     const fetchTemplates = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('email_templates')
-            .select('*')
-            .order('name');
+        const { data, error } = await adminFetch<EmailTemplate>('email_templates', {
+            order: [{ column: 'name' }],
+        });
 
         if (error) {
             console.error('Error fetching templates:', error);
@@ -67,21 +65,18 @@ export default function AdminEmailTemplatesPage() {
         setSaving(true);
         setError('');
 
-        const { error } = await supabase
-            .from('email_templates')
-            .update({
-                subject: editingTemplate.subject,
-                greeting: editingTemplate.greeting,
-                body_intro: editingTemplate.body_intro,
-                body_details: editingTemplate.body_details,
-                body_action: editingTemplate.body_action,
-                body_closing: editingTemplate.body_closing,
-                signature: editingTemplate.signature,
-                button_text: editingTemplate.button_text,
-                button_url: editingTemplate.button_url,
-                is_active: editingTemplate.is_active,
-            })
-            .eq('id', editingTemplate.id);
+        const { error } = await adminUpdateById('email_templates', editingTemplate.id, {
+            subject: editingTemplate.subject,
+            greeting: editingTemplate.greeting,
+            body_intro: editingTemplate.body_intro,
+            body_details: editingTemplate.body_details,
+            body_action: editingTemplate.body_action,
+            body_closing: editingTemplate.body_closing,
+            signature: editingTemplate.signature,
+            button_text: editingTemplate.button_text,
+            button_url: editingTemplate.button_url,
+            is_active: editingTemplate.is_active,
+        });
 
         if (error) {
             console.error('Error saving template:', error);

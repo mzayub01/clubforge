@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
 
@@ -15,17 +16,26 @@ export default async function InstructorLayout({
         redirect('/login');
     }
 
-    // Get user profile and verify instructor role
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, role')
+    // Get user role from tenant_members (multi-tenant model)
+    const adminSupabase = createAdminClient();
+    const { data: tenantMember } = await adminSupabase
+        .from('tenant_members')
+        .select('role, tenant_id')
         .eq('user_id', user.id)
+        .eq('is_active', true)
         .single();
 
-    // Instructors and admins can access instructor pages
-    if (profile?.role !== 'instructor' && profile?.role !== 'admin') {
+    // Instructors, professors, and admins can access instructor pages
+    if (!['instructor', 'professor', 'admin'].includes(tenantMember?.role || '')) {
         redirect('/dashboard');
     }
+
+    // Get user name from profiles
+    const { data: profile } = await adminSupabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Instructor';
 
@@ -39,4 +49,3 @@ export default async function InstructorLayout({
         </div>
     );
 }
-

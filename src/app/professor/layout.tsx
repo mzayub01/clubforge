@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
 
@@ -15,17 +16,26 @@ export default async function ProfessorLayout({
         redirect('/login');
     }
 
-    // Get user profile and verify professor role
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, role')
+    // Get user role from tenant_members (multi-tenant model)
+    const adminSupabase = createAdminClient();
+    const { data: tenantMember } = await adminSupabase
+        .from('tenant_members')
+        .select('role, tenant_id')
         .eq('user_id', user.id)
+        .eq('is_active', true)
         .single();
 
     // Only professors and admins can access professor pages
-    if (profile?.role !== 'professor' && profile?.role !== 'admin') {
+    if (!['professor', 'admin'].includes(tenantMember?.role || '')) {
         redirect('/dashboard');
     }
+
+    // Get user name from profiles
+    const { data: profile } = await adminSupabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Professor';
 

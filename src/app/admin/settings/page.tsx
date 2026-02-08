@@ -86,26 +86,12 @@ export default function AdminSettingsPage() {
 
     const fetchData = async () => {
         try {
-            // Get current user's tenant
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
+            const res = await fetch('/api/admin/settings');
+            if (!res.ok) throw new Error('Failed to fetch settings');
+            const result = await res.json();
 
-            const { data: tenantMember } = await supabase
-                .from('tenant_members')
-                .select('tenant_id')
-                .eq('user_id', user.id)
-                .eq('is_active', true)
-                .single();
-
-            if (!tenantMember) return;
-
-            const { data: tenantData } = await supabase
-                .from('tenants')
-                .select('*')
-                .eq('id', tenantMember.tenant_id)
-                .single();
-
-            if (tenantData) {
+            if (result.tenant) {
+                const tenantData = result.tenant;
                 setTenant(tenantData as TenantData);
                 setName(tenantData.name || '');
                 setContactEmail(tenantData.contact_email || '');
@@ -119,25 +105,9 @@ export default function AdminSettingsPage() {
                 setRequireProfilePhoto((settings.require_profile_photo as boolean) || false);
             }
 
-            // Fetch stats
-            const [
-                { count: totalMembers },
-                { count: activeMembers },
-                { count: totalClasses },
-                { count: totalLocations },
-            ] = await Promise.all([
-                supabase.from('profiles').select('*', { count: 'exact', head: true }),
-                supabase.from('memberships').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-                supabase.from('classes').select('*', { count: 'exact', head: true }).eq('is_active', true),
-                supabase.from('locations').select('*', { count: 'exact', head: true }).eq('is_active', true),
-            ]);
-
-            setStats({
-                totalMembers: totalMembers || 0,
-                activeMembers: activeMembers || 0,
-                totalClasses: totalClasses || 0,
-                totalLocations: totalLocations || 0,
-            });
+            if (result.stats) {
+                setStats(result.stats);
+            }
         } catch (err) {
             console.error('Error fetching settings:', err);
         } finally {
@@ -150,17 +120,22 @@ export default function AdminSettingsPage() {
         setSaving(true);
         setError('');
         try {
-            const { error: updateError } = await supabase
-                .from('tenants')
-                .update({
-                    name,
-                    contact_email: contactEmail || null,
-                    contact_phone: contactPhone || null,
-                    tagline: tagline || null,
-                })
-                .eq('id', tenant.id);
-
-            if (updateError) throw updateError;
+            const res = await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    section: 'general',
+                    data: {
+                        name,
+                        contactEmail: contactEmail || null,
+                        contactPhone: contactPhone || null,
+                        tagline: tagline || null,
+                    },
+                }),
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'Failed to save');
+            if (result.tenant) setTenant(result.tenant as TenantData);
             setSuccess('General settings saved successfully!');
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
@@ -175,24 +150,23 @@ export default function AdminSettingsPage() {
         setSaving(true);
         setError('');
         try {
-            const settings = {
-                ...((tenant.settings || {}) as Record<string, unknown>),
-                waiver_text: waiverText || undefined,
-                etiquette_text: etiquetteText || undefined,
-                registration_message: registrationMessage || undefined,
-                require_profile_photo: requireProfilePhoto,
-            };
-
-            const { error: updateError } = await supabase
-                .from('tenants')
-                .update({
-                    primary_color: primaryColor,
-                    settings,
-                })
-                .eq('id', tenant.id);
-
-            if (updateError) throw updateError;
-            setTenant(prev => prev ? { ...prev, primary_color: primaryColor, settings } : null);
+            const res = await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    section: 'branding',
+                    data: {
+                        primaryColor,
+                        waiverText,
+                        etiquetteText,
+                        registrationMessage,
+                        requireProfilePhoto,
+                    },
+                }),
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'Failed to save');
+            if (result.tenant) setTenant(result.tenant as TenantData);
             setSuccess('Branding settings saved successfully!');
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
@@ -221,12 +195,19 @@ export default function AdminSettingsPage() {
                 .from('tenant-assets')
                 .getPublicUrl(path);
 
-            await supabase
-                .from('tenants')
-                .update({ logo_url: publicUrl })
-                .eq('id', tenant.id);
+            // Update tenant record via API (bypasses RLS)
+            const res = await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    section: 'logo',
+                    data: { logoUrl: publicUrl },
+                }),
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'Failed to update logo');
 
-            setTenant(prev => prev ? { ...prev, logo_url: publicUrl } : null);
+            if (result.tenant) setTenant(result.tenant as TenantData);
             setSuccess('Logo updated!');
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
@@ -766,7 +747,7 @@ export default function AdminSettingsPage() {
                             marginBottom: 'var(--space-4)',
                         }}>
                             <span className={`badge ${tenant?.subscription_tier === 'elite' ? 'badge-gold' :
-                                    tenant?.subscription_tier === 'pro' ? 'badge-blue' : 'badge-green'
+                                tenant?.subscription_tier === 'pro' ? 'badge-blue' : 'badge-green'
                                 }`} style={{ fontSize: 'var(--text-base)', padding: 'var(--space-2) var(--space-4)' }}>
                                 {(tenant?.subscription_tier || 'starter').toUpperCase()}
                             </span>

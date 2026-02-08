@@ -58,7 +58,7 @@ export default function CheckoutCancelPage() {
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                    <Link href="/join" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
+                    <Link href="/pricing" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
                         <RefreshCw size={18} />
                         Try Again
                     </Link>

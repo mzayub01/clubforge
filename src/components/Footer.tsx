@@ -1,108 +1,106 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-    MapPin,
-    Phone,
-    Mail,
-    Facebook,
-    Instagram,
-    Youtube
-} from 'lucide-react';
+import { Mail, Twitter, Linkedin, Github } from 'lucide-react';
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="footer">
-            <div className="footer-grid">
+        <footer className="footer" style={{ background: 'var(--color-gray-900)', color: 'var(--color-gray-300)' }}>
+            <div
+                style={{
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    padding: 'var(--space-16) var(--space-6) var(--space-8)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: 'var(--space-10)',
+                }}
+            >
                 {/* Brand */}
-                <div className="footer-brand">
-                    <Image
-                        src="/logo-simple.png"
-                        alt="ClubForge"
-                        width={120}
-                        height={120}
-                        style={{
-                            height: '80px',
-                            width: 'auto',
-                            filter: 'brightness(0) invert(1)'
-                        }}
-                    />
-                    <p style={{ marginTop: 'var(--space-4)' }}>
-                        The all-in-one management platform for martial arts gyms and fitness centers.
+                <div style={{ gridColumn: 'span 1' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                        <Image
+                            src="/logo-simple.png"
+                            alt="ClubForge"
+                            width={120}
+                            height={40}
+                            style={{ height: '32px', width: 'auto', filter: 'brightness(0) invert(1)' }}
+                        />
+                        <span style={{ fontSize: 'var(--text-lg)', fontWeight: '700', color: 'var(--color-white)' }}>
+                            ClubForge
+                        </span>
+                    </div>
+                    <p style={{ fontSize: 'var(--text-sm)', lineHeight: '1.7', color: 'var(--color-gray-400)', marginBottom: 'var(--space-4)' }}>
+                        The operating system for clubs. Build, run, and grow your gym, dojo, or academy with one powerful platform.
                     </p>
-                    <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
-                        <a
-                            href="https://facebook.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: 'var(--color-gray-400)' }}
-                        >
-                            <Facebook size={20} />
+                    <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                        <a href="https://twitter.com/clubforgehq" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gray-500)' }}>
+                            <Twitter size={18} />
                         </a>
-                        <a
-                            href="https://instagram.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: 'var(--color-gray-400)' }}
-                        >
-                            <Instagram size={20} />
-                        </a>
-                        <a
-                            href="https://youtube.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: 'var(--color-gray-400)' }}
-                        >
-                            <Youtube size={20} />
+                        <a href="https://linkedin.com/company/clubforge" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gray-500)' }}>
+                            <Linkedin size={18} />
                         </a>
                     </div>
                 </div>
 
+                {/* Product */}
                 <div>
-                    <h4 className="footer-title">Quick Links</h4>
-                    <ul className="footer-links">
-                        <li><Link href="/about">About Us</Link></li>
-                        <li><Link href="/classes">BJJ Classes</Link></li>
-                        <li><Link href="/events">Events</Link></li>
-                        <li><Link href="/faq">FAQ</Link></li>
-                        <li><Link href="/register">Register</Link></li>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
+                        Product
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <li><Link href="/#features" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Features</Link></li>
+                        <li><Link href="/pricing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Pricing</Link></li>
+                        <li><Link href="/demo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Book a Demo</Link></li>
+                        <li><Link href="/register" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Start Free Trial</Link></li>
                     </ul>
                 </div>
 
-                {/* Locations */}
+                {/* Company */}
                 <div>
-                    <h4 className="footer-title">Platform</h4>
-                    <ul className="footer-links">
-                        <li><Link href="/classes">Features</Link></li>
-                        <li><Link href="/faq">Pricing</Link></li>
-                        <li><Link href="/about">About</Link></li>
-                        <li><Link href="/faq">Support</Link></li>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
+                        Company
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <li><Link href="/about" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>About</Link></li>
+                        <li><Link href="/faq" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>FAQ</Link></li>
+                        <li><a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Contact</a></li>
                     </ul>
                 </div>
 
-                {/* Contact */}
+                {/* Legal */}
                 <div>
-                    <h4 className="footer-title">Contact Us</h4>
-                    <ul className="footer-links">
-                        <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                            <MapPin size={16} />
-                            <span>Worldwide</span>
-                        </li>
-                        <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                            <Mail size={16} />
-                            <a href="mailto:support@clubforgehq.com">support@clubforgehq.com</a>
-                        </li>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
+                        Legal
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <li><Link href="/privacy" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Privacy Policy</Link></li>
+                        <li><Link href="/terms" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Terms of Service</Link></li>
                     </ul>
                 </div>
             </div>
 
-            <div className="footer-bottom">
-                <p>© {currentYear} ClubForge. All rights reserved.</p>
-                <div style={{ marginTop: 'var(--space-2)', display: 'flex', justifyContent: 'center', gap: 'var(--space-4)' }}>
-                    <Link href="/privacy">Privacy Policy</Link>
-                    <Link href="/terms">Terms of Service</Link>
-                    <Link href="/waiver">Liability Waiver</Link>
+            {/* Bottom bar */}
+            <div
+                style={{
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    padding: 'var(--space-6) var(--space-6)',
+                    borderTop: '1px solid var(--color-gray-800)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 'var(--space-4)',
+                }}
+            >
+                <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-gray-500)' }}>
+                    © {currentYear} ClubForge. All rights reserved.
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-gray-500)' }}>
+                    <Mail size={14} />
+                    <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gray-500)' }}>support@clubforgehq.com</a>
                 </div>
             </div>
         </footer>

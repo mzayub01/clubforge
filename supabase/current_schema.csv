@@ -1,0 +1,197 @@
+table_name,column_name,data_type,column_default,is_nullable,udt_name
+announcements,id,uuid,uuid_generate_v4(),NO,uuid
+announcements,title,text,null,NO,text
+announcements,message,text,null,NO,text
+announcements,location_id,uuid,null,YES,uuid
+announcements,target_audience,text,'all'::text,YES,text
+announcements,is_active,boolean,true,YES,bool
+announcements,expires_at,timestamp with time zone,null,YES,timestamptz
+announcements,created_by,uuid,null,YES,uuid
+announcements,created_at,timestamp with time zone,now(),YES,timestamptz
+announcements,updated_at,timestamp with time zone,now(),YES,timestamptz
+announcements,tenant_id,uuid,null,YES,uuid
+attendance,id,uuid,uuid_generate_v4(),NO,uuid
+attendance,class_id,uuid,null,NO,uuid
+attendance,user_id,uuid,null,NO,uuid
+attendance,class_date,date,CURRENT_DATE,NO,date
+attendance,check_in_time,timestamp with time zone,now(),YES,timestamptz
+attendance,checked_in_by,uuid,null,YES,uuid
+attendance,notes,text,null,YES,text
+attendance,created_at,timestamp with time zone,now(),YES,timestamptz
+attendance,tenant_id,uuid,null,YES,uuid
+belt_progression,id,uuid,uuid_generate_v4(),NO,uuid
+belt_progression,user_id,uuid,null,NO,uuid
+belt_progression,belt_rank,USER-DEFINED,null,NO,belt_rank
+belt_progression,stripes,integer,0,YES,int4
+belt_progression,awarded_date,date,CURRENT_DATE,YES,date
+belt_progression,awarded_by,uuid,null,YES,uuid
+belt_progression,notes,text,null,YES,text
+belt_progression,created_at,timestamp with time zone,now(),YES,timestamptz
+belt_progression,tenant_id,uuid,null,YES,uuid
+classes,id,uuid,uuid_generate_v4(),NO,uuid
+classes,location_id,uuid,null,NO,uuid
+classes,instructor_id,uuid,null,YES,uuid
+classes,name,text,null,NO,text
+classes,description,text,null,YES,text
+classes,class_type,USER-DEFINED,null,NO,class_type
+classes,day_of_week,integer,null,NO,int4
+classes,start_time,time without time zone,null,NO,time
+classes,end_time,time without time zone,null,NO,time
+classes,max_capacity,integer,null,YES,int4
+classes,is_recurring,boolean,true,YES,bool
+classes,is_active,boolean,true,YES,bool
+classes,created_at,timestamp with time zone,now(),YES,timestamptz
+classes,updated_at,timestamp with time zone,now(),YES,timestamptz
+classes,tenant_id,uuid,null,YES,uuid
+event_rsvps,id,uuid,uuid_generate_v4(),NO,uuid
+event_rsvps,event_id,uuid,null,NO,uuid
+event_rsvps,user_id,uuid,null,NO,uuid
+event_rsvps,status,USER-DEFINED,'pending'::rsvp_status,NO,rsvp_status
+event_rsvps,payment_status,USER-DEFINED,null,YES,payment_status
+event_rsvps,stripe_payment_intent_id,text,null,YES,text
+event_rsvps,notes,text,null,YES,text
+event_rsvps,created_at,timestamp with time zone,now(),YES,timestamptz
+event_rsvps,updated_at,timestamp with time zone,now(),YES,timestamptz
+event_rsvps,tenant_id,uuid,null,YES,uuid
+events,id,uuid,uuid_generate_v4(),NO,uuid
+events,title,text,null,NO,text
+events,description,text,null,YES,text
+events,event_type,USER-DEFINED,null,NO,event_type
+events,location_id,uuid,null,YES,uuid
+events,start_date,date,null,NO,date
+events,end_date,date,null,YES,date
+events,start_time,time without time zone,null,YES,time
+events,end_time,time without time zone,null,YES,time
+events,max_capacity,integer,null,YES,int4
+events,price,integer,0,YES,int4
+events,is_members_only,boolean,false,YES,bool
+events,rsvp_deadline,date,null,YES,date
+events,image_url,text,null,YES,text
+events,is_active,boolean,true,YES,bool
+events,created_at,timestamp with time zone,now(),YES,timestamptz
+events,updated_at,timestamp with time zone,now(),YES,timestamptz
+events,tenant_id,uuid,null,YES,uuid
+instructors,id,uuid,uuid_generate_v4(),NO,uuid
+instructors,user_id,uuid,null,NO,uuid
+instructors,bio,text,null,YES,text
+instructors,specializations,ARRAY,null,YES,_text
+instructors,is_active,boolean,true,YES,bool
+instructors,created_at,timestamp with time zone,now(),YES,timestamptz
+instructors,updated_at,timestamp with time zone,now(),YES,timestamptz
+instructors,tenant_id,uuid,null,YES,uuid
+locations,id,uuid,uuid_generate_v4(),NO,uuid
+locations,name,text,null,NO,text
+locations,address,text,null,NO,text
+locations,city,text,null,NO,text
+locations,postcode,text,null,NO,text
+locations,description,text,null,YES,text
+locations,max_capacity,integer,100,NO,int4
+locations,current_members,integer,0,YES,int4
+locations,is_active,boolean,true,YES,bool
+locations,contact_email,text,null,YES,text
+locations,contact_phone,text,null,YES,text
+locations,settings,jsonb,"'{""allow_waitlist"": true}'::jsonb",YES,jsonb
+locations,created_at,timestamp with time zone,now(),YES,timestamptz
+locations,updated_at,timestamp with time zone,now(),YES,timestamptz
+locations,tenant_id,uuid,null,YES,uuid
+membership_types,id,uuid,uuid_generate_v4(),NO,uuid
+membership_types,location_id,uuid,null,NO,uuid
+membership_types,name,text,null,NO,text
+membership_types,description,text,null,YES,text
+membership_types,price,integer,0,NO,int4
+membership_types,duration_days,integer,365,NO,int4
+membership_types,age_min,integer,null,YES,int4
+membership_types,age_max,integer,null,YES,int4
+membership_types,is_active,boolean,true,YES,bool
+membership_types,stripe_price_id,text,null,YES,text
+membership_types,created_at,timestamp with time zone,now(),YES,timestamptz
+membership_types,updated_at,timestamp with time zone,now(),YES,timestamptz
+membership_types,tenant_id,uuid,null,YES,uuid
+memberships,id,uuid,uuid_generate_v4(),NO,uuid
+memberships,user_id,uuid,null,NO,uuid
+memberships,location_id,uuid,null,NO,uuid
+memberships,membership_type_id,uuid,null,YES,uuid
+memberships,status,USER-DEFINED,'pending'::membership_status,NO,membership_status
+memberships,start_date,date,CURRENT_DATE,YES,date
+memberships,end_date,date,null,YES,date
+memberships,stripe_subscription_id,text,null,YES,text
+memberships,created_at,timestamp with time zone,now(),YES,timestamptz
+memberships,updated_at,timestamp with time zone,now(),YES,timestamptz
+memberships,tenant_id,uuid,null,YES,uuid
+naseeha,id,uuid,uuid_generate_v4(),NO,uuid
+naseeha,title,text,null,NO,text
+naseeha,content,text,null,NO,text
+naseeha,week_number,integer,null,NO,int4
+naseeha,year,integer,null,NO,int4
+naseeha,author_id,uuid,null,YES,uuid
+naseeha,is_active,boolean,true,YES,bool
+naseeha,created_at,timestamp with time zone,now(),YES,timestamptz
+naseeha,updated_at,timestamp with time zone,now(),YES,timestamptz
+naseeha,tenant_id,uuid,null,YES,uuid
+profiles,id,uuid,uuid_generate_v4(),NO,uuid
+profiles,user_id,uuid,null,NO,uuid
+profiles,email,text,null,NO,text
+profiles,role,USER-DEFINED,'member'::user_role,NO,user_role
+profiles,first_name,text,null,NO,text
+profiles,last_name,text,null,NO,text
+profiles,date_of_birth,date,null,NO,date
+profiles,address,text,null,YES,text
+profiles,city,text,null,YES,text
+profiles,postcode,text,null,YES,text
+profiles,phone,text,null,YES,text
+profiles,emergency_contact_name,text,null,YES,text
+profiles,emergency_contact_phone,text,null,YES,text
+profiles,medical_info,text,null,YES,text
+profiles,is_child,boolean,false,YES,bool
+profiles,parent_guardian_id,uuid,null,YES,uuid
+profiles,child_address,text,null,YES,text
+profiles,belt_rank,USER-DEFINED,'white'::belt_rank,YES,belt_rank
+profiles,stripe_customer_id,text,null,YES,text
+profiles,profile_image_url,text,null,YES,text
+profiles,best_practice_accepted,boolean,false,YES,bool
+profiles,best_practice_accepted_at,timestamp with time zone,null,YES,timestamptz
+profiles,waiver_accepted,boolean,false,YES,bool
+profiles,waiver_accepted_at,timestamp with time zone,null,YES,timestamptz
+profiles,created_at,timestamp with time zone,now(),YES,timestamptz
+profiles,updated_at,timestamp with time zone,now(),YES,timestamptz
+profiles,tenant_id,uuid,null,YES,uuid
+tenant_members,id,uuid,uuid_generate_v4(),NO,uuid
+tenant_members,tenant_id,uuid,null,NO,uuid
+tenant_members,user_id,uuid,null,NO,uuid
+tenant_members,role,USER-DEFINED,'member'::user_role,NO,user_role
+tenant_members,is_active,boolean,true,YES,bool
+tenant_members,created_at,timestamp with time zone,now(),YES,timestamptz
+tenant_members,updated_at,timestamp with time zone,now(),YES,timestamptz
+tenants,id,uuid,uuid_generate_v4(),NO,uuid
+tenants,name,text,null,NO,text
+tenants,slug,text,null,NO,text
+tenants,owner_user_id,uuid,null,YES,uuid
+tenants,logo_url,text,null,YES,text
+tenants,primary_color,text,'#c5a456'::text,YES,text
+tenants,contact_email,text,null,YES,text
+tenants,contact_phone,text,null,YES,text
+tenants,stripe_account_id,text,null,YES,text
+tenants,subscription_tier,text,'free'::text,YES,text
+tenants,subscription_status,text,'active'::text,YES,text
+tenants,settings,jsonb,'{}'::jsonb,YES,jsonb
+tenants,is_active,boolean,true,YES,bool
+tenants,created_at,timestamp with time zone,now(),YES,timestamptz
+tenants,updated_at,timestamp with time zone,now(),YES,timestamptz
+videos,id,uuid,uuid_generate_v4(),NO,uuid
+videos,title,text,null,NO,text
+videos,description,text,null,YES,text
+videos,url,text,null,NO,text
+videos,thumbnail_url,text,null,YES,text
+videos,category,text,null,NO,text
+videos,belt_level,USER-DEFINED,null,YES,belt_rank
+videos,duration_seconds,integer,null,YES,int4
+videos,is_active,boolean,true,YES,bool
+videos,created_at,timestamp with time zone,now(),YES,timestamptz
+videos,updated_at,timestamp with time zone,now(),YES,timestamptz
+videos,tenant_id,uuid,null,YES,uuid
+waitlist,id,uuid,uuid_generate_v4(),NO,uuid
+waitlist,user_id,uuid,null,NO,uuid
+waitlist,location_id,uuid,null,NO,uuid
+waitlist,position,integer,null,NO,int4
+waitlist,created_at,timestamp with time zone,now(),YES,timestamptz
+waitlist,tenant_id,uuid,null,YES,uuid

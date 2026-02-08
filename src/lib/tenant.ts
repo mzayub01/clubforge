@@ -20,8 +20,13 @@ export interface Tenant {
   contact_email?: string;
   contact_phone?: string;
   stripe_account_id?: string;
-  subscription_tier: 'free' | 'pro' | 'enterprise';
+  stripe_customer_id?: string;
+  stripe_connect_enabled: boolean;
+  subscription_tier: 'starter' | 'pro' | 'elite';
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'trialing';
+  trial_ends_at?: string;
+  onboarding_completed: boolean;
+  tagline?: string;
   settings: Record<string, unknown>;
   is_active: boolean;
   created_at: string;

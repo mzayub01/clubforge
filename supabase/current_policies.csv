@@ -1,0 +1,72 @@
+schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check
+public,announcements,announcements_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = announcements.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,announcements,announcements_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id()) AND ((expires_at IS NULL) OR (expires_at > now()))),null
+public,attendance,attendance_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = attendance.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = ANY (ARRAY['admin'::user_role, 'instructor'::user_role]))))))",null
+public,attendance,attendance_insert_own,PERMISSIVE,{public},INSERT,null,((auth.uid() = user_id) AND (tenant_id = current_tenant_id()))
+public,attendance,attendance_select_own,PERMISSIVE,{public},SELECT,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,belt_progression,belt_progression_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = belt_progression.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,belt_progression,belt_progression_select_own,PERMISSIVE,{public},SELECT,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,classes,classes_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = classes.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = ANY (ARRAY['admin'::user_role, 'instructor'::user_role]))))))",null
+public,classes,classes_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,event_rsvps,event_rsvps_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = event_rsvps.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,event_rsvps,event_rsvps_insert_own,PERMISSIVE,{public},INSERT,null,((auth.uid() = user_id) AND (tenant_id = current_tenant_id()))
+public,event_rsvps,event_rsvps_select_own,PERMISSIVE,{public},SELECT,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,event_rsvps,event_rsvps_update_own,PERMISSIVE,{public},UPDATE,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,events,events_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = events.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,events,events_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,instructors,instructors_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = instructors.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,instructors,instructors_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,instructors,instructors_update_own,PERMISSIVE,{public},UPDATE,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,locations,locations_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = locations.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,locations,locations_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,membership_types,membership_types_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = membership_types.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,membership_types,membership_types_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,memberships,memberships_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = memberships.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,memberships,memberships_select_own,PERMISSIVE,{public},SELECT,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,naseeha,naseeha_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = naseeha.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,naseeha,naseeha_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,profiles,profiles_admin_update,PERMISSIVE,{public},UPDATE,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = profiles.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,profiles,profiles_insert,PERMISSIVE,{public},INSERT,null,true
+public,profiles,profiles_select_own,PERMISSIVE,{public},SELECT,"((auth.uid() = user_id) OR ((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = profiles.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = ANY (ARRAY['admin'::user_role, 'instructor'::user_role])))))))",null
+public,profiles,profiles_update_own,PERMISSIVE,{public},UPDATE,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null
+public,tenant_members,Service role can manage tenant members,PERMISSIVE,{public},ALL,true,true
+public,tenant_members,Tenant admins can manage tenant members,PERMISSIVE,{public},ALL,"(EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = tenant_members.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role))))",null
+public,tenant_members,Users can view own tenant memberships,PERMISSIVE,{public},SELECT,(auth.uid() = user_id),null
+public,tenants,Anyone can read active tenants by slug,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,tenants,Service role can manage tenants,PERMISSIVE,{public},ALL,true,true
+public,videos,videos_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = videos.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,videos,videos_select,PERMISSIVE,{public},SELECT,((is_active = true) AND (tenant_id = current_tenant_id())),null
+public,waitlist,waitlist_admin_manage,PERMISSIVE,{public},ALL,"((tenant_id = current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM tenant_members tm
+  WHERE ((tm.tenant_id = waitlist.tenant_id) AND (tm.user_id = auth.uid()) AND (tm.role = 'admin'::user_role)))))",null
+public,waitlist,waitlist_select_own,PERMISSIVE,{public},SELECT,((auth.uid() = user_id) AND (tenant_id = current_tenant_id())),null

@@ -9,7 +9,7 @@ export type UserRole = 'member' | 'instructor' | 'professor' | 'admin';
 export type PlatformRole = 'platform_admin';
 
 // Subscription Tiers
-export type SubscriptionTier = 'free' | 'pro' | 'enterprise';
+export type SubscriptionTier = 'starter' | 'pro' | 'elite';
 export type SubscriptionStatus = 'active' | 'past_due' | 'cancelled' | 'trialing';
 
 // Adult Belt Ranks
@@ -43,6 +43,14 @@ export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 // Multi-Tenancy Models
 // ===============================================
 
+export interface TenantSettings {
+  waiver_text?: string;
+  etiquette_text?: string;
+  registration_message?: string;
+  require_profile_photo?: boolean;
+  [key: string]: unknown; // allow additional keys
+}
+
 export interface Tenant {
   id: string;
   name: string;
@@ -53,9 +61,14 @@ export interface Tenant {
   contact_email?: string;
   contact_phone?: string;
   stripe_account_id?: string;
+  stripe_customer_id?: string;
+  stripe_connect_enabled: boolean;
   subscription_tier: SubscriptionTier;
   subscription_status: SubscriptionStatus;
-  settings: Record<string, unknown>;
+  trial_ends_at?: string;
+  onboarding_completed: boolean;
+  tagline?: string;
+  settings: TenantSettings;
   is_active: boolean;
   created_at: string;
   updated_at: string;

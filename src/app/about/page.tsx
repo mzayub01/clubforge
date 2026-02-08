@@ -1,531 +1,175 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { Shield, Users, Award, Target, Heart, Star, ChevronRight, BookOpen, Swords, MapPin, Calendar } from 'lucide-react';
+import {
+    ArrowRight, Shield, Heart, Zap, Target,
+    Users, Globe, Award, Lightbulb,
+} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'About Us | ClubForge',
-    description: 'ClubForge is a non-profit registered charity using Sunnah sports to build strong, disciplined, faith-anchored individuals and communities.',
+    title: 'About | ClubForge',
+    description: 'ClubForge was born from running a real club. We know the chaos of spreadsheets, WhatsApp, and duct-taped admin — so we built something better.',
 };
 
 export default async function AboutPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    const commitments = [
-        {
-            icon: Shield,
-            text: 'Reviving Prophetic traditions of strength and self-defence',
-        },
-        {
-            icon: Star,
-            text: 'Empowering youth with confidence, discipline, and resilience',
-        },
-        {
-            icon: Users,
-            text: 'Strengthening bonds of brotherhood and sisterhood',
-        },
-        {
-            icon: Target,
-            text: 'Providing clear pathways for growth, progression, and leadership',
-        },
-        {
-            icon: Heart,
-            text: 'Using sport as a vehicle for positive change within the Ummah',
-        },
-        {
-            icon: BookOpen,
-            text: 'Integrating spiritual development with physical training',
-        },
-    ];
-
-    const sunnahSports = [
-        { name: 'Wrestling & Grappling (BJJ)', status: 'Active', icon: Swords },
-        { name: 'Archery', status: 'Coming Soon', icon: Target },
-        { name: 'Horse Riding', status: 'Coming Soon', icon: Star },
-    ];
-
-    const differentiators = [
-        {
-            title: 'Sunnah-Centred',
-            description: 'Training framed as a revival of Sunnah sports with emphasis on adab, intention, and character over ego.',
-        },
-        {
-            title: 'Faith-Aligned',
-            description: 'Islamic etiquette, modesty, and safeguarding built into our culture with appropriate provision for all.',
-        },
-        {
-            title: 'Community-First',
-            description: 'Operating in masjids and community spaces, prioritising access and affordability over profit.',
-        },
-        {
-            title: 'Strong Lineage',
-            description: 'Direct lineage through respected instructors like Professor Mario Sukata with consistent high standards.',
-        },
-    ];
-
     return (
         <>
             <Navbar user={user ? { id: user.id, email: user.email! } : null} />
 
             <main>
-                {/* Hero Section */}
-                <section
-                    style={{
-                        background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
-                        padding: 'var(--space-16) var(--space-6)',
-                        textAlign: 'center',
-                    }}
-                >
-                    <div className="container container-md animate-slide-up">
-                        <div style={{
-                            display: 'inline-block',
-                            background: 'rgba(197, 164, 86, 0.15)',
-                            padding: 'var(--space-1) var(--space-4)',
-                            borderRadius: 'var(--radius-full)',
-                            marginBottom: 'var(--space-4)',
-                        }}>
-                            <span style={{ color: 'var(--color-gold)', fontSize: 'var(--text-sm)', fontWeight: '600' }}>
-                                Registered Charity • ClubForge
-                            </span>
-                        </div>
-                        <h1 style={{
-                            marginBottom: 'var(--space-4)',
-                            background: 'var(--color-gold-gradient)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                        }}>
-                            About ClubForge
+                {/* Hero */}
+                <section style={{
+                    background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
+                    padding: 'var(--space-16) var(--space-6)',
+                    textAlign: 'center',
+                }}>
+                    <div className="container" style={{ maxWidth: '750px', margin: '0 auto' }}>
+                        <h1 style={{ marginBottom: 'var(--space-4)' }}>
+                            Built by club operators,{' '}
+                            <span style={{
+                                background: 'var(--color-gold-gradient)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                            }}>for club operators</span>
                         </h1>
-                        <p style={{
-                            fontSize: 'var(--text-xl)',
-                            color: 'var(--text-secondary)',
-                            maxWidth: '750px',
-                            margin: '0 auto',
-                        }}>
-                            A non-profit registered charity using Sunnah sports to build strong, disciplined, faith-anchored individuals and communities — not just fighters.
+                        <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xl)', lineHeight: '1.7' }}>
+                            ClubForge wasn&apos;t designed in a boardroom. It was born from the chaos of actually running a club — managing members in spreadsheets, chasing payments on WhatsApp, and losing hours every week to admin that should have been automated.
                         </p>
                     </div>
                 </section>
 
-                {/* Mission Section */}
-                <section className="section" style={{ background: 'var(--bg-primary)' }}>
-                    <div className="container container-lg">
-                        <div className="glass-card" style={{
-                            padding: 'var(--space-10)',
-                            marginBottom: 'var(--space-8)',
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: 'var(--space-6)',
-                                marginBottom: 'var(--space-8)',
-                            }}>
-                                <Image
-                                    src="/logo-full.png"
-                                    alt="ClubForge"
-                                    width={180}
-                                    height={180}
-                                    style={{ height: '140px', width: 'auto' }}
-                                />
-                            </div>
-
-                            <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-6)', color: 'var(--color-gold)' }}>
-                                Our Mission
-                            </h2>
-
-                            <p style={{
-                                fontSize: 'var(--text-lg)',
-                                lineHeight: '1.9',
-                                marginBottom: 'var(--space-6)',
-                                textAlign: 'center',
-                                maxWidth: '800px',
-                                margin: '0 auto var(--space-6)',
-                            }}>
-                                We exist to build <strong>strong individuals</strong>, <strong>resilient families</strong>, and <strong>confident communities</strong> — physically, mentally, and spiritually. ClubForge is a holistic development platform rooted in Sunnah sports, faith, and community, training individuals for the mats and for life. Everyone is welcome.
+                {/* Origin Story */}
+                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)' }}>
+                    <div style={{ maxWidth: '750px', margin: '0 auto' }}>
+                        <h2 style={{ marginBottom: 'var(--space-6)' }}>The problem we lived</h2>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', lineHeight: '1.8' }}>
+                            <p>
+                                We ran a martial arts club. It started small — 20 members, one location, weekly classes. Simple enough.
                             </p>
-
-                            <p style={{
-                                fontSize: 'var(--text-lg)',
-                                lineHeight: '1.9',
-                                marginBottom: 'var(--space-6)',
-                                textAlign: 'center',
-                                maxWidth: '800px',
-                                margin: '0 auto',
-                            }}>
-                                Our approach goes beyond sport. We see training as a means of developing <em>character</em>, <em>discipline</em>, <em>humility</em>, and <em>brotherhood</em>, rooted in Islamic values and lived practice.
+                            <p>
+                                Then it grew. 50 members. Then 100. Then a second location. Suddenly we were drowning: a Google Sheet for members, Stripe for payments (manually matched), WhatsApp for announcements, a notebook for belt gradings, and Excel for attendance.
+                            </p>
+                            <p>
+                                We tried existing gym software. They were either built for yoga studios and didn&apos;t understand belt progression, or built for enterprise chains and cost a fortune. None of them understood what it means to actually <strong>run a club</strong> — with coaches, gradings, progression, and the operational structure that a serious club needs.
+                            </p>
+                            <p style={{ fontWeight: '600', color: 'var(--text-primary)' }}>
+                                So we built ClubForge. The system we wished existed.
                             </p>
                         </div>
                     </div>
                 </section>
 
-                {/* Beyond BJJ Section */}
-                <section
-                    className="section"
-                    style={{
-                        background: 'var(--color-dark-green)',
-                        color: 'var(--color-white)',
-                    }}
-                >
-                    <div className="container container-lg">
-                        <h2 style={{
-                            color: 'var(--color-gold)',
-                            textAlign: 'center',
-                            marginBottom: 'var(--space-4)',
-                        }}>
-                            More Than Just BJJ
-                        </h2>
-                        <p style={{
-                            textAlign: 'center',
-                            color: 'var(--color-gray-300)',
-                            marginBottom: 'var(--space-8)',
-                            maxWidth: '600px',
-                            margin: '0 auto var(--space-8)',
-                        }}>
-                            While Brazilian Jiu-Jitsu and grappling are our core focus, ClubForge is a comprehensive platform offering:
-                        </p>
-
+                {/* Mission */}
+                <section style={{ background: 'var(--bg-secondary)', padding: 'var(--space-16) var(--space-6)' }}>
+                    <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
                         <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                            gap: 'var(--space-6)',
-                            marginBottom: 'var(--space-8)',
+                            width: '64px', height: '64px', borderRadius: 'var(--radius-full)',
+                            background: 'var(--color-gold-gradient)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto var(--space-6)',
                         }}>
-                            {/* Sunnah Sports */}
-                            <div style={{
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                borderRadius: 'var(--radius-xl)',
-                                padding: 'var(--space-6)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                            }}>
-                                <div style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: 'var(--color-gold-gradient)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 'var(--space-4)',
-                                }}>
-                                    <Swords size={24} color="var(--color-black)" />
-                                </div>
-                                <h3 style={{ color: 'var(--color-gold)', marginBottom: 'var(--space-3)' }}>Sunnah Sports</h3>
-                                <ul style={{ color: 'var(--color-gray-300)', paddingLeft: 'var(--space-4)', margin: 0 }}>
-                                    <li>Wrestling & Grappling (BJJ)</li>
-                                    <li>Archery (coming soon)</li>
-                                    <li>Horse Riding (coming soon)</li>
-                                    <li>Fitness & Conditioning</li>
-                                </ul>
-                            </div>
-
-                            {/* Spiritual Development */}
-                            <div style={{
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                borderRadius: 'var(--radius-xl)',
-                                padding: 'var(--space-6)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                            }}>
-                                <div style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: 'var(--color-gold-gradient)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 'var(--space-4)',
-                                }}>
-                                    <BookOpen size={24} color="var(--color-black)" />
-                                </div>
-                                <h3 style={{ color: 'var(--color-gold)', marginBottom: 'var(--space-3)' }}>Spiritual Development</h3>
-                                <ul style={{ color: 'var(--color-gray-300)', paddingLeft: 'var(--space-4)', margin: 0 }}>
-                                    <li>Dhikr gatherings & nasheeds</li>
-                                    <li>Youth dars & Islamic learning</li>
-                                    <li>Retreats (e.g., Morocco)</li>
-                                    <li>Naseeha (advice) sessions</li>
-                                </ul>
-                            </div>
-
-                            {/* Community Initiatives */}
-                            <div style={{
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                borderRadius: 'var(--radius-xl)',
-                                padding: 'var(--space-6)',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                            }}>
-                                <div style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: 'var(--color-gold-gradient)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: 'var(--space-4)',
-                                }}>
-                                    <Users size={24} color="var(--color-black)" />
-                                </div>
-                                <h3 style={{ color: 'var(--color-gold)', marginBottom: 'var(--space-3)' }}>Community Initiatives</h3>
-                                <ul style={{ color: 'var(--color-gray-300)', paddingLeft: 'var(--space-4)', margin: 0 }}>
-                                    <li>Youth empowerment & mentorship</li>
-                                    <li>Brotherhood/sisterhood gatherings</li>
-                                    <li>Da&apos;wah events & outreach</li>
-                                    <li>Family-inclusive celebrations</li>
-                                </ul>
-                            </div>
+                            <Target size={28} color="var(--color-black)" />
                         </div>
+                        <h2 style={{ marginBottom: 'var(--space-4)' }}>Our mission</h2>
+                        <p style={{
+                            color: 'var(--text-secondary)', fontSize: 'var(--text-xl)',
+                            lineHeight: '1.8', maxWidth: '700px', margin: '0 auto',
+                        }}>
+                            To give every club owner the tools, structure, and clarity to run their club like a real operation — without the enterprise price tag, the generic fitness software, or the duct tape.
+                        </p>
                     </div>
                 </section>
 
-                {/* Commitments Section */}
-                <section className="section" style={{ background: 'var(--bg-primary)' }}>
-                    <div className="container container-lg">
-                        <h2 style={{
-                            textAlign: 'center',
-                            marginBottom: 'var(--space-8)',
-                        }}>
-                            ClubForge is Committed To
-                        </h2>
-
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                            gap: 'var(--space-4)',
-                        }}>
-                            {commitments.map((item, index) => (
-                                <div
-                                    key={index}
-                                    className="glass-card"
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 'var(--space-4)',
-                                        padding: 'var(--space-4)',
-                                    }}
-                                >
+                {/* Values */}
+                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)' }}>
+                    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                        <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>What we believe</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-6)' }}>
+                            {[
+                                {
+                                    icon: Shield,
+                                    title: 'Reliability over features',
+                                    desc: 'We\'d rather have 10 rock-solid features than 100 half-baked ones. Your club runs on this — it has to work.',
+                                },
+                                {
+                                    icon: Lightbulb,
+                                    title: 'Structure creates freedom',
+                                    desc: 'Clear roles, audit trails, and processes aren\'t bureaucracy — they\'re what let you scale without chaos.',
+                                },
+                                {
+                                    icon: Heart,
+                                    title: 'Your data, your members',
+                                    desc: 'Export everything, anytime. No lock-in, no hostage data. If you leave, your data comes with you.',
+                                },
+                                {
+                                    icon: Zap,
+                                    title: 'Simple beats clever',
+                                    desc: 'We ship things that work, not things that impress at demos. If it saves you time, it ships.',
+                                },
+                            ].map((value) => (
+                                <div key={value.title} className="glass-card" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
                                     <div style={{
-                                        width: '48px',
-                                        height: '48px',
-                                        borderRadius: 'var(--radius-full)',
-                                        background: 'var(--color-gold-gradient)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0,
+                                        width: '48px', height: '48px', borderRadius: 'var(--radius-full)',
+                                        background: 'rgba(197, 164, 86, 0.15)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        margin: '0 auto var(--space-4)',
                                     }}>
-                                        <item.icon size={24} color="var(--color-black)" />
+                                        <value.icon size={24} color="var(--color-gold)" />
                                     </div>
-                                    <p style={{
-                                        margin: 0,
-                                        color: 'var(--text-primary)',
-                                        fontSize: 'var(--text-base)',
-                                    }}>
-                                        {item.text}
-                                    </p>
+                                    <h4 style={{ marginBottom: 'var(--space-2)', fontSize: 'var(--text-lg)' }}>{value.title}</h4>
+                                    <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--text-sm)', lineHeight: '1.7' }}>{value.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* What Makes Us Different */}
-                <section className="section" style={{ background: 'var(--bg-secondary)' }}>
-                    <div className="container container-lg">
-                        <h2 style={{
-                            textAlign: 'center',
-                            marginBottom: 'var(--space-4)',
-                        }}>
-                            What Makes Us Different
-                        </h2>
-                        <p style={{
-                            textAlign: 'center',
-                            color: 'var(--text-secondary)',
-                            marginBottom: 'var(--space-8)',
-                            maxWidth: '600px',
-                            margin: '0 auto var(--space-8)',
-                        }}>
-                            ClubForge trains individuals for the mats and for life.
-                        </p>
-
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                            gap: 'var(--space-6)',
-                        }}>
-                            {differentiators.map((item, index) => (
-                                <div
-                                    key={index}
-                                    className="glass-card"
-                                    style={{ padding: 'var(--space-6)', textAlign: 'center' }}
-                                >
-                                    <h3 style={{
-                                        color: 'var(--color-gold)',
-                                        marginBottom: 'var(--space-3)',
-                                        fontSize: 'var(--text-lg)',
-                                    }}>
-                                        {item.title}
-                                    </h3>
-                                    <p style={{
-                                        margin: 0,
-                                        color: 'var(--text-secondary)',
-                                        fontSize: 'var(--text-sm)',
-                                        lineHeight: '1.7',
-                                    }}>
-                                        {item.description}
-                                    </p>
+                {/* Numbers */}
+                <section style={{
+                    background: 'linear-gradient(160deg, #0F172A 0%, #1E293B 40%, #0F172A 100%)',
+                    padding: 'var(--space-16) var(--space-6)',
+                    color: 'var(--color-white)',
+                }}>
+                    <div style={{
+                        maxWidth: '900px', margin: '0 auto',
+                        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                        gap: 'var(--space-8)', textAlign: 'center',
+                    }}>
+                        {[
+                            { label: 'Built from', value: 'Real experience', icon: Award },
+                            { label: 'Designed for', value: 'Club operators', icon: Users },
+                            { label: 'Ambition', value: 'Global scale', icon: Globe },
+                        ].map(stat => (
+                            <div key={stat.label}>
+                                <stat.icon size={32} color="#C5A456" style={{ marginBottom: 'var(--space-3)' }} />
+                                <div style={{ fontSize: 'var(--text-2xl)', fontWeight: '800', marginBottom: 'var(--space-1)' }}>
+                                    {stat.value}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Beyond the Mats */}
-                <section className="section" style={{ background: 'var(--bg-primary)' }}>
-                    <div className="container container-lg">
-                        <div className="glass-card" style={{ padding: 'var(--space-10)' }}>
-                            <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-                                Beyond the Mats
-                            </h2>
-
-                            <p style={{
-                                fontSize: 'var(--text-lg)',
-                                lineHeight: '1.9',
-                                marginBottom: 'var(--space-6)',
-                                textAlign: 'center',
-                                maxWidth: '800px',
-                                margin: '0 auto var(--space-6)',
-                            }}>
-                                Alongside regular classes, we host <strong>grading ceremonies</strong>, <strong>competitions</strong>, <strong>seminars</strong>, <strong>retreats</strong>, and <strong>community gatherings</strong>, creating spaces for learning, reflection, and connection beyond the mats.
-                            </p>
-
-                            <div style={{
-                                background: 'rgba(197, 164, 86, 0.1)',
-                                borderRadius: 'var(--radius-xl)',
-                                padding: 'var(--space-8)',
-                                borderLeft: '4px solid var(--color-gold)',
-                                marginBottom: 'var(--space-6)',
-                            }}>
-                                <p style={{
-                                    fontSize: 'var(--text-xl)',
-                                    fontWeight: '600',
-                                    marginBottom: 'var(--space-4)',
-                                    color: 'var(--text-primary)',
-                                }}>
-                                    ClubForge is not about trophies or titles.
-                                </p>
-                                <p style={{
-                                    fontSize: 'var(--text-lg)',
-                                    lineHeight: '1.8',
-                                    marginBottom: 0,
-                                    color: 'var(--text-secondary)',
-                                }}>
-                                    It is about showing up consistently, training with intention, and carrying the lessons of the mat into everyday life. Youth are trained not just to &quot;win&quot;, but to carry themselves well in life.
-                                </p>
+                                <div style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>{stat.label}</div>
                             </div>
-
-                            <div style={{
-                                textAlign: 'center',
-                                padding: 'var(--space-6)',
-                                background: 'var(--bg-secondary)',
-                                borderRadius: 'var(--radius-xl)',
-                            }}>
-                                <p style={{
-                                    fontSize: 'var(--text-2xl)',
-                                    fontWeight: '700',
-                                    marginBottom: 0,
-                                    background: 'var(--color-gold-gradient)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text',
-                                }}>
-                                    Strength with purpose. Discipline with faith. Community with direction.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Locations Quick Info */}
-                <section
-                    className="section"
-                    style={{
-                        background: 'var(--color-dark-green)',
-                        color: 'var(--color-white)',
-                    }}
-                >
-                    <div className="container container-lg" style={{ textAlign: 'center' }}>
-                        <h2 style={{ color: 'var(--color-gold)', marginBottom: 'var(--space-4)' }}>
-                            5 Locations Across Manchester
-                        </h2>
-                        <p style={{ color: 'var(--color-gray-300)', marginBottom: 'var(--space-6)' }}>
-                            Classes for kids, teens, and adults delivered by experienced instructors who uphold both technical excellence and good adab.
-                        </p>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap',
-                            gap: 'var(--space-3)',
-                            marginBottom: 'var(--space-6)',
-                        }}>
-                            {['Fats Gym', 'Cheadle Masjid', 'Guidance Hub', 'Afifah School', 'PCC'].map((loc) => (
-                                <span
-                                    key={loc}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 'var(--space-2)',
-                                        padding: 'var(--space-2) var(--space-4)',
-                                        background: 'rgba(255, 255, 255, 0.1)',
-                                        borderRadius: 'var(--radius-full)',
-                                        fontSize: 'var(--text-sm)',
-                                    }}
-                                >
-                                    <MapPin size={14} />
-                                    {loc}
-                                </span>
-                            ))}
-                        </div>
-                        <Link href="/classes" className="btn btn-outline btn-lg" style={{
-                            borderColor: 'var(--color-gold)',
-                            color: 'var(--color-gold)',
-                        }}>
-                            View All Classes
-                            <ChevronRight size={20} />
-                        </Link>
+                        ))}
                     </div>
                 </section>
 
                 {/* CTA */}
-                <section className="section" style={{ background: 'var(--bg-primary)' }}>
-                    <div className="container container-md" style={{ textAlign: 'center' }}>
-                        <h2 style={{ marginBottom: 'var(--space-4)' }}>
-                            Be Part of Our Community
-                        </h2>
-                        <p style={{
-                            color: 'var(--text-secondary)',
-                            marginBottom: 'var(--space-8)',
-                            fontSize: 'var(--text-lg)',
-                        }}>
-                            Whether you&apos;re a complete beginner or an experienced martial artist,
-                            ClubForge welcomes you. Join a movement building strong individuals on and off the mats.
+                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)', textAlign: 'center' }}>
+                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                        <h2 style={{ marginBottom: 'var(--space-4)' }}>Join the movement</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-6)' }}>
+                            We&apos;re building the operating system for clubs worldwide. Start your free trial and be part of it.
                         </p>
-                        <div style={{
-                            display: 'flex',
-                            gap: 'var(--space-4)',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap',
-                        }}>
+                        <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <Link href="/register" className="btn btn-primary btn-lg">
-                                Join Now
-                                <ChevronRight size={20} />
+                                Start Free Trial
+                                <ArrowRight size={20} />
                             </Link>
-                            <Link href="/faq" className="btn btn-outline btn-lg">
-                                Read FAQ
+                            <Link href="/demo" className="btn btn-outline btn-lg">
+                                Book a Demo
                             </Link>
                         </div>
                     </div>

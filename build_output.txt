@@ -1,0 +1,124 @@
+﻿node.exe : ΓÜá Warning: Next.js inferred your workspace root, but it may not be 
+correct.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:Strin 
+   g) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ We detected multiple lockfiles and selected the directory of 
+C:\Users\user\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider 
+removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root
+-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\user\dev\dojohub\package-lock.json
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. 
+Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 3.7s
+  Running TypeScript ...
+  Collecting page data using 21 workers ...
+  Generating static pages using 21 workers (0/82) ...
+  Generating static pages using 21 workers (20/82) 
+  Generating static pages using 21 workers (40/82) 
+  Generating static pages using 21 workers (61/82) 
+Γ£ô Generating static pages using 21 workers (82/82) in 2.6s
+  Finalizing page optimization ...
+
+Route (app)
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /about
+Γö£ ╞Æ /admin
+Γö£ ╞Æ /admin/announcements
+Γö£ ╞Æ /admin/attendance
+Γö£ ╞Æ /admin/class-roster
+Γö£ ╞Æ /admin/classes
+Γö£ ╞Æ /admin/email-templates
+Γö£ ╞Æ /admin/events
+Γö£ ╞Æ /admin/finance
+Γö£ ╞Æ /admin/instructors
+Γö£ ╞Æ /admin/locations
+Γö£ ╞Æ /admin/members
+Γö£ ╞Æ /admin/membership-types
+Γö£ ╞Æ /admin/memberships
+Γö£ ╞Æ /admin/naseeha
+Γö£ ╞Æ /admin/professor-access
+Γö£ ╞Æ /admin/promo-codes
+Γö£ ╞Æ /admin/settings
+Γö£ ╞Æ /admin/videos
+Γö£ ╞Æ /admin/waitlist
+Γö£ ╞Æ /api/admin/create-user
+Γö£ ╞Æ /api/admin/fix-migration
+Γö£ ╞Æ /api/admin/members
+Γö£ ╞Æ /api/admin/send-payment-reminder
+Γö£ ╞Æ /api/attendance/checkin
+Γö£ ╞Æ /api/check-slug
+Γö£ ╞Æ /api/email/announcement
+Γö£ ╞Æ /api/email/event-confirmation
+Γö£ ╞Æ /api/email/welcome
+Γö£ ╞Æ /api/grading/promote
+Γö£ ╞Æ /api/multisite/available-locations
+Γö£ ╞Æ /api/multisite/checkout
+Γö£ ╞Æ /api/onboard
+Γö£ ╞Æ /api/parent/add-child
+Γö£ ╞Æ /api/profile/belt
+Γö£ ╞Æ /api/stripe/cancel
+Γö£ ╞Æ /api/stripe/checkout
+Γö£ ╞Æ /api/stripe/coupons
+Γö£ ╞Æ /api/stripe/event-checkout
+Γö£ ╞Æ /api/stripe/invoices
+Γö£ ╞Æ /api/stripe/refund
+Γö£ ╞Æ /api/stripe/webhook
+Γö£ Γùï /apple-icon.png
+Γö£ Γùï /checkout/cancel
+Γö£ Γùï /checkout/success
+Γö£ ╞Æ /classes
+Γö£ ╞Æ /dashboard
+Γö£ ╞Æ /dashboard/add-child
+Γö£ ╞Æ /dashboard/announcements
+Γö£ ╞Æ /dashboard/attendance
+Γö£ ╞Æ /dashboard/classes
+Γö£ ╞Æ /dashboard/events
+Γö£ ╞Æ /dashboard/membership
+Γö£ ╞Æ /dashboard/membership/add-site
+Γö£ ╞Æ /dashboard/naseeha
+Γö£ ╞Æ /dashboard/payments
+Γö£ ╞Æ /dashboard/profile
+Γö£ ╞Æ /dashboard/progress
+Γö£ ╞Æ /dashboard/videos
+Γö£ ╞Æ /demo
+Γö£ ╞Æ /events
+Γö£ Γùï /faq
+Γö£ Γùï /forgot-password
+Γö£ Γùï /get-started
+Γö£ Γùï /icon.png
+Γö£ ╞Æ /instructor
+Γö£ ╞Æ /instructor/attendance
+Γö£ ╞Æ /instructor/classes
+Γö£ ╞Æ /instructor/naseeha
+Γö£ ╞Æ /instructor/students
+Γö£ Γùï /login
+Γö£ ╞Æ /pricing
+Γö£ ╞Æ /privacy
+Γö£ ╞Æ /professor
+Γö£ Γùï /register
+Γö£ Γùï /reset-password
+Γö£ ╞Æ /terms
+Γö£ Γùï /videos
+Γö£ Γùï /waitlist-confirmation
+Γöö ╞Æ /waiver
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

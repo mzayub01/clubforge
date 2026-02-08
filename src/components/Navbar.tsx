@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Menu, X, User, LogOut, Home, Info, Award, Calendar, Crown, ChevronRight, HelpCircle } from 'lucide-react';
+import { Menu, X, ChevronRight } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -20,210 +20,179 @@ export default function Navbar({ user }: NavbarProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
-    const supabase = getSupabaseClient();
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
+            setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Prevent body scroll when menu is open
-    useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isMenuOpen]);
-
     const handleSignOut = async () => {
-        setIsMenuOpen(false);
+        const supabase = getSupabaseClient();
         await supabase.auth.signOut();
         router.push('/');
         router.refresh();
     };
 
-    const navLinks = [
-        { href: '/', label: 'Home', icon: Home },
-        { href: '/about', label: 'About Us', icon: Info },
-        { href: '/classes', label: 'BJJ Classes', icon: Award },
-        { href: '/events', label: 'Events', icon: Calendar },
-        { href: '/faq', label: 'FAQ', icon: HelpCircle },
-    ];
-
     const isActive = (href: string) => {
         if (href === '/') return pathname === '/';
-        return pathname.startsWith(href);
+        return pathname?.startsWith(href);
     };
 
+    // Determine if we're on a dark hero page (homepage)
+    const isDarkHero = pathname === '/' && !isScrolled;
+
+    const navLinks = user
+        ? [
+            { href: '/dashboard', label: 'Dashboard' },
+            { href: '/admin', label: 'Admin', show: true },
+        ]
+        : [
+            { href: '/#features', label: 'Features' },
+            { href: '/pricing', label: 'Pricing' },
+            { href: '/demo', label: 'Demo' },
+            { href: '/about', label: 'About' },
+        ];
+
     return (
-        <>
-            <nav
-                className="navbar"
-                style={{
-                    boxShadow: isScrolled ? 'var(--shadow-md)' : 'none',
-                }}
-            >
-                <div className="navbar-container">
-                    {/* Logo */}
-                    <Link href="/" className="navbar-logo">
-                        <Image
-                            src="/logo-full.png"
-                            alt="ClubForge"
-                            width={160}
-                            height={48}
-                            priority
-                            style={{ height: '40px', width: 'auto' }}
-                        />
-                    </Link>
-
-                    {/* Desktop Navigation */}
-                    <div className="navbar-links">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`navbar-link ${isActive(link.href) ? 'active' : ''}`}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="navbar-actions">
-                        {user ? (
-                            <>
-                                <Link href="/dashboard" className="btn btn-ghost btn-sm desktop-only">
-                                    <User size={18} />
-                                    <span>Dashboard</span>
-                                </Link>
-                                <button
-                                    onClick={handleSignOut}
-                                    className="btn btn-outline btn-sm desktop-only"
-                                >
-                                    <LogOut size={18} />
-                                    <span>Sign Out</span>
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <Link href="/login" className="btn btn-ghost btn-sm desktop-only">
-                                    Sign In
-                                </Link>
-                                <Link href="/join" className="btn btn-primary btn-sm desktop-only">
-                                    Join Now
-                                </Link>
-                            </>
-                        )}
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="mobile-menu-btn"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Mobile Menu Overlay */}
-            <div
-                className={`mobile-menu-overlay ${isMenuOpen ? 'open' : ''}`}
-                onClick={() => setIsMenuOpen(false)}
-            />
-
-            {/* Mobile Menu Panel */}
-            <div className={`mobile-menu-panel ${isMenuOpen ? 'open' : ''}`}>
-                {/* Menu Header */}
-                <div className="mobile-menu-header">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                        <Crown size={24} color="var(--color-gold)" />
-                        <span style={{ fontWeight: '700', fontSize: 'var(--text-lg)' }}>ClubForge</span>
-                    </div>
-                    <button
-                        className="mobile-menu-close"
-                        onClick={() => setIsMenuOpen(false)}
-                        aria-label="Close menu"
+        <nav
+            className="navbar"
+            style={{
+                background: isScrolled
+                    ? 'var(--bg-glass-dark)'
+                    : isDarkHero
+                        ? 'transparent'
+                        : 'var(--bg-glass-dark)',
+                borderBottom: isScrolled ? 'var(--glass-border)' : 'none',
+                transition: 'all 0.3s ease',
+            }}
+        >
+            <div className="navbar-container">
+                {/* Logo */}
+                <Link href="/" className="navbar-logo" style={{ textDecoration: 'none' }}>
+                    <Image
+                        src="/logo-simple.png"
+                        alt="ClubForge"
+                        width={120}
+                        height={48}
+                        style={{ height: '40px', width: 'auto' }}
+                        priority
+                    />
+                    <span
+                        style={{
+                            fontSize: 'var(--text-xl)',
+                            fontWeight: '700',
+                            fontFamily: 'var(--font-display)',
+                            color: 'var(--color-gold)',
+                        }}
                     >
-                        <X size={24} />
-                    </button>
+                        ClubForge
+                    </span>
+                </Link>
+
+                {/* Desktop Nav Links */}
+                <div className="navbar-links">
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className={`navbar-link ${isActive(link.href) ? 'active' : ''}`}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
                 </div>
 
-                {/* Menu Links */}
-                <div className="mobile-menu-nav">
-                    {navLinks.map((link) => {
-                        const Icon = link.icon;
-                        return (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`mobile-menu-link ${isActive(link.href) ? 'active' : ''}`}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <Icon size={22} />
-                                <span>{link.label}</span>
-                                <ChevronRight size={18} style={{ marginLeft: 'auto', opacity: 0.4 }} />
-                            </Link>
-                        );
-                    })}
-                </div>
-
-                {/* Divider */}
-                <div className="mobile-menu-divider" />
-
-                {/* User Section */}
-                <div className="mobile-menu-footer">
+                {/* Desktop Actions */}
+                <div className="navbar-actions">
                     {user ? (
                         <>
-                            <Link
-                                href="/dashboard"
-                                className="mobile-menu-link"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <User size={22} />
-                                <span>My Dashboard</span>
-                                <ChevronRight size={18} style={{ marginLeft: 'auto', opacity: 0.4 }} />
+                            <Link href="/dashboard" className="btn btn-ghost btn-sm">
+                                Dashboard
                             </Link>
-                            <button
-                                onClick={handleSignOut}
-                                className="mobile-menu-link"
-                                style={{ width: '100%', textAlign: 'left', color: 'var(--color-red)' }}
-                            >
-                                <LogOut size={22} />
-                                <span>Sign Out</span>
+                            <button onClick={handleSignOut} className="btn btn-outline btn-sm">
+                                Sign Out
                             </button>
                         </>
                     ) : (
-                        <div style={{ display: 'flex', gap: 'var(--space-3)', padding: 'var(--space-4)' }}>
+                        <>
                             <Link
                                 href="/login"
-                                className="btn btn-outline"
-                                style={{ flex: 1 }}
-                                onClick={() => setIsMenuOpen(false)}
+                                className="btn btn-ghost btn-sm"
+                                style={{ display: 'none' }}
+                                id="desktop-login"
                             >
-                                Sign In
+                                Log In
                             </Link>
-                            <Link
-                                href="/join"
-                                className="btn btn-primary"
-                                style={{ flex: 1 }}
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Join Now
+                            <style>{`@media (min-width: 768px) { #desktop-login { display: inline-flex !important; } }`}</style>
+                            <Link href="/register" className="btn btn-primary btn-sm">
+                                Start Free Trial
+                                <ChevronRight size={16} />
                             </Link>
-                        </div>
+                        </>
                     )}
+
+                    {/* Mobile menu button */}
+                    <button
+                        className="mobile-menu-btn"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
                 </div>
             </div>
-        </>
+
+            {/* Mobile Menu */}
+            {isMenuOpen && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        right: 0,
+                        background: 'var(--bg-primary)',
+                        borderBottom: '1px solid var(--border-light)',
+                        padding: 'var(--space-4) var(--space-6)',
+                        boxShadow: 'var(--shadow-lg)',
+                    }}
+                >
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            style={{
+                                display: 'block',
+                                padding: 'var(--space-3) 0',
+                                color: isActive(link.href) ? 'var(--color-gold)' : 'var(--text-primary)',
+                                fontWeight: '500',
+                                borderBottom: '1px solid var(--border-light)',
+                            }}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
+                    <div style={{ paddingTop: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
+                        {user ? (
+                            <button onClick={handleSignOut} className="btn btn-outline" style={{ width: '100%' }}>
+                                Sign Out
+                            </button>
+                        ) : (
+                            <>
+                                <Link href="/login" className="btn btn-outline" style={{ flex: 1 }}>
+                                    Log In
+                                </Link>
+                                <Link href="/register" className="btn btn-primary" style={{ flex: 1 }}>
+                                    Start Free Trial
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </nav>
     );
 }

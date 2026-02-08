@@ -13,7 +13,7 @@ export interface TenantInfo {
     slug: string;
     logo_url?: string;
     primary_color: string;
-    subscription_tier: 'free' | 'pro' | 'enterprise';
+    subscription_tier: 'starter' | 'pro' | 'elite';
 }
 
 interface TenantContextValue {

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
@@ -9,21 +10,39 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const supabase = await createClient();
+    // Use a lightweight auth check — no tenant context needed for admin layout
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+        redirect('/login');
+    }
+
+    const cookieStore = await cookies();
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+        cookies: {
+            get(name: string) {
+                return cookieStore.get(name)?.value;
+            },
+        },
+    });
+
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
         redirect('/login');
     }
 
-    // Get user role from tenant_members (multi-tenant model)
+    // Use admin client (service role) to check tenant_members role
     const adminSupabase = createAdminClient();
-    const { data: tenantMember } = await adminSupabase
+    const { data: tenantMember, error: tmError } = await adminSupabase
         .from('tenant_members')
         .select('role, tenant_id')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .single();
+
+    console.log('[AdminLayout] user:', user.id, 'tenantMember:', tenantMember, 'error:', tmError?.message);
 
     if (tenantMember?.role !== 'admin') {
         redirect('/dashboard');

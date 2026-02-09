@@ -7,8 +7,55 @@ import { useRouter } from 'next/navigation';
 import {
     User, Building2, MapPin, CreditCard, Rocket,
     ArrowRight, ArrowLeft, Check, Eye, EyeOff,
-    AlertCircle, Loader2, Sparkles
+    AlertCircle, Loader2, Sparkles, ChevronDown
 } from 'lucide-react';
+
+// -----------------------------------------------
+// Countries (flag, ISO-2, dial code, currency, sample postal code)
+// -----------------------------------------------
+const COUNTRIES = [
+    { flag: '🇬🇧', code: 'GB', name: 'United Kingdom', dial: '+44', currency: '£', postalLabel: 'Postcode', postalPlaceholder: 'SW1A 1AA' },
+    { flag: '🇺🇸', code: 'US', name: 'United States', dial: '+1', currency: '$', postalLabel: 'ZIP Code', postalPlaceholder: '10001' },
+    { flag: '🇨🇦', code: 'CA', name: 'Canada', dial: '+1', currency: 'C$', postalLabel: 'Postal Code', postalPlaceholder: 'K1A 0B1' },
+    { flag: '🇦🇺', code: 'AU', name: 'Australia', dial: '+61', currency: 'A$', postalLabel: 'Postcode', postalPlaceholder: '2000' },
+    { flag: '🇮🇪', code: 'IE', name: 'Ireland', dial: '+353', currency: '€', postalLabel: 'Eircode', postalPlaceholder: 'D02 AF30' },
+    { flag: '🇩🇪', code: 'DE', name: 'Germany', dial: '+49', currency: '€', postalLabel: 'PLZ', postalPlaceholder: '10115' },
+    { flag: '🇫🇷', code: 'FR', name: 'France', dial: '+33', currency: '€', postalLabel: 'Code Postal', postalPlaceholder: '75001' },
+    { flag: '🇪🇸', code: 'ES', name: 'Spain', dial: '+34', currency: '€', postalLabel: 'Código Postal', postalPlaceholder: '28001' },
+    { flag: '🇮🇹', code: 'IT', name: 'Italy', dial: '+39', currency: '€', postalLabel: 'CAP', postalPlaceholder: '00100' },
+    { flag: '🇳🇱', code: 'NL', name: 'Netherlands', dial: '+31', currency: '€', postalLabel: 'Postcode', postalPlaceholder: '1011 AA' },
+    { flag: '🇧🇪', code: 'BE', name: 'Belgium', dial: '+32', currency: '€', postalLabel: 'Postcode', postalPlaceholder: '1000' },
+    { flag: '🇵🇹', code: 'PT', name: 'Portugal', dial: '+351', currency: '€', postalLabel: 'Código Postal', postalPlaceholder: '1000-001' },
+    { flag: '🇦🇹', code: 'AT', name: 'Austria', dial: '+43', currency: '€', postalLabel: 'PLZ', postalPlaceholder: '1010' },
+    { flag: '🇨🇭', code: 'CH', name: 'Switzerland', dial: '+41', currency: 'CHF', postalLabel: 'PLZ', postalPlaceholder: '8001' },
+    { flag: '🇸🇪', code: 'SE', name: 'Sweden', dial: '+46', currency: 'kr', postalLabel: 'Postnummer', postalPlaceholder: '111 22' },
+    { flag: '🇳🇴', code: 'NO', name: 'Norway', dial: '+47', currency: 'kr', postalLabel: 'Postnummer', postalPlaceholder: '0150' },
+    { flag: '🇩🇰', code: 'DK', name: 'Denmark', dial: '+45', currency: 'kr', postalLabel: 'Postnummer', postalPlaceholder: '1050' },
+    { flag: '🇫🇮', code: 'FI', name: 'Finland', dial: '+358', currency: '€', postalLabel: 'Postinumero', postalPlaceholder: '00100' },
+    { flag: '🇵🇱', code: 'PL', name: 'Poland', dial: '+48', currency: 'zł', postalLabel: 'Kod Pocztowy', postalPlaceholder: '00-001' },
+    { flag: '🇨🇿', code: 'CZ', name: 'Czech Republic', dial: '+420', currency: 'Kč', postalLabel: 'PSČ', postalPlaceholder: '110 00' },
+    { flag: '🇳🇿', code: 'NZ', name: 'New Zealand', dial: '+64', currency: 'NZ$', postalLabel: 'Postcode', postalPlaceholder: '6011' },
+    { flag: '🇿🇦', code: 'ZA', name: 'South Africa', dial: '+27', currency: 'R', postalLabel: 'Postal Code', postalPlaceholder: '2000' },
+    { flag: '🇸🇬', code: 'SG', name: 'Singapore', dial: '+65', currency: 'S$', postalLabel: 'Postal Code', postalPlaceholder: '049318' },
+    { flag: '🇦🇪', code: 'AE', name: 'UAE', dial: '+971', currency: 'AED', postalLabel: 'P.O. Box', postalPlaceholder: '12345' },
+    { flag: '🇸🇦', code: 'SA', name: 'Saudi Arabia', dial: '+966', currency: 'SAR', postalLabel: 'Postal Code', postalPlaceholder: '11564' },
+    { flag: '🇯🇵', code: 'JP', name: 'Japan', dial: '+81', currency: '¥', postalLabel: 'Postal Code', postalPlaceholder: '100-0001' },
+    { flag: '🇰🇷', code: 'KR', name: 'South Korea', dial: '+82', currency: '₩', postalLabel: 'Postal Code', postalPlaceholder: '04524' },
+    { flag: '🇮🇳', code: 'IN', name: 'India', dial: '+91', currency: '₹', postalLabel: 'PIN Code', postalPlaceholder: '110001' },
+    { flag: '🇧🇷', code: 'BR', name: 'Brazil', dial: '+55', currency: 'R$', postalLabel: 'CEP', postalPlaceholder: '01001-000' },
+    { flag: '🇲🇽', code: 'MX', name: 'Mexico', dial: '+52', currency: 'MX$', postalLabel: 'Código Postal', postalPlaceholder: '06600' },
+    { flag: '🇵🇰', code: 'PK', name: 'Pakistan', dial: '+92', currency: 'Rs', postalLabel: 'Postal Code', postalPlaceholder: '44000' },
+    { flag: '🇹🇷', code: 'TR', name: 'Turkey', dial: '+90', currency: '₺', postalLabel: 'Posta Kodu', postalPlaceholder: '34000' },
+    { flag: '🇪🇬', code: 'EG', name: 'Egypt', dial: '+20', currency: 'E£', postalLabel: 'Postal Code', postalPlaceholder: '11511' },
+    { flag: '🇳🇬', code: 'NG', name: 'Nigeria', dial: '+234', currency: '₦', postalLabel: 'Postal Code', postalPlaceholder: '100001' },
+    { flag: '🇰🇪', code: 'KE', name: 'Kenya', dial: '+254', currency: 'KSh', postalLabel: 'Postal Code', postalPlaceholder: '00100' },
+    { flag: '🇲🇾', code: 'MY', name: 'Malaysia', dial: '+60', currency: 'RM', postalLabel: 'Postcode', postalPlaceholder: '50000' },
+    { flag: '🇵🇭', code: 'PH', name: 'Philippines', dial: '+63', currency: '₱', postalLabel: 'ZIP Code', postalPlaceholder: '1000' },
+    { flag: '🇹🇭', code: 'TH', name: 'Thailand', dial: '+66', currency: '฿', postalLabel: 'Postal Code', postalPlaceholder: '10100' },
+    { flag: '🇶🇦', code: 'QA', name: 'Qatar', dial: '+974', currency: 'QR', postalLabel: 'Postal Code', postalPlaceholder: '00000' },
+    { flag: '🇰🇼', code: 'KW', name: 'Kuwait', dial: '+965', currency: 'KD', postalLabel: 'Postal Code', postalPlaceholder: '13001' },
+    { flag: '🇧🇭', code: 'BH', name: 'Bahrain', dial: '+973', currency: 'BD', postalLabel: 'Postal Code', postalPlaceholder: '199' },
+];
 
 // -----------------------------------------------
 // Types
@@ -21,6 +68,8 @@ interface FormData {
     email: string;
     password: string;
     phone: string;
+    dialCode: string;
+    countryCode: string;
     // Step 2
     clubName: string;
     slug: string;
@@ -30,7 +79,9 @@ interface FormData {
     city: string;
     postcode: string;
     clubPhone: string;
+    clubDialCode: string;
     clubEmail: string;
+    timezone: string;
     // Step 4
     plan: 'starter' | 'pro' | 'elite';
     billingInterval: 'monthly' | 'annual';
@@ -109,6 +160,8 @@ export default function GetStartedPage() {
         email: '',
         password: '',
         phone: '',
+        dialCode: '+44',
+        countryCode: 'GB',
         clubName: '',
         slug: '',
         clubType: 'bjj',
@@ -116,11 +169,16 @@ export default function GetStartedPage() {
         city: '',
         postcode: '',
         clubPhone: '',
+        clubDialCode: '+44',
         clubEmail: '',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/London',
         plan: 'pro',
         billingInterval: 'monthly',
         termsAccepted: false,
     });
+
+    // Derive country info from selected countryCode
+    const selectedCountry = COUNTRIES.find(c => c.code === form.countryCode) || COUNTRIES[0];
 
     // Auto-generate slug from club name
     useEffect(() => {
@@ -279,6 +337,40 @@ export default function GetStartedPage() {
     // Render Steps
     // -----------------------------------------------
 
+    // Reusable phone input with country code dropdown
+    const renderPhoneInput = (phoneField: 'phone' | 'clubPhone', dialField: 'dialCode' | 'clubDialCode', label: string, required = false) => (
+        <div>
+            <label style={labelStyle}>{label}{required ? ' *' : ''}</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ position: 'relative', minWidth: '110px' }}>
+                    <select
+                        value={form[dialField]}
+                        onChange={e => updateField(dialField, e.target.value)}
+                        style={{
+                            ...inputStyle,
+                            paddingRight: '28px',
+                            appearance: 'none',
+                            cursor: 'pointer',
+                            fontSize: 'var(--text-sm)',
+                        }}
+                    >
+                        {COUNTRIES.map(c => (
+                            <option key={c.code + c.dial} value={c.dial}>{c.flag} {c.dial}</option>
+                        ))}
+                    </select>
+                    <ChevronDown size={14} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-tertiary)' }} />
+                </div>
+                <input
+                    style={{ ...inputStyle, flex: 1 }}
+                    type="tel"
+                    value={form[phoneField]}
+                    onChange={e => updateField(phoneField, e.target.value)}
+                    placeholder="7xxx xxx xxx"
+                />
+            </div>
+        </div>
+    );
+
     const renderStep1 = () => (
         <div style={fieldGroupStyle}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
@@ -297,7 +389,7 @@ export default function GetStartedPage() {
             <div>
                 <label style={labelStyle}>Email *</label>
                 <input style={inputStyle} type="email" value={form.email}
-                    onChange={e => updateField('email', e.target.value)} placeholder="john@ironmongerbjj.com" />
+                    onChange={e => updateField('email', e.target.value)} placeholder="you@yourclub.com" />
             </div>
 
             <div>
@@ -315,11 +407,7 @@ export default function GetStartedPage() {
                 </div>
             </div>
 
-            <div>
-                <label style={labelStyle}>Phone</label>
-                <input style={inputStyle} type="tel" value={form.phone}
-                    onChange={e => updateField('phone', e.target.value)} placeholder="+44 7xxx xxx xxx" />
-            </div>
+            {renderPhoneInput('phone', 'dialCode', 'Phone')}
         </div>
     );
 
@@ -379,8 +467,33 @@ export default function GetStartedPage() {
     const renderStep3 = () => (
         <div style={fieldGroupStyle}>
             <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
-                You can add or update your address later from settings.
+                You can add or update these details later from settings.
             </p>
+
+            {/* Country picker */}
+            <div>
+                <label style={labelStyle}>Country *</label>
+                <div style={{ position: 'relative' }}>
+                    <select
+                        value={form.countryCode}
+                        onChange={e => {
+                            const c = COUNTRIES.find(c => c.code === e.target.value);
+                            if (c) {
+                                updateField('countryCode', c.code);
+                                updateField('dialCode', c.dial);
+                                updateField('clubDialCode', c.dial);
+                            }
+                        }}
+                        style={{ ...inputStyle, appearance: 'none', cursor: 'pointer', paddingRight: '36px' }}
+                    >
+                        {COUNTRIES.map(c => (
+                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                        ))}
+                    </select>
+                    <ChevronDown size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-tertiary)' }} />
+                </div>
+            </div>
+
             <div>
                 <label style={labelStyle}>Street Address</label>
                 <input style={inputStyle} value={form.address}
@@ -390,25 +503,34 @@ export default function GetStartedPage() {
                 <div>
                     <label style={labelStyle}>City</label>
                     <input style={inputStyle} value={form.city}
-                        onChange={e => updateField('city', e.target.value)} placeholder="Manchester" />
+                        onChange={e => updateField('city', e.target.value)} placeholder="City" />
                 </div>
                 <div>
-                    <label style={labelStyle}>Postcode</label>
+                    <label style={labelStyle}>{selectedCountry.postalLabel}</label>
                     <input style={inputStyle} value={form.postcode}
-                        onChange={e => updateField('postcode', e.target.value)} placeholder="M1 1AA" />
+                        onChange={e => updateField('postcode', e.target.value)} placeholder={selectedCountry.postalPlaceholder} />
                 </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-                <div>
-                    <label style={labelStyle}>Club Phone</label>
-                    <input style={inputStyle} type="tel" value={form.clubPhone}
-                        onChange={e => updateField('clubPhone', e.target.value)} placeholder="+44 xxx" />
-                </div>
+                {renderPhoneInput('clubPhone', 'clubDialCode', 'Club Phone')}
                 <div>
                     <label style={labelStyle}>Club Email</label>
                     <input style={inputStyle} type="email" value={form.clubEmail}
                         onChange={e => updateField('clubEmail', e.target.value)} placeholder="info@yourclub.com" />
                 </div>
+            </div>
+
+            {/* Auto-detected timezone */}
+            <div>
+                <label style={labelStyle}>Timezone</label>
+                <input
+                    style={{ ...inputStyle, color: 'var(--text-secondary)', background: 'var(--bg-secondary)' }}
+                    value={form.timezone}
+                    readOnly
+                />
+                <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', margin: '4px 0 0' }}>
+                    Auto-detected from your browser. Used for class scheduling.
+                </p>
             </div>
         </div>
     );
@@ -495,7 +617,7 @@ export default function GetStartedPage() {
 
                                 <div style={{ marginBottom: 'var(--space-3)' }}>
                                     <span style={{ fontSize: 'var(--text-2xl)', fontWeight: '800', color: isSelected ? 'var(--color-gold)' : 'var(--text-primary)' }}>
-                                        £{price}
+                                        {selectedCountry.currency}{price}
                                     </span>
                                     <span style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>/mo</span>
                                 </div>

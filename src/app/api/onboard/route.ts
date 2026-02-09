@@ -18,6 +18,8 @@ interface OnboardRequest {
     email: string;
     password: string;
     phone: string;
+    dialCode: string;
+    countryCode: string;
 
     // Step 2: Club details
     clubName: string;
@@ -29,7 +31,9 @@ interface OnboardRequest {
     city: string;
     postcode: string;
     clubPhone: string;
+    clubDialCode: string;
     clubEmail: string;
+    timezone: string;
 
     // Step 4: Plan selection
     plan: 'starter' | 'pro' | 'elite';
@@ -126,10 +130,12 @@ export async function POST(request: NextRequest) {
                     trial_ends_at: trialEndsAt,
                     onboarding_completed: false,
                     contact_email: body.clubEmail || body.email,
-                    contact_phone: body.clubPhone || body.phone,
+                    contact_phone: body.clubPhone ? `${body.clubDialCode || ''}${body.clubPhone}` : (body.phone ? `${body.dialCode || ''}${body.phone}` : ''),
                     settings: {
                         club_type: body.clubType,
                         billing_interval: body.billingInterval,
+                        country: body.countryCode || 'GB',
+                        timezone: body.timezone || 'Europe/London',
                     },
                 })
                 .select('id')
@@ -150,7 +156,7 @@ export async function POST(request: NextRequest) {
                     first_name: body.firstName,
                     last_name: body.lastName,
                     email: body.email,
-                    phone: body.phone,
+                    phone: body.phone ? `${body.dialCode || ''}${body.phone}` : '',
                     date_of_birth: '1990-01-01', // Default, owner can update later
                     address: body.address || '',
                     city: body.city || '',

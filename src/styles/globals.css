@@ -1667,3 +1667,48 @@ body:has(.dashboard-sidebar-overlay.open) .bottom-nav {
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
+
+/* ===== Pain Section (Landing Page) ===== */
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+}
+
+.cf-pain-card:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(197, 164, 86, 0.2) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.cf-stat-callout>div {
+  transition: all 0.25s ease;
+}
+
+.cf-stat-callout>div:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(239, 68, 68, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .cf-stat-callout {
+    gap: 12px !important;
+  }
+
+  .cf-stat-callout>div {
+    min-width: 0 !important;
+    flex: 1 1 120px;
+    padding: 16px 12px !important;
+  }
+}

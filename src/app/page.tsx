@@ -580,74 +580,166 @@ export default async function HomePage() {
         </section>
 
         {/* ==================== PAIN → SOLUTION ==================== */}
-        <section style={{ background: '#FAFBFC', padding: '100px 24px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-              <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+        <section style={{
+          background: 'linear-gradient(180deg, #0F172A 0%, #1A2332 100%)',
+          padding: '100px 24px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Subtle background pattern */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(197, 164, 86, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.03) 0%, transparent 50%)',
+            pointerEvents: 'none',
+          }} />
+
+          <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+            {/* Header */}
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '100px',
+                padding: '6px 16px',
+                marginBottom: '24px',
               }}>
-                The problem
-              </p>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', animation: 'pulse 2s ease-in-out infinite' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#FCA5A5', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  The problem
+                </span>
+              </div>
               <h2 style={{
-                fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
-                color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
-                marginBottom: '16px',
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                color: '#FFFFFF', fontWeight: '800', lineHeight: '1.1',
+                marginBottom: '20px',
               }}>
-                Sound familiar?
+                Still running your club{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, #EF4444, #F97316)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                }}>
+                  like this?
+                </span>
               </h2>
-              <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
-                Spreadsheets, WhatsApp groups, and 4 different tools glued together. Your club deserves better infrastructure.
+              <p style={{ color: '#94A3B8', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>
+                Spreadsheets, WhatsApp groups, and 4 different tools duct-taped together.
+                Your members deserve a professional experience. So do you.
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Stat callout */}
+            <div style={{
+              display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '48px',
+              flexWrap: 'wrap',
+            }}
+              className="cf-stat-callout"
+            >
               {[
-                { pain: 'Managing 200+ members in Google Sheets', solution: 'Automated member database with self-registration and family accounts' },
-                { pain: 'Chasing payments via WhatsApp every month', solution: 'Stripe-powered subscriptions with automated billing and reminders' },
-                { pain: 'No idea who actually shows up to class', solution: 'One-tap attendance tracking with retention reports and analytics' },
-                { pain: 'Running 3 locations with 3 different systems', solution: 'Unified multi-location management from a single dashboard' },
-                { pain: 'Parents constantly asking about their kid\'s progress', solution: 'Member portal with rank progression, grading history, and coach feedback' },
-                { pain: 'No audit trail for belt promotions or gradings', solution: 'Structured promotion history with coach sign-off and full audit trail' },
+                { value: '12+', unit: 'hrs/week', desc: 'spent on admin' },
+                { value: '4-5', unit: 'tools', desc: 'juggled daily' },
+                { value: '£000s', unit: 'lost', desc: 'in missed payments' },
+              ].map((stat) => (
+                <div key={stat.desc} style={{
+                  textAlign: 'center', padding: '20px 28px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '16px',
+                  minWidth: '160px',
+                }}>
+                  <p style={{
+                    fontSize: '2rem', fontWeight: '800', margin: '0 0 2px',
+                    background: 'linear-gradient(135deg, #EF4444, #F97316)',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                  }}>
+                    {stat.value}
+                  </p>
+                  <p style={{ fontSize: '13px', color: '#64748B', margin: 0, fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    {stat.unit}
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#475569', margin: '4px 0 0' }}>
+                    {stat.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Pain → Solution cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px',
+              marginBottom: '48px',
+            }}>
+              {[
+                { emoji: '📊', pain: 'Managing 200+ members in spreadsheets', solution: 'Automated member database with self-registration and family accounts' },
+                { emoji: '💬', pain: 'Chasing payments via WhatsApp every month', solution: 'Stripe-powered subscriptions with automated billing and reminders' },
+                { emoji: '👻', pain: 'No idea who actually shows up to class', solution: 'One-tap attendance with retention reports and analytics' },
+                { emoji: '🏢', pain: 'Running 3 locations with 3 different systems', solution: 'Unified multi-location management from a single dashboard' },
+                { emoji: '😩', pain: 'Parents constantly asking about progress', solution: 'Member portal with rank progression, grading history, and coach feedback' },
+                { emoji: '📋', pain: 'No audit trail for belt promotions', solution: 'Structured grading history with coach sign-off and full audit trail' },
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="cf-pain-row"
+                  className="cf-pain-card"
                   style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr',
-                    background: '#FFFFFF', borderRadius: '14px',
-                    border: '1px solid #F1F5F9',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    transition: 'all 0.3s ease',
+                    position: 'relative',
                     overflow: 'hidden',
                   }}
                 >
-                  <div style={{
-                    padding: '20px 24px',
-                    display: 'flex', alignItems: 'center', gap: '12px',
-                    borderRight: '1px solid #F1F5F9',
-                  }}>
-                    <div style={{
-                      width: '8px', height: '8px', borderRadius: '50%',
-                      background: '#FCA5A5', flexShrink: 0,
-                    }} />
+                  {/* Pain */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '24px', lineHeight: '1' }}>{item.emoji}</span>
                     <p style={{
-                      fontSize: '14px', color: '#94A3B8', margin: 0,
-                      textDecoration: 'line-through', fontWeight: '500',
+                      fontSize: '14px', color: '#FCA5A5', margin: 0,
+                      textDecoration: 'line-through',
+                      textDecorationColor: 'rgba(252, 165, 165, 0.4)',
+                      fontWeight: '500', lineHeight: '1.5',
                     }}>
                       {item.pain}
                     </p>
                   </div>
+                  {/* Divider */}
                   <div style={{
-                    padding: '20px 24px',
-                    display: 'flex', alignItems: 'center', gap: '12px',
-                  }}>
-                    <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0 }} />
-                    <p style={{ fontSize: '14px', color: '#0F172A', fontWeight: '600', margin: 0 }}>
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(197, 164, 86, 0.3), transparent)',
+                    marginBottom: '16px',
+                  }} />
+                  {/* Solution */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ fontSize: '14px', color: '#E2E8F0', fontWeight: '600', margin: 0, lineHeight: '1.5' }}>
                       {item.solution}
                     </p>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* CTA */}
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#64748B', fontSize: '1rem', marginBottom: '20px' }}>
+                Ready to leave the chaos behind?
+              </p>
+              <Link
+                href="/get-started"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '10px',
+                  background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
+                  color: '#0F172A', fontWeight: '700', fontSize: '1rem',
+                  padding: '14px 32px', borderRadius: '12px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 24px rgba(197, 164, 86, 0.25)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Start Your Free Trial <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </section>

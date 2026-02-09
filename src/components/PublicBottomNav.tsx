@@ -20,14 +20,15 @@ export default function PublicBottomNav() {
         return pathname.startsWith(href);
     };
 
-    // Don't show on dashboard, admin, instructor, professor, or tenant pages
-    if (pathname.startsWith('/dashboard') ||
-        pathname.startsWith('/admin') ||
-        pathname.startsWith('/instructor') ||
-        pathname.startsWith('/professor') ||
-        pathname.startsWith('/tenant-home') ||
-        pathname.startsWith('/login') ||
-        pathname.startsWith('/register')) {
+    // Don't show on dashboard, admin, instructor, professor, or SaaS platform pages
+    const hiddenPrefixes = [
+        '/dashboard', '/admin', '/instructor', '/professor',
+        '/tenant-home', '/login', '/register',
+        '/pricing', '/get-started', '/faq', '/demo',
+        '/waitlist', '/privacy', '/terms', '/forgot-password',
+        '/reset-password', '/platform', '/waiver',
+    ];
+    if (pathname === '/' || hiddenPrefixes.some(p => pathname.startsWith(p))) {
         return null;
     }
 

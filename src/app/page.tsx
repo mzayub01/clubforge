@@ -658,57 +658,86 @@ export default async function HomePage() {
               ))}
             </div>
 
-            {/* Pain → Solution cards */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '16px',
-              marginBottom: '48px',
+            {/* Before → After transformation */}
+            <div className="cf-before-after" style={{
+              display: 'grid', gridTemplateColumns: '1fr auto 1fr',
+              gap: '0', marginBottom: '12px', padding: '0 8px',
             }}>
+              <p style={{ fontSize: '13px', fontWeight: '700', color: '#EF4444', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
+                Before
+              </p>
+              <div />
+              <p style={{ fontSize: '13px', fontWeight: '700', color: '#10B981', textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>
+                With ClubForge
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '48px' }}>
               {[
-                { emoji: '📊', pain: 'Managing 200+ members in spreadsheets', solution: 'Automated member database with self-registration and family accounts' },
-                { emoji: '💬', pain: 'Chasing payments via WhatsApp every month', solution: 'Stripe-powered subscriptions with automated billing and reminders' },
-                { emoji: '👻', pain: 'No idea who actually shows up to class', solution: 'One-tap attendance with retention reports and analytics' },
-                { emoji: '🏢', pain: 'Running 3 locations with 3 different systems', solution: 'Unified multi-location management from a single dashboard' },
-                { emoji: '😩', pain: 'Parents constantly asking about progress', solution: 'Member portal with rank progression, grading history, and coach feedback' },
-                { emoji: '📋', pain: 'No audit trail for belt promotions', solution: 'Structured grading history with coach sign-off and full audit trail' },
+                { emoji: '📊', before: 'Managing 200+ members across spreadsheets', after: 'Automated member database with self-registration & family accounts' },
+                { emoji: '💬', before: 'Chasing payments via WhatsApp every month', after: 'Stripe-powered subscriptions with automated billing & reminders' },
+                { emoji: '👻', before: 'No idea who actually shows up to class', after: 'One-tap attendance tracking with retention reports & analytics' },
+                { emoji: '🏢', before: 'Running 3 locations with 3 different systems', after: 'Unified multi-location management from a single dashboard' },
+                { emoji: '😩', before: 'Parents constantly asking about their kid\'s progress', after: 'Member portal with rank progression, grading history & feedback' },
+                { emoji: '📋', before: 'No audit trail for belt promotions or gradings', after: 'Structured grading history with coach sign-off & full audit trail' },
               ].map((item, i) => (
                 <div
                   key={i}
                   className="cf-pain-card"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                    borderRadius: '16px',
-                    padding: '24px',
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto 1fr',
+                    alignItems: 'center',
+                    borderRadius: '14px',
                     overflow: 'hidden',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    transition: 'all 0.3s ease',
                   }}
                 >
-                  {/* Pain */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '24px', lineHeight: '1' }}>{item.emoji}</span>
+                  {/* BEFORE */}
+                  <div style={{
+                    padding: '20px 24px',
+                    display: 'flex', alignItems: 'center', gap: '14px',
+                    background: 'rgba(239, 68, 68, 0.04)',
+                    borderRight: '1px solid rgba(255, 255, 255, 0.04)',
+                    height: '100%',
+                  }}>
+                    <span style={{ fontSize: '22px', lineHeight: '1', flexShrink: 0 }}>{item.emoji}</span>
                     <p style={{
                       fontSize: '14px', color: '#FCA5A5', margin: 0,
                       textDecoration: 'line-through',
-                      textDecorationColor: 'rgba(252, 165, 165, 0.4)',
+                      textDecorationColor: 'rgba(252, 165, 165, 0.35)',
                       fontWeight: '500', lineHeight: '1.5',
                     }}>
-                      {item.pain}
+                      {item.before}
                     </p>
                   </div>
-                  {/* Divider */}
+
+                  {/* Arrow */}
                   <div style={{
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent, rgba(197, 164, 86, 0.3), transparent)',
-                    marginBottom: '16px',
-                  }} />
-                  {/* Solution */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <p style={{ fontSize: '14px', color: '#E2E8F0', fontWeight: '600', margin: 0, lineHeight: '1.5' }}>
-                      {item.solution}
+                    padding: '0 12px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                  }}>
+                    <ArrowRight size={20} style={{
+                      color: '#C5A456',
+                      filter: 'drop-shadow(0 0 4px rgba(197, 164, 86, 0.4))',
+                    }} />
+                  </div>
+
+                  {/* AFTER */}
+                  <div style={{
+                    padding: '20px 24px',
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    background: 'rgba(16, 185, 129, 0.04)',
+                    borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
+                    height: '100%',
+                  }}>
+                    <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0 }} />
+                    <p style={{
+                      fontSize: '14px', color: '#E2E8F0', fontWeight: '600',
+                      margin: 0, lineHeight: '1.5',
+                    }}>
+                      {item.after}
                     </p>
                   </div>
                 </div>

@@ -1711,4 +1711,17 @@ body:has(.dashboard-sidebar-overlay.open) .bottom-nav {
     flex: 1 1 120px;
     padding: 16px 12px !important;
   }
+
+  .cf-before-after {
+    display: none !important;
+  }
+
+  .cf-pain-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cf-pain-card>div:nth-child(2) {
+    padding: 4px 0 !important;
+    transform: rotate(90deg);
+  }
 }

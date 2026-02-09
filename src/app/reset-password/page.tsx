@@ -343,7 +343,7 @@ export default function ResetPasswordPage() {
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
                     <Link href="/">
                         <Image
-                            src="/logo-full.png"
+                            src="/logo-clubforge-final.svg"
                             alt="ClubForge"
                             width={160}
                             height={80}

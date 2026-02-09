@@ -59,7 +59,7 @@ export default function WaitlistConfirmationPage() {
                 {/* Logo */}
                 <Link href="/">
                     <Image
-                        src="/logo-full.png"
+                        src="/logo-clubforge-final.svg"
                         alt="ClubForge"
                         width={140}
                         height={70}

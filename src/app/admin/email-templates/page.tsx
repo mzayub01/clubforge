@@ -147,7 +147,7 @@ export default function AdminEmailTemplatesPage() {
                     {/* Logo */}
                     <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
                         <img
-                            src="/logo-full.png"
+                            src="/logo-clubforge-final.svg"
                             alt="ClubForge"
                             style={{ height: '60px', width: 'auto' }}
                         />

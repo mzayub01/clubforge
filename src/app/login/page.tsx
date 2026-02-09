@@ -141,10 +141,9 @@ export default function LoginPage() {
                     ) : (
                         <>
                             <Link href="/">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src="/logo-full.png"
-                                    alt="DojoHub"
+                                    src="/logo-clubforge-final.svg"
+                                    alt="ClubForge"
                                     style={{ height: '70px', width: 'auto', margin: '0 auto' }}
                                 />
                             </Link>

@@ -596,19 +596,6 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                borderRadius: '100px',
-                padding: '6px 16px',
-                marginBottom: '24px',
-              }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444', animation: 'pulse 2s ease-in-out infinite' }} />
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#FCA5A5', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  The problem
-                </span>
-              </div>
               <h2 style={{
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
                 color: '#FFFFFF', fontWeight: '800', lineHeight: '1.1',
@@ -629,6 +616,13 @@ export default async function HomePage() {
             </div>
 
             {/* Stat callout */}
+            <p style={{
+              textAlign: 'center', fontSize: '13px', fontWeight: '600',
+              color: '#64748B', textTransform: 'uppercase', letterSpacing: '1.5px',
+              marginBottom: '16px',
+            }}>
+              The typical club owner
+            </p>
             <div style={{
               display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '48px',
               flexWrap: 'wrap',

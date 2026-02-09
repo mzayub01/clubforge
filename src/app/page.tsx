@@ -51,8 +51,8 @@ export default async function HomePage() {
         {/* Responsive overrides and hover effects */}
         <style>{`
           @media (max-width: 768px) {
-            .cf-dashboard-mockup .cf-dashboard-inner { grid-template-columns: 1fr !important; }
-            .cf-dashboard-mockup .cf-dashboard-inner > div:first-child { display: none !important; }
+            .cf-dashboard-mockup { display: none !important; }
+            .cf-mobile-phone-mockup { display: block !important; }
             .cf-pain-row { grid-template-columns: 1fr !important; }
             .cf-pain-row > div:first-child { border-right: none !important; border-bottom: 1px solid #F1F5F9; }
             .cf-steps-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
@@ -326,6 +326,74 @@ export default async function HomePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Mobile Phone Mockup — visible only on mobile */}
+              <div className="cf-mobile-phone-mockup" style={{ display: 'none', maxWidth: '320px', margin: '0 auto' }}>
+                <div style={{
+                  background: '#0F172A', borderRadius: '36px', padding: '12px',
+                  boxShadow: '0 25px 80px rgba(15, 23, 42, 0.3)',
+                }}>
+                  <div style={{ background: '#FFFFFF', borderRadius: '26px', overflow: 'hidden' }}>
+                    <div style={{ padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0F172A' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#FFFFFF' }}>9:41</span>
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        <div style={{ width: '14px', height: '10px', borderRadius: '2px', border: '1px solid #fff', position: 'relative' }}>
+                          <div style={{ position: 'absolute', top: '2px', left: '2px', right: '2px', bottom: '2px', background: '#10B981', borderRadius: '1px' }} />
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ padding: '16px 20px 12px', background: 'linear-gradient(180deg, #0F172A, #1E293B)' }}>
+                      <div style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', borderRadius: '8px', padding: '6px 12px', display: 'inline-block', marginBottom: '12px' }}>
+                        <span style={{ color: '#0F172A', fontWeight: '700', fontSize: '11px' }}>Your Club</span>
+                      </div>
+                      <p style={{ color: '#FFFFFF', fontWeight: '700', fontSize: '16px', margin: '0 0 4px' }}>Dashboard</p>
+                      <p style={{ color: '#94A3B8', fontSize: '11px', margin: 0 }}>Welcome back, Admin</p>
+                    </div>
+                    <div style={{ padding: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      {[
+                        { label: 'Members', value: '247', change: '+12%', color: '#3B82F6' },
+                        { label: 'Revenue', value: '£8,420', change: '+8.3%', color: '#10B981' },
+                        { label: 'Classes', value: '18', change: '3 today', color: '#8B5CF6' },
+                        { label: 'Attendance', value: '87%', change: '+4.2%', color: '#F59E0B' },
+                      ].map((s) => (
+                        <div key={s.label} style={{ background: '#F8FAFC', borderRadius: '12px', padding: '12px', border: '1px solid #F1F5F9' }}>
+                          <p style={{ fontSize: '10px', color: '#94A3B8', fontWeight: '500', margin: '0 0 2px' }}>{s.label}</p>
+                          <p style={{ fontSize: '18px', fontWeight: '800', color: '#0F172A', margin: '0 0 2px' }}>{s.value}</p>
+                          <p style={{ fontSize: '10px', color: s.color, fontWeight: '600', margin: 0 }}>{s.change}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ padding: '0 16px 16px' }}>
+                      <p style={{ fontSize: '12px', fontWeight: '700', color: '#0F172A', margin: '0 0 10px' }}>Today&apos;s Classes</p>
+                      {[
+                        { time: '09:00', name: 'Adult BJJ', spots: '18/25', live: true },
+                        { time: '16:30', name: 'Kids Karate', spots: '22/30', live: false },
+                        { time: '18:00', name: 'MMA Conditioning', spots: '14/20', live: false },
+                      ].map((c) => (
+                        <div key={c.time} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F1F5F9' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', width: '36px' }}>{c.time}</span>
+                            <div>
+                              <p style={{ fontSize: '12px', fontWeight: '600', color: '#0F172A', margin: 0 }}>{c.name}</p>
+                              <p style={{ fontSize: '10px', color: '#94A3B8', margin: 0 }}>{c.spots} spots</p>
+                            </div>
+                          </div>
+                          <span style={{ fontSize: '9px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px', background: c.live ? '#DCFCE7' : '#F1F5F9', color: c.live ? '#16A34A' : '#64748B' }}>{c.live ? 'LIVE' : 'UPCOMING'}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ padding: '10px 20px 16px', display: 'flex', justifyContent: 'space-around', borderTop: '1px solid #F1F5F9' }}>
+                      {['🏠', '👥', '📅', '💳'].map((icon, i) => (
+                        <div key={i} style={{ textAlign: 'center', fontSize: '16px', opacity: i === 0 ? 1 : 0.4 }}>
+                          {icon}
+                          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: i === 0 ? '#C5A456' : 'transparent', margin: '4px auto 0' }} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

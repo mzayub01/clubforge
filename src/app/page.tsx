@@ -743,11 +743,13 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)', fontWeight: '800',
+                background: 'linear-gradient(135deg, #D4B86A, #C5A456, #A88B3D)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                letterSpacing: '0.5px',
+                marginBottom: '12px',
               }}>
-                Platform
+                ClubForge is
               </p>
               <h2 style={{
                 fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',

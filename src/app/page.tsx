@@ -51,7 +51,8 @@ export default async function HomePage() {
         {/* Responsive overrides and hover effects */}
         <style>{`
           @media (max-width: 768px) {
-            .cf-dashboard-mockup { display: none !important; }
+            .cf-dashboard-mockup .cf-dashboard-inner { grid-template-columns: 1fr !important; }
+            .cf-dashboard-mockup .cf-dashboard-inner > div:first-child { display: none !important; }
             .cf-pain-row { grid-template-columns: 1fr !important; }
             .cf-pain-row > div:first-child { border-right: none !important; border-bottom: 1px solid #F1F5F9; }
             .cf-steps-grid { grid-template-columns: 1fr !important; gap: 40px !important; }

@@ -61,32 +61,28 @@ const TIER_FEATURES: Record<SubscriptionTier, readonly string[]> = {
 export interface UsageLimits {
     maxMembers: number;
     maxLocations: number;
-    maxStaff: number;
-    maxClasses: number;
     maxEvents: number;
+    maxVideos: number;
 }
 
 const TIER_LIMITS: Record<SubscriptionTier, UsageLimits> = {
     starter: {
         maxMembers: 150,
         maxLocations: 1,
-        maxStaff: 3,
-        maxClasses: 20,
         maxEvents: 5,
+        maxVideos: 0,
     },
     pro: {
         maxMembers: 750,
         maxLocations: 3,
-        maxStaff: 10,
-        maxClasses: 100,
         maxEvents: 50,
+        maxVideos: 30,
     },
     elite: {
         maxMembers: Infinity,
         maxLocations: Infinity,
-        maxStaff: Infinity,
-        maxClasses: Infinity,
         maxEvents: Infinity,
+        maxVideos: Infinity,
     },
 };
 

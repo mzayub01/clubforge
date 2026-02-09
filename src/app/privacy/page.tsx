@@ -80,7 +80,7 @@ export default async function PrivacyPage() {
                             <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                 <li>All data is encrypted in transit (TLS) and at rest</li>
                                 <li>Row-level security (RLS) ensures complete tenant isolation — clubs cannot access each other&apos;s data</li>
-                                <li>Hosted on Supabase and Vercel with enterprise-grade infrastructure</li>
+                                <li>Hosted on enterprise-grade cloud infrastructure with global availability</li>
                                 <li>Regular security reviews and updates</li>
                                 <li>Payment data handled by Stripe (PCI DSS compliant)</li>
                             </ul>
@@ -95,9 +95,9 @@ export default async function PrivacyPage() {
 
                             <h2 style={{ color: 'var(--text-primary)' }}>7. Third-Party Services</h2>
                             <ul style={{ paddingLeft: 'var(--space-6)' }}>
-                                <li><strong>Supabase</strong> — database hosting and authentication</li>
+                                <li><strong>Cloud Database Provider</strong> — secure database hosting and authentication</li>
                                 <li><strong>Stripe</strong> — payment processing</li>
-                                <li><strong>Vercel</strong> — application hosting</li>
+                                <li><strong>Cloud Hosting Provider</strong> — application hosting and content delivery</li>
                             </ul>
                             <p>Each service has its own privacy policy and is GDPR-compliant.</p>
 
@@ -127,7 +127,7 @@ export default async function PrivacyPage() {
                                 <p style={{ margin: 0 }}>
                                     <strong>ClubForge</strong><br />
                                     Email: <a href="mailto:privacy@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>privacy@clubforgehq.com</a><br />
-                                    Manchester, United Kingdom
+                                    United Kingdom
                                 </p>
                             </div>
 

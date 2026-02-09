@@ -126,7 +126,7 @@ export default async function TermsPage() {
                                 <p style={{ margin: 0 }}>
                                     <strong>ClubForge</strong><br />
                                     Email: <a href="mailto:legal@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>legal@clubforgehq.com</a><br />
-                                    Manchester, United Kingdom
+                                    United Kingdom
                                 </p>
                             </div>
 

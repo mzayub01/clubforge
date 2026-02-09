@@ -190,11 +190,15 @@ export async function GET(request: NextRequest) {
             { count: activeMembers },
             { count: totalClasses },
             { count: totalLocations },
+            { count: totalEvents },
+            { count: totalVideos },
         ] = await Promise.all([
             adminSupabase.from('profiles').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
             adminSupabase.from('memberships').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('status', 'active'),
             adminSupabase.from('classes').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_active', true),
             adminSupabase.from('locations').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_active', true),
+            adminSupabase.from('events').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+            adminSupabase.from('videos').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
         ]);
 
         return NextResponse.json({
@@ -204,6 +208,8 @@ export async function GET(request: NextRequest) {
                 activeMembers: activeMembers || 0,
                 totalClasses: totalClasses || 0,
                 totalLocations: totalLocations || 0,
+                totalEvents: totalEvents || 0,
+                totalVideos: totalVideos || 0,
             }
         });
     } catch (err) {

@@ -177,7 +177,7 @@ export default function TodayClassCard({ selectedUserId }: TodayClassCardProps) 
                 name: selectedClass.name,
                 start_time: selectedClass.start_time,
                 end_time: selectedClass.end_time,
-                location_name: (selectedClass.location as { name: string })?.name || '',
+                location_name: (selectedClass.location as unknown as { name: string })?.name || '',
                 isHappeningNow,
                 isUpcoming,
                 canCheckIn,

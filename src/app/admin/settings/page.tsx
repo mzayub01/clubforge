@@ -10,8 +10,9 @@ import { useSearchParams } from 'next/navigation';
 import {
     Settings, Palette, CreditCard, Crown, Save, CheckCircle, AlertCircle,
     Upload, ExternalLink, Loader2, Database, Mail, Phone, Globe, Tag,
-    Shield, Zap, MapPin
+    Shield, Zap, MapPin, ImageIcon
 } from 'lucide-react';
+import { getUsageLimits, SubscriptionTier } from '@/lib/feature-gate';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
 type Tab = 'general' | 'branding' | 'payments' | 'subscription';
@@ -38,6 +39,8 @@ interface AppStats {
     activeMembers: number;
     totalClasses: number;
     totalLocations: number;
+    totalEvents: number;
+    totalVideos: number;
 }
 
 export default function AdminSettingsPage() {
@@ -828,24 +831,39 @@ export default function AdminSettingsPage() {
                         </div>
 
                         <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                                <span style={{ color: 'var(--text-secondary)' }}>Members</span>
-                                <span style={{ fontWeight: '500' }}>
-                                    {stats?.totalMembers || 0} / {
-                                        tenant?.subscription_tier === 'elite' ? 'Unlimited' :
-                                            tenant?.subscription_tier === 'pro' ? '500' : '50'
-                                    }
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                                <span style={{ color: 'var(--text-secondary)' }}>Locations</span>
-                                <span style={{ fontWeight: '500' }}>
-                                    {stats?.totalLocations || 0} / {
-                                        tenant?.subscription_tier === 'elite' ? 'Unlimited' :
-                                            tenant?.subscription_tier === 'pro' ? '10' : '1'
-                                    }
-                                </span>
-                            </div>
+                            {(() => {
+                                const tier = (tenant?.subscription_tier || 'starter') as SubscriptionTier;
+                                const limits = getUsageLimits(tier);
+                                const formatLimit = (v: number) => v === Infinity ? 'Unlimited' : String(v);
+                                return (
+                                    <>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>Members</span>
+                                            <span style={{ fontWeight: '500' }}>
+                                                {stats?.totalMembers || 0} / {formatLimit(limits.maxMembers)}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>Locations</span>
+                                            <span style={{ fontWeight: '500' }}>
+                                                {stats?.totalLocations || 0} / {formatLimit(limits.maxLocations)}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>Events</span>
+                                            <span style={{ fontWeight: '500' }}>
+                                                {stats?.totalEvents || 0} / {formatLimit(limits.maxEvents)}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                                            <span style={{ color: 'var(--text-secondary)' }}>Videos</span>
+                                            <span style={{ fontWeight: '500' }}>
+                                                {stats?.totalVideos || 0} / {formatLimit(limits.maxVideos)}
+                                            </span>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
 
                         {tenant?.subscription_tier !== 'elite' && (

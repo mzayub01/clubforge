@@ -4,47 +4,6 @@ import { createClient as createStandardClient } from '@supabase/supabase-js';
 import { getTenantId } from '@/lib/tenant';
 
 // -----------------------------------------------
-// Mock client (when Supabase is not configured)
-// -----------------------------------------------
-
-const createMockClient = () => ({
-    auth: {
-        getUser: async () => ({ data: { user: null }, error: null }),
-        getSession: async () => ({ data: { session: null }, error: null }),
-        signInWithPassword: async () => ({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
-        signUp: async () => ({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
-        signOut: async () => ({ error: null }),
-    },
-    from: () => ({
-        select: () => ({
-            eq: () => ({
-                eq: () => ({
-                    order: () => ({
-                        limit: async () => ({ data: [], error: null }),
-                    }),
-                    single: async () => ({ data: null, error: null }),
-                }),
-                order: () => ({
-                    order: () => ({ data: [], error: null }),
-                }),
-                single: async () => ({ data: null, error: null }),
-                in: () => ({
-                    order: async () => ({ data: [], error: null }),
-                }),
-            }),
-            order: () => ({
-                order: () => ({ data: [], error: null }),
-            }),
-            single: async () => ({ data: null, error: null }),
-        }),
-        insert: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-        update: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-        delete: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
-    }),
-    rpc: async () => ({ data: null, error: null }),
-});
-
-// -----------------------------------------------
 // Server client (uses anon key, respects RLS)
 // -----------------------------------------------
 
@@ -53,8 +12,9 @@ export async function createClient() {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-        console.warn('Supabase credentials not configured. Using mock client.');
-        return createMockClient() as ReturnType<typeof createServerClient>;
+        throw new Error(
+            'Missing Supabase credentials. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.',
+        );
     }
 
     const cookieStore = await cookies();
@@ -104,8 +64,9 @@ export async function createAdminClient() {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceKey) {
-        console.warn('Supabase admin credentials not configured. Using mock client.');
-        return createMockClient() as ReturnType<typeof createServerClient>;
+        throw new Error(
+            'Missing Supabase admin credentials. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.',
+        );
     }
 
     return createStandardClient(supabaseUrl, serviceKey, {
@@ -126,8 +87,9 @@ export async function createTenantAdminClient() {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceKey) {
-        console.warn('Supabase admin credentials not configured. Using mock client.');
-        return createMockClient() as ReturnType<typeof createServerClient>;
+        throw new Error(
+            'Missing Supabase admin credentials. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.',
+        );
     }
 
     const client = createStandardClient(supabaseUrl, serviceKey, {

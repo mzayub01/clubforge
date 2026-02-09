@@ -102,10 +102,10 @@ export default function AdminEmailTemplatesPage() {
             '{{firstName}}': 'Ahmed',
             '{{locationName}}': 'Fats Gym',
             '{{membershipType}}': 'Adult Membership',
-            '{{eventTitle}}': 'BJJ Competition 2026',
+            '{{eventTitle}}': 'Annual Club Competition 2026',
             '{{eventDate}}': 'Saturday, 15th February 2026',
             '{{eventTime}}': '10:00 AM',
-            '{{eventLocation}}': 'Fats Gym, Manchester',
+            '{{eventLocation}}': 'Main Training Hall',
             '{{ticketType}}': 'General Admission',
             '{{amountPaid}}': '£25.00',
             '{{price}}': '£30/month',
@@ -230,7 +230,7 @@ export default function AdminEmailTemplatesPage() {
                         fontSize: 'var(--text-sm)',
                     }}>
                         <p style={{ margin: '0 0 4px' }}>ClubForge</p>
-                        <p style={{ margin: 0 }}>Brazilian Jiu-Jitsu Classes in Manchester</p>
+                        <p style={{ margin: 0 }}>Club Management Platform</p>
                     </div>
                 </div>
             </div>

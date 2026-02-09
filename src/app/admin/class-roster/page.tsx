@@ -110,7 +110,7 @@ export default function ClassRosterPage() {
 
         // Build memberships query filters
         const membershipFilters: { column: string; operator?: string; value: unknown }[] = [
-            { column: 'location_id', value: (classInfo.location as { id: string }).id },
+            { column: 'location_id', value: (classInfo.location as unknown as { id: string }).id },
             { column: 'status', value: 'active' },
         ];
 
@@ -231,7 +231,7 @@ export default function ClassRosterPage() {
         // Format the date for filename
         const formattedDate = selectedDate.replace(/-/g, '');
         const className = selectedClassInfo.name.replace(/[^a-zA-Z0-9]/g, '_');
-        const locationName = (selectedClassInfo.location as { name: string })?.name?.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown';
+        const locationName = (selectedClassInfo.location as unknown as { name: string })?.name?.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown';
 
         // Create CSV rows
         const rows = roster.map(member => [
@@ -326,7 +326,7 @@ export default function ClassRosterPage() {
                             <option value="">Choose a class...</option>
                             {classes.map((cls) => (
                                 <option key={cls.id} value={cls.id}>
-                                    {cls.name} - {DAYS_OF_WEEK[cls.day_of_week]} ({(cls.location as { name: string })?.name})
+                                    {cls.name} - {DAYS_OF_WEEK[cls.day_of_week]} ({(cls.location as unknown as { name: string })?.name})
                                 </option>
                             ))}
                         </select>
@@ -369,7 +369,7 @@ export default function ClassRosterPage() {
                             <h2 style={{ margin: 0, fontSize: 'var(--text-xl)' }}>{selectedClassInfo.name}</h2>
                             <p style={{ margin: 'var(--space-1) 0 0', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                                 <MapPin size={14} />
-                                {(selectedClassInfo.location as { name: string })?.name}
+                                {(selectedClassInfo.location as unknown as { name: string })?.name}
                                 <span style={{ margin: '0 var(--space-2)' }}>•</span>
                                 <Clock size={14} />
                                 {selectedClassInfo.start_time} - {selectedClassInfo.end_time}

@@ -62,7 +62,9 @@ export default function LoginPage() {
             console.log('[Login] Role API response:', roleData);
             const role = roleData.role;
 
-            if (role === 'admin') {
+            if (role === 'platform_admin') {
+                router.push('/platform');
+            } else if (role === 'admin') {
                 router.push('/admin');
             } else if (role === 'instructor' || role === 'professor') {
                 router.push('/instructor');

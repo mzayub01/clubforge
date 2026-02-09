@@ -3,12 +3,20 @@
 // Returns the authenticated user's role for login redirect
 // ===============================================
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        // Rate limit: 30 requests per minute
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+        const { success: allowed } = rateLimit(`auth-role:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+        }
+
         // Get authenticated user via server client (reads cookies)
         const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -27,6 +35,21 @@ export async function GET() {
 
         // Use admin client (service role) to bypass RLS
         const adminSupabase = createAdminClient();
+
+        // Check if the user is a platform admin first
+        const { data: platformAdmin } = await adminSupabase
+            .from('platform_admins')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
+
+        if (platformAdmin) {
+            console.log('[/api/auth/role] Platform admin found:', user.id);
+            return NextResponse.json({
+                role: 'platform_admin',
+                tenantId: null,
+            });
+        }
 
         const { data: tenantMember, error: queryError } = await adminSupabase
             .from('tenant_members')

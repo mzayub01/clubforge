@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
+import { ThemeProvider } from '@/lib/theme-provider';
 
 export default async function InstructorLayout({
     children,
@@ -39,26 +40,37 @@ export default async function InstructorLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Instructor';
 
-    // Get tenant logo for the sidebar
+    // Get tenant info for sidebar + theming
     let tenantLogoUrl: string | undefined;
     let tenantName: string | undefined;
+    let tenantPrimaryColor: string | undefined;
+    let tenantTagline: string | undefined;
     if (tenantMember?.tenant_id) {
         const { data: tenant } = await adminSupabase
             .from('tenants')
-            .select('logo_url, name')
+            .select('logo_url, name, primary_color, tagline')
             .eq('id', tenantMember.tenant_id)
             .single();
         tenantLogoUrl = tenant?.logo_url || undefined;
         tenantName = tenant?.name || undefined;
+        tenantPrimaryColor = tenant?.primary_color || undefined;
+        tenantTagline = tenant?.tagline || undefined;
     }
 
     return (
-        <div className="dashboard-layout">
-            <DashboardSidebar role="instructor" userName={userName} tenantLogoUrl={tenantLogoUrl} tenantName={tenantName} />
-            <main className="dashboard-main">
-                {children}
-            </main>
-            <BottomNav role="instructor" />
-        </div>
+        <ThemeProvider
+            primaryColor={tenantPrimaryColor}
+            logoUrl={tenantLogoUrl}
+            clubName={tenantName}
+            tagline={tenantTagline}
+        >
+            <div className="dashboard-layout">
+                <DashboardSidebar role="instructor" userName={userName} tenantLogoUrl={tenantLogoUrl} tenantName={tenantName} />
+                <main className="dashboard-main">
+                    {children}
+                </main>
+                <BottomNav role="instructor" />
+            </div>
+        </ThemeProvider>
     );
 }

@@ -74,7 +74,7 @@ export default async function WaiverPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)', marginTop: 0 }}>1. Acknowledgement of Risks</h2>
                                 <p>
-                                    I understand and acknowledge that participation in Brazilian Jiu-Jitsu (BJJ), grappling, wrestling, and other martial arts activities involves inherent risks of physical injury. These risks include, but are not limited to:
+                                    I understand and acknowledge that participation in martial arts, fitness, and other physical activities involves inherent risks of physical injury. These risks include, but are not limited to:
                                 </p>
                                 <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                     <li>Sprains, strains, and muscle injuries</li>
@@ -207,7 +207,7 @@ export default async function WaiverPage() {
                                     <p style={{ margin: 0 }}>
                                         <strong>ClubForge</strong><br />
                                         Email: <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a><br />
-                                        Manchester, United Kingdom
+                                        United Kingdom
                                     </p>
                                 </div>
 

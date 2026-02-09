@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
         const pathname = request.nextUrl.pathname;
 
         // SaaS-only pages that should not be visible on tenant subdomains
-        const saasOnlyPaths = ['/get-started', '/pricing', '/faq', '/about', '/demo'];
+        const saasOnlyPaths = ['/get-started', '/pricing', '/faq', '/about', '/demo', '/platform'];
         if (saasOnlyPaths.some(p => pathname === p || pathname.startsWith(p + '/'))) {
             const url = request.nextUrl.clone();
             url.pathname = '/';

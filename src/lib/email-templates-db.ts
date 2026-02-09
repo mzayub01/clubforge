@@ -161,7 +161,7 @@ export function renderTemplateToHtml(
                                 ClubForge
                             </p>
                             <p style="font-size: 14px; color: #888888; margin: 0 0 8px;">
-                                Brazilian Jiu-Jitsu Classes in Manchester
+                                Club Management Platform
                             </p>
                             <a href="https://clubforgehq.com" style="font-size: 14px; color: #c5a456; text-decoration: none;">
                                 Visit our website

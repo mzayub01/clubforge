@@ -626,7 +626,7 @@ select.form-input {
 }
 
 .sidebar-link.active {
-  background: rgba(197, 164, 86, 0.1);
+  background: var(--tenant-color-alpha, rgba(197, 164, 86, 0.1));
   color: var(--color-gold);
 }
 

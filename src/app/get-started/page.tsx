@@ -61,7 +61,7 @@ const PLANS = [
         monthlyPrice: 39,
         annualPrice: 31,
         description: 'For new and small clubs',
-        features: ['Up to 150 members', '1 location', '3 staff', 'Stripe billing', 'Belt progression', 'Basic reports'],
+        features: ['Up to 150 members', '1 location', 'Up to 5 events', 'Stripe billing', 'Belt progression', 'Basic reports'],
     },
     {
         id: 'pro' as const,
@@ -69,7 +69,7 @@ const PLANS = [
         monthlyPrice: 129,
         annualPrice: 103,
         description: 'For established clubs scaling up',
-        features: ['Up to 750 members', '3 locations', '10 staff', 'Events & waitlist', 'Email templates', 'Advanced reports'],
+        features: ['Up to 750 members', '3 locations', '50 events · 30 videos', 'Events & ticketing', 'Video library', 'Advanced reports'],
         popular: true,
     },
     {
@@ -78,7 +78,7 @@ const PLANS = [
         monthlyPrice: 349,
         annualPrice: 279,
         description: 'For large academies & franchises',
-        features: ['Unlimited members', 'Unlimited locations', 'Unlimited staff', 'Custom domain', 'White-label', 'API access & SLA'],
+        features: ['Unlimited members', 'Unlimited locations', 'Unlimited events & videos', 'Custom domain', 'White-label', 'API access & SLA'],
     },
 ];
 

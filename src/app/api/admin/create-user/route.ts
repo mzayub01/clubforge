@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { getTenantId } from '@/lib/tenant';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 10 requests per minute
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+        const { success: allowed } = rateLimit(`create-user:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
+        }
+
         // Verify the requester is an admin
         const supabase = await createServerClient();
         const { data: { user } } = await supabase.auth.getUser();

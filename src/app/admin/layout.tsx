@@ -4,6 +4,10 @@ import { createServerClient } from '@supabase/ssr';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
+import { ThemeProvider } from '@/lib/theme-provider';
+import PlatformBroadcastBanner from '@/components/platform/PlatformBroadcastBanner';
+import { FeatureGateProvider } from '@/components/providers/FeatureGateProvider';
+import type { SubscriptionTier } from '@/lib/feature-gate';
 
 export default async function AdminLayout({
     children,
@@ -57,26 +61,42 @@ export default async function AdminLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Admin';
 
-    // Get tenant logo for the sidebar
+    // Get tenant info for sidebar + theming
     let tenantLogoUrl: string | undefined;
     let tenantName: string | undefined;
+    let tenantPrimaryColor: string | undefined;
+    let tenantTagline: string | undefined;
+    let subscriptionTier: SubscriptionTier = 'starter';
     if (tenantMember?.tenant_id) {
         const { data: tenant } = await adminSupabase
             .from('tenants')
-            .select('logo_url, name')
+            .select('logo_url, name, primary_color, tagline, subscription_tier')
             .eq('id', tenantMember.tenant_id)
             .single();
         tenantLogoUrl = tenant?.logo_url || undefined;
         tenantName = tenant?.name || undefined;
+        tenantPrimaryColor = tenant?.primary_color || undefined;
+        tenantTagline = tenant?.tagline || undefined;
+        subscriptionTier = (tenant?.subscription_tier as SubscriptionTier) || 'starter';
     }
 
     return (
-        <div className="dashboard-layout">
-            <DashboardSidebar role="admin" userName={userName} tenantLogoUrl={tenantLogoUrl} tenantName={tenantName} />
-            <main className="dashboard-main">
-                {children}
-            </main>
-            <BottomNav role="admin" />
-        </div>
+        <ThemeProvider
+            primaryColor={tenantPrimaryColor}
+            logoUrl={tenantLogoUrl}
+            clubName={tenantName}
+            tagline={tenantTagline}
+        >
+            <FeatureGateProvider tier={subscriptionTier}>
+                <div className="dashboard-layout">
+                    <DashboardSidebar role="admin" userName={userName} tenantLogoUrl={tenantLogoUrl} tenantName={tenantName} />
+                    <main className="dashboard-main">
+                        <PlatformBroadcastBanner />
+                        {children}
+                    </main>
+                    <BottomNav role="admin" />
+                </div>
+            </FeatureGateProvider>
+        </ThemeProvider>
     );
 }

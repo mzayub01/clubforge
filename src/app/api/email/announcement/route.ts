@@ -3,9 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 10 requests per minute
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+        const { success: allowed } = rateLimit(`email - announce:${ip} `, { maxRequests: 10, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+        }
+
         // Verify the requester is an admin
         const supabase = await createServerClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -125,14 +133,14 @@ export async function POST(request: NextRequest) {
 
                 if (!emailContent) {
                     // Fallback if template not in database
-                    const fallbackSubject = `📢 ${announcementTitle}`;
+                    const fallbackSubject = `📢 ${announcementTitle} `;
                     const fallbackHtml = `
-                        <p>Hi ${recipient.firstName},</p>
-                        <p>We have an important announcement:</p>
-                        <h2>${announcementTitle}</h2>
-                        <p>${announcementMessage.replace(/\n/g, '<br>')}</p>
-                        <p>Best regards,<br>The ClubForge Team</p>
-                    `;
+    < p > Hi ${recipient.firstName}, </p>
+        < p > We have an important announcement: </p>
+            < h2 > ${announcementTitle} </h2>
+                < p > ${announcementMessage.replace(/\n/g, '<br>')} </p>
+                    < p > Best regards, <br>The ClubForge Team </p>
+                        `;
                     const result = await sendEmail({
                         to: recipient.email,
                         subject: fallbackSubject,
@@ -143,7 +151,7 @@ export async function POST(request: NextRequest) {
                         sent++;
                     } else {
                         failed++;
-                        errors.push(`${recipient.email}: ${result.error}`);
+                        errors.push(`${recipient.email}: ${result.error} `);
                     }
                 } else {
                     const result = await sendEmail({
@@ -156,7 +164,7 @@ export async function POST(request: NextRequest) {
                         sent++;
                     } else {
                         failed++;
-                        errors.push(`${recipient.email}: ${result.error}`);
+                        errors.push(`${recipient.email}: ${result.error} `);
                     }
                 }
 
@@ -165,7 +173,7 @@ export async function POST(request: NextRequest) {
 
             } catch (err) {
                 failed++;
-                errors.push(`${recipient.email}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+                errors.push(`${recipient.email}: ${err instanceof Error ? err.message : 'Unknown error'} `);
             }
         }
 

@@ -12,46 +12,46 @@ import { useDashboard } from '@/components/dashboard/DashboardProvider';
 // Best Practice and Etiquette text
 const BEST_PRACTICE_TEXT = `Best Practice and Etiquette
 
-In attending Brazilian Jiu Jitsu classes, we aim to uphold the sunnah of our beloved Prophet Muhammad ﷺ and build a strong bond of brotherhood/sisterhood amongst us. We believe in the importance of intention and self-reflection (muhasaba), striving to be competitive but respectful to our opponents. To ensure a harmonious environment, we must adhere to the following etiquette:
+In attending our classes, we aim to foster a respectful, safe, and welcoming environment for all members. We believe in the importance of sportsmanship and mutual respect. To ensure a harmonious training environment, please adhere to the following etiquette:
 
-Respect for the Professor and Coaches: Islam teaches us to respect our instructors, as they guide us in our practice. Listen attentively to their guidance and follow their instructions diligently.
+Respect for Instructors and Coaches: Listen attentively to their guidance and follow their instructions diligently.
 
-Wearing a Gi: During the class, it is important to wear a gi (uniform) as this is a gi session. This shows respect for the tradition and uniformity among participants.
+Proper Attire: Wear the required uniform or attire for your class. This shows respect for the tradition and ensures safety during training.
 
-No Eating or Drinking on the Mats: To maintain cleanliness and hygiene, refrain from eating or drinking on the mats. This helps us to avoid any contamination or distractions during training.
+No Eating or Drinking on the Mats: To maintain cleanliness and hygiene, refrain from eating or drinking on the training area.
 
-No Shoes on Mats: Shoes are not allowed on the mats to keep them clean and safe for everyone. Remember to remove your shoes before stepping onto the training area.
+No Shoes on Mats: Remove your shoes before stepping onto the training area to keep mats clean and safe for everyone.
 
-Personal Hygiene: Being in close contact with others during training requires proper personal hygiene. Ensure that there are no unpleasant odors on your clothes or body to maintain a comfortable environment for everyone.
+Personal Hygiene: Being in close contact with others during training requires proper personal hygiene. Ensure that your clothes and body are clean.
 
-Clipped Finger and Toe Nails: For the safety of yourself and others, trim your finger and toe nails regularly to prevent accidental scratching or injury.
+Clipped Finger and Toe Nails: For the safety of yourself and others, trim your nails regularly to prevent accidental scratching or injury.
 
-No Eye Gouging, Punching, or Kicking: We have a strict policy against any form of violence or aggressive behavior during training. Engaging in eye gouging, punching, or kicking is not tolerated. If an accident happens, quickly apologize and rectify the situation.
+No Dangerous Behaviour: Any form of reckless or aggressive behaviour during training is not tolerated. If an accident happens, immediately apologize and address the situation.
 
-Parental Involvement and Side Coaching: Parents are kindly requested to refrain from entering the mats during kids' classes. Avoid giving instructions or coaching from the sidelines to maintain a focused learning environment.
+Parental Involvement: Parents are kindly requested to refrain from entering the training area during children's classes. Avoid coaching from the sidelines to maintain a focused learning environment.
 
-Displaying Good Adab: Adab (good manners) is a fundamental aspect of our practice. Always exhibit respect, humility, and kindness towards fellow participants on and off the mats. Show appreciation and congratulate your training partners for their efforts.
+Good Manners: Always exhibit respect, humility, and kindness towards fellow participants on and off the mats. Show appreciation for your training partners' efforts.
 
-By following these guidelines, we can create a respectful and inclusive atmosphere that aligns with the teachings of Islam and promotes the revival of our beloved Prophet Muhammad's Sunnah. May Allah bless our training and strengthen our bonds of brotherhood/sisterhood.`;
+By following these guidelines, we can create a respectful and inclusive atmosphere that promotes growth and community.`;
 
 // Waiver text
-const WAIVER_TEXT = `Disclaimer and Waiver of Liability for Brazilian Jiu-Jitsu Classes by ClubForge
+const WAIVER_TEXT = `Disclaimer and Waiver of Liability
 
-As the participant or legal guardian of the participant(s), I hereby acknowledge and agree to the following terms and conditions for participation in the Brazilian Jiu-Jitsu (BJJ) classes:
+As the participant or legal guardian of the participant(s), I hereby acknowledge and agree to the following terms and conditions for participation in classes:
 
-Risk Acknowledgement: I understand that Brazilian Jiu-Jitsu is a contact sport that involves physical exertion and carries an inherent risk of injury. I acknowledge these risks, which may include, but are not limited to, bruises, strains, sprains, fractures, concussions, and other physical or mental harm.
+Risk Acknowledgement: I understand that martial arts and physical fitness activities are contact activities that involve physical exertion and carry an inherent risk of injury. I acknowledge these risks, which may include, but are not limited to, bruises, strains, sprains, fractures, concussions, and other physical or mental harm.
 
 Fitness and Health: I confirm that the participant(s) is/are physically fit, in good health, and do not have any condition or ailment that could be adversely affected by participation in these classes.
 
-Rules and Supervision: I agree that the participant(s) will adhere to all class rules and instructions provided by instructors and staff members of ClubForge. I understand that supervision and guidance will be provided during all class sessions.
+Rules and Supervision: I agree that the participant(s) will adhere to all class rules and instructions provided by instructors and staff members. I understand that supervision and guidance will be provided during all class sessions.
 
-Waiver of Liability: I hereby release, waive, discharge, and covenant not to sue ClubForge, their officers, agents, employees, coaches, volunteers, or other representatives for any injury, loss, or damage to the participant(s) or my/our property arising out of or in connection with participation in these classes, whether caused by negligence or otherwise.
+Waiver of Liability: I hereby release, waive, discharge, and covenant not to sue the club, their officers, agents, employees, coaches, volunteers, or other representatives for any injury, loss, or damage to the participant(s) or my/our property arising out of or in connection with participation in these classes, whether caused by negligence or otherwise.
 
 Medical Attention: In the event of an injury, I authorise the class staff to secure emergency medical care for the participant(s). I agree to be responsible for any medical or other charges in connection with the participant's participation in these classes.
 
-Photography/Video Consent: I consent to the use of photographs and videos taken during the classes for promotional, educational, or training purposes by ClubForge.
+Photography/Video Consent: I consent to the use of photographs and videos taken during the classes for promotional, educational, or training purposes.
 
-Compliance with Policies: I agree to comply with all the policies, procedures, and regulations set by ClubForge during the classes.
+Compliance with Policies: I agree to comply with all the policies, procedures, and regulations set during the classes.
 
 Understanding of Terms: I have read this waiver and release of liability and fully understand its terms. I understand that I/we have given up substantial rights by agreeing to it and do so freely and voluntarily without any inducement.`;
 
@@ -513,7 +513,7 @@ export default function AddChildPage() {
                                     fontSize: 'var(--text-sm)',
                                     margin: 0,
                                 }}>
-                                    Already training in BJJ? Select their current belt. New to BJJ? Leave as White Belt.
+                                    Already training? Select their current belt. New? Leave as White Belt.
                                 </p>
                             </div>
 

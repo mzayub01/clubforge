@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Video, Play, Clock, Award, Edit, Trash2, AlertCircle, CheckCircle, ExternalLink, Upload, Link, Loader2 } from 'lucide-react';
+import { Plus, Video, Play, Clock, Award, Edit, Trash2, AlertCircle, CheckCircle, ExternalLink, Upload, Link, Loader2, Zap, Lock } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
 import { getSupabaseClient } from '@/lib/supabase/client'; // Kept for Storage only
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 
 interface VideoItem {
     id: string;
@@ -51,6 +52,12 @@ export default function AdminVideosPage() {
     useEffect(() => {
         fetchVideos();
     }, []);
+
+    // --- Video limit enforcement ---
+    const { checkLimit, limits, can } = useFeatureGate();
+    const videoLimitInfo = checkLimit('maxVideos', videos.length);
+    const videosNotAvailable = limits.maxVideos === 0; // Starter tier
+    const atVideoLimit = !videoLimitInfo.allowed && videoLimitInfo.limit !== -1;
 
     const fetchVideos = async () => {
         try {
@@ -165,6 +172,15 @@ export default function AdminVideosPage() {
 
         let videoUrl = formData.url;
 
+        // Enforce video limit on creation (not edits)
+        if (!editingVideo && (videosNotAvailable || atVideoLimit)) {
+            const msg = videosNotAvailable
+                ? 'Video library is not available on the Starter plan. Upgrade to Pro to upload videos.'
+                : `You've reached the ${videoLimitInfo.limit}-video limit on your current plan. Please upgrade to add more videos.`;
+            setError(msg);
+            return;
+        }
+
         // If using file upload mode and a file is selected, upload it first
         if (uploadMode === 'file' && selectedFile) {
             try {
@@ -270,10 +286,40 @@ export default function AdminVideosPage() {
                         Manage training videos for members ({videos.length} total)
                     </p>
                 </div>
-                <button onClick={() => openModal()} className="btn btn-primary">
-                    <Plus size={18} />
-                    Add Video
-                </button>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {videosNotAvailable ? (
+                        <a
+                            href="/pricing"
+                            className="btn btn-primary"
+                            style={{ textDecoration: 'none' }}
+                        >
+                            <Lock size={16} />
+                            Upgrade to Pro to Unlock Videos
+                        </a>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => openModal()}
+                                className="btn btn-primary"
+                                disabled={atVideoLimit}
+                                title={atVideoLimit ? `Video limit reached (${videoLimitInfo.limit})` : undefined}
+                            >
+                                <Plus size={18} />
+                                Add Video
+                            </button>
+                            {atVideoLimit && (
+                                <a
+                                    href="/pricing"
+                                    className="btn btn-outline"
+                                    style={{ borderColor: 'var(--color-gold)', color: 'var(--color-gold)', textDecoration: 'none' }}
+                                >
+                                    <Zap size={16} />
+                                    Upgrade — {videoLimitInfo.limit} video limit reached
+                                </a>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
 
             {error && (

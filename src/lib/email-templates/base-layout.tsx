@@ -106,7 +106,7 @@ export function BaseEmailLayout({ children, previewText }: BaseLayoutProps) {
                             ClubForge
                         </Text>
                         <Text style={baseStyles.footerText}>
-                            Brazilian Jiu-Jitsu Classes in Manchester
+                            Club Management Platform
                         </Text>
                         <Link href="https://clubforgehq.com" style={baseStyles.footerLink}>
                             Visit our website

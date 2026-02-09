@@ -3,8 +3,16 @@ import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getTenantId } from '@/lib/tenant';
 import Stripe from 'stripe';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+    // Rate limit: 10 requests per minute
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const { success: allowed } = rateLimit(`stripe-checkout:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+    if (!allowed) {
+        return NextResponse.json({ error: 'Too many requests', url: null }, { status: 429 });
+    }
+
     // Return a specific JSON response when Stripe is not configured
     if (!isStripeConfigured()) {
         console.log('Stripe checkout: Stripe not configured');

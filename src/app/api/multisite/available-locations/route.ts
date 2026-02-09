@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         const currentSiteCount = currentLocationIds.length;
         const currentSites = (currentMemberships || []).map(m => ({
             id: m.location_id,
-            name: (m.location as { id: string; name: string } | null)?.name || 'Unknown',
+            name: ((loc => (Array.isArray(loc) ? loc[0] : loc) as { id: string; name: string } | null)(m.location as unknown))?.name || 'Unknown',
         }));
 
         // Get available locations (multisite enabled, not already a member)

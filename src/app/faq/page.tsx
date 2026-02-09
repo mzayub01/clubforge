@@ -78,7 +78,7 @@ const faqItems: FAQItem[] = [
     {
         category: 'Security & Data',
         question: 'Is my data secure?',
-        answer: 'Yes. ClubForge uses Supabase (built on PostgreSQL) with row-level security ensuring complete data isolation between clubs. All data is encrypted in transit and at rest. We never share your data with third parties.',
+        answer: 'Yes. ClubForge uses enterprise-grade databases with row-level security ensuring complete data isolation between clubs. All data is encrypted in transit and at rest. We never share your data with third parties.',
     },
     {
         category: 'Security & Data',
@@ -88,7 +88,7 @@ const faqItems: FAQItem[] = [
     {
         category: 'Security & Data',
         question: 'Where is the data stored?',
-        answer: 'ClubForge runs on Supabase and Vercel\'s global edge network. Your data is stored securely in cloud infrastructure with automated backups and high availability.',
+        answer: 'ClubForge runs on a global edge network with enterprise-grade cloud infrastructure. Your data is stored securely with automated backups and high availability.',
     },
 
     // Support

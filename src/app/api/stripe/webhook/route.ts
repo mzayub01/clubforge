@@ -263,8 +263,8 @@ export async function POST(request: NextRequest) {
                         .eq('stripe_subscription_id', String(subscriptionId))
                         .single();
 
-                    const membershipTypeName = (membershipData?.membership_type as { name: string } | null)?.name || 'Membership';
-                    const firstName = (membershipData?.profiles as { first_name: string } | null)?.first_name || 'Member';
+                    const membershipTypeName = (membershipData?.membership_type as unknown as { name: string } | null)?.name || 'Membership';
+                    const firstName = (membershipData?.profiles as unknown as { first_name: string } | null)?.first_name || 'Member';
 
                     const html = renderPaymentFailedEmail({
                         firstName,

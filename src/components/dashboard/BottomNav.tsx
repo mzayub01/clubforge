@@ -152,7 +152,7 @@ export default function BottomNav({ role = 'member' }: BottomNavProps) {
                 }
                 
                 .icon-wrapper.active {
-                    background: linear-gradient(135deg, rgba(212, 184, 106, 0.2) 0%, rgba(197, 164, 86, 0.25) 100%);
+                    background: var(--tenant-color-alpha, rgba(212, 184, 106, 0.2));
                     color: var(--color-gold);
                     transform: translateY(-2px);
                 }

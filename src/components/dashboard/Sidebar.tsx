@@ -53,6 +53,7 @@ interface SidebarProps {
 interface SidebarSection {
     id: string;
     title: string;
+    icon?: React.ComponentType<{ size?: number; color?: string }>;
     links: { href: string; label: string; icon: React.ComponentType<{ size?: number }> }[];
     defaultOpen?: boolean;
 }
@@ -129,46 +130,74 @@ function CollapsibleSection({
     }
 
     return (
-        <div className="sidebar-section" style={{ marginBottom: 'var(--space-1)' }}>
+        <div className="sidebar-section" style={{ marginBottom: 'var(--space-3)' }}>
             <button
                 onClick={toggleOpen}
                 className="sidebar-section-header"
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
                     width: '100%',
-                    padding: 'var(--space-2) var(--space-3)',
-                    background: 'none',
+                    padding: '10px var(--space-3)',
+                    background: isOpen ? 'rgba(197, 164, 86, 0.1)' : 'rgba(255, 255, 255, 0.04)',
                     border: 'none',
+                    borderLeft: isOpen ? '3px solid var(--color-gold)' : '3px solid transparent',
                     cursor: 'pointer',
-                    color: 'var(--text-secondary)',
-                    fontSize: '11px',
+                    color: isOpen ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontSize: '13px',
                     fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.8px',
+                    letterSpacing: '0.3px',
                     borderRadius: 'var(--radius-md)',
-                    transition: 'color 0.2s ease',
+                    transition: 'all 0.2s ease',
+                    gap: 'var(--space-2)',
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(197, 164, 86, 0.12)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.borderLeftColor = 'var(--color-gold)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isOpen ? 'rgba(197, 164, 86, 0.1)' : 'rgba(255, 255, 255, 0.04)';
+                    e.currentTarget.style.color = isOpen ? 'var(--text-primary)' : 'var(--text-secondary)';
+                    e.currentTarget.style.borderLeftColor = isOpen ? 'var(--color-gold)' : 'transparent';
                 }}
             >
-                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                {section.icon && <section.icon size={18} color={isOpen ? 'var(--color-gold)' : undefined} />}
+                <span style={{ flex: 1, textAlign: 'left' }}>
                     {section.title}
-                    {hasActiveLink && !isOpen && (
-                        <span style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            background: 'var(--color-gold)',
-                            display: 'inline-block',
-                        }} />
-                    )}
                 </span>
+                {hasActiveLink && !isOpen && (
+                    <span style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: 'var(--color-gold)',
+                        display: 'inline-block',
+                        flexShrink: 0,
+                    }} />
+                )}
+                {!isOpen && (
+                    <span style={{
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        color: 'var(--text-tertiary)',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        padding: '2px 7px',
+                        borderRadius: '8px',
+                        minWidth: '20px',
+                        textAlign: 'center',
+                        lineHeight: '16px',
+                    }}>
+                        {section.links.length}
+                    </span>
+                )}
                 <ChevronDown
                     size={14}
                     style={{
                         transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
                         transition: 'transform 0.2s ease',
-                        opacity: 0.5,
+                        opacity: isOpen ? 0.8 : 0.4,
+                        flexShrink: 0,
                     }}
                 />
             </button>
@@ -176,6 +205,8 @@ function CollapsibleSection({
                 overflow: 'hidden',
                 maxHeight: isOpen ? `${section.links.length * 48}px` : '0',
                 transition: 'max-height 0.25s ease',
+                marginLeft: '6px',
+                borderLeft: isOpen ? '1px solid rgba(197, 164, 86, 0.12)' : '1px solid transparent',
             }}>
                 {section.links.map((link) => (
                     <Link
@@ -215,8 +246,20 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
     const handleSignOut = async () => {
         setIsOpen(false);
         await supabase.auth.signOut();
-        router.push('/');
-        router.refresh();
+
+        // On a tenant subdomain, do a full-page navigation so the middleware
+        // rewrite (/ → /tenant-home) kicks in. Client-side router.push
+        // would skip the middleware and show the SaaS landing page.
+        const hostname = window.location.hostname;
+        const isSubdomain = (hostname.includes('.') && !hostname.startsWith('www.'))
+            || (hostname.endsWith('.localhost') && hostname !== 'localhost');
+
+        if (isSubdomain) {
+            window.location.href = '/';
+        } else {
+            router.push('/');
+            router.refresh();
+        }
     };
 
     const { hasParentMembership } = useDashboard();
@@ -254,12 +297,14 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         {
             id: 'overview',
             title: 'Overview',
+            icon: LayoutDashboard,
             links: [{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard }],
             defaultOpen: true,
         },
         {
             id: 'members',
             title: 'Members',
+            icon: Users,
             links: [
                 { href: '/admin/members', label: 'All Members', icon: Users },
                 { href: '/admin/memberships', label: 'Memberships', icon: CreditCard },
@@ -273,6 +318,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         {
             id: 'club',
             title: 'Your Club',
+            icon: MapPin,
             links: [
                 { href: '/admin/locations', label: 'Locations', icon: MapPin },
                 { href: '/admin/membership-types', label: 'Membership Plans', icon: CreditCard },
@@ -285,6 +331,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         {
             id: 'engagement',
             title: 'Engagement',
+            icon: Bell,
             links: [
                 { href: '/admin/announcements', label: 'Announcements', icon: Bell },
                 { href: '/admin/events', label: 'Events', icon: PartyPopper },
@@ -298,6 +345,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         {
             id: 'money',
             title: 'Money',
+            icon: PoundSterling,
             links: [
                 { href: '/admin/finance', label: 'Finance', icon: PoundSterling },
                 { href: '/admin/attendance', label: 'Attendance', icon: CheckCircle },

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, CheckCircle, AlertCircle, Filter, Download } from 'lucide-react';
+import { Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, CheckCircle, AlertCircle, Filter, Download, Zap } from 'lucide-react';
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import type { Event, Location } from '@/lib/types';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 
 const EVENT_TYPES = [
     { value: 'class', label: 'Class' },
@@ -49,6 +50,11 @@ export default function AdminEventsPage() {
     useEffect(() => {
         fetchData();
     }, []);
+
+    // --- Event limit enforcement ---
+    const { checkLimit, limits } = useFeatureGate();
+    const eventLimitInfo = checkLimit('maxEvents', events.length);
+    const atEventLimit = !eventLimitInfo.allowed && eventLimitInfo.limit !== -1;
 
     const fetchData = async () => {
         const [eventsRes, locationsRes] = await Promise.all([
@@ -138,6 +144,12 @@ export default function AdminEventsPage() {
 
         if (!formData.title || !formData.start_date) {
             setError('Please fill in required fields');
+            return;
+        }
+
+        // Enforce event limit on creation (not edits)
+        if (!editEvent && atEventLimit) {
+            setError(`You've reached the ${eventLimitInfo.limit}-event limit on your current plan. Please upgrade to create more events.`);
             return;
         }
 
@@ -234,10 +246,27 @@ export default function AdminEventsPage() {
                     <h1 className="dashboard-title">Events</h1>
                     <p className="dashboard-subtitle">Manage retreats, gatherings, and special events</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => openModal()}>
-                    <Plus size={18} />
-                    Add Event
-                </button>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => openModal()}
+                        disabled={atEventLimit}
+                        title={atEventLimit ? `Event limit reached (${eventLimitInfo.limit})` : undefined}
+                    >
+                        <Plus size={18} />
+                        Add Event
+                    </button>
+                    {atEventLimit && (
+                        <a
+                            href="/pricing"
+                            className="btn btn-outline"
+                            style={{ borderColor: 'var(--color-gold)', color: 'var(--color-gold)', textDecoration: 'none' }}
+                        >
+                            <Zap size={16} />
+                            Upgrade — {eventLimitInfo.limit} event limit reached
+                        </a>
+                    )}
+                </div>
             </div>
 
             {success && <div className="alert alert-success" style={{ marginBottom: 'var(--space-4)' }}><CheckCircle size={18} />{success}</div>}
@@ -287,7 +316,7 @@ export default function AdminEventsPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><Calendar size={14} />{new Date(event.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                                     {event.start_time && <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><Clock size={14} />{event.start_time} - {event.end_time || 'TBD'}</div>}
                                     {event.location ? (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><MapPin size={14} />{(event.location as { name: string }).name}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><MapPin size={14} />{(event.location as unknown as { name: string }).name}</div>
                                     ) : (event as any).custom_location ? (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><MapPin size={14} />{(event as any).custom_location}</div>
                                     ) : null}

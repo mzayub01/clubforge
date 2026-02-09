@@ -76,7 +76,8 @@ export default async function AdminFinancePage() {
     let totalEventRevenue = 0;
 
     eventRsvps?.forEach((rsvp) => {
-        const eventData = rsvp.event as { id: string; title: string; price: number } | null;
+        const eventRaw = rsvp.event as unknown;
+        const eventData = (Array.isArray(eventRaw) ? eventRaw[0] : eventRaw) as { id: string; title: string; price: number } | null;
         if (!eventData) return;
 
         const price = eventData.price || 0;
@@ -130,8 +131,10 @@ export default async function AdminFinancePage() {
     }
 
     memberships?.forEach((m) => {
-        const locationData = m.location as { id: string; name: string } | null;
-        const typeData = m.membership_type as { id: string; name: string; price: number } | null;
+        const locRaw = m.location as unknown;
+        const locationData = (Array.isArray(locRaw) ? locRaw[0] : locRaw) as { id: string; name: string } | null;
+        const typeRaw = m.membership_type as unknown;
+        const typeData = (Array.isArray(typeRaw) ? typeRaw[0] : typeRaw) as { id: string; name: string; price: number } | null;
         const price = typeData?.price || 0;
         const startDate = m.start_date ? new Date(m.start_date) : new Date(m.created_at);
         const hasStripeSubscription = !!m.stripe_subscription_id;

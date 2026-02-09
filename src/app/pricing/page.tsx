@@ -4,6 +4,25 @@ import {
     ArrowRight,
     X,
     HelpCircle,
+    Users,
+    MapPin,
+    UserCog,
+    Calendar,
+    Award,
+    CreditCard,
+    BarChart3,
+    Bell,
+    Video,
+    BookOpen,
+    Mail,
+    Tag,
+    Globe,
+    Paintbrush,
+    Code,
+    Zap,
+    Headphones,
+    Download,
+    PartyPopper,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -14,83 +33,94 @@ export const metadata = {
     description: 'Simple, honest pricing for clubs of every size. No hidden fees. No per-member charges. Start your 14-day free trial.',
 };
 
-const tiers = [
+// -----------------------------------------------
+// Feature comparison data — aligned to feature-gate.ts
+// -----------------------------------------------
+
+type FeatureValue = boolean | string;
+
+interface FeatureRow {
+    name: string;
+    starter: FeatureValue;
+    pro: FeatureValue;
+    elite: FeatureValue;
+    tooltip?: string;
+}
+
+interface FeatureCategory {
+    title: string;
+    icon: React.ComponentType<{ size?: number; color?: string }>;
+    rows: FeatureRow[];
+}
+
+const featureCategories: FeatureCategory[] = [
     {
-        name: 'Starter',
-        price: 39,
-        annual: 31,
-        description: 'For new and small clubs getting started.',
-        highlighted: false,
-        cta: 'Start Free Trial',
-        ctaHref: '/get-started',
-        features: [
-            { name: 'Members', value: 'Up to 150' },
-            { name: 'Locations', value: '1' },
-            { name: 'Staff accounts', value: '3' },
-            { name: 'Member management', value: true },
-            { name: 'Class scheduling', value: true },
-            { name: 'Attendance tracking', value: true },
-            { name: 'Belt & rank progression', value: true },
-            { name: 'Stripe payments', value: true },
-            { name: 'Basic events', value: true },
-            { name: 'Email support (48h)', value: true },
-            { name: 'Custom email templates', value: false },
-            { name: 'Advanced reports', value: false },
-            { name: 'Custom domain', value: false },
-            { name: 'White-label branding', value: false },
-            { name: 'API access', value: false },
+        title: 'Usage Limits',
+        icon: Users,
+        rows: [
+            { name: 'Members', starter: 'Up to 150', pro: 'Up to 750', elite: 'Unlimited' },
+            { name: 'Locations', starter: '1', pro: 'Up to 3', elite: 'Unlimited' },
+            { name: 'Events', starter: 'Up to 5', pro: 'Up to 50', elite: 'Unlimited' },
+            { name: 'Video library', starter: false, pro: 'Up to 30', elite: 'Unlimited' },
         ],
     },
     {
-        name: 'Pro',
-        price: 129,
-        annual: 103,
-        description: 'For established clubs ready to scale.',
-        highlighted: true,
-        cta: 'Start Free Trial',
-        ctaHref: '/get-started',
-        features: [
-            { name: 'Members', value: 'Up to 750' },
-            { name: 'Locations', value: 'Up to 3' },
-            { name: 'Staff accounts', value: '10' },
-            { name: 'Member management', value: true },
-            { name: 'Class scheduling', value: true },
-            { name: 'Attendance tracking', value: true },
-            { name: 'Belt & rank progression', value: true },
-            { name: 'Stripe payments', value: true },
-            { name: 'Full event management', value: true },
-            { name: 'Priority support (24h)', value: true },
-            { name: 'Custom email templates', value: true },
-            { name: 'Advanced reports', value: true },
-            { name: 'Custom domain', value: false },
-            { name: 'White-label branding', value: false },
-            { name: 'API access', value: false },
+        title: 'Core Club Management',
+        icon: Calendar,
+        rows: [
+            { name: 'Member management', starter: true, pro: true, elite: true, tooltip: 'Profiles, family accounts, self-registration' },
+            { name: 'Class scheduling', starter: true, pro: true, elite: true, tooltip: 'Recurring & one-off classes, instructor assignment, capacity limits' },
+            { name: 'Attendance tracking', starter: true, pro: true, elite: true, tooltip: 'One-tap check-in for members and parents' },
+            { name: 'Belt & rank progression', starter: true, pro: true, elite: true, tooltip: 'Structured ranking system with grading history' },
+            { name: 'Stripe payments & billing', starter: true, pro: true, elite: true, tooltip: 'Subscriptions, invoicing, promo codes via Stripe' },
+            { name: 'Announcements', starter: true, pro: true, elite: true, tooltip: 'Send announcements with optional email delivery' },
+            { name: 'Member self-registration', starter: true, pro: true, elite: true },
+            { name: 'Basic reports', starter: true, pro: true, elite: true, tooltip: 'Member counts, attendance summary, revenue overview' },
         ],
     },
     {
-        name: 'Elite',
-        price: 349,
-        annual: 279,
-        description: 'For large academies and franchises.',
-        highlighted: false,
-        cta: 'Book a Demo',
-        ctaHref: '/demo',
-        features: [
-            { name: 'Members', value: 'Unlimited' },
-            { name: 'Locations', value: 'Unlimited' },
-            { name: 'Staff accounts', value: 'Unlimited' },
-            { name: 'Member management', value: true },
-            { name: 'Class scheduling', value: true },
-            { name: 'Attendance tracking', value: true },
-            { name: 'Belt & rank progression', value: true },
-            { name: 'Stripe payments', value: true },
-            { name: 'Full event management', value: true },
-            { name: 'Dedicated support + SLA', value: true },
-            { name: 'Custom email templates', value: true },
-            { name: 'Advanced reports', value: true },
-            { name: 'Custom domain', value: true },
-            { name: 'White-label branding', value: true },
-            { name: 'API access & webhooks', value: true },
+        title: 'Growth & Engagement',
+        icon: PartyPopper,
+        rows: [
+            { name: 'Event management', starter: false, pro: true, elite: true, tooltip: 'Create, manage, and take payments for events' },
+            { name: 'Waitlist management', starter: false, pro: true, elite: true, tooltip: 'Manage a waitlist for oversubscribed classes or your club' },
+            { name: 'Video library', starter: false, pro: true, elite: true, tooltip: 'Upload and share technique videos with members' },
+            { name: 'Weekly wisdom / naseeha', starter: false, pro: true, elite: true, tooltip: 'Publish weekly advice and inspiration to members' },
+            { name: 'Custom email templates', starter: false, pro: true, elite: true, tooltip: 'Design branded email templates for member communications' },
+            { name: 'Promo codes', starter: false, pro: true, elite: true, tooltip: 'Create discount codes for memberships and events' },
+            { name: 'Grading feedback', starter: false, pro: true, elite: true, tooltip: 'Coaches provide written feedback on belt gradings' },
+            { name: 'Multi-location support', starter: false, pro: true, elite: true, tooltip: 'Manage multiple venues from one dashboard' },
+        ],
+    },
+    {
+        title: 'Analytics & Data',
+        icon: BarChart3,
+        rows: [
+            { name: 'Advanced reports & analytics', starter: false, pro: true, elite: true, tooltip: 'Retention trends, revenue forecasting, detailed attendance analytics' },
+            { name: 'Data export (CSV)', starter: false, pro: true, elite: true, tooltip: 'Export member data as CSV for offline analysis' },
+            { name: 'Data export (JSON)', starter: false, pro: true, elite: true },
+            { name: 'Data export (API)', starter: false, pro: false, elite: true, tooltip: 'Programmatic access to export data via API' },
+        ],
+    },
+    {
+        title: 'Enterprise & Branding',
+        icon: Globe,
+        rows: [
+            { name: 'Custom subdomain', starter: false, pro: false, elite: true, tooltip: 'yourclub.clubforge.io → your own branded URL' },
+            { name: 'White-label branding', starter: false, pro: false, elite: true, tooltip: 'Remove ClubForge branding, fully custom look & feel' },
+            { name: 'API access', starter: false, pro: false, elite: true, tooltip: 'Full REST API for integrations' },
+            { name: 'Webhooks', starter: false, pro: false, elite: true, tooltip: 'Real-time event notifications for external systems' },
+            { name: 'Automation engine', starter: false, pro: false, elite: true, tooltip: 'Automated workflows triggered by member actions' },
+        ],
+    },
+    {
+        title: 'Support',
+        icon: Headphones,
+        rows: [
+            { name: 'Email support', starter: '48h response', pro: '24h response', elite: 'Priority' },
+            { name: 'Dedicated account manager', starter: false, pro: false, elite: true },
+            { name: 'SLA guarantee', starter: false, pro: false, elite: true, tooltip: 'Guaranteed uptime and response time commitments' },
+            { name: 'Migration assistance', starter: false, pro: true, elite: true, tooltip: 'Help importing data from other platforms' },
         ],
     },
 ];
@@ -118,6 +148,10 @@ const faqs = [
     },
 ];
 
+// -----------------------------------------------
+// Component
+// -----------------------------------------------
+
 export default async function PricingPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -144,86 +178,115 @@ export default async function PricingPage() {
                 </section>
 
                 {/* Pricing Cards */}
-                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-6) var(--space-6) var(--space-20)' }}>
+                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-6) var(--space-6) var(--space-10)' }}>
                     <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                             gap: 'var(--space-6)',
                         }}>
-                            {tiers.map((tier) => (
-                                <div
-                                    key={tier.name}
-                                    className={tier.highlighted ? '' : 'glass-card'}
-                                    style={{
-                                        padding: 'var(--space-8)',
-                                        borderRadius: 'var(--radius-2xl)',
-                                        position: 'relative',
-                                        ...(tier.highlighted ? {
-                                            background: 'var(--bg-primary)',
-                                            border: '2px solid var(--color-gold)',
-                                            boxShadow: '0 8px 40px rgba(197, 164, 86, 0.2)',
-                                        } : {}),
-                                    }}
-                                >
-                                    {tier.highlighted && (
-                                        <div style={{
-                                            position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
-                                            background: 'var(--color-gold-gradient)', color: 'var(--color-black)',
-                                            padding: 'var(--space-1) var(--space-4)', borderRadius: 'var(--radius-full)',
-                                            fontSize: 'var(--text-xs)', fontWeight: '700', textTransform: 'uppercase',
-                                        }}>
-                                            Most Popular
-                                        </div>
-                                    )}
-
-                                    <h3 style={{
-                                        fontSize: 'var(--text-xl)',
-                                        color: tier.highlighted ? 'var(--color-gold)' : 'var(--text-primary)',
-                                        marginBottom: 'var(--space-2)',
-                                    }}>
-                                        {tier.name}
-                                    </h3>
-
-                                    <div style={{ marginBottom: 'var(--space-2)' }}>
-                                        <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£{tier.price}</span>
-                                        <span style={{ color: 'var(--text-secondary)' }}>/month</span>
-                                    </div>
-                                    <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
-                                        or £{tier.annual}/mo billed annually
-                                    </p>
-
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
-                                        {tier.description}
-                                    </p>
-
-                                    <Link
-                                        href={tier.ctaHref}
-                                        className={tier.highlighted ? 'btn btn-primary' : 'btn btn-outline'}
-                                        style={{ width: '100%', marginBottom: 'var(--space-6)' }}
-                                    >
-                                        {tier.cta}
-                                        {tier.highlighted && <ArrowRight size={16} />}
-                                    </Link>
-
-                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                                        {tier.features.map((f) => (
-                                            <li key={f.name} style={{
-                                                display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
-                                                fontSize: 'var(--text-sm)',
-                                                color: f.value === false ? 'var(--text-tertiary)' : 'var(--text-primary)',
-                                            }}>
-                                                {f.value === false ? (
-                                                    <X size={16} color="var(--text-tertiary)" />
-                                                ) : (
-                                                    <CheckCircle2 size={16} color="var(--color-gold)" />
-                                                )}
-                                                {typeof f.value === 'string' ? `${f.name}: ${f.value}` : f.name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            {/* Starter */}
+                            <div className="glass-card" style={{ padding: 'var(--space-8)', borderRadius: 'var(--radius-2xl)' }}>
+                                <h3 style={{ fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-2)' }}>
+                                    Starter
+                                </h3>
+                                <div style={{ marginBottom: 'var(--space-2)' }}>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£39</span>
+                                    <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
-                            ))}
+                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                    or £31/mo billed annually
+                                </p>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
+                                    For new and small clubs getting started.
+                                </p>
+                                <Link href="/get-started" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)' }}>
+                                    Start Free Trial
+                                </Link>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                                    {['Up to 150 members', '1 location', 'Up to 5 events', 'Unlimited classes & staff', 'Member management & profiles', 'Class scheduling & attendance', 'Belt & rank progression', 'Stripe payments & billing', 'Announcements', 'Basic reports', 'Email support (48h)'].map(f => (
+                                        <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                                            <CheckCircle2 size={16} color="var(--color-gold)" style={{ flexShrink: 0 }} /> {f}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Pro */}
+                            <div style={{
+                                padding: 'var(--space-8)', borderRadius: 'var(--radius-2xl)', position: 'relative',
+                                background: 'var(--bg-primary)', border: '2px solid var(--color-gold)',
+                                boxShadow: '0 8px 40px rgba(197, 164, 86, 0.2)',
+                            }}>
+                                <div style={{
+                                    position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
+                                    background: 'var(--color-gold-gradient)', color: 'var(--color-black)',
+                                    padding: 'var(--space-1) var(--space-4)', borderRadius: 'var(--radius-full)',
+                                    fontSize: 'var(--text-xs)', fontWeight: '700', textTransform: 'uppercase',
+                                }}>
+                                    Most Popular
+                                </div>
+                                <h3 style={{ fontSize: 'var(--text-xl)', color: 'var(--color-gold)', marginBottom: 'var(--space-2)' }}>
+                                    Pro
+                                </h3>
+                                <div style={{ marginBottom: 'var(--space-2)' }}>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£129</span>
+                                    <span style={{ color: 'var(--text-secondary)' }}>/month</span>
+                                </div>
+                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                    or £103/mo billed annually
+                                </p>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
+                                    For established clubs ready to scale.
+                                </p>
+                                <Link href="/get-started" className="btn btn-primary" style={{ width: '100%', marginBottom: 'var(--space-6)' }}>
+                                    Start Free Trial <ArrowRight size={16} />
+                                </Link>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                                    {['Up to 750 members', '3 locations', 'Up to 50 events', '30 training videos', 'Unlimited classes & staff', 'Everything in Starter, plus:', 'Event management & waitlists', 'Video library for drills & techniques', 'Custom email templates & promo codes', 'Multi-location support', 'Advanced reports & analytics', 'Data export (CSV & JSON)', 'Grading feedback from coaches', 'Priority support (24h)', 'Migration assistance'].map(f => (
+                                        <li key={f} style={{
+                                            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+                                            fontSize: 'var(--text-sm)',
+                                            color: f.startsWith('Everything') ? 'var(--color-gold)' : 'var(--text-primary)',
+                                            fontWeight: f.startsWith('Everything') ? '600' : '400',
+                                        }}>
+                                            <CheckCircle2 size={16} color="var(--color-gold)" style={{ flexShrink: 0 }} /> {f}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Elite */}
+                            <div className="glass-card" style={{ padding: 'var(--space-8)', borderRadius: 'var(--radius-2xl)' }}>
+                                <h3 style={{ fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-2)' }}>
+                                    Elite
+                                </h3>
+                                <div style={{ marginBottom: 'var(--space-2)' }}>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£349</span>
+                                    <span style={{ color: 'var(--text-secondary)' }}>/month</span>
+                                </div>
+                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                    or £279/mo billed annually
+                                </p>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
+                                    For large academies and franchises.
+                                </p>
+                                <Link href="/demo" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)' }}>
+                                    Book a Demo
+                                </Link>
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                                    {['Unlimited members', 'Unlimited locations', 'Unlimited events', 'Unlimited videos', 'Unlimited classes & staff', 'Everything in Pro, plus:', 'Custom subdomain', 'Full white-label branding', 'API access & webhooks', 'Automation engine', 'Data export via API', 'Dedicated account manager', 'SLA guarantee'].map(f => (
+                                        <li key={f} style={{
+                                            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+                                            fontSize: 'var(--text-sm)',
+                                            color: f.startsWith('Everything') ? 'var(--color-gold)' : 'var(--text-primary)',
+                                            fontWeight: f.startsWith('Everything') ? '600' : '400',
+                                        }}>
+                                            <CheckCircle2 size={16} color="var(--color-gold)" style={{ flexShrink: 0 }} /> {f}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginTop: 'var(--space-8)', marginBottom: 0 }}>
@@ -232,8 +295,152 @@ export default async function PricingPage() {
                     </div>
                 </section>
 
-                {/* FAQ */}
+                {/* ===== FULL FEATURE COMPARISON TABLE ===== */}
                 <section style={{ background: 'var(--bg-secondary)', padding: 'var(--space-16) var(--space-6)' }}>
+                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-3)' }}>
+                            Full Feature Comparison
+                        </h2>
+                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--space-10)', fontSize: 'var(--text-base)' }}>
+                            A detailed breakdown of what&apos;s included in every plan.
+                        </p>
+
+                        {/* Sticky tier header */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 120px 120px 120px',
+                            gap: '0',
+                            position: 'sticky',
+                            top: '0',
+                            zIndex: 10,
+                            background: 'var(--bg-secondary)',
+                            padding: 'var(--space-3) 0',
+                            borderBottom: '2px solid var(--border-primary)',
+                        }}>
+                            <div />
+                            <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Starter</div>
+                            <div style={{
+                                textAlign: 'center', fontWeight: '700', fontSize: 'var(--text-sm)', color: 'var(--color-gold)',
+                                background: 'rgba(197, 164, 86, 0.08)', borderRadius: 'var(--radius-md)', padding: 'var(--space-1) 0',
+                            }}>Pro</div>
+                            <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Elite</div>
+                        </div>
+
+                        {/* Feature categories */}
+                        {featureCategories.map((category) => (
+                            <div key={category.title} style={{ marginBottom: 'var(--space-4)' }}>
+                                {/* Category header */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-2)',
+                                    padding: 'var(--space-4) 0 var(--space-2)',
+                                    borderBottom: '1px solid var(--border-primary)',
+                                }}>
+                                    <category.icon size={18} color="var(--color-gold)" />
+                                    <span style={{
+                                        fontSize: 'var(--text-sm)',
+                                        fontWeight: '700',
+                                        color: 'var(--text-primary)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px',
+                                    }}>
+                                        {category.title}
+                                    </span>
+                                </div>
+
+                                {/* Feature rows */}
+                                {category.rows.map((row, i) => (
+                                    <div
+                                        key={row.name}
+                                        style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '1fr 120px 120px 120px',
+                                            gap: '0',
+                                            padding: 'var(--space-3) 0',
+                                            borderBottom: i < category.rows.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <div style={{
+                                            fontSize: 'var(--text-sm)',
+                                            color: 'var(--text-primary)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 'var(--space-1)',
+                                        }}>
+                                            {row.name}
+                                            {row.tooltip && (
+                                                <span title={row.tooltip} style={{ cursor: 'help' }}>
+                                                    <HelpCircle size={13} color="var(--text-tertiary)" />
+                                                </span>
+                                            )}
+                                        </div>
+                                        {(['starter', 'pro', 'elite'] as const).map((tier) => {
+                                            const val = row[tier];
+                                            return (
+                                                <div key={tier} style={{ textAlign: 'center' }}>
+                                                    {val === true ? (
+                                                        <CheckCircle2 size={18} color="var(--color-gold)" />
+                                                    ) : val === false ? (
+                                                        <X size={18} color="var(--text-tertiary)" style={{ opacity: 0.4 }} />
+                                                    ) : (
+                                                        <span style={{
+                                                            fontSize: 'var(--text-sm)',
+                                                            fontWeight: '600',
+                                                            color: tier === 'elite' ? 'var(--color-gold)' : 'var(--text-primary)',
+                                                        }}>
+                                                            {val}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+
+                        {/* Bottom CTA */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 120px 120px 120px',
+                            gap: '0',
+                            padding: 'var(--space-6) 0 var(--space-2)',
+                            borderTop: '2px solid var(--border-primary)',
+                            marginTop: 'var(--space-4)',
+                        }}>
+                            <div />
+                            <div style={{ textAlign: 'center' }}>
+                                <Link href="/get-started" style={{
+                                    fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
+                                    textDecoration: 'underline',
+                                }}>
+                                    Start Trial
+                                </Link>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <Link href="/get-started" style={{
+                                    fontSize: 'var(--text-xs)', color: 'var(--color-gold)',
+                                    fontWeight: '600', textDecoration: 'underline',
+                                }}>
+                                    Start Trial
+                                </Link>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <Link href="/demo" style={{
+                                    fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
+                                    textDecoration: 'underline',
+                                }}>
+                                    Book Demo
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* FAQ */}
+                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)' }}>
                     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
                         <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
                             Pricing FAQ
@@ -255,7 +462,7 @@ export default async function PricingPage() {
                 </section>
 
                 {/* CTA */}
-                <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)', textAlign: 'center' }}>
+                <section style={{ background: 'var(--bg-secondary)', padding: 'var(--space-16) var(--space-6)', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ marginBottom: 'var(--space-4)' }}>Ready to get started?</h2>
                         <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>

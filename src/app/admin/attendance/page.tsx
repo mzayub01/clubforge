@@ -150,7 +150,7 @@ export default function AdminAttendancePage() {
                             <option value="">Choose a class...</option>
                             {classes.map((cls) => (
                                 <option key={cls.id} value={cls.id}>
-                                    {cls.name} - {DAYS_OF_WEEK[cls.day_of_week]} ({(cls.location as { name: string })?.name})
+                                    {cls.name} - {DAYS_OF_WEEK[cls.day_of_week]} ({(cls.location as unknown as { name: string })?.name})
                                 </option>
                             ))}
                         </select>

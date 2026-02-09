@@ -27,6 +27,8 @@ import {
   Settings,
   Globe,
   ChevronDown,
+  Video,
+  Ticket,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -690,6 +692,8 @@ export default async function HomePage() {
                 { icon: Award, title: 'Belt & Rank Progression', description: 'Structured ranking systems, grading history, coach feedback, promotion audit trails. No other platform does this.', color: '#F59E0B' },
                 { icon: CheckCircle2, title: 'Attendance Tracking', description: 'One-tap check-in, parent-child support, attendance reports, retention insights. See who shows up.', color: '#10B981' },
                 { icon: CreditCard, title: 'Payments & Billing', description: 'Stripe-powered subscriptions, automated invoicing, promo codes, revenue dashboards. Get paid on time.', color: '#EC4899' },
+                { icon: Video, title: 'Video Library & Monetisation', description: 'Upload drill and technique videos for your members. Build a premium content library that adds value to memberships and keeps students training between sessions.', color: '#6366F1' },
+                { icon: Ticket, title: 'Events & Ticketing', description: 'Run seminars, competitions, and retreats with built-in registration and Stripe-powered payments. Accept payments, manage attendees, and track revenue — all from one dashboard.', color: '#F97316' },
                 { icon: BarChart3, title: 'Reports & Insights', description: 'Retention trends, attendance analytics, revenue forecasting, operational health. Data-driven decisions.', color: '#06B6D4' },
               ].map((feature) => (
                 <div
@@ -1016,7 +1020,7 @@ export default async function HomePage() {
                   For new and small clubs building their foundation.
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                  {['Up to 150 members', '1 location', '3 staff accounts', 'Class scheduling & attendance', 'Belt progression tracking', 'Stripe payments & invoicing', 'Member self-registration'].map(f => (
+                  {['Up to 150 members', '1 location', 'Up to 5 events', 'Class scheduling & attendance', 'Belt progression tracking', 'Stripe payments & invoicing', 'Member self-registration'].map(f => (
                     <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#CBD5E1', fontSize: '0.9rem' }}>
                       <CheckCircle2 size={16} color="#C5A456" style={{ flexShrink: 0 }} /> {f}
                     </li>
@@ -1059,7 +1063,7 @@ export default async function HomePage() {
                   For established clubs ready to professionalise and scale.
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                  {['Up to 750 members', '3 locations', '10 staff accounts', 'Everything in Starter', 'Event management', 'Custom email templates', 'Advanced analytics & reports', 'Priority support (24h SLA)'].map(f => (
+                  {['Up to 750 members', '3 locations', 'Up to 50 events', 'Up to 30 training videos', 'Everything in Starter', 'Video library for drills & techniques', 'Event management & ticketing', 'Advanced analytics & reports', 'Priority support (24h SLA)'].map(f => (
                     <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#CBD5E1', fontSize: '0.9rem' }}>
                       <CheckCircle2 size={16} color="#C5A456" style={{ flexShrink: 0 }} /> {f}
                     </li>
@@ -1095,7 +1099,7 @@ export default async function HomePage() {
                   For large academies and franchise operations.
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                  {['Unlimited members', 'Unlimited locations', 'Unlimited staff accounts', 'Everything in Pro', 'Custom subdomain', 'Full white-label branding', 'API access & webhooks', 'Dedicated support + SLA'].map(f => (
+                  {['Unlimited members', 'Unlimited locations', 'Unlimited events & videos', 'Everything in Pro', 'Custom subdomain', 'Full white-label branding', 'API access & webhooks', 'Dedicated support + SLA'].map(f => (
                     <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#CBD5E1', fontSize: '0.9rem' }}>
                       <CheckCircle2 size={16} color="#C5A456" style={{ flexShrink: 0 }} /> {f}
                     </li>

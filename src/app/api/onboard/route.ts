@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripeClient } from '@/lib/stripe';
 import { calculateTrialEndDate } from '@/lib/trial';
 import { getStripePriceId, TRIAL_DURATION_DAYS } from '@/lib/stripe-plans';
+import { rateLimit } from '@/lib/rate-limit';
 
 interface OnboardRequest {
     // Step 1: Owner details
@@ -37,6 +38,13 @@ interface OnboardRequest {
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 5 requests per minute (tenant provisioning is expensive)
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+        const { success: allowed } = rateLimit(`onboard:${ip} `, { maxRequests: 5, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429 });
+        }
+
         const body: OnboardRequest = await request.json();
 
         // -----------------------------------------------
@@ -45,7 +53,7 @@ export async function POST(request: NextRequest) {
         const required = ['firstName', 'lastName', 'email', 'password', 'clubName', 'slug', 'plan'];
         for (const field of required) {
             if (!(body as unknown as Record<string, unknown>)[field]) {
-                return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
+                return NextResponse.json({ error: `Missing required field: ${field} ` }, { status: 400 });
             }
         }
 
@@ -128,7 +136,7 @@ export async function POST(request: NextRequest) {
                 .single();
 
             if (tenantError || !tenant) {
-                throw new Error(`Failed to create tenant: ${tenantError?.message}`);
+                throw new Error(`Failed to create tenant: ${tenantError?.message} `);
             }
 
             // -----------------------------------------------
@@ -156,7 +164,7 @@ export async function POST(request: NextRequest) {
                 }, { onConflict: 'user_id' });
 
             if (profileError) {
-                throw new Error(`Failed to create profile: ${profileError.message}`);
+                throw new Error(`Failed to create profile: ${profileError.message} `);
             }
 
             // -----------------------------------------------
@@ -172,7 +180,7 @@ export async function POST(request: NextRequest) {
                 });
 
             if (memberError) {
-                throw new Error(`Failed to create tenant member: ${memberError.message}`);
+                throw new Error(`Failed to create tenant member: ${memberError.message} `);
             }
 
             // -----------------------------------------------
@@ -206,7 +214,7 @@ export async function POST(request: NextRequest) {
                     // Create Stripe customer
                     const customer = await stripe.customers.create({
                         email: body.email,
-                        name: `${body.firstName} ${body.lastName}`,
+                        name: `${body.firstName} ${body.lastName} `,
                         metadata: {
                             tenant_id: tenant.id,
                             club_name: body.clubName,
@@ -255,7 +263,7 @@ export async function POST(request: NextRequest) {
                 userId,
                 stripeCustomerId,
                 trialEndsAt,
-                redirectUrl: `/${body.slug}/admin`,
+                redirectUrl: `/ ${body.slug}/admin`,
             });
 
         } catch (provisioningError) {

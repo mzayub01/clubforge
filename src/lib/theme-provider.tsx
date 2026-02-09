@@ -73,24 +73,35 @@ export function ThemeProvider({
     // Inject CSS custom properties
     useEffect(() => {
         const root = document.documentElement;
+
+        // ── Tenant-specific variables ──
         root.style.setProperty('--tenant-color', primaryColor);
         root.style.setProperty('--tenant-color-h', String(hsl.h));
         root.style.setProperty('--tenant-color-s', `${hsl.s}%`);
         root.style.setProperty('--tenant-color-l', `${hsl.l}%`);
         // Light variant (higher lightness)
-        root.style.setProperty('--tenant-color-light', `hsl(${hsl.h}, ${hsl.s}%, ${Math.min(hsl.l + 15, 90)}%)`);
+        const lightColor = `hsl(${hsl.h}, ${hsl.s}%, ${Math.min(hsl.l + 15, 90)}%)`;
+        root.style.setProperty('--tenant-color-light', lightColor);
         // Dark variant (lower lightness)
-        root.style.setProperty('--tenant-color-dark', `hsl(${hsl.h}, ${hsl.s}%, ${Math.max(hsl.l - 15, 10)}%)`);
+        const darkColor = `hsl(${hsl.h}, ${hsl.s}%, ${Math.max(hsl.l - 15, 10)}%)`;
+        root.style.setProperty('--tenant-color-dark', darkColor);
         // Transparent variant for backgrounds
         root.style.setProperty('--tenant-color-alpha', `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.1)`);
         // Gradient
-        root.style.setProperty(
-            '--tenant-color-gradient',
-            `linear-gradient(135deg, hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%) 0%, hsl(${hsl.h}, ${Math.max(hsl.s - 10, 0)}%, ${Math.min(hsl.l + 10, 85)}%) 100%)`
-        );
+        const gradient = `linear-gradient(135deg, hsl(${hsl.h}, ${hsl.s}%, ${Math.min(hsl.l + 10, 85)}%) 0%, hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%) 50%, hsl(${hsl.h}, ${hsl.s}%, ${Math.max(hsl.l - 10, 20)}%) 100%)`;
+        root.style.setProperty('--tenant-color-gradient', gradient);
+
+        // ── Override the design-system gold tokens ──
+        // This makes ALL existing CSS that uses var(--color-gold) etc.
+        // automatically pick up the tenant's brand colour.
+        root.style.setProperty('--color-gold', primaryColor);
+        root.style.setProperty('--color-gold-light', lightColor);
+        root.style.setProperty('--color-gold-dark', darkColor);
+        root.style.setProperty('--color-gold-gradient', gradient);
+        root.style.setProperty('--shadow-gold', `0 4px 20px hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.3)`);
 
         return () => {
-            // Cleanup (reset to defaults)
+            // Cleanup tenant vars
             root.style.removeProperty('--tenant-color');
             root.style.removeProperty('--tenant-color-h');
             root.style.removeProperty('--tenant-color-s');
@@ -99,6 +110,12 @@ export function ThemeProvider({
             root.style.removeProperty('--tenant-color-dark');
             root.style.removeProperty('--tenant-color-alpha');
             root.style.removeProperty('--tenant-color-gradient');
+            // Cleanup gold overrides (reverts to :root defaults)
+            root.style.removeProperty('--color-gold');
+            root.style.removeProperty('--color-gold-light');
+            root.style.removeProperty('--color-gold-dark');
+            root.style.removeProperty('--color-gold-gradient');
+            root.style.removeProperty('--shadow-gold');
         };
     }, [primaryColor, hsl]);
 

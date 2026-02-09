@@ -943,7 +943,7 @@ export default async function HomePage() {
             }}>
               {[
                 { icon: Shield, title: 'Stripe-Powered Billing', desc: 'PCI-compliant payment processing. Subscriptions, invoicing, and promo codes — all handled by the industry standard.' },
-                { icon: Lock, title: 'Tenant Isolation', desc: 'Full multi-tenant architecture with row-level security. Your data is completely isolated. No club can see another\'s data.' },
+                { icon: Lock, title: 'Tenant Isolation', desc: 'Full multi-tenant architecture with row-level security. Your data is completely isolated.' },
                 { icon: Eye, title: 'Role-Based Permissions', desc: 'Owner → Admin → Instructor → Staff → Member. Everyone sees exactly what they should. Nothing more.' },
                 { icon: Globe, title: 'Reliable & Fast', desc: 'Hosted on modern cloud infrastructure with automatic backups, SSL encryption, and 99.9% uptime. Always on when you need it.' },
               ].map((item) => (

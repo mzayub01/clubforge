@@ -699,7 +699,6 @@ export default async function HomePage() {
                     display: 'flex', alignItems: 'center', gap: '14px',
                     background: 'rgba(239, 68, 68, 0.04)',
                     borderRight: '1px solid rgba(255, 255, 255, 0.04)',
-                    height: '100%',
                   }}>
                     <span style={{ fontSize: '22px', lineHeight: '1', flexShrink: 0 }}>{item.emoji}</span>
                     <p style={{
@@ -730,7 +729,6 @@ export default async function HomePage() {
                     display: 'flex', alignItems: 'center', gap: '12px',
                     background: 'rgba(16, 185, 129, 0.04)',
                     borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
-                    height: '100%',
                   }}>
                     <CheckCircle2 size={18} color="#10B981" style={{ flexShrink: 0 }} />
                     <p style={{

@@ -25,10 +25,32 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ClubForge | Gym & Martial Arts Management Platform",
-  description: "The all-in-one SaaS platform for martial arts gyms. Manage memberships, classes, belt progression, and more.",
-  keywords: ["gym management", "martial arts software", "dojo management", "membership management", "SaaS", "BJJ"],
-  authors: [{ name: "ClubForge" }],
+  metadataBase: new URL('https://clubforgehq.com'),
+  title: {
+    default: 'ClubForge — The Operating System for Martial Arts Clubs',
+    template: '%s | ClubForge',
+  },
+  description: 'The all-in-one SaaS platform for martial arts gyms, dojos, and academies. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and more — all from one dashboard.',
+  keywords: [
+    'gym management software',
+    'martial arts software',
+    'dojo management',
+    'membership management',
+    'class scheduling software',
+    'belt progression tracking',
+    'BJJ software',
+    'karate club management',
+    'martial arts gym app',
+    'fitness club software',
+    'ClubForge',
+    'club management platform',
+    'attendance tracking',
+    'Stripe payments for gyms',
+    'multi-location gym software',
+  ],
+  authors: [{ name: 'ClubForge', url: 'https://clubforgehq.com' }],
+  creator: 'ClubForge',
+  publisher: 'ClubForge',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -39,10 +61,31 @@ export const metadata: Metadata = {
     telephone: true,
   },
   openGraph: {
-    title: "ClubForge | Gym & Martial Arts Management",
-    description: "The all-in-one SaaS platform for martial arts gyms and fitness centers.",
-    type: "website",
-    locale: "en_GB",
+    title: 'ClubForge — The Operating System for Martial Arts Clubs',
+    description: 'Build, run, and grow your gym, dojo, or academy with one powerful platform. Member management, class scheduling, belt progression, payments, and more.',
+    type: 'website',
+    locale: 'en_GB',
+    url: 'https://clubforgehq.com',
+    siteName: 'ClubForge',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ClubForge — The Operating System for Martial Arts Clubs',
+    description: 'The all-in-one platform for martial arts gyms. Manage members, classes, belt ranks, and payments from one dashboard.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://clubforgehq.com',
   },
   icons: {
     icon: '/logo-clubforge-icon.svg',

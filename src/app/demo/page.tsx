@@ -5,8 +5,16 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'Book a Demo | ClubForge',
-    description: 'See ClubForge in action. Book a personalised walkthrough with our team or explore the platform on your own.',
+    title: 'Book a Demo — See ClubForge in Action',
+    description: 'Get a personalised 30-minute walkthrough of ClubForge. See member management, class scheduling, belt progression, and billing features tailored to your club.',
+    alternates: {
+        canonical: 'https://clubforgehq.com/demo',
+    },
+    openGraph: {
+        title: 'Book a Demo — See ClubForge in Action',
+        description: 'Get a personalised walkthrough tailored to your club.',
+        url: 'https://clubforgehq.com/demo',
+    },
 };
 
 export default async function DemoPage() {

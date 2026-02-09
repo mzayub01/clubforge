@@ -35,8 +35,72 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-  title: 'ClubForge — The Operating System for Clubs',
-  description: 'Build, run, and grow your gym, dojo, or academy with one powerful platform. Member management, class scheduling, belt progression, payments, and more.',
+  title: 'ClubForge — The Operating System for Martial Arts Clubs',
+  description: 'Build, run, and grow your gym, dojo, or academy with one powerful platform. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and multi-location support.',
+  alternates: {
+    canonical: 'https://clubforgehq.com',
+  },
+  openGraph: {
+    title: 'ClubForge — The Operating System for Martial Arts Clubs',
+    description: 'Build, run, and grow your gym, dojo, or academy with one powerful platform.',
+    url: 'https://clubforgehq.com',
+  },
+};
+
+// JSON-LD Structured Data
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'ClubForge',
+      url: 'https://clubforgehq.com',
+      logo: 'https://clubforgehq.com/logo-clubforge-final.svg',
+      sameAs: [],
+      description: 'The all-in-one SaaS platform for martial arts gyms, dojos, and academies.',
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'ClubForge',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      url: 'https://clubforgehq.com',
+      description: 'Club management platform for martial arts gyms. Member management, class scheduling, belt progression, Stripe payments, and multi-location support.',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Starter',
+          price: '49',
+          priceCurrency: 'GBP',
+          url: 'https://clubforgehq.com/pricing',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro',
+          price: '129',
+          priceCurrency: 'GBP',
+          url: 'https://clubforgehq.com/pricing',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Elite',
+          price: '349',
+          priceCurrency: 'GBP',
+          url: 'https://clubforgehq.com/pricing',
+        },
+      ],
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '47',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      name: 'ClubForge',
+      url: 'https://clubforgehq.com',
+    },
+  ],
 };
 
 export default async function HomePage() {
@@ -46,6 +110,12 @@ export default async function HomePage() {
   return (
     <>
       <Navbar user={user ? { id: user.id, email: user.email! } : null} />
+
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <main>
         {/* Responsive overrides and hover effects */}

@@ -93,11 +93,9 @@ function CollapsibleSection({
         if (typeof window === 'undefined') return section.defaultOpen ?? false;
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored !== null) return stored === 'true';
-        // Auto-open if section has the active link
         return hasActiveLink || (section.defaultOpen ?? false);
     });
 
-    // Auto-open when navigating to a link in this section
     useEffect(() => {
         if (hasActiveLink && !isOpen) {
             setIsOpen(true);
@@ -112,114 +110,171 @@ function CollapsibleSection({
         });
     }, [STORAGE_KEY]);
 
-    // Single link section (no collapsing needed)
+    // Single link section — render as a standalone nav link
     if (section.links.length === 1) {
         const link = section.links[0];
+        const isActive = pathname === link.href;
         return (
-            <div className="sidebar-section" style={{ marginBottom: 'var(--space-1)' }}>
+            <div style={{ marginBottom: 'var(--space-1)' }}>
                 <Link
                     href={link.href}
-                    className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
                     onClick={onLinkClick}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        textDecoration: 'none',
+                        background: isActive ? 'rgba(197, 164, 86, 0.12)' : 'transparent',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        fontWeight: '600',
+                        fontSize: '15px',
+                        transition: 'all 0.15s ease',
+                    }}
                 >
-                    <link.icon size={20} />
-                    <span style={{ flex: 1 }}>{link.label}</span>
+                    <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: isActive ? 'rgba(197, 164, 86, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                    }}>
+                        <span style={{ color: isActive ? 'var(--color-gold)' : 'var(--text-secondary)' }}>
+                            <link.icon size={18} />
+                        </span>
+                    </div>
+                    <span>{link.label}</span>
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="sidebar-section" style={{ marginBottom: 'var(--space-3)' }}>
+        <div style={{
+            marginBottom: 'var(--space-1)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+            paddingBottom: 'var(--space-2)',
+        }}>
+            {/* Section Header */}
             <button
                 onClick={toggleOpen}
-                className="sidebar-section-header"
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    padding: '10px var(--space-3)',
-                    background: isOpen ? 'rgba(197, 164, 86, 0.1)' : 'rgba(255, 255, 255, 0.04)',
+                    padding: '12px 16px',
+                    background: 'transparent',
                     border: 'none',
-                    borderLeft: isOpen ? '3px solid var(--color-gold)' : '3px solid transparent',
                     cursor: 'pointer',
-                    color: isOpen ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    fontSize: '13px',
+                    color: hasActiveLink || isOpen ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontSize: '15px',
                     fontWeight: '700',
-                    letterSpacing: '0.3px',
-                    borderRadius: 'var(--radius-md)',
-                    transition: 'all 0.2s ease',
-                    gap: 'var(--space-2)',
+                    borderRadius: '10px',
+                    transition: 'all 0.15s ease',
+                    gap: '12px',
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(197, 164, 86, 0.12)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                    e.currentTarget.style.borderLeftColor = 'var(--color-gold)';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 255, 255, 0.04)';
                 }}
                 onMouseLeave={(e) => {
-                    e.currentTarget.style.background = isOpen ? 'rgba(197, 164, 86, 0.1)' : 'rgba(255, 255, 255, 0.04)';
-                    e.currentTarget.style.color = isOpen ? 'var(--text-primary)' : 'var(--text-secondary)';
-                    e.currentTarget.style.borderLeftColor = isOpen ? 'var(--color-gold)' : 'transparent';
+                    (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
                 }}
             >
-                {section.icon && <section.icon size={18} color={isOpen ? 'var(--color-gold)' : undefined} />}
+                {/* Section Icon */}
+                {section.icon && (
+                    <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        background: isOpen || hasActiveLink ? 'rgba(197, 164, 86, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        transition: 'background 0.15s ease',
+                    }}>
+                        <span style={{ color: isOpen || hasActiveLink ? 'var(--color-gold)' : 'var(--text-secondary)' }}>
+                            <section.icon size={18} />
+                        </span>
+                    </div>
+                )}
                 <span style={{ flex: 1, textAlign: 'left' }}>
                     {section.title}
                 </span>
-                {hasActiveLink && !isOpen && (
-                    <span style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: 'var(--color-gold)',
-                        display: 'inline-block',
-                        flexShrink: 0,
-                    }} />
-                )}
+
+                {/* Item count badge (collapsed only) */}
                 {!isOpen && (
                     <span style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         fontWeight: '600',
                         color: 'var(--text-tertiary)',
                         background: 'rgba(255, 255, 255, 0.08)',
-                        padding: '2px 7px',
-                        borderRadius: '8px',
-                        minWidth: '20px',
-                        textAlign: 'center',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
                         lineHeight: '16px',
                     }}>
                         {section.links.length}
                     </span>
                 )}
+
                 <ChevronDown
-                    size={14}
+                    size={16}
                     style={{
                         transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
                         transition: 'transform 0.2s ease',
-                        opacity: isOpen ? 0.8 : 0.4,
+                        opacity: 0.5,
                         flexShrink: 0,
                     }}
                 />
             </button>
+
+            {/* Expandable Sub-Items */}
             <div style={{
                 overflow: 'hidden',
-                maxHeight: isOpen ? `${section.links.length * 48}px` : '0',
+                maxHeight: isOpen ? `${section.links.length * 40 + 8}px` : '0',
                 transition: 'max-height 0.25s ease',
-                marginLeft: '6px',
-                borderLeft: isOpen ? '1px solid rgba(197, 164, 86, 0.12)' : '1px solid transparent',
+                paddingLeft: '28px',
             }}>
-                {section.links.map((link) => (
-                    <Link
-                        key={link.href}
-                        href={link.href}
-                        className={`sidebar-link ${pathname === link.href ? 'active' : ''}`}
-                        onClick={onLinkClick}
-                    >
-                        <link.icon size={20} />
-                        <span style={{ flex: 1 }}>{link.label}</span>
-                        <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
-                    </Link>
-                ))}
+                <div style={{ paddingTop: '2px', paddingBottom: '4px' }}>
+                    {section.links.map((link) => {
+                        const isActive = pathname === link.href;
+                        return (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={onLinkClick}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    textDecoration: 'none',
+                                    color: isActive ? 'var(--color-gold)' : 'var(--text-secondary)',
+                                    fontSize: '13px',
+                                    fontWeight: isActive ? '600' : '400',
+                                    transition: 'all 0.15s ease',
+                                    background: isActive ? 'rgba(197, 164, 86, 0.08)' : 'transparent',
+                                }}
+                            >
+                                {/* Bullet dot */}
+                                <span style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    borderRadius: '50%',
+                                    background: isActive ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.25)',
+                                    flexShrink: 0,
+                                    transition: 'background 0.15s ease',
+                                }} />
+                                <span style={{ flex: 1 }}>{link.label}</span>
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
@@ -518,15 +573,43 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
 
                     {/* Settings link for admin */}
                     {useGroupedLayout && (
-                        <div className="sidebar-section" style={{ marginTop: 'var(--space-2)' }}>
+                        <div style={{
+                            marginTop: 'var(--space-2)',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                            paddingTop: 'var(--space-2)',
+                        }}>
                             <Link
                                 href="/admin/settings"
-                                className={`sidebar-link ${pathname === '/admin/settings' ? 'active' : ''}`}
                                 onClick={closeSidebar}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    textDecoration: 'none',
+                                    background: pathname === '/admin/settings' ? 'rgba(197, 164, 86, 0.12)' : 'transparent',
+                                    color: pathname === '/admin/settings' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                    fontWeight: '600',
+                                    fontSize: '15px',
+                                    transition: 'all 0.15s ease',
+                                }}
                             >
-                                <Settings size={20} />
-                                <span style={{ flex: 1 }}>Settings</span>
-                                <ChevronRight size={16} style={{ opacity: 0.3 }} className="sidebar-link-arrow" />
+                                <div style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '8px',
+                                    background: pathname === '/admin/settings' ? 'rgba(197, 164, 86, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                }}>
+                                    <span style={{ color: pathname === '/admin/settings' ? 'var(--color-gold)' : 'var(--text-secondary)' }}>
+                                        <Settings size={18} />
+                                    </span>
+                                </div>
+                                <span>Settings</span>
                             </Link>
                         </div>
                     )}

@@ -213,6 +213,7 @@ export async function POST(request: NextRequest) {
             // 7. Create Stripe customer + subscription (with trial)
             // -----------------------------------------------
             let stripeCustomerId: string | null = null;
+            let stripeCheckoutUrl: string | null = null;
             const stripe = getStripeClient();
 
             if (stripe) {
@@ -230,22 +231,32 @@ export async function POST(request: NextRequest) {
 
                     stripeCustomerId = customer.id;
 
-                    // Create subscription with trial
+                    // Create checkout session with trial (collects payment method upfront)
                     const priceId = getStripePriceId(body.plan, body.billingInterval);
 
                     if (priceId) {
-                        await stripe.subscriptions.create({
+                        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
+                        const checkoutSession = await stripe.checkout.sessions.create({
                             customer: customer.id,
-                            items: [{ price: priceId }],
-                            trial_period_days: TRIAL_DURATION_DAYS,
-                            payment_settings: {
-                                save_default_payment_method: 'on_subscription',
+                            mode: 'subscription',
+                            payment_method_types: ['card'],
+                            line_items: [{ price: priceId, quantity: 1 }],
+                            subscription_data: {
+                                trial_period_days: TRIAL_DURATION_DAYS,
+                                metadata: {
+                                    tenant_id: tenant.id,
+                                    plan: body.plan,
+                                },
                             },
+                            success_url: `${baseUrl}/${body.slug}/admin?onboarded=true`,
+                            cancel_url: `${baseUrl}/get-started?step=4`,
                             metadata: {
                                 tenant_id: tenant.id,
-                                plan: body.plan,
+                                type: 'platform_subscription',
                             },
                         });
+
+                        stripeCheckoutUrl = checkoutSession.url;
                     }
 
                     // Save Stripe customer ID to tenant
@@ -268,8 +279,9 @@ export async function POST(request: NextRequest) {
                 slug: body.slug,
                 userId,
                 stripeCustomerId,
+                stripeCheckoutUrl,
                 trialEndsAt,
-                redirectUrl: `/ ${body.slug}/admin`,
+                redirectUrl: stripeCheckoutUrl || `/${body.slug}/admin`,
             });
 
         } catch (provisioningError) {

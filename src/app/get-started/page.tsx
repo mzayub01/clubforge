@@ -294,8 +294,13 @@ export default function GetStartedPage() {
                 throw new Error(data.error || 'Something went wrong');
             }
 
-            // Success! Redirect to admin dashboard
-            router.push('/login?onboarded=true&slug=' + data.slug);
+            // Success! Redirect to Stripe Checkout (for payment method collection)
+            // or to login if Stripe isn't configured
+            if (data.stripeCheckoutUrl) {
+                window.location.href = data.stripeCheckoutUrl;
+            } else {
+                router.push('/login?onboarded=true&slug=' + data.slug);
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create your club. Please try again.');
         } finally {

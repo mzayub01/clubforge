@@ -867,14 +867,26 @@ export default function AdminSettingsPage() {
                         </div>
 
                         {tenant?.subscription_tier !== 'elite' && (
-                            <a
-                                href="/pricing"
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const res = await fetch('/api/stripe/upgrade', { method: 'POST' });
+                                        const data = await res.json();
+                                        if (data.url) {
+                                            window.location.href = data.url;
+                                        } else {
+                                            alert(data.error || 'Unable to open billing portal');
+                                        }
+                                    } catch {
+                                        alert('Failed to connect to billing portal');
+                                    }
+                                }}
                                 className="btn btn-primary"
-                                style={{ marginTop: 'var(--space-4)', display: 'flex', textDecoration: 'none' }}
+                                style={{ marginTop: 'var(--space-4)', display: 'flex', gap: '8px', cursor: 'pointer', border: 'none' }}
                             >
                                 <Zap size={18} />
                                 Upgrade Plan
-                            </a>
+                            </button>
                         )}
                     </div>
                 </div>

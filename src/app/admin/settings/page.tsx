@@ -885,7 +885,7 @@ export default function AdminSettingsPage() {
                                 style={{ marginTop: 'var(--space-4)', display: 'flex', gap: '8px', cursor: 'pointer', border: 'none' }}
                             >
                                 <Zap size={18} />
-                                Upgrade Plan
+                                Upgrade Plan / Manage Billing
                             </button>
                         )}
                     </div>

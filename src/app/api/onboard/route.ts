@@ -233,8 +233,9 @@ export async function POST(request: NextRequest) {
 
                     // Create checkout session with trial (collects payment method upfront)
                     const priceId = getStripePriceId(body.plan, body.billingInterval);
+                    console.log('[Onboard] Stripe price ID for', body.plan, body.billingInterval, ':', priceId || '(EMPTY - env vars missing?)');
 
-                    if (priceId) {
+                    if (priceId && priceId.startsWith('price_')) {
                         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
                         const checkoutSession = await stripe.checkout.sessions.create({
                             customer: customer.id,
@@ -248,7 +249,7 @@ export async function POST(request: NextRequest) {
                                     plan: body.plan,
                                 },
                             },
-                            success_url: `${baseUrl}/${body.slug}/admin?onboarded=true`,
+                            success_url: `${baseUrl}/login?onboarded=true&slug=${body.slug}`,
                             cancel_url: `${baseUrl}/get-started?step=4`,
                             metadata: {
                                 tenant_id: tenant.id,
@@ -257,6 +258,9 @@ export async function POST(request: NextRequest) {
                         });
 
                         stripeCheckoutUrl = checkoutSession.url;
+                        console.log('[Onboard] Checkout session created, URL:', stripeCheckoutUrl ? 'OK' : 'NULL');
+                    } else {
+                        console.warn('[Onboard] Skipping Stripe checkout - no valid price ID. Check STRIPE_PRICE_* env vars.');
                     }
 
                     // Save Stripe customer ID to tenant

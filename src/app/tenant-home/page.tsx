@@ -61,7 +61,6 @@ export default function TenantHomePage() {
     const [tenant, setTenant] = useState<TenantInfo | null>(null);
     const [classes, setClasses] = useState<ClassInfo[]>([]);
     const [locations, setLocations] = useState<LocationInfo[]>([]);
-    const [memberCount, setMemberCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -75,7 +74,6 @@ export default function TenantHomePage() {
                 setTenant(data.tenant);
                 setClasses(data.classes || []);
                 setLocations(data.locations || []);
-                setMemberCount(data.memberCount || 0);
             })
             .catch(() => setError(true))
             .finally(() => setLoading(false));
@@ -174,12 +172,6 @@ export default function TenantHomePage() {
 
                     {/* Stats Bar */}
                     <div className={styles.statsBar}>
-                        {memberCount > 0 && (
-                            <div className={styles.statItem}>
-                                <Users size={16} />
-                                <span><strong>{memberCount}</strong> member{memberCount !== 1 ? 's' : ''}</span>
-                            </div>
-                        )}
                         {totalClassesPerWeek > 0 && (
                             <div className={styles.statItem}>
                                 <Calendar size={16} />

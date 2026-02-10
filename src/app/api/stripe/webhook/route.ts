@@ -123,6 +123,54 @@ export async function POST(request: NextRequest) {
             } catch (emailErr) {
                 console.error('Failed to send event confirmation email:', emailErr);
             }
+        } else if (metadata.type === 'platform_subscription') {
+            // Platform subscription payment (club owner subscribing to ClubForge)
+            const { tenant_id } = metadata;
+            console.log('[Webhook] Platform subscription checkout completed for tenant:', tenant_id);
+
+            if (tenant_id) {
+                const supabase = await createAdminClient();
+                await supabase
+                    .from('tenants')
+                    .update({
+                        subscription_status: 'active',
+                        stripe_subscription_id: session.subscription as string,
+                    })
+                    .eq('id', tenant_id);
+                console.log('[Webhook] Tenant subscription activated:', tenant_id);
+            }
+        } else if (metadata.type === 'plan_upgrade') {
+            // Plan upgrade (club owner upgrading their plan)
+            const { tenant_id } = metadata;
+            console.log('[Webhook] Plan upgrade checkout completed for tenant:', tenant_id);
+
+            if (tenant_id) {
+                const supabase = await createAdminClient();
+
+                // Get the subscription to find the plan from its metadata
+                const subscriptionId = session.subscription as string;
+                if (subscriptionId) {
+                    const stripeClient = getStripeClient();
+                    const subscription = await stripeClient!.subscriptions.retrieve(subscriptionId);
+                    const plan = subscription.metadata?.plan || null;
+
+                    const updateData: Record<string, any> = {
+                        subscription_status: 'active',
+                        stripe_subscription_id: subscriptionId,
+                    };
+
+                    if (plan) {
+                        updateData.subscription_tier = plan;
+                    }
+
+                    await supabase
+                        .from('tenants')
+                        .update(updateData)
+                        .eq('id', tenant_id);
+
+                    console.log('[Webhook] Tenant plan upgraded to:', plan, 'for tenant:', tenant_id);
+                }
+            }
         } else {
             // Membership payment (existing logic)
             const { userId, locationId, membershipTypeId, tenantId: membershipTenantId } = metadata;

@@ -1,18 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, CheckCircle, PartyPopper } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
-export default function LoginPage() {
+function LoginPageContent() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const isOnboarded = searchParams.get('onboarded') === 'true';
+    const isUpgraded = searchParams.get('upgraded') === 'true';
     const supabase = getSupabaseClient();
 
     // Tenant branding state
@@ -98,6 +101,44 @@ export default function LoginPage() {
                     padding: 'var(--space-8)',
                 }}
             >
+                {/* Onboarding Success Banner */}
+                {isOnboarded && (
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1))',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                        borderRadius: '12px',
+                        padding: 'var(--space-5)',
+                        marginBottom: 'var(--space-6)',
+                        textAlign: 'center',
+                    }}>
+                        <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>🎉</div>
+                        <h3 style={{ color: '#22c55e', margin: '0 0 var(--space-2) 0', fontSize: '1.1rem' }}>
+                            Welcome to ClubForge!
+                        </h3>
+                        <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
+                            Your club has been created and your payment is confirmed.
+                            Your 14-day free trial is now active. Sign in below to get started!
+                        </p>
+                    </div>
+                )}
+
+                {/* Upgrade Success Banner */}
+                {isUpgraded && (
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(197, 164, 86, 0.15), rgba(197, 164, 86, 0.1))',
+                        border: '1px solid rgba(197, 164, 86, 0.3)',
+                        borderRadius: '12px',
+                        padding: 'var(--space-4)',
+                        marginBottom: 'var(--space-6)',
+                        textAlign: 'center',
+                    }}>
+                        <CheckCircle size={24} style={{ color: '#c5a456', marginBottom: '4px' }} />
+                        <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--text-sm)' }}>
+                            Plan upgraded successfully! Your new features are now active.
+                        </p>
+                    </div>
+                )}
+
                 {/* Logo / Club Branding */}
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
                     {isTenant && tenantInfo ? (
@@ -297,5 +338,13 @@ export default function LoginPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
+            <LoginPageContent />
+        </Suspense>
     );
 }

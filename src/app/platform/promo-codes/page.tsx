@@ -165,7 +165,7 @@ export default function PlatformPromoCodesPage() {
                 <div>
                     <h1 className="dashboard-title">Platform Promo Codes</h1>
                     <p className="dashboard-subtitle">
-                        Create discount codes for ClubForge subscription plans (Starter, Growth, Pro)
+                        Create discount codes for ClubForge subscription plans (Starter, Pro, Elite)
                     </p>
                 </div>
                 <button onClick={() => setShowModal(true)} className="btn btn-primary">

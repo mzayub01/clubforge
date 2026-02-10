@@ -325,16 +325,33 @@ function LoginPageContent() {
                     marginTop: 'var(--space-6)',
                     color: 'var(--text-secondary)',
                 }}>
-                    Don&apos;t have an account?{' '}
-                    <Link
-                        href="/register"
-                        style={{
-                            color: 'var(--color-gold)',
-                            fontWeight: '600',
-                        }}
-                    >
-                        Join Now
-                    </Link>
+                    {isTenant ? (
+                        <>
+                            Don&apos;t have an account?{' '}
+                            <Link
+                                href="/register"
+                                style={{
+                                    color: 'var(--color-gold)',
+                                    fontWeight: '600',
+                                }}
+                            >
+                                Join Now
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            Want to create your own club?{' '}
+                            <Link
+                                href="/get-started"
+                                style={{
+                                    color: 'var(--color-gold)',
+                                    fontWeight: '600',
+                                }}
+                            >
+                                Get Started
+                            </Link>
+                        </>
+                    )}
                 </p>
             </div>
         </div>

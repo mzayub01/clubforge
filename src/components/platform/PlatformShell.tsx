@@ -12,6 +12,7 @@ import {
     Building2,
     BarChart3,
     Megaphone,
+    Tag,
     LogOut,
     Menu,
     X,
@@ -29,6 +30,7 @@ const navItems = [
     { href: '/platform', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/platform/tenants', label: 'Tenants', icon: Building2 },
     { href: '/platform/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/platform/promo-codes', label: 'Promo Codes', icon: Tag },
     { href: '/platform/broadcasts', label: 'Broadcasts', icon: Megaphone },
 ];
 

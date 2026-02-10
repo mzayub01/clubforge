@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 
 // GET - List all coupons
-export async function GET() {
+// Optional query param: ?stripeAccountId=acct_xxx (for connected accounts)
+export async function GET(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured', coupons: [] }, { status: 400 });
     }
@@ -13,7 +14,10 @@ export async function GET() {
     }
 
     try {
-        const coupons = await stripe.coupons.list({ limit: 50 });
+        const stripeAccountId = request.nextUrl.searchParams.get('stripeAccountId');
+        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
+
+        const coupons = await stripe.coupons.list({ limit: 50 }, opts);
 
         const formattedCoupons = coupons.data.map((coupon) => ({
             id: coupon.id,
@@ -37,6 +41,7 @@ export async function GET() {
 }
 
 // POST - Create a new coupon
+// Optional body field: stripeAccountId (for connected accounts)
 export async function POST(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured' }, { status: 400 });
@@ -48,7 +53,8 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-        const { id, name, percent_off, amount_off, duration, duration_in_months, max_redemptions } = await request.json();
+        const { id, name, percent_off, amount_off, duration, duration_in_months, max_redemptions, stripeAccountId } = await request.json();
+        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
 
         if (!id) {
             return NextResponse.json({ error: 'Coupon code (id) is required' }, { status: 400 });
@@ -77,10 +83,10 @@ export async function POST(request: NextRequest) {
             couponParams.max_redemptions = parseInt(max_redemptions);
         }
 
-        console.log('Creating coupon with params:', JSON.stringify(couponParams));
+        console.log('Creating coupon with params:', JSON.stringify(couponParams), stripeAccountId ? `on connected account ${stripeAccountId}` : 'on platform account');
         let coupon;
         try {
-            coupon = await stripe.coupons.create(couponParams);
+            coupon = await stripe.coupons.create(couponParams, opts);
             console.log('Coupon created:', coupon.id);
         } catch (err: any) {
             console.error('Failed to create coupon:', err);
@@ -99,7 +105,7 @@ export async function POST(request: NextRequest) {
             };
             console.log('Creating promotion code with params:', JSON.stringify(promoParams));
 
-            const promotionCode = await stripe.promotionCodes.create(promoParams);
+            const promotionCode = await stripe.promotionCodes.create(promoParams, opts);
             console.log('Promotion code created:', promotionCode.id);
 
             return NextResponse.json({
@@ -116,7 +122,7 @@ export async function POST(request: NextRequest) {
             console.error('Failed to create promotion code:', err);
             // If promo code creation fails, try to rollback (delete) the coupon to avoid orphans
             try {
-                await stripe.coupons.del(coupon.id);
+                await stripe.coupons.del(coupon.id, opts);
                 console.log('Rolled back (deleted) orphan coupon:', coupon.id);
             } catch (delErr) {
                 console.error('Failed to rollback coupon:', delErr);
@@ -130,6 +136,7 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE - Delete a coupon
+// Optional body field: stripeAccountId (for connected accounts)
 export async function DELETE(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured' }, { status: 400 });
@@ -141,13 +148,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
-        const { couponId } = await request.json();
+        const { couponId, stripeAccountId } = await request.json();
+        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
 
         if (!couponId) {
             return NextResponse.json({ error: 'Coupon ID is required' }, { status: 400 });
         }
 
-        await stripe.coupons.del(couponId);
+        await stripe.coupons.del(couponId, opts);
 
         return NextResponse.json({ success: true, message: 'Coupon deleted' });
     } catch (error: any) {

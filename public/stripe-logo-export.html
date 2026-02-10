@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ClubForge Stripe Logo Export</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #0F172A;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            border: 1px dashed #ccc;
+            margin: 10px;
+        }
+
+        button {
+            background: #C5A456;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px;
+        }
+
+        button:hover {
+            background: #A88B3D;
+        }
+
+        .label {
+            font-weight: 600;
+            margin-top: 16px;
+            color: #333;
+        }
+
+        .hint {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .checkerboard {
+            background: repeating-conic-gradient(#ddd 0% 25%, white 0% 50%) 50%/20px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ClubForge — Stripe Logo Export</h1>
+    <p>Right-click each image and "Save image as..." PNG, or click the download buttons.</p>
+
+    <div class="card">
+        <p class="label">🔲 Icon (Square — 512×512)</p>
+        <p class="hint">Use this for the Stripe <strong>Icon</strong> field</p>
+        <canvas id="icon-canvas" width="512" height="512" class="checkerboard"></canvas>
+        <br>
+        <button onclick="download('icon-canvas', 'clubforge-icon-512.png')">⬇ Download Icon PNG</button>
+    </div>
+
+    <div class="card">
+        <p class="label">🏷️ Full Logo (960×256)</p>
+        <p class="hint">Use this for the Stripe <strong>Logo</strong> field</p>
+        <canvas id="logo-canvas" width="960" height="256" class="checkerboard"></canvas>
+        <br>
+        <button onclick="download('logo-canvas', 'clubforge-logo-960.png')">⬇ Download Logo PNG</button>
+    </div>
+
+    <div class="card">
+        <p class="label">🌙 Full Logo — Dark BG (960×256)</p>
+        <p class="hint">White text version for dark backgrounds</p>
+        <canvas id="logo-dark-canvas" width="960" height="256"></canvas>
+        <br>
+        <button onclick="download('logo-dark-canvas', 'clubforge-logo-dark-960.png')">⬇ Download Dark Logo PNG</button>
+    </div>
+
+    <script>
+        // ===== DRAW TWIN CUBES ICON =====
+        function drawCubes(ctx, ox, oy, scale) {
+            // Back cube (NAVY)
+            ctx.fillStyle = '#1E293B';
+            drawPoly(ctx, ox, oy, scale, [[52, 4], [86, 24], [52, 44], [18, 24]]);
+            ctx.fillStyle = '#0F172A';
+            drawPoly(ctx, ox, oy, scale, [[18, 24], [52, 44], [52, 72], [18, 52]]);
+            ctx.fillStyle = '#162033';
+            drawPoly(ctx, ox, oy, scale, [[52, 44], [86, 24], [86, 52], [52, 72]]);
+
+            // Front cube (GOLD)
+            ctx.fillStyle = '#D4B86A';
+            drawPoly(ctx, ox, oy, scale, [[34, 26], [68, 46], [34, 66], [0, 46]]);
+            ctx.fillStyle = '#C5A456';
+            drawPoly(ctx, ox, oy, scale, [[0, 46], [34, 66], [34, 92], [0, 72]]);
+            ctx.fillStyle = '#B8943D';
+            drawPoly(ctx, ox, oy, scale, [[34, 66], [68, 46], [68, 72], [34, 92]]);
+        }
+
+        function drawPoly(ctx, ox, oy, scale, points) {
+            ctx.beginPath();
+            ctx.moveTo(ox + points[0][0] * scale, oy + points[0][1] * scale);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(ox + points[i][0] * scale, oy + points[i][1] * scale);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // ===== 1. ICON 512x512 =====
+        (function () {
+            const c = document.getElementById('icon-canvas');
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 512, 512);
+            // Center the cubes (original viewBox 90x96, scale to ~400px)
+            const s = 4.5;
+            const ox = (512 - 88 * s) / 2;
+            const oy = (512 - 92 * s) / 2;
+            drawCubes(ctx, ox, oy, s);
+        })();
+
+        // ===== 2. FULL LOGO 960x256 (light) =====
+        (function () {
+            const c = document.getElementById('logo-canvas');
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 960, 256);
+
+            // Draw cubes on the left
+            const s = 2.3;
+            drawCubes(ctx, 30, (256 - 92 * s) / 2, s);
+
+            // Draw wordmark
+            ctx.textBaseline = 'middle';
+            ctx.font = '800 72px Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+            ctx.fillStyle = '#0F172A';
+            ctx.fillText('Club', 250, 135);
+            const clubW = ctx.measureText('Club').width;
+            ctx.fillStyle = '#C5A456';
+            ctx.fillText('Forge', 250 + clubW, 135);
+        })();
+
+        // ===== 3. FULL LOGO DARK BG 960x256 =====
+        (function () {
+            const c = document.getElementById('logo-dark-canvas');
+            const ctx = c.getContext('2d');
+            // Dark background
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(0, 0, 960, 256);
+
+            // Draw cubes on the left
+            const s = 2.3;
+            drawCubes(ctx, 30, (256 - 92 * s) / 2, s);
+
+            // Draw wordmark (white + gold)
+            ctx.textBaseline = 'middle';
+            ctx.font = '800 72px Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('Club', 250, 135);
+            const clubW = ctx.measureText('Club').width;
+            ctx.fillStyle = '#C5A456';
+            ctx.fillText('Forge', 250 + clubW, 135);
+        })();
+
+        function download(canvasId, filename) {
+            const c = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = c.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+
+</html>

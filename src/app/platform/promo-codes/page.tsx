@@ -1,15 +1,13 @@
 'use client';
 
 // ===============================================
-// ClubForge - Club Admin Promo Codes
-// Manage promo codes on the club's Stripe Connect account
-// Used for discounting member membership fees
+// ClubForge - Platform Promo Codes (Super Admin)
+// Manage promo codes on the ClubForge platform Stripe account
+// Used for discounting subscription plans (Starter/Growth/Pro)
 // ===============================================
 
 import { useState, useEffect } from 'react';
-import { Tag, Plus, Trash2, Percent, PoundSterling, CheckCircle, AlertCircle, CreditCard, ExternalLink, Shield } from 'lucide-react';
-import Link from 'next/link';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { Tag, Plus, Trash2, Percent, PoundSterling, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
 
 interface Coupon {
     id: string;
@@ -25,14 +23,12 @@ interface Coupon {
     created: number;
 }
 
-export default function AdminPromoCodesPage() {
+export default function PlatformPromoCodesPage() {
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
-    const [stripeEnabled, setStripeEnabled] = useState(false);
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -45,63 +41,14 @@ export default function AdminPromoCodesPage() {
     });
 
     useEffect(() => {
-        checkStripeStatus();
+        fetchCoupons();
     }, []);
 
-    const checkStripeStatus = async () => {
-        try {
-            const supabase = getSupabaseClient();
-            // Get current user's tenant
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                setError('Not authenticated');
-                setLoading(false);
-                return;
-            }
-
-            // Get the user's membership to find their tenant
-            const { data: membership } = await supabase
-                .from('memberships')
-                .select('tenant_id')
-                .eq('user_id', user.id)
-                .eq('role', 'admin')
-                .single();
-
-            if (!membership) {
-                setError('No admin membership found');
-                setLoading(false);
-                return;
-            }
-
-            // Get tenant Stripe status
-            const { data: tenant } = await supabase
-                .from('tenants')
-                .select('stripe_account_id, stripe_connect_enabled')
-                .eq('id', membership.tenant_id)
-                .single();
-
-            if (tenant?.stripe_account_id && tenant?.stripe_connect_enabled) {
-                setStripeAccountId(tenant.stripe_account_id);
-                setStripeEnabled(true);
-                // Fetch coupons from connected account
-                await fetchCoupons(tenant.stripe_account_id);
-            } else {
-                setStripeEnabled(false);
-                setLoading(false);
-            }
-        } catch (err: any) {
-            setError(err.message);
-            setLoading(false);
-        }
-    };
-
-    const fetchCoupons = async (accountId?: string) => {
-        const acctId = accountId || stripeAccountId;
-        if (!acctId) return;
-
+    // Platform-level: no stripeAccountId (operates on ClubForge's Stripe account)
+    const fetchCoupons = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/stripe/coupons?stripeAccountId=${encodeURIComponent(acctId)}`);
+            const response = await fetch('/api/stripe/coupons');
             const data = await response.json();
             if (data.error) {
                 setError(data.error);
@@ -132,14 +79,14 @@ export default function AdminPromoCodesPage() {
                     duration: formData.duration,
                     duration_in_months: formData.duration === 'repeating' ? formData.duration_in_months : undefined,
                     max_redemptions: formData.max_redemptions || undefined,
-                    stripeAccountId, // Connected account
+                    // No stripeAccountId — platform account
                 }),
             });
 
             const data = await response.json();
 
             if (data.success) {
-                setSuccess(`Promo code "${data.coupon.id}" created successfully!`);
+                setSuccess(`Platform promo code "${data.coupon.id}" created successfully!`);
                 setShowModal(false);
                 setFormData({
                     id: '',
@@ -167,7 +114,7 @@ export default function AdminPromoCodesPage() {
             const response = await fetch('/api/stripe/coupons', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ couponId, stripeAccountId }),
+                body: JSON.stringify({ couponId }),
             });
 
             const data = await response.json();
@@ -212,76 +159,14 @@ export default function AdminPromoCodesPage() {
         );
     }
 
-    // ===== STRIPE NOT ACTIVATED =====
-    if (!stripeEnabled) {
-        return (
-            <div>
-                <div className="dashboard-header">
-                    <h1 className="dashboard-title">Promo Codes</h1>
-                    <p className="dashboard-subtitle">Create discount codes for your club members</p>
-                </div>
-
-                <div className="glass-card" style={{
-                    textAlign: 'center',
-                    padding: 'var(--space-12)',
-                    maxWidth: '520px',
-                    margin: '0 auto',
-                }}>
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '50%',
-                        background: 'rgba(197, 164, 86, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto var(--space-6)',
-                    }}>
-                        <Shield size={36} color="var(--color-gold)" />
-                    </div>
-
-                    <h3 style={{ marginBottom: 'var(--space-3)', fontSize: '1.2rem' }}>
-                        Stripe Payments Not Activated
-                    </h3>
-                    <p style={{
-                        color: 'var(--text-secondary)',
-                        marginBottom: 'var(--space-6)',
-                        lineHeight: 1.6,
-                        fontSize: 'var(--text-sm)',
-                    }}>
-                        To create promo codes for your members, you need to activate Stripe Connect first.
-                        This connects your club&apos;s payment account so you can manage discounts and collect payments.
-                    </p>
-
-                    <Link
-                        href="/admin/settings?tab=payments"
-                        className="btn btn-primary"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}
-                    >
-                        <CreditCard size={18} />
-                        Go to Payment Settings
-                        <ExternalLink size={14} />
-                    </Link>
-
-                    <p style={{
-                        color: 'var(--text-tertiary)',
-                        fontSize: 'var(--text-xs)',
-                        marginTop: 'var(--space-4)',
-                    }}>
-                        Once Stripe is activated, you&apos;ll be able to create and manage promo codes here.
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
-    // ===== STRIPE ACTIVATED — FULL PROMO CODES UI =====
     return (
         <div>
             <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
                 <div>
-                    <h1 className="dashboard-title">Promo Codes</h1>
-                    <p className="dashboard-subtitle">Create discount codes for your club members</p>
+                    <h1 className="dashboard-title">Platform Promo Codes</h1>
+                    <p className="dashboard-subtitle">
+                        Create discount codes for ClubForge subscription plans (Starter, Growth, Pro)
+                    </p>
                 </div>
                 <button onClick={() => setShowModal(true)} className="btn btn-primary">
                     <Plus size={18} />
@@ -302,6 +187,20 @@ export default function AdminPromoCodesPage() {
                     {success}
                 </div>
             )}
+
+            {/* Info Banner */}
+            <div className="glass-card" style={{
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-6)',
+                borderLeft: '4px solid var(--color-gold)',
+                background: 'rgba(197, 164, 86, 0.06)',
+            }}>
+                <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>Platform-Level Promo Codes</strong> — These codes apply discounts to ClubForge subscription plans.
+                    Club owners will enter these codes when subscribing or upgrading their plan.
+                    For club-level member discounts, each club manages their own promo codes from their admin dashboard.
+                </p>
+            </div>
 
             {/* Stats */}
             <div className="stats-grid" style={{ marginBottom: 'var(--space-6)' }}>
@@ -327,9 +226,9 @@ export default function AdminPromoCodesPage() {
             {coupons.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
                     <Tag size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Promo Codes</h3>
+                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Platform Promo Codes</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                        Create your first promo code to offer discounts to your members.
+                        Create your first promo code to offer discounts on ClubForge subscription plans.
                     </p>
                     <button onClick={() => setShowModal(true)} className="btn btn-primary">
                         <Plus size={18} />
@@ -414,7 +313,10 @@ export default function AdminPromoCodesPage() {
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">Create Promo Code</h2>
+                            <h2 className="modal-title">Create Platform Promo Code</h2>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
+                                This code will apply to ClubForge subscription plans
+                            </p>
                         </div>
 
                         <form onSubmit={handleSubmit}>
@@ -426,12 +328,12 @@ export default function AdminPromoCodesPage() {
                                         className="form-input"
                                         value={formData.id}
                                         onChange={(e) => setFormData({ ...formData, id: e.target.value.toUpperCase().replace(/\s/g, '') })}
-                                        placeholder="e.g., WINTER25"
+                                        placeholder="e.g., LAUNCH50"
                                         required
                                         style={{ textTransform: 'uppercase' }}
                                     />
                                     <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: '4px' }}>
-                                        This is the code members will enter at checkout
+                                        Club owners will enter this code when subscribing to a plan
                                     </p>
                                 </div>
 
@@ -442,7 +344,7 @@ export default function AdminPromoCodesPage() {
                                         className="form-input"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="e.g., Winter 2024 Discount"
+                                        placeholder="e.g., Launch Discount"
                                     />
                                 </div>
 

@@ -241,6 +241,7 @@ export async function POST(request: NextRequest) {
                             customer: customer.id,
                             mode: 'subscription',
                             payment_method_types: ['card'],
+                            allow_promotion_codes: true,
                             line_items: [{ price: priceId, quantity: 1 }],
                             subscription_data: {
                                 trial_period_days: TRIAL_DURATION_DAYS,

@@ -1,29 +1,56 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Calendar, ArrowRight, CheckCircle2, Monitor, Users, Zap } from 'lucide-react';
+import { Calendar, ArrowRight, CheckCircle2, Zap, Loader2, Send } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { createClient } from '@/lib/supabase/server';
 
-export const metadata = {
-    title: 'Book a Demo — See ClubForge in Action',
-    description: 'Get a personalised 30-minute walkthrough of ClubForge. See member management, class scheduling, belt progression, and billing features tailored to your club.',
-    alternates: {
-        canonical: 'https://clubforgehq.com/demo',
-    },
-    openGraph: {
-        title: 'Book a Demo — See ClubForge in Action',
-        description: 'Get a personalised walkthrough tailored to your club.',
-        url: 'https://clubforgehq.com/demo',
-    },
-};
+export default function DemoPage() {
+    const [form, setForm] = useState({
+        name: '',
+        email: '',
+        clubName: '',
+        clubType: '',
+        memberCount: '',
+    });
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
 
-export default async function DemoPage() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        if (!form.name || !form.email) {
+            setError('Please fill in your name and email.');
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const res = await fetch('/api/demo-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Something went wrong');
+            }
+
+            setSubmitted(true);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to submit. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <>
-            <Navbar user={user ? { id: user.id, email: user.email! } : null} />
+            <Navbar user={null} />
 
             <main>
                 {/* Hero */}
@@ -65,84 +92,140 @@ export default async function DemoPage() {
                             background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-2xl)',
                             border: '1px solid rgba(255,255,255,0.1)', padding: 'var(--space-8)',
                         }}>
-                            <h3 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)', fontSize: 'var(--text-xl)' }}>
-                                Book your demo
-                            </h3>
-                            <form style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
-                                        Your name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="John Smith"
-                                        className="form-input"
-                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
-                                    />
+                            {submitted ? (
+                                <div style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+                                    <div style={{
+                                        width: '64px', height: '64px', borderRadius: 'var(--radius-full)',
+                                        background: 'rgba(34, 197, 94, 0.15)', display: 'flex',
+                                        alignItems: 'center', justifyContent: 'center',
+                                        margin: '0 auto var(--space-4)',
+                                    }}>
+                                        <CheckCircle2 size={32} color="#22C55E" />
+                                    </div>
+                                    <h3 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-2)' }}>
+                                        Demo Requested! ✅
+                                    </h3>
+                                    <p style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', lineHeight: '1.7' }}>
+                                        Thanks {form.name.split(' ')[0]}! We&apos;ll get back to you within 24 hours to schedule your personalised walkthrough.
+                                    </p>
+                                    <Link href="/get-started" className="btn btn-primary" style={{ marginTop: 'var(--space-6)', display: 'inline-flex' }}>
+                                        Or start your free trial now
+                                        <ArrowRight size={16} />
+                                    </Link>
                                 </div>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
-                                        Email
-                                    </label>
-                                    <input
-                                        type="email"
-                                        placeholder="john@mygym.com"
-                                        className="form-input"
-                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
-                                        Club name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Ironmonger BJJ"
-                                        className="form-input"
-                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
-                                        Club type
-                                    </label>
-                                    <select
-                                        className="form-input"
-                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
-                                    >
-                                        <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
-                                        <option value="bjj" style={{ background: '#1E293B', color: '#FFFFFF' }}>BJJ / Jiu-Jitsu</option>
-                                        <option value="mma" style={{ background: '#1E293B', color: '#FFFFFF' }}>MMA / Boxing</option>
-                                        <option value="karate" style={{ background: '#1E293B', color: '#FFFFFF' }}>Karate / Taekwondo</option>
-                                        <option value="crossfit" style={{ background: '#1E293B', color: '#FFFFFF' }}>CrossFit</option>
-                                        <option value="dance" style={{ background: '#1E293B', color: '#FFFFFF' }}>Dance / Gymnastics</option>
-                                        <option value="youth" style={{ background: '#1E293B', color: '#FFFFFF' }}>Youth Sports</option>
-                                        <option value="other" style={{ background: '#1E293B', color: '#FFFFFF' }}>Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
-                                        How many members do you have?
-                                    </label>
-                                    <select
-                                        className="form-input"
-                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
-                                    >
-                                        <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
-                                        <option value="1-50" style={{ background: '#1E293B', color: '#FFFFFF' }}>1-50</option>
-                                        <option value="51-150" style={{ background: '#1E293B', color: '#FFFFFF' }}>51-150</option>
-                                        <option value="151-500" style={{ background: '#1E293B', color: '#FFFFFF' }}>151-500</option>
-                                        <option value="500+" style={{ background: '#1E293B', color: '#FFFFFF' }}>500+</option>
-                                    </select>
-                                </div>
-                                <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: 'var(--space-2)' }}>
-                                    Request Demo
-                                    <ArrowRight size={18} />
-                                </button>
-                                <p style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', margin: 0, textAlign: 'center' }}>
-                                    We&apos;ll get back to you within 24 hours.
-                                </p>
-                            </form>
+                            ) : (
+                                <>
+                                    <h3 style={{ color: 'var(--color-white)', marginBottom: 'var(--space-6)', fontSize: 'var(--text-xl)' }}>
+                                        Book your demo
+                                    </h3>
+                                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                Your name *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="John Smith"
+                                                className="form-input"
+                                                value={form.name}
+                                                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                Email *
+                                            </label>
+                                            <input
+                                                type="email"
+                                                placeholder="john@mygym.com"
+                                                className="form-input"
+                                                value={form.email}
+                                                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                Club name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Ironmonger BJJ"
+                                                className="form-input"
+                                                value={form.clubName}
+                                                onChange={e => setForm(f => ({ ...f, clubName: e.target.value }))}
+                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                Club type
+                                            </label>
+                                            <select
+                                                className="form-input"
+                                                value={form.clubType}
+                                                onChange={e => setForm(f => ({ ...f, clubType: e.target.value }))}
+                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                            >
+                                                <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
+                                                <option value="bjj" style={{ background: '#1E293B', color: '#FFFFFF' }}>BJJ / Jiu-Jitsu</option>
+                                                <option value="mma" style={{ background: '#1E293B', color: '#FFFFFF' }}>MMA / Boxing</option>
+                                                <option value="karate" style={{ background: '#1E293B', color: '#FFFFFF' }}>Karate / Taekwondo</option>
+                                                <option value="crossfit" style={{ background: '#1E293B', color: '#FFFFFF' }}>CrossFit</option>
+                                                <option value="dance" style={{ background: '#1E293B', color: '#FFFFFF' }}>Dance / Gymnastics</option>
+                                                <option value="youth" style={{ background: '#1E293B', color: '#FFFFFF' }}>Youth Sports</option>
+                                                <option value="other" style={{ background: '#1E293B', color: '#FFFFFF' }}>Other</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                How many members do you have?
+                                            </label>
+                                            <select
+                                                className="form-input"
+                                                value={form.memberCount}
+                                                onChange={e => setForm(f => ({ ...f, memberCount: e.target.value }))}
+                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                            >
+                                                <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
+                                                <option value="1-50" style={{ background: '#1E293B', color: '#FFFFFF' }}>1-50</option>
+                                                <option value="51-150" style={{ background: '#1E293B', color: '#FFFFFF' }}>51-150</option>
+                                                <option value="151-500" style={{ background: '#1E293B', color: '#FFFFFF' }}>151-500</option>
+                                                <option value="500+" style={{ background: '#1E293B', color: '#FFFFFF' }}>500+</option>
+                                            </select>
+                                        </div>
+                                        {error && (
+                                            <p style={{ color: '#EF4444', fontSize: 'var(--text-sm)', margin: 0 }}>
+                                                {error}
+                                            </p>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary btn-lg"
+                                            disabled={submitting}
+                                            style={{ width: '100%', marginTop: 'var(--space-2)', opacity: submitting ? 0.7 : 1 }}
+                                        >
+                                            {submitting ? (
+                                                <>
+                                                    <Loader2 size={18} className="spin" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Request Demo
+                                                    <ArrowRight size={18} />
+                                                </>
+                                            )}
+                                        </button>
+                                        <p style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', margin: 0, textAlign: 'center' }}>
+                                            We&apos;ll get back to you within 24 hours.
+                                        </p>
+                                    </form>
+                                </>
+                            )}
                         </div>
                     </div>
                 </section>

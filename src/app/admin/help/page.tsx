@@ -45,7 +45,7 @@ const helpCategories: HelpCategory[] = [
 
 **Step 2 — Add a Location**: Every club needs at least one location. Enter the address and any capacity limits. You can add more locations later from **Admin → Locations**.
 
-**Step 3 — Create Membership Types**: Set up the membership tiers you offer (e.g. "Adult Monthly", "Junior Pay-as-you-go"). You can specify pricing, billing intervals, and which locations each membership applies to.
+**Step 3 — Create Membership Plans**: Set up the membership tiers you offer (e.g. "Adult Monthly", "Junior Pay-as-you-go"). You can specify pricing, billing intervals, and which locations each membership applies to.
 
 **Step 4 — Set Up Classes**: Create your class schedule — name, day, time, location, and capacity. You can assign instructors to classes once you've added them.
 
@@ -66,15 +66,13 @@ const helpCategories: HelpCategory[] = [
 **Revenue Overview**: See your monthly revenue, trial status, and current plan.
 
 **Navigation**: Use the sidebar on desktop (or bottom nav on mobile) to navigate between sections:
-- **Dashboard** — Overview and stats
-- **Members** — View, search, and manage all members
-- **Memberships** — Manage active, pending, and expired memberships
-- **Classes** — Create and manage your class schedule
-- **Attendance** — View check-in history and reports
-- **Events** — Create one-off events with RSVP
-- **Videos** — Upload and manage instructional videos
-- **Locations** — Manage your club's locations
-- **Settings** — Club configuration, branding, and payments`,
+- **Overview** — Dashboard with stats and setup progress
+- **Members** — All Members, Memberships, Waitlist, Instructors, Professor Access, Invite Members
+- **Your Club** — Locations, Membership Plans, Classes, Class Roster, Grading
+- **Engagement** — Announcements, Events, Videos, Weekly Wisdom, Email Templates, Promo Codes
+- **Money** — Finance and Attendance reports
+- **Settings** — Club configuration, branding, and payments
+- **Help Centre** — You're here!`,
                 tags: ['dashboard', 'overview', 'navigation', 'home', 'admin'],
             },
             {
@@ -112,7 +110,7 @@ This link takes new members to a branded registration page that shows:
             {
                 id: 'viewing-members',
                 title: 'Viewing & Searching Members',
-                content: `Navigate to **Admin → Members** to see all your club members.
+                content: `Navigate to **Admin → All Members** to see all your club members.
 
 **Search**: Use the search bar to find members by first name, last name, or email.
 
@@ -130,7 +128,7 @@ This link takes new members to a branded registration page that shows:
                 title: 'Adding Members Manually',
                 content: `While most members will self-register via your registration link, you can also add them manually.
 
-**Admin → Members → Invite Member** (or **Admin → Invite**)
+**Admin → Invite Members**
 
 1. Enter the member's email address
 2. They'll receive an invitation email with a link to complete their registration
@@ -163,7 +161,7 @@ This link takes new members to a branded registration page that shows:
 - Update their profile
 - RSVP to events
 
-> **Note**: Role assignments are managed by admins through the **Admin → Members** page.`,
+> **Note**: Role assignments are managed by admins through the **Admin → All Members** page.`,
                 tags: ['roles', 'admin', 'instructor', 'member', 'permissions', 'access'],
             },
         ],
@@ -176,8 +174,8 @@ This link takes new members to a branded registration page that shows:
         articles: [
             {
                 id: 'membership-types',
-                title: 'Creating Membership Types',
-                content: `Go to **Admin → Membership Types** to configure the memberships your club offers.
+                title: 'Creating Membership Plans',
+                content: `Go to **Admin → Membership Plans** to configure the memberships your club offers.
 
 Each membership type needs:
 - **Name** — e.g. "Adult Monthly", "Junior Quarterly", "Family Annual"
@@ -293,7 +291,7 @@ The roster shows:
             {
                 id: 'instructor-access',
                 title: 'Managing Instructor Access',
-                content: `Control which instructors have access to which classes via **Admin → Instructor Access**.
+                content: `Control which instructors have access to which classes via **Admin → Professor Access**.
 
 **Assign instructors to classes** — each instructor will only see the classes they're assigned to in their instructor dashboard.
 
@@ -305,8 +303,8 @@ The roster shows:
 
 **Adding a new instructor**:
 1. Create them as a member (or they self-register)
-2. Go to **Admin → Members** and change their role to "Instructor"
-3. Assign them to their classes via **Admin → Instructor Access**`,
+2. Go to **Admin → All Members** and change their role to "Instructor"
+3. Assign them to their classes via **Admin → Professor Access**`,
                 tags: ['instructors', 'coaches', 'teacher', 'access', 'assign', 'professor'],
             },
         ],
@@ -387,7 +385,7 @@ The roster shows:
             {
                 id: 'professor-feedback',
                 title: 'Leaving Student Feedback',
-                content: `Instructors can leave structured feedback on students via **Instructor Dashboard → Feedback** or through the **Admin → Feedback** page.
+                content: `Instructors can leave structured feedback on students via **Instructor Dashboard → Students** or through the **Admin → Grading** page.
 
 **Feedback includes**:
 - The student's name and current belt level
@@ -467,7 +465,7 @@ You can customise the content of these templates to match your club's tone and b
             {
                 id: 'naseeha',
                 title: 'Weekly Inspiration / Naseeha',
-                content: `The **Naseeha** feature (found at **Admin → Naseeha**) lets you share inspirational quotes, advice, or wisdom with your members.
+                content: `The **Weekly Wisdom** feature (found at **Admin → Weekly Wisdom**) lets you share inspirational quotes, advice, or wisdom with your members.
 
 **How it works**:
 - Create entries with a title, content, and optional category
@@ -613,7 +611,7 @@ Settings are auto-saved when you click "Save Changes".`,
             {
                 id: 'subscription-plans',
                 title: 'ClubForge Subscription Plans',
-                content: `View and manage your ClubForge plan at **Admin → Settings → Plan**.
+                content: `View and manage your ClubForge plan at **Admin → Settings → Subscription**.
 
 **Available plans**:
 
@@ -662,7 +660,7 @@ Settings are auto-saved when you click "Save Changes".`,
                 content: `You can export your member data at any time.
 
 **How to export**:
-- From **Admin → Members**, look for the export/download option
+- From **Admin → All Members**, look for the export/download option
 - Choose CSV format for spreadsheet-compatible output
 
 **What's included**: Member names, emails, membership types, belt ranks, join dates, and contact details.

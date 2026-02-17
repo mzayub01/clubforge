@@ -43,7 +43,7 @@ const helpCategories: HelpCategory[] = [
 
 **Step 1 — Club Profile**: Enter your club name, tagline, and contact details. Upload your logo (recommended 200×200px, PNG or SVG). Your club URL will be automatically generated based on your club name (e.g. \`your-club.clubforgehq.com\`).
 
-**Step 2 — Add a Location**: Every club needs at least one location. Enter the address and any capacity limits. You can add more locations later from **Admin → Locations**.
+**Step 2 — Add a Location**: Every club needs at least one location. Enter the address and any capacity limits. You can add more locations later from **Admin → Your Club → Locations**.
 
 **Step 3 — Create Membership Plans**: Set up the membership tiers you offer (e.g. "Adult Monthly", "Junior Pay-as-you-go"). You can specify pricing, billing intervals, and which locations each membership applies to.
 
@@ -110,7 +110,7 @@ This link takes new members to a branded registration page that shows:
             {
                 id: 'viewing-members',
                 title: 'Viewing & Searching Members',
-                content: `Navigate to **Admin → All Members** to see all your club members.
+                content: `Navigate to **Admin → Members → All Members** to see all your club members.
 
 **Search**: Use the search bar to find members by first name, last name, or email.
 
@@ -128,7 +128,7 @@ This link takes new members to a branded registration page that shows:
                 title: 'Adding Members Manually',
                 content: `While most members will self-register via your registration link, you can also add them manually.
 
-**Admin → Invite Members**
+**Admin → Members → Invite Members**
 
 1. Enter the member's email address
 2. They'll receive an invitation email with a link to complete their registration
@@ -161,7 +161,7 @@ This link takes new members to a branded registration page that shows:
 - Update their profile
 - RSVP to events
 
-> **Note**: Role assignments are managed by admins through the **Admin → All Members** page.`,
+> **Note**: Role assignments are managed by admins through the **Admin → Members → All Members** page.`,
                 tags: ['roles', 'admin', 'instructor', 'member', 'permissions', 'access'],
             },
         ],
@@ -175,7 +175,7 @@ This link takes new members to a branded registration page that shows:
             {
                 id: 'membership-types',
                 title: 'Creating Membership Plans',
-                content: `Go to **Admin → Membership Plans** to configure the memberships your club offers.
+                content: `Go to **Admin → Your Club → Membership Plans** to configure the memberships your club offers.
 
 Each membership type needs:
 - **Name** — e.g. "Adult Monthly", "Junior Quarterly", "Family Annual"
@@ -193,7 +193,7 @@ Each membership type needs:
             {
                 id: 'managing-memberships',
                 title: 'Managing Active Memberships',
-                content: `View all memberships at **Admin → Memberships**.
+                content: `View all memberships at **Admin → Members → Memberships**.
 
 **Statuses**:
 - 🟢 **Active** — Current, paid-up membership
@@ -237,7 +237,7 @@ Each membership type needs:
                 title: 'Managing the Waitlist',
                 content: `If a membership type or location is at capacity, new members are automatically placed on a **waitlist**.
 
-View and manage the waitlist at **Admin → Waitlist**.
+View and manage the waitlist at **Admin → Members → Waitlist**.
 
 **How it works**:
 1. You set capacity limits on location membership configurations
@@ -259,7 +259,7 @@ View and manage the waitlist at **Admin → Waitlist**.
             {
                 id: 'creating-classes',
                 title: 'Creating & Editing Classes',
-                content: `Go to **Admin → Classes** to manage your class schedule.
+                content: `Go to **Admin → Your Club → Classes** to manage your class schedule.
 
 **To create a class**, click the **"Add Class"** button and fill in:
 - **Name** — e.g. "Adult BJJ", "Kids Karate", "Open Mat"
@@ -278,7 +278,7 @@ View and manage the waitlist at **Admin → Waitlist**.
             {
                 id: 'class-roster',
                 title: 'Class Rosters',
-                content: `View the roster for any class at **Admin → Class Roster**.
+                content: `View the roster for any class at **Admin → Your Club → Class Roster**.
 
 The roster shows:
 - All members who are eligible for the class (based on their membership type)
@@ -291,7 +291,7 @@ The roster shows:
             {
                 id: 'instructor-access',
                 title: 'Managing Instructor Access',
-                content: `Control which instructors have access to which classes via **Admin → Professor Access**.
+                content: `Control which instructors have access to which classes via **Admin → Members → Professor Access**.
 
 **Assign instructors to classes** — each instructor will only see the classes they're assigned to in their instructor dashboard.
 
@@ -303,8 +303,8 @@ The roster shows:
 
 **Adding a new instructor**:
 1. Create them as a member (or they self-register)
-2. Go to **Admin → All Members** and change their role to "Instructor"
-3. Assign them to their classes via **Admin → Professor Access**`,
+2. Go to **Admin → Members → All Members** and change their role to "Instructor"
+3. Assign them to their classes via **Admin → Members → Professor Access**`,
                 tags: ['instructors', 'coaches', 'teacher', 'access', 'assign', 'professor'],
             },
         ],
@@ -328,7 +328,7 @@ The roster shows:
 
 **For instructors and admins**:
 - Instructors can check in members manually from the instructor dashboard
-- Admins can view and manage all attendance from **Admin → Attendance**
+- Admins can view and manage all attendance from **Admin → Money → Attendance**
 
 **For parents**:
 - Parents can check in their children through the parent portal
@@ -340,7 +340,7 @@ The roster shows:
             {
                 id: 'attendance-reports',
                 title: 'Viewing Attendance Reports',
-                content: `View attendance data at **Admin → Attendance**.
+                content: `View attendance data at **Admin → Money → Attendance**.
 
 **What you can see**:
 - Full attendance history for all classes
@@ -385,7 +385,7 @@ The roster shows:
             {
                 id: 'professor-feedback',
                 title: 'Leaving Student Feedback',
-                content: `Instructors can leave structured feedback on students via **Instructor Dashboard → Students** or through the **Admin → Grading** page.
+                content: `Instructors can leave structured feedback on students via **Instructor Dashboard → Students** or through the **Admin → Your Club → Grading** page.
 
 **Feedback includes**:
 - The student's name and current belt level
@@ -410,7 +410,7 @@ The roster shows:
                 title: 'Creating Events',
                 content: `Events are for things outside your regular class schedule — seminars, gradings, open days, competitions, social events.
 
-Go to **Admin → Events** and click **"Create Event"**.
+Go to **Admin → Engagement → Events** and click **"Create Event"**.
 
 **Event details**:
 - **Title** — e.g. "Belt Grading Day", "Open Mat Sunday", "Guest Seminar"
@@ -435,7 +435,7 @@ Go to **Admin → Events** and click **"Create Event"**.
             {
                 id: 'announcements',
                 title: 'Sending Announcements',
-                content: `Keep your members in the loop with announcements at **Admin → Announcements**.
+                content: `Keep your members in the loop with announcements at **Admin → Engagement → Announcements**.
 
 **Create an announcement**:
 - **Title** — Headline text
@@ -450,7 +450,7 @@ Announcements appear on the member dashboard so they're visible as soon as membe
             {
                 id: 'email-templates',
                 title: 'Email Templates',
-                content: `Manage your club's email templates at **Admin → Email Templates**.
+                content: `Manage your club's email templates at **Admin → Engagement → Email Templates**.
 
 ClubForge sends automated emails for key events:
 - **Welcome email** — Sent when a new member registers
@@ -465,7 +465,7 @@ You can customise the content of these templates to match your club's tone and b
             {
                 id: 'naseeha',
                 title: 'Weekly Inspiration / Naseeha',
-                content: `The **Weekly Wisdom** feature (found at **Admin → Weekly Wisdom**) lets you share inspirational quotes, advice, or wisdom with your members.
+                content: `The **Weekly Wisdom** feature (found at **Admin → Engagement → Weekly Wisdom**) lets you share inspirational quotes, advice, or wisdom with your members.
 
 **How it works**:
 - Create entries with a title, content, and optional category
@@ -486,7 +486,7 @@ This feature is especially popular with martial arts clubs that value discipline
             {
                 id: 'managing-videos',
                 title: 'Managing Your Video Library',
-                content: `Build a training resource library at **Admin → Videos**.
+                content: `Build a training resource library at **Admin → Engagement → Videos**.
 
 **Adding videos**:
 - **Title** — Descriptive name (e.g. "Triangle Choke from Guard")
@@ -509,7 +509,7 @@ This feature is especially popular with martial arts clubs that value discipline
             {
                 id: 'managing-locations',
                 title: 'Managing Locations',
-                content: `Manage your club's physical locations at **Admin → Locations**.
+                content: `Manage your club's physical locations at **Admin → Your Club → Locations**.
 
 **Adding a location**:
 - **Name** — e.g. "Main Gym", "City Centre Branch"
@@ -535,7 +535,7 @@ This is especially useful for:
 - Managing demand through waitlists
 
 **Setting capacity**:
-1. Go to **Admin → Locations**
+1. Go to **Admin → Your Club → Locations**
 2. Edit a location and set the capacity
 3. When capacity is reached, new registrations for that location will go to the waitlist automatically
 
@@ -553,7 +553,7 @@ This is especially useful for:
             {
                 id: 'promo-codes',
                 title: 'Creating Promo Codes',
-                content: `Create discount codes at **Admin → Promo Codes** to incentivise sign-ups and reward loyalty.
+                content: `Create discount codes at **Admin → Engagement → Promo Codes** to incentivise sign-ups and reward loyalty.
 
 **Promo code options**:
 - **Code** — The text code members enter (e.g. "SUMMER50", "FRIEND20")
@@ -660,7 +660,7 @@ Settings are auto-saved when you click "Save Changes".`,
                 content: `You can export your member data at any time.
 
 **How to export**:
-- From **Admin → All Members**, look for the export/download option
+- From **Admin → Members → All Members**, look for the export/download option
 - Choose CSV format for spreadsheet-compatible output
 
 **What's included**: Member names, emails, membership types, belt ranks, join dates, and contact details.
@@ -719,7 +719,7 @@ Settings are auto-saved when you click "Save Changes".`,
 - Try refreshing the page — some data loads asynchronously
 
 **"Member listed as pending"**
-- Without Stripe: you need to manually activate memberships from **Admin → Memberships**
+- Without Stripe: you need to manually activate memberships from **Admin → Members → Memberships**
 - With Stripe: payment may not have completed — check Stripe Dashboard for the transaction status`,
                 tags: ['troubleshooting', 'issues', 'problems', 'fix', 'not working', 'error', 'help'],
             },

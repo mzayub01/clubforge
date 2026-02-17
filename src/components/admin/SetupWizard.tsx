@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     CheckCircle, MapPin, CreditCard, Calendar,
     Palette, PoundSterling, UserPlus, ChevronRight,
-    X, Sparkles, Loader2, PartyPopper
+    X, Sparkles, Loader2, PartyPopper, Award
 } from 'lucide-react';
 
 interface SetupStep {
@@ -35,6 +35,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; color?: stri
     'palette': Palette,
     'pound-sterling': PoundSterling,
     'user-plus': UserPlus,
+    'award': Award,
 };
 
 export default function SetupWizard() {

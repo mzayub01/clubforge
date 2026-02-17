@@ -49,12 +49,14 @@ export async function GET() {
             membershipTypesResult,
             classesResult,
             membersResult,
+            rankSchemasResult,
         ] = await Promise.all([
-            admin.from('tenants').select('name, logo_url, brand_color, stripe_connect_enabled, onboarding_completed_at, onboarding_dismissed_at').eq('id', tenantId).single(),
+            admin.from('tenants').select('name, logo_url, brand_color, stripe_connect_enabled, onboarding_completed_at, onboarding_dismissed_at, settings').eq('id', tenantId).single(),
             admin.from('locations').select('id, address').eq('tenant_id', tenantId).eq('is_active', true),
             admin.from('membership_types').select('id').eq('tenant_id', tenantId).eq('is_active', true),
             admin.from('classes').select('id').eq('tenant_id', tenantId).eq('is_active', true),
             admin.from('tenant_members').select('id').eq('tenant_id', tenantId).eq('is_active', true).neq('role', 'admin'),
+            admin.from('rank_schemas').select('id').eq('tenant_id', tenantId).eq('is_active', true),
         ]);
 
         const tenant = tenantResult.data;
@@ -62,6 +64,10 @@ export async function GET() {
         const membershipTypes = membershipTypesResult.data || [];
         const classes = classesResult.data || [];
         const nonAdminMembers = membersResult.data || [];
+        const rankSchemas = rankSchemasResult.data || [];
+        const tenantSettings = (tenant as any)?.settings || {};
+        // Grading is configured if they've either added schemas OR explicitly disabled belt progression
+        const gradingConfigured = rankSchemas.length > 0 || tenantSettings.belt_progress_enabled === false;
 
         // Has a location with an address filled in
         const hasLocationWithAddress = locations.some((l: any) => l.address && l.address.trim().length > 0);
@@ -106,6 +112,14 @@ export async function GET() {
                 completed: !!(tenant?.logo_url),
                 href: '/admin/settings',
                 icon: 'palette',
+            },
+            {
+                id: 'grading',
+                title: 'Configure Grading',
+                description: 'Choose a belt/rank schema or disable grading',
+                completed: gradingConfigured,
+                href: '/admin/grading-settings',
+                icon: 'award',
             },
             {
                 id: 'stripe',

@@ -1,37 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Calendar, Clock, MapPin, User, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
 import { adminFetch, adminInsert, adminUpdateById, adminDelete } from '@/lib/admin-api';
+import { getClassTypes, getClassTypeLabel } from '@/lib/class-type-utils';
 import type { Class, Location, Instructor } from '@/lib/types';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const CLASS_TYPES = [
-    { value: 'bjj', label: 'Brazilian Jiu-Jitsu' },
-    { value: 'kendo', label: 'Kendo' },
-    { value: 'strength', label: 'Strength & Conditioning' },
-    { value: 'archery', label: 'Archery' },
-    { value: 'other', label: 'Other' },
-];
 
 export default function AdminClassesPage() {
     const [classes, setClasses] = useState<Class[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [membershipTypes, setMembershipTypes] = useState<{ id: string; name: string; location_id: string }[]>([]);
+    const [schemaNames, setSchemaNames] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editClass, setEditClass] = useState<Class | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // Derive class types from rank schemas + generic defaults
+    const classTypes = useMemo(() => getClassTypes(schemaNames), [schemaNames]);
+
 
 
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        class_type: 'bjj',
+        class_type: '',
         location_id: '',
         instructor_id: '',
         day_of_week: 0,
@@ -47,7 +45,7 @@ export default function AdminClassesPage() {
     }, []);
 
     const fetchData = async () => {
-        const [classesRes, locationsRes, instructorsRes, membershipTypesRes] = await Promise.all([
+        const [classesRes, locationsRes, instructorsRes, membershipTypesRes, rankSchemasRes] = await Promise.all([
             adminFetch<Class>('classes', {
                 select: '*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)',
                 order: [{ column: 'day_of_week' }],
@@ -63,12 +61,17 @@ export default function AdminClassesPage() {
                 select: 'id, name, location_id',
                 filters: [{ column: 'is_active', value: true }],
             }),
+            adminFetch<{ id: string; name: string }>('rank_schemas', {
+                select: 'id, name',
+                filters: [{ column: 'is_active', value: true }],
+            }),
         ]);
 
         setClasses(classesRes.data || []);
         setLocations(locationsRes.data || []);
         setInstructors(instructorsRes.data || []);
         setMembershipTypes(membershipTypesRes.data || []);
+        setSchemaNames((rankSchemasRes.data || []).map((s: { name: string }) => s.name));
         setLoading(false);
     };
 
@@ -97,7 +100,7 @@ export default function AdminClassesPage() {
             setFormData({
                 name: '',
                 description: '',
-                class_type: 'bjj',
+                class_type: classTypes[0]?.value || 'other',
                 location_id: locations[0]?.id || '',
                 instructor_id: '',
                 day_of_week: 6,
@@ -249,8 +252,8 @@ export default function AdminClassesPage() {
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                     <div>
                                                         <h4 style={{ margin: '0 0 var(--space-1)' }}>{cls.name}</h4>
-                                                        <span className={`badge badge-${cls.class_type === 'bjj' ? 'gold' : 'gray'}`}>
-                                                            {CLASS_TYPES.find(t => t.value === cls.class_type)?.label}
+                                                        <span className={`badge badge-gold`}>
+                                                            {getClassTypeLabel(cls.class_type, schemaNames)}
                                                         </span>
                                                         {!cls.is_active && <span className="badge badge-gray" style={{ marginLeft: 'var(--space-2)' }}>Inactive</span>}
                                                     </div>
@@ -311,7 +314,7 @@ export default function AdminClassesPage() {
                                     <div className="form-group">
                                         <label className="form-label">Class Type*</label>
                                         <select className="form-input" value={formData.class_type} onChange={(e) => setFormData({ ...formData, class_type: e.target.value })}>
-                                            {CLASS_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+                                            {classTypes.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">

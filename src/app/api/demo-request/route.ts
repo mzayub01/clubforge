@@ -102,10 +102,10 @@ export async function POST(request: NextRequest) {
         const confirmationHtml = `
             <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
                 <!-- Header -->
-                <div style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0;">
+                <div style="background: #FFFFFF; padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0; border: 1px solid #E2E8F0; border-bottom: 3px solid #C5A456;">
                     <img src="https://clubforgehq.com/logo-clubforge-final.png" alt="ClubForge" style="height: 36px; margin-bottom: 16px;" />
-                    <h1 style="margin: 0; font-size: 24px; color: #FFFFFF; font-weight: 700;">We&rsquo;ve received your request</h1>
-                    <p style="margin: 12px 0 0; color: #94A3B8; font-size: 15px; line-height: 1.6;">
+                    <h1 style="margin: 0; font-size: 24px; color: #0F172A; font-weight: 700;">We&rsquo;ve received your request</h1>
+                    <p style="margin: 12px 0 0; color: #64748B; font-size: 15px; line-height: 1.6;">
                         Thank you for your interest in ClubForge, ${firstName}.
                     </p>
                 </div>

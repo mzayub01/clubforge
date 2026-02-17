@@ -62,6 +62,7 @@ export default function Footer() {
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                         <li><Link href="/about" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>About</Link></li>
                         <li><Link href="/faq" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>FAQ</Link></li>
+                        <li><Link href="/help" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Help Centre</Link></li>
                         <li><a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Contact</a></li>
                     </ul>
                 </div>

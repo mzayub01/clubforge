@@ -165,6 +165,7 @@ export async function POST(request: NextRequest) {
                     emergency_contact_phone: '',
                     is_child: false,
                     belt_rank: 'white',
+                    role: 'admin', // Club owners get admin role
                     best_practice_accepted: true,
                     waiver_accepted: true,
                 }, { onConflict: 'user_id' });

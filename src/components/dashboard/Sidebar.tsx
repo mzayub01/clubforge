@@ -611,6 +611,39 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                                 </div>
                                 <span>Settings</span>
                             </Link>
+                            <Link
+                                href="/admin/help"
+                                onClick={closeSidebar}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px 16px',
+                                    borderRadius: '10px',
+                                    textDecoration: 'none',
+                                    background: pathname === '/admin/help' ? 'rgba(197, 164, 86, 0.12)' : 'transparent',
+                                    color: pathname === '/admin/help' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                    fontWeight: '600',
+                                    fontSize: '15px',
+                                    transition: 'all 0.15s ease',
+                                }}
+                            >
+                                <div style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '8px',
+                                    background: pathname === '/admin/help' ? 'rgba(197, 164, 86, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                }}>
+                                    <span style={{ color: pathname === '/admin/help' ? 'var(--color-gold)' : 'var(--text-secondary)' }}>
+                                        <BookOpen size={18} />
+                                    </span>
+                                </div>
+                                <span>Help Centre</span>
+                            </Link>
                         </div>
                     )}
 

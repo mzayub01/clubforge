@@ -9,8 +9,6 @@ import {
     UserPlus, ClipboardList, Bell, BarChart3, Ticket,
     GraduationCap, FileText, Megaphone, ExternalLink,
 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 // ===============================================
 // Help Center Data
@@ -770,8 +768,6 @@ export default function HelpCenterPage() {
 
     return (
         <>
-            <Navbar />
-
             <main>
                 {/* Hero */}
                 <section style={{
@@ -1088,8 +1084,6 @@ export default function HelpCenterPage() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
 
             <style jsx>{`
                 .help-article-content h2,

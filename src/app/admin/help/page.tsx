@@ -463,17 +463,17 @@ You can customise the content of these templates to match your club's tone and b
                 tags: ['email', 'templates', 'automated', 'welcome', 'confirmation'],
             },
             {
-                id: 'naseeha',
-                title: 'Weekly Inspiration / Naseeha',
+                id: 'weekly-wisdom',
+                title: 'Weekly Inspiration',
                 content: `The **Weekly Wisdom** feature (found at **Admin → Engagement → Weekly Wisdom**) lets you share inspirational quotes, advice, or wisdom with your members.
 
 **How it works**:
 - Create entries with a title, content, and optional category
-- Members see the latest naseeha on their dashboard
+- Members see the latest wisdom on their dashboard
 - Great for sharing martial arts philosophy, motivational quotes, or club values
 
 This feature is especially popular with martial arts clubs that value discipline, respect, and personal development beyond physical training.`,
-                tags: ['naseeha', 'inspiration', 'quotes', 'motivation', 'wisdom'],
+                tags: ['inspiration', 'quotes', 'motivation', 'wisdom', 'weekly'],
             },
         ],
     },

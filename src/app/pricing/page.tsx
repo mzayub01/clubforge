@@ -93,7 +93,7 @@ const featureCategories: FeatureCategory[] = [
             { name: 'Event management', starter: false, pro: true, elite: true, tooltip: 'Create, manage, and take payments for events' },
             { name: 'Waitlist management', starter: false, pro: true, elite: true, tooltip: 'Manage a waitlist for oversubscribed classes or your club' },
             { name: 'Video library', starter: false, pro: true, elite: true, tooltip: 'Upload and share technique videos with members' },
-            { name: 'Weekly wisdom / naseeha', starter: false, pro: true, elite: true, tooltip: 'Publish weekly advice and inspiration to members' },
+            { name: 'Weekly wisdom', starter: false, pro: true, elite: true, tooltip: 'Publish weekly advice and inspiration to members' },
             { name: 'Custom email templates', starter: false, pro: true, elite: true, tooltip: 'Design branded email templates for member communications' },
             { name: 'Promo codes', starter: false, pro: true, elite: true, tooltip: 'Create discount codes for memberships and events' },
             { name: 'Grading feedback', starter: false, pro: true, elite: true, tooltip: 'Coaches provide written feedback on belt gradings' },

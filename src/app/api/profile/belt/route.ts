@@ -12,15 +12,14 @@ export async function POST(request: NextRequest) {
 
         const { belt, stripes, userId } = await request.json();
 
-        // Validate belt
-        const validBelts = ['white', 'blue', 'purple', 'brown', 'black'];
-        if (!validBelts.includes(belt)) {
+        // Validate belt — accept any non-empty string (dynamic schemas may have any belt name)
+        if (!belt || typeof belt !== 'string') {
             return NextResponse.json({ error: 'Invalid belt rank' }, { status: 400 });
         }
 
-        // Validate stripes
-        if (typeof stripes !== 'number' || stripes < 0 || stripes > 4) {
-            return NextResponse.json({ error: 'Stripes must be 0-4' }, { status: 400 });
+        // Validate stripes — allow up to 12 for kids/extended schemas
+        if (typeof stripes !== 'number' || stripes < 0 || stripes > 12) {
+            return NextResponse.json({ error: 'Stripes must be 0-12' }, { status: 400 });
         }
 
         // Determine which user to update

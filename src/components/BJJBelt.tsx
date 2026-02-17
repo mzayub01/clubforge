@@ -1,33 +1,18 @@
 'use client';
 
+import { getBeltColors, type RankLevel } from '@/hooks/useRankSchemas';
+
 interface BJJBeltProps {
     belt: 'white' | 'blue' | 'purple' | 'brown' | 'black' | string;
     stripes: number;
     size?: 'sm' | 'md' | 'lg';
     showLabel?: boolean;
     isChild?: boolean;
+    /** Optional dynamic rank levels for color lookup */
+    rankLevels?: RankLevel[];
+    /** Optional max stripes override from schema */
+    schemaMaxStripes?: number;
 }
-
-const BELT_COLORS: Record<string, { main: string; bar: string }> = {
-    white: { main: '#F5F5F5', bar: '#1A1A1A' },
-    blue: { main: '#1E40AF', bar: '#1A1A1A' },
-    purple: { main: '#6B21A8', bar: '#1A1A1A' },
-    brown: { main: '#78350F', bar: '#1A1A1A' },
-    black: { main: '#1A1A1A', bar: '#DC2626' },
-    // Kids belt colors
-    grey: { main: '#6B7280', bar: '#1A1A1A' },
-    'grey-white': { main: '#9CA3AF', bar: '#1A1A1A' },
-    'grey-black': { main: '#4B5563', bar: '#1A1A1A' },
-    yellow: { main: '#EAB308', bar: '#1A1A1A' },
-    'yellow-white': { main: '#FDE047', bar: '#1A1A1A' },
-    'yellow-black': { main: '#A16207', bar: '#1A1A1A' },
-    orange: { main: '#EA580C', bar: '#1A1A1A' },
-    'orange-white': { main: '#FB923C', bar: '#1A1A1A' },
-    'orange-black': { main: '#C2410C', bar: '#1A1A1A' },
-    green: { main: '#16A34A', bar: '#1A1A1A' },
-    'green-white': { main: '#4ADE80', bar: '#1A1A1A' },
-    'green-black': { main: '#15803D', bar: '#1A1A1A' },
-};
 
 const SIZES = {
     sm: { width: 80, height: 16, stripeWidth: 3 },
@@ -43,8 +28,8 @@ function getKidsStripeColor(stripeIndex: number): string {
     return '#6B7280'; // Grey
 }
 
-export default function BJJBelt({ belt, stripes, size = 'md', showLabel = false, isChild = false }: BJJBeltProps) {
-    const colors = BELT_COLORS[belt] || BELT_COLORS.white;
+export default function BJJBelt({ belt, stripes, size = 'md', showLabel = false, isChild = false, rankLevels, schemaMaxStripes }: BJJBeltProps) {
+    const colors = getBeltColors(belt, rankLevels);
     const dims = SIZES[size];
     const barWidth = dims.width * 0.15;
 

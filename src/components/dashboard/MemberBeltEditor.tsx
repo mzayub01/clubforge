@@ -3,24 +3,35 @@
 import { useState } from 'react';
 import BJJBelt from '@/components/BJJBelt';
 import { ChevronDown, ChevronUp, Check, Loader2 } from 'lucide-react';
-
-type BeltRank = 'white' | 'blue' | 'purple' | 'brown' | 'black';
+import { useRankSchemas, type RankLevel } from '@/hooks/useRankSchemas';
 
 interface MemberBeltEditorProps {
-    initialBelt: BeltRank;
+    initialBelt: string;
     initialStripes: number;
+    isChild?: boolean;
 }
 
-const BELTS: BeltRank[] = ['white', 'blue', 'purple', 'brown', 'black'];
-
-export default function MemberBeltEditor({ initialBelt, initialStripes }: MemberBeltEditorProps) {
-    const [belt, setBelt] = useState<BeltRank>(initialBelt);
+export default function MemberBeltEditor({ initialBelt, initialStripes, isChild = false }: MemberBeltEditorProps) {
+    const { getSchemaForMember, loading: schemasLoading } = useRankSchemas();
+    const [belt, setBelt] = useState(initialBelt);
     const [stripes, setStripes] = useState(initialStripes);
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    const schema = getSchemaForMember(isChild);
+    const rankLevels = schema.rank_levels;
+    const hasStripes = schema.has_stripes;
+    const maxStripes = schema.max_stripes;
+
     const hasChanges = belt !== initialBelt || stripes !== initialStripes;
+
+    // Build belt options from schema levels
+    const beltOptions = rankLevels.map(l => ({
+        value: l.name.toLowerCase().replace(/\//g, '-'),
+        label: l.name,
+        color: l.color_hex,
+    }));
 
     const handleSave = async () => {
         setSaving(true);
@@ -38,7 +49,6 @@ export default function MemberBeltEditor({ initialBelt, initialStripes }: Member
             if (data.success) {
                 setMessage({ type: 'success', text: 'Belt updated successfully!' });
                 setIsEditing(false);
-                // Update initial values
                 setTimeout(() => setMessage(null), 3000);
             } else {
                 setMessage({ type: 'error', text: data.error || 'Failed to update' });
@@ -59,7 +69,7 @@ export default function MemberBeltEditor({ initialBelt, initialStripes }: Member
         }}>
             {/* Belt Display */}
             <div style={{ marginBottom: 'var(--space-4)' }}>
-                <BJJBelt belt={belt} stripes={stripes} size="lg" />
+                <BJJBelt belt={belt} stripes={stripes} size="lg" isChild={isChild} rankLevels={rankLevels} />
             </div>
 
             <h2 style={{
@@ -67,8 +77,12 @@ export default function MemberBeltEditor({ initialBelt, initialStripes }: Member
                 textTransform: 'capitalize',
                 fontSize: 'var(--text-3xl)',
             }}>
-                {belt} Belt
-                {stripes > 0 && <span style={{ fontSize: 'var(--text-xl)', color: 'var(--text-secondary)' }}> • {stripes} stripe{stripes > 1 ? 's' : ''}</span>}
+                {belt.replace(/-/g, '/')} Belt
+                {stripes > 0 && hasStripes && (
+                    <span style={{ fontSize: 'var(--text-xl)', color: 'var(--text-secondary)' }}>
+                        {' '}• {stripes} stripe{stripes > 1 ? 's' : ''}
+                    </span>
+                )}
             </h2>
 
             {message && (
@@ -100,51 +114,68 @@ export default function MemberBeltEditor({ initialBelt, initialStripes }: Member
                             Belt Color
                         </label>
                         <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            {BELTS.map((b) => (
-                                <button
-                                    key={b}
-                                    onClick={() => setBelt(b)}
-                                    style={{
-                                        padding: 'var(--space-2) var(--space-3)',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: belt === b ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
-                                        background: belt === b ? 'var(--bg-secondary)' : 'transparent',
-                                        cursor: 'pointer',
-                                        textTransform: 'capitalize',
-                                        fontWeight: belt === b ? '600' : '400',
-                                    }}
-                                >
-                                    {b}
-                                </button>
-                            ))}
+                            {schemasLoading ? (
+                                <Loader2 size={16} className="spinner" />
+                            ) : (
+                                beltOptions.map((b) => (
+                                    <button
+                                        key={b.value}
+                                        onClick={() => setBelt(b.value)}
+                                        style={{
+                                            padding: 'var(--space-2) var(--space-3)',
+                                            borderRadius: 'var(--radius-md)',
+                                            border: belt === b.value ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
+                                            background: belt === b.value ? 'var(--bg-secondary)' : 'transparent',
+                                            cursor: 'pointer',
+                                            textTransform: 'capitalize',
+                                            fontWeight: belt === b.value ? '600' : '400',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 'var(--space-1)',
+                                        }}
+                                    >
+                                        <span style={{
+                                            width: '12px',
+                                            height: '12px',
+                                            borderRadius: '50%',
+                                            background: b.color,
+                                            border: b.color === '#F5F5F5' ? '1px solid var(--border-medium)' : 'none',
+                                            flexShrink: 0,
+                                        }} />
+                                        {b.label}
+                                    </button>
+                                ))
+                            )}
                         </div>
                     </div>
 
-                    {/* Stripes Selection */}
-                    <div style={{ marginBottom: 'var(--space-4)' }}>
-                        <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-                            Stripes (0-4)
-                        </label>
-                        <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center' }}>
-                            {[0, 1, 2, 3, 4].map((s) => (
-                                <button
-                                    key={s}
-                                    onClick={() => setStripes(s)}
-                                    style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: stripes === s ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
-                                        background: stripes === s ? 'var(--bg-secondary)' : 'transparent',
-                                        cursor: 'pointer',
-                                        fontWeight: stripes === s ? '600' : '400',
-                                    }}
-                                >
-                                    {s}
-                                </button>
-                            ))}
+                    {/* Stripes Selection — only if schema supports stripes */}
+                    {hasStripes && (
+                        <div style={{ marginBottom: 'var(--space-4)' }}>
+                            <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                                Stripes (0-{maxStripes})
+                            </label>
+                            <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                {Array.from({ length: maxStripes + 1 }, (_, i) => i).map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setStripes(s)}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: 'var(--radius-md)',
+                                            border: stripes === s ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
+                                            background: stripes === s ? 'var(--bg-secondary)' : 'transparent',
+                                            cursor: 'pointer',
+                                            fontWeight: stripes === s ? '600' : '400',
+                                        }}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center' }}>

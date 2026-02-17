@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Star, Award, Loader2, CheckCircle, MessageSquare } from 'lucide-react';
 import BJJBelt from '@/components/BJJBelt';
+import { useRankSchemas } from '@/hooks/useRankSchemas';
 
 interface MemberForGrading {
     user_id: string;
@@ -21,31 +22,8 @@ interface GradingModalProps {
     onSuccess: () => void;
 }
 
-const ADULT_BELTS = [
-    { value: 'white', label: 'White' },
-    { value: 'blue', label: 'Blue' },
-    { value: 'purple', label: 'Purple' },
-    { value: 'brown', label: 'Brown' },
-    { value: 'black', label: 'Black' },
-];
-
-const KIDS_BELTS = [
-    { value: 'white', label: 'White' },
-    { value: 'grey-white', label: 'Grey/White' },
-    { value: 'grey', label: 'Grey' },
-    { value: 'grey-black', label: 'Grey/Black' },
-    { value: 'yellow-white', label: 'Yellow/White' },
-    { value: 'yellow', label: 'Yellow' },
-    { value: 'yellow-black', label: 'Yellow/Black' },
-    { value: 'orange-white', label: 'Orange/White' },
-    { value: 'orange', label: 'Orange' },
-    { value: 'orange-black', label: 'Orange/Black' },
-    { value: 'green-white', label: 'Green/White' },
-    { value: 'green', label: 'Green' },
-    { value: 'green-black', label: 'Green/Black' },
-];
-
 export default function GradingModal({ member, classId, onClose, onSuccess }: GradingModalProps) {
+    const { getSchemaForMember } = useRankSchemas();
     const [newBelt, setNewBelt] = useState(member.belt_rank);
     const [newStripes, setNewStripes] = useState(member.stripes);
     const [comments, setComments] = useState('');
@@ -53,7 +31,17 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
-    const belts = member.is_kids_program ? KIDS_BELTS : ADULT_BELTS;
+    // Get dynamic schema for this member
+    const schema = getSchemaForMember(member.is_kids_program);
+    const rankLevels = schema.rank_levels;
+    const hasStripes = schema.has_stripes;
+    const maxStripes = schema.max_stripes;
+
+    // Build belt options from schema levels
+    const belts = rankLevels.map(l => ({
+        value: l.name.toLowerCase().replace(/\//g, '-'),
+        label: l.name,
+    }));
 
     const handleSubmit = async () => {
         // Validate that something changed
@@ -166,10 +154,11 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
                                 <label className="form-label">Current Rank</label>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
                                     <BJJBelt
-                                        belt={member.belt_rank as 'white' | 'blue' | 'purple' | 'brown' | 'black'}
+                                        belt={member.belt_rank}
                                         stripes={member.stripes}
                                         size="md"
                                         isChild={member.is_kids_program}
+                                        rankLevels={rankLevels}
                                     />
                                     <span style={{ textTransform: 'capitalize', fontWeight: '500' }}>
                                         {member.belt_rank} Belt • {member.stripes} stripe{member.stripes !== 1 ? 's' : ''}
@@ -196,43 +185,32 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
                                 </select>
                             </div>
 
-                            {/* Stripes Selection */}
-                            <div className="form-group">
-                                <label className="form-label">
-                                    Stripes {member.is_kids_program && <span style={{ color: 'var(--text-secondary)', fontWeight: 'normal', fontSize: 'var(--text-xs)' }}>(White 1-4, Red 5-8, Grey 9-12)</span>}
-                                </label>
-                                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                    {(member.is_kids_program
-                                        ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-                                        : [0, 1, 2, 3, 4]
-                                    ).map(num => {
-                                        // Color code for kids: 1-4 white, 5-8 red, 9-12 grey
-                                        let stripeColor = 'inherit';
-                                        if (member.is_kids_program && num > 0) {
-                                            if (num <= 4) stripeColor = 'var(--text-primary)';
-                                            else if (num <= 8) stripeColor = '#DC2626';
-                                            else stripeColor = '#6B7280';
-                                        }
-                                        return (
+                            {/* Stripes Selection — only if schema supports stripes */}
+                            {hasStripes && (
+                                <div className="form-group">
+                                    <label className="form-label">
+                                        Stripes (0-{maxStripes})
+                                    </label>
+                                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                        {Array.from({ length: maxStripes + 1 }, (_, i) => i).map(num => (
                                             <button
                                                 key={num}
                                                 type="button"
                                                 onClick={() => setNewStripes(num)}
                                                 className={`btn ${newStripes === num ? 'btn-primary' : 'btn-ghost'}`}
                                                 style={{
-                                                    flex: member.is_kids_program ? 'none' : 1,
-                                                    width: member.is_kids_program ? '36px' : 'auto',
+                                                    flex: maxStripes > 4 ? 'none' : 1,
+                                                    width: maxStripes > 4 ? '36px' : 'auto',
                                                     padding: 'var(--space-2)',
                                                     minWidth: 'auto',
-                                                    color: newStripes !== num ? stripeColor : undefined,
                                                 }}
                                             >
                                                 {num}
                                             </button>
-                                        );
-                                    })}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Preview */}
                             <div style={{ marginBottom: 'var(--space-4)' }}>
@@ -247,13 +225,14 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
                                     border: isPromotion() ? '2px solid var(--color-green)' : 'none',
                                 }}>
                                     <BJJBelt
-                                        belt={newBelt as 'white' | 'blue' | 'purple' | 'brown' | 'black'}
+                                        belt={newBelt}
                                         stripes={newStripes}
                                         size="md"
                                         isChild={member.is_kids_program}
+                                        rankLevels={rankLevels}
                                     />
                                     <span style={{ textTransform: 'capitalize', fontWeight: '500' }}>
-                                        {newBelt} Belt • {newStripes} stripe{newStripes !== 1 ? 's' : ''}
+                                        {newBelt.replace(/-/g, '/')} Belt{hasStripes ? ` • ${newStripes} stripe${newStripes !== 1 ? 's' : ''}` : ''}
                                     </span>
                                     {isPromotion() && (
                                         <span className="badge badge-green">Promotion!</span>
@@ -357,6 +336,6 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
                     border-top: 1px solid var(--border-light);
                 }
             `}</style>
-        </div>
+        </div >
     );
 }

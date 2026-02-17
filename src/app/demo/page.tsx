@@ -2,14 +2,61 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Calendar, ArrowRight, CheckCircle2, Zap, Loader2, Send } from 'lucide-react';
+import { Calendar, ArrowRight, CheckCircle2, Zap, Loader2, Send, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+
+const DIAL_CODES = [
+    { code: '+44', country: '🇬🇧', label: 'UK (+44)' },
+    { code: '+1', country: '🇺🇸', label: 'US (+1)' },
+    { code: '+353', country: '🇮🇪', label: 'Ireland (+353)' },
+    { code: '+61', country: '🇦🇺', label: 'Australia (+61)' },
+    { code: '+64', country: '🇳🇿', label: 'New Zealand (+64)' },
+    { code: '+1', country: '🇨🇦', label: 'Canada (+1)' },
+    { code: '+91', country: '🇮🇳', label: 'India (+91)' },
+    { code: '+971', country: '🇦🇪', label: 'UAE (+971)' },
+    { code: '+966', country: '🇸🇦', label: 'Saudi Arabia (+966)' },
+    { code: '+974', country: '🇶🇦', label: 'Qatar (+974)' },
+    { code: '+973', country: '🇧🇭', label: 'Bahrain (+973)' },
+    { code: '+965', country: '🇰🇼', label: 'Kuwait (+965)' },
+    { code: '+968', country: '🇴🇲', label: 'Oman (+968)' },
+    { code: '+92', country: '🇵🇰', label: 'Pakistan (+92)' },
+    { code: '+90', country: '🇹🇷', label: 'Turkey (+90)' },
+    { code: '+49', country: '🇩🇪', label: 'Germany (+49)' },
+    { code: '+33', country: '🇫🇷', label: 'France (+33)' },
+    { code: '+34', country: '🇪🇸', label: 'Spain (+34)' },
+    { code: '+39', country: '🇮🇹', label: 'Italy (+39)' },
+    { code: '+31', country: '🇳🇱', label: 'Netherlands (+31)' },
+    { code: '+46', country: '🇸🇪', label: 'Sweden (+46)' },
+    { code: '+47', country: '🇳🇴', label: 'Norway (+47)' },
+    { code: '+45', country: '🇩🇰', label: 'Denmark (+45)' },
+    { code: '+48', country: '🇵🇱', label: 'Poland (+48)' },
+    { code: '+351', country: '🇵🇹', label: 'Portugal (+351)' },
+    { code: '+55', country: '🇧🇷', label: 'Brazil (+55)' },
+    { code: '+52', country: '🇲🇽', label: 'Mexico (+52)' },
+    { code: '+27', country: '🇿🇦', label: 'South Africa (+27)' },
+    { code: '+81', country: '🇯🇵', label: 'Japan (+81)' },
+    { code: '+82', country: '🇰🇷', label: 'South Korea (+82)' },
+    { code: '+65', country: '🇸🇬', label: 'Singapore (+65)' },
+    { code: '+60', country: '🇲🇾', label: 'Malaysia (+60)' },
+    { code: '+63', country: '🇵🇭', label: 'Philippines (+63)' },
+    { code: '+234', country: '🇳🇬', label: 'Nigeria (+234)' },
+    { code: '+254', country: '🇰🇪', label: 'Kenya (+254)' },
+    { code: '+20', country: '🇪🇬', label: 'Egypt (+20)' },
+];
+
+const inputStyle = {
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    color: 'var(--color-white)',
+};
 
 export default function DemoPage() {
     const [form, setForm] = useState({
         name: '',
         email: '',
+        dialCode: '+44',
+        phone: '',
         clubName: '',
         clubType: '',
         memberCount: '',
@@ -32,7 +79,10 @@ export default function DemoPage() {
             const res = await fetch('/api/demo-request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({
+                    ...form,
+                    phone: form.phone ? `${form.dialCode} ${form.phone}` : '',
+                }),
             });
 
             if (!res.ok) {
@@ -106,7 +156,7 @@ export default function DemoPage() {
                                         Demo Requested! ✅
                                     </h3>
                                     <p style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', lineHeight: '1.7' }}>
-                                        Thanks {form.name.split(' ')[0]}! We&apos;ll get back to you within 24 hours to schedule your personalised walkthrough.
+                                        Thanks {form.name.split(' ')[0]}! We&apos;ve sent a confirmation to <strong style={{ color: 'var(--color-gold)' }}>{form.email}</strong>. A member of our team will be in touch within 24 hours to arrange your personalised walkthrough.
                                     </p>
                                     <Link href="/get-started" className="btn btn-primary" style={{ marginTop: 'var(--space-6)', display: 'inline-flex' }}>
                                         Or start your free trial now
@@ -129,7 +179,7 @@ export default function DemoPage() {
                                                 className="form-input"
                                                 value={form.name}
                                                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                style={inputStyle}
                                                 required
                                             />
                                         </div>
@@ -143,9 +193,41 @@ export default function DemoPage() {
                                                 className="form-input"
                                                 value={form.email}
                                                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                style={inputStyle}
                                                 required
                                             />
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
+                                                Phone number
+                                            </label>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <select
+                                                    className="form-input"
+                                                    value={form.dialCode}
+                                                    onChange={e => setForm(f => ({ ...f, dialCode: e.target.value }))}
+                                                    style={{
+                                                        ...inputStyle,
+                                                        width: '140px',
+                                                        flexShrink: 0,
+                                                        fontSize: 'var(--text-sm)',
+                                                    }}
+                                                >
+                                                    {DIAL_CODES.map((dc, i) => (
+                                                        <option key={`${dc.code}-${i}`} value={dc.code} style={{ background: '#1E293B', color: '#FFFFFF' }}>
+                                                            {dc.country} {dc.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <input
+                                                    type="tel"
+                                                    placeholder="7700 900000"
+                                                    className="form-input"
+                                                    value={form.phone}
+                                                    onChange={e => setForm(f => ({ ...f, phone: e.target.value.replace(/[^\d\s-]/g, '') }))}
+                                                    style={{ ...inputStyle, flex: 1 }}
+                                                />
+                                            </div>
                                         </div>
                                         <div>
                                             <label style={{ display: 'block', color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-1)' }}>
@@ -157,7 +239,7 @@ export default function DemoPage() {
                                                 className="form-input"
                                                 value={form.clubName}
                                                 onChange={e => setForm(f => ({ ...f, clubName: e.target.value }))}
-                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                style={inputStyle}
                                             />
                                         </div>
                                         <div>
@@ -168,7 +250,7 @@ export default function DemoPage() {
                                                 className="form-input"
                                                 value={form.clubType}
                                                 onChange={e => setForm(f => ({ ...f, clubType: e.target.value }))}
-                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                style={inputStyle}
                                             >
                                                 <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
                                                 <option value="bjj" style={{ background: '#1E293B', color: '#FFFFFF' }}>BJJ / Jiu-Jitsu</option>
@@ -188,7 +270,7 @@ export default function DemoPage() {
                                                 className="form-input"
                                                 value={form.memberCount}
                                                 onChange={e => setForm(f => ({ ...f, memberCount: e.target.value }))}
-                                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-white)' }}
+                                                style={inputStyle}
                                             >
                                                 <option value="" style={{ background: '#1E293B', color: '#FFFFFF' }}>Select...</option>
                                                 <option value="1-50" style={{ background: '#1E293B', color: '#FFFFFF' }}>1-50</option>

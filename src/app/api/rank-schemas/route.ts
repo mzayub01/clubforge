@@ -1,7 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getRankPreset } from '@/lib/rank-presets';
+
+/**
+ * Helper: resolve tenant from authenticated user via tenant_members lookup.
+ * This is the standard admin API pattern — works regardless of subdomain context.
+ */
+async function resolveAdminTenant(supabase: Awaited<ReturnType<typeof createClient>>) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { user: null, tenantId: null, error: 'Unauthorized' as const, status: 401 };
+
+    const admin = createAdminClient();
+    const { data: tenantMember } = await admin
+        .from('tenant_members')
+        .select('tenant_id, role')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+    if (!tenantMember) return { user, tenantId: null, error: 'No tenant found for user' as const, status: 400 };
+
+    return { user, tenantId: tenantMember.tenant_id, role: tenantMember.role, error: null, status: 200 };
+}
 
 /**
  * GET /api/rank-schemas - Get all rank schemas for the current tenant
@@ -10,27 +31,23 @@ import { getRankPreset } from '@/lib/rank-presets';
 export async function GET(request: NextRequest) {
     try {
         const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { tenantId, error, status } = await resolveAdminTenant(supabase);
 
-        const tenantId = await getTenantId();
-        if (!tenantId) {
-            return NextResponse.json({ error: 'Tenant not found' }, { status: 400 });
+        if (error || !tenantId) {
+            return NextResponse.json({ error: error || 'Tenant not found' }, { status });
         }
 
         const includeLevels = request.nextUrl.searchParams.get('include_levels') === 'true';
 
         if (includeLevels) {
-            const { data: schemas, error } = await supabase
+            const { data: schemas, error: queryError } = await supabase
                 .from('rank_schemas')
                 .select('*, rank_levels(*)')
                 .eq('tenant_id', tenantId)
                 .eq('is_active', true)
                 .order('sort_order');
 
-            if (error) throw error;
+            if (queryError) throw queryError;
 
             // Sort levels within each schema
             const sorted = schemas?.map(s => ({
@@ -42,14 +59,14 @@ export async function GET(request: NextRequest) {
 
             return NextResponse.json({ success: true, schemas: sorted || [] });
         } else {
-            const { data: schemas, error } = await supabase
+            const { data: schemas, error: queryError } = await supabase
                 .from('rank_schemas')
                 .select('*')
                 .eq('tenant_id', tenantId)
                 .eq('is_active', true)
                 .order('sort_order');
 
-            if (error) throw error;
+            if (queryError) throw queryError;
             return NextResponse.json({ success: true, schemas: schemas || [] });
         }
     } catch (error) {
@@ -65,25 +82,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { tenantId, role, error, status } = await resolveAdminTenant(supabase);
+
+        if (error || !tenantId) {
+            return NextResponse.json({ error: error || 'Tenant not found' }, { status });
         }
 
-        // Check admin role
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (profile?.role !== 'admin') {
+        if (role !== 'admin') {
             return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-        }
-
-        const tenantId = await getTenantId();
-        if (!tenantId) {
-            return NextResponse.json({ error: 'Tenant not found' }, { status: 400 });
         }
 
         const body = await request.json();
@@ -209,18 +215,13 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { tenantId, role, error, status } = await resolveAdminTenant(supabase);
+
+        if (error || !tenantId) {
+            return NextResponse.json({ error: error || 'Tenant not found' }, { status });
         }
 
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (profile?.role !== 'admin') {
+        if (role !== 'admin') {
             return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
         }
 
@@ -230,12 +231,12 @@ export async function DELETE(request: NextRequest) {
         }
 
         // Soft-delete by marking inactive
-        const { error } = await supabase
+        const { error: deleteError } = await supabase
             .from('rank_schemas')
             .update({ is_active: false })
             .eq('id', schemaId);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
 
         return NextResponse.json({ success: true });
     } catch (error) {

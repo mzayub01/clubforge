@@ -101,6 +101,23 @@ export async function PUT(request: NextRequest) {
             updatePayload = {
                 logo_url: data.logoUrl,
             };
+        } else if (section === 'features') {
+            // Get current settings first to merge
+            const { data: currentTenant } = await adminSupabase
+                .from('tenants')
+                .select('settings')
+                .eq('id', tenantId)
+                .single();
+
+            const currentSettings = (currentTenant?.settings || {}) as Record<string, unknown>;
+            const mergedSettings = {
+                ...currentSettings,
+                belt_progress_enabled: data.belt_progress_enabled ?? currentSettings.belt_progress_enabled,
+            };
+
+            updatePayload = {
+                settings: mergedSettings,
+            };
         } else {
             return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
         }

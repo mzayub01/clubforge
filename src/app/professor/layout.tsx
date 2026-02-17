@@ -39,9 +39,21 @@ export default async function ProfessorLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Professor';
 
+    // Get tenant info for beltProgressEnabled
+    let beltProgressEnabled: boolean | undefined;
+    if (tenantMember?.tenant_id) {
+        const { data: tenant } = await adminSupabase
+            .from('tenants')
+            .select('settings')
+            .eq('id', tenantMember.tenant_id)
+            .single();
+        const settings = (tenant?.settings || {}) as Record<string, unknown>;
+        beltProgressEnabled = settings.belt_progress_enabled !== false;
+    }
+
     return (
         <div className="dashboard-layout">
-            <DashboardSidebar role="professor" userName={userName} />
+            <DashboardSidebar role="professor" userName={userName} beltProgressEnabled={beltProgressEnabled} />
             <main className="dashboard-main">
                 {children}
             </main>

@@ -46,16 +46,19 @@ export default async function DashboardLayout({
     let tenantName: string | undefined;
     let tenantPrimaryColor: string | undefined;
     let tenantTagline: string | undefined;
+    let beltProgressEnabled: boolean | undefined;
     if (tenantId) {
         const { data: tenant } = await supabase
             .from('tenants')
-            .select('logo_url, name, primary_color, tagline')
+            .select('logo_url, name, primary_color, tagline, settings')
             .eq('id', tenantId)
             .single();
         tenantLogoUrl = tenant?.logo_url || undefined;
         tenantName = tenant?.name || undefined;
         tenantPrimaryColor = tenant?.primary_color || undefined;
         tenantTagline = tenant?.tagline || undefined;
+        const settings = (tenant?.settings || {}) as Record<string, unknown>;
+        beltProgressEnabled = settings.belt_progress_enabled !== false; // default true
     }
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
@@ -89,6 +92,7 @@ export default async function DashboardLayout({
                         hasChildren={(childProfiles?.length || 0) > 0}
                         tenantLogoUrl={tenantLogoUrl}
                         tenantName={tenantName}
+                        beltProgressEnabled={beltProgressEnabled}
                     />
                     <main className="dashboard-main">
                         {children}

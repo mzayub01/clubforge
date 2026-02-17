@@ -48,6 +48,7 @@ interface SidebarProps {
     hasChildren?: boolean;
     tenantLogoUrl?: string;
     tenantName?: string;
+    beltProgressEnabled?: boolean;
 }
 
 interface SidebarSection {
@@ -280,7 +281,7 @@ function CollapsibleSection({
     );
 }
 
-export default function DashboardSidebar({ role, userRole, userName = 'Member', profileImageUrl, hasChildren = false, tenantLogoUrl, tenantName }: SidebarProps) {
+export default function DashboardSidebar({ role, userRole, userName = 'Member', profileImageUrl, hasChildren = false, tenantLogoUrl, tenantName, beltProgressEnabled }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const supabase = getSupabaseClient();
@@ -319,12 +320,14 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
 
     const { hasParentMembership } = useDashboard();
 
+    const beltEnabled = beltProgressEnabled !== false; // default true
+
     // ---- MEMBER LINKS (flat like before) ----
     const memberLinks = [
         { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
         { href: '/dashboard/attendance', label: 'Attendance', icon: CheckCircle },
-        { href: '/dashboard/progress', label: 'Belt Progress', icon: Award },
+        ...(beltEnabled ? [{ href: '/dashboard/progress', label: 'Belt Progress', icon: Award }] : []),
         { href: '/dashboard/videos', label: 'Video Library', icon: Video },
         { href: '/dashboard/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
         { href: '/dashboard/events', label: 'Events', icon: PartyPopper },
@@ -343,9 +346,9 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
         { href: '/instructor/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
     ];
 
-    const professorLinks = [
-        { href: '/professor', label: 'Grading', icon: Award },
-    ];
+    const professorLinks = beltEnabled
+        ? [{ href: '/professor', label: 'Grading', icon: Award }]
+        : [];
 
     // ---- ADMIN SECTIONS (new grouped layout) ----
     const adminSections: SidebarSection[] = [
@@ -379,7 +382,8 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                 { href: '/admin/membership-types', label: 'Membership Plans', icon: CreditCard },
                 { href: '/admin/classes', label: 'Classes', icon: Calendar },
                 { href: '/admin/class-roster', label: 'Class Roster', icon: ClipboardList },
-                { href: '/professor', label: 'Grading', icon: Award },
+                ...(beltEnabled ? [{ href: '/professor', label: 'Grading', icon: Award }] : []),
+                ...(beltEnabled ? [{ href: '/admin/grading-settings', label: 'Grading Settings', icon: GraduationCap }] : []),
             ],
             defaultOpen: true,
         },

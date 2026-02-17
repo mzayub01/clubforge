@@ -358,7 +358,7 @@ The roster shows:
     {
         id: 'belt-progression',
         title: 'Belt & Rank Progression',
-        description: 'Manage grading schemes, record promotions, and track student progress.',
+        description: 'Manage grading schemes, configure rank schemas, record promotions, and track student progress.',
         icon: Award,
         articles: [
             {
@@ -367,20 +367,102 @@ The roster shows:
                 content: `ClubForge includes a **full structured ranking system** — one of our unique features that no other platform offers natively.
 
 **What's included**:
-- Separate **adult and youth** belt schemes
+- **Configurable rank schemas** — choose from presets (BJJ, Karate, Taekwondo, Judo) or create custom schemas
+- Separate **adult and youth** belt schemes (e.g. BJJ Adult with 5 belts, BJJ Kids with 13 belts)
 - Full **grading history** with timestamps and recorded-by data
 - **Instructor feedback** forms for each student
 - **Promotion audit trail** — who promoted whom and when
 - Belt display on member profiles and class rosters
+- Option to **disable belt progression entirely** for clubs that don't need it (e.g. fitness studios)
 
 **How promotions work**:
 1. An instructor assesses a student (tracked via the instructor dashboard)
-2. The instructor records a promotion — selecting the new belt level
+2. The instructor records a promotion — selecting the new belt/rank level from your configured schema
 3. The promotion is logged with a timestamp and the instructor's name
 4. The member sees their updated belt on their profile
 
 > **Tip**: Use the **Professor Feedback** feature to leave detailed notes on student performance before and after gradings. These build up into a progression journal that members really value.`,
-                tags: ['belt', 'rank', 'grading', 'promotion', 'progression', 'martial arts', 'level'],
+                tags: ['belt', 'rank', 'grading', 'promotion', 'progression', 'martial arts', 'level', 'schema'],
+            },
+            {
+                id: 'grading-settings',
+                title: 'Grading Settings',
+                content: `Manage your club's grading system at **Admin → Your Club → Grading Settings**.
+
+This page is your central hub for configuring how belt/rank progression works in your club.
+
+**What you can do here**:
+
+**1. Toggle Belt Progression On/Off**
+At the top of the page, you'll find a toggle switch to enable or disable belt progression features for your entire club. When disabled:
+- The "Belt Progress" link is hidden from member dashboards
+- The "Grading" link is hidden from instructor and admin menus
+- Members won't see belt information on their profiles
+- All grading features are suppressed across the platform
+
+This is ideal for **fitness studios, yoga centres**, or any club that doesn't use a belt/ranking system.
+
+**2. Manage Rank Schemas**
+Below the toggle, you'll see your active rank schemas and can add new ones from presets.
+
+> **Note**: Changes to grading settings take effect immediately across all user dashboards.`,
+                tags: ['grading settings', 'toggle', 'enable', 'disable', 'belt toggle', 'configuration', 'admin'],
+            },
+            {
+                id: 'rank-schemas',
+                title: 'Configurable Rank Schemas',
+                content: `ClubForge supports **multiple martial arts** with different belt systems. You can configure which rank schema(s) your club uses from **Admin → Your Club → Grading Settings**.
+
+**Available Presets**:
+
+| Schema | Belts | Stripes | Description |
+|--------|-------|---------|-------------|
+| **BJJ Adult** | 5 | 0-4 per belt | White → Blue → Purple → Brown → Black |
+| **BJJ Kids** | 13 | 0-12 per belt | White → Grey → Yellow → Orange → Green (with /White and /Black variants) |
+| **Karate** | 10 | None | White → Yellow → Orange → Green → Blue → Purple → Brown → Black (1st-3rd Dan) |
+| **Taekwondo** | 10 | None | White → Yellow → Green → Blue → Red → Black (with transition belts) |
+| **Judo** | 7 | None | White → Yellow → Orange → Green → Blue → Brown → Black |
+
+**Adding a Preset**:
+1. Go to **Admin → Your Club → Grading Settings**
+2. Scroll to the **"Add a Rank Schema"** section
+3. Click on a preset card (e.g. "Karate")
+4. The schema is instantly added with all its belt levels and colours
+
+**How the Schema is Used**:
+- When grading a member, the instructor sees belt options from the active schema
+- Belt colours and stripe counts match the selected schema
+- Members see the correct belt visual on their profile
+
+**Kids vs Adult Schemas**:
+If your club has both adult and youth programs (e.g. BJJ Adult + BJJ Kids), add both schemas. The system automatically selects the right one based on whether the member is in the kids program.
+
+> **Tip**: You can remove a schema and add a different one if your club changes martial arts or teaching style.`,
+                tags: ['rank schema', 'belt system', 'bjj', 'karate', 'taekwondo', 'judo', 'kids', 'adult', 'presets', 'martial arts', 'configure'],
+            },
+            {
+                id: 'disabling-belts',
+                title: 'Disabling Belt Progression',
+                content: `Not every club needs a belt/ranking system. **Fitness studios, boxing gyms, yoga centres**, and other non-graded clubs can turn off belt progression entirely.
+
+**How to Disable**:
+1. Go to **Admin → Your Club → Grading Settings**
+2. Toggle **"Belt Progress Enabled"** to **OFF**
+3. The change takes effect immediately
+
+**What Happens When Disabled**:
+- ❌ "Belt Progress" removed from member sidebar
+- ❌ "Grading" removed from instructor and admin menus
+- ❌ "Grading Settings" link hidden (but still accessible directly if you know the URL)
+- ❌ Belt information hidden on member profiles
+- ✅ All other features (attendance, classes, memberships, events) continue to work normally
+- ✅ Existing belt data is **preserved** — if you re-enable later, belts will reappear
+
+**How to Re-Enable**:
+Simply toggle the switch back to **ON** at any time. All previously recorded belt data and promotion history will be restored.
+
+> **Note**: Disabling belt progression does not delete any data. It only hides the UI elements.`,
+                tags: ['disable', 'turn off', 'hide', 'belt', 'no belts', 'fitness', 'boxing', 'yoga', 'toggle'],
             },
             {
                 id: 'professor-feedback',

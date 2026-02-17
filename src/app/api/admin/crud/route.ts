@@ -134,9 +134,10 @@ export async function POST(request: NextRequest) {
 
         const adminSupabase = createAdminClient();
 
-        // Special case: tenants table doesn't have tenant_id column
-        const hasTenantId = table !== 'tenants';
-        const tenantFilter = hasTenantId ? { column: 'tenant_id', value: auth.tenantId } : null;
+        // Scope queries to the current tenant
+        // Special case: tenants table uses 'id' instead of 'tenant_id'
+        const tenantFilterColumn = table === 'tenants' ? 'id' : 'tenant_id';
+        const tenantFilter = { column: tenantFilterColumn, value: auth.tenantId };
 
         // Auto-inject current user ID where '__CURRENT_USER__' sentinel is used
         if (data && typeof data === 'object') {
@@ -211,8 +212,8 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ error: 'Missing data for insert' }, { status: 400 });
                 }
 
-                // Auto-inject tenant_id
-                const insertData = hasTenantId ? { ...data, tenant_id: auth.tenantId } : data;
+                // Auto-inject tenant_id (skip for tenants table which doesn't have this column)
+                const insertData = table !== 'tenants' ? { ...data, tenant_id: auth.tenantId } : data;
 
                 const { data: result, error } = await adminSupabase
                     .from(table)
@@ -258,7 +259,7 @@ export async function POST(request: NextRequest) {
                     return NextResponse.json({ error: 'Missing data for upsert' }, { status: 400 });
                 }
 
-                const upsertData = hasTenantId ? { ...data, tenant_id: auth.tenantId } : data;
+                const upsertData = table !== 'tenants' ? { ...data, tenant_id: auth.tenantId } : data;
 
                 const { data: result, error } = await adminSupabase
                     .from(table)

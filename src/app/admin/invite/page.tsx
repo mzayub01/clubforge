@@ -12,9 +12,26 @@ export default function InviteMembersPage() {
     const [showQR, setShowQR] = useState(false);
 
     useEffect(() => {
-        // Build registration URL from current hostname
-        const baseUrl = window.location.origin;
-        setRegistrationUrl(`${baseUrl}/register`);
+        // Fetch tenant slug and build the club's subdomain registration URL
+        const fetchTenantSlug = async () => {
+            try {
+                const res = await fetch('/api/admin/settings');
+                if (res.ok) {
+                    const result = await res.json();
+                    const slug = result.tenant?.slug;
+                    if (slug) {
+                        const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
+                        setRegistrationUrl(`https://${slug}.${baseDomain}/register`);
+                        return;
+                    }
+                }
+            } catch {
+                // Fallback below
+            }
+            // Fallback: use current origin
+            setRegistrationUrl(`${window.location.origin}/register`);
+        };
+        fetchTenantSlug();
     }, []);
 
     const handleCopy = async () => {

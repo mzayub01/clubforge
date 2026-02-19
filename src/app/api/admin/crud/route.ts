@@ -33,6 +33,8 @@ const ALLOWED_TABLES = [
     'location_membership_configs',
     'tenant_members',
     'tenants',
+    'rank_schemas',
+    'rank_levels',
 ] as const;
 
 type AllowedTable = typeof ALLOWED_TABLES[number];

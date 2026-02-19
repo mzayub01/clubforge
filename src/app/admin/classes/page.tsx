@@ -45,34 +45,41 @@ export default function AdminClassesPage() {
     }, []);
 
     const fetchData = async () => {
-        const [classesRes, locationsRes, instructorsRes, membershipTypesRes, rankSchemasRes] = await Promise.all([
-            adminFetch<Class>('classes', {
-                select: '*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)',
-                order: [{ column: 'day_of_week' }],
-            }),
-            adminFetch<Location>('locations', {
-                filters: [{ column: 'is_active', value: true }],
-            }),
-            adminFetch<Instructor>('instructors', {
-                select: '*, profile:profiles(*)',
-                filters: [{ column: 'is_active', value: true }],
-            }),
-            adminFetch<{ id: string; name: string; location_id: string }>('membership_types', {
-                select: 'id, name, location_id',
-                filters: [{ column: 'is_active', value: true }],
-            }),
-            adminFetch<{ id: string; name: string }>('rank_schemas', {
-                select: 'id, name',
-                filters: [{ column: 'is_active', value: true }],
-            }),
-        ]);
+        try {
+            const [classesRes, locationsRes, instructorsRes, membershipTypesRes, rankSchemasRes] = await Promise.all([
+                adminFetch<Class>('classes', {
+                    select: '*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)',
+                    order: [{ column: 'day_of_week' }],
+                }),
+                adminFetch<Location>('locations', {
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+                adminFetch<Instructor>('instructors', {
+                    select: '*, profile:profiles(*)',
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+                adminFetch<{ id: string; name: string; location_id: string }>('membership_types', {
+                    select: 'id, name, location_id',
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+                adminFetch<{ id: string; name: string }>('rank_schemas', {
+                    select: 'id, name',
+                    filters: [{ column: 'is_active', value: true }],
+                }),
+            ]);
 
-        setClasses(classesRes.data || []);
-        setLocations(locationsRes.data || []);
-        setInstructors(instructorsRes.data || []);
-        setMembershipTypes(membershipTypesRes.data || []);
-        setSchemaNames((rankSchemasRes.data || []).map((s: { name: string }) => s.name));
-        setLoading(false);
+            if (classesRes.error) console.error('Classes fetch error:', classesRes.error);
+
+            setClasses(classesRes.data || []);
+            setLocations(locationsRes.data || []);
+            setInstructors(instructorsRes.data || []);
+            setMembershipTypes(membershipTypesRes.data || []);
+            setSchemaNames((rankSchemasRes.data || []).map((s: { name: string }) => s.name));
+        } catch (err) {
+            console.error('fetchData error:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const openModal = (classItem?: Class) => {

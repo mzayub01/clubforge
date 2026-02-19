@@ -10,6 +10,7 @@ const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'F
 export default function AdminAttendancePage() {
     const [classes, setClasses] = useState<Class[]>([]);
     const [members, setMembers] = useState<Profile[]>([]);
+    const [memberMap, setMemberMap] = useState<Record<string, Profile>>({});
     const [attendance, setAttendance] = useState<Attendance[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedClass, setSelectedClass] = useState<string>('');
@@ -43,7 +44,14 @@ export default function AdminAttendancePage() {
         ]);
 
         setClasses(classesRes.data || []);
-        setMembers(membersRes.data || []);
+        const allMembers = membersRes.data || [];
+        setMembers(allMembers);
+        // Build member lookup by user_id
+        const mMap: Record<string, Profile> = {};
+        for (const m of allMembers) {
+            mMap[m.user_id] = m;
+        }
+        setMemberMap(mMap);
         setLoading(false);
     };
 
@@ -51,7 +59,6 @@ export default function AdminAttendancePage() {
         console.log('Fetching attendance for class:', selectedClass, 'date:', selectedDate);
 
         const { data, error } = await adminFetch<Attendance>('attendance', {
-            select: '*, profile:profiles(*)',
             filters: [
                 { column: 'class_id', value: selectedClass },
                 { column: 'class_date', value: selectedDate },
@@ -279,11 +286,11 @@ export default function AdminAttendancePage() {
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                                             <div className="avatar avatar-sm">
-                                                {(record.profile as Profile)?.first_name?.[0]}{(record.profile as Profile)?.last_name?.[0]}
+                                                {memberMap[record.user_id]?.first_name?.[0]}{memberMap[record.user_id]?.last_name?.[0]}
                                             </div>
                                             <div>
                                                 <p style={{ fontWeight: '500', margin: 0, fontSize: 'var(--text-sm)' }}>
-                                                    {(record.profile as Profile)?.first_name} {(record.profile as Profile)?.last_name}
+                                                    {memberMap[record.user_id]?.first_name} {memberMap[record.user_id]?.last_name}
                                                 </p>
                                                 <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0 }}>
                                                     {new Date(record.check_in_time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}

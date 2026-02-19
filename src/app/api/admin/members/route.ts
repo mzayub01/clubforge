@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function DELETE(request: NextRequest) {
     try {
-        // Get authenticated user and verify admin role
-        const supabase = await createServerClient();
+        // Get authenticated user and verify admin role via tenant_members
+        const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Verify admin role
-        const { data: adminProfile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (!adminProfile || adminProfile.role !== 'admin') {
+        const membership = await resolveTenantForUser(user.id);
+        if (!membership || membership.role !== 'admin') {
             return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
@@ -35,12 +30,9 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 });
         }
 
-        // Use service role client for admin operations
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!,
-            { auth: { autoRefreshToken: false, persistSession: false } }
-        );
+        // Use admin client for service-role operations
+        const supabaseAdmin = createAdminClient();
+
 
         // Delete related records first (memberships, attendance, etc.)
         await supabaseAdmin.from('attendance').delete().eq('user_id', userId);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { resolveTenantForUser } from '@/lib/tenant';
 import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase } from '@/lib/email-templates-db';
 
@@ -20,16 +21,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Check if user is admin
-        const { data: adminProfile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (adminProfile?.role !== 'admin') {
+        // Check if user is admin via tenant_members
+        const membership = await resolveTenantForUser(user.id);
+        if (!membership || membership.role !== 'admin') {
             return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
         }
+
 
         // Generate the payment link (link to membership page where they can complete payment)
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';

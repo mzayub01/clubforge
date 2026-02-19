@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     if (!isStripeConfigured()) {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'userId, locationId, and tierId are required' }, { status: 400 });
         }
 
-        const supabase = await createAdminClient();
+        const supabase = createAdminClient();
 
         // Get user profile
         const { data: profile } = await supabase
@@ -82,8 +82,9 @@ export async function POST(request: NextRequest) {
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-        // Get tenant context for metadata
-        const tenantId = await getTenantId();
+        // Get tenant context from user's membership
+        const membership = await resolveTenantForUser(userId);
+        const tenantId = membership?.tenantId;
 
         // Get or create Stripe customer
         let customerId = profile.stripe_customer_id;

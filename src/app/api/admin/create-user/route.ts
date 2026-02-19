@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
@@ -13,21 +13,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
         }
 
-        // Verify the requester is an admin
-        const supabase = await createServerClient();
+        // Verify the requester is an admin via tenant_members
+        const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { data: adminProfile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (adminProfile?.role !== 'admin') {
+        const membership = await resolveTenantForUser(user.id);
+        if (!membership || membership.role !== 'admin') {
             return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
         }
 
@@ -39,11 +34,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Use admin client to create user
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!,
-            { auth: { autoRefreshToken: false, persistSession: false } }
-        );
+        const supabaseAdmin = createAdminClient();
 
         // Create auth user
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -60,9 +51,6 @@ export async function POST(request: NextRequest) {
         if (!newUser.user) {
             return NextResponse.json({ success: false, error: 'Failed to create user' }, { status: 500 });
         }
-
-        // Get tenant context
-        const tenantId = await getTenantId();
 
         // Create/update profile for the user (upsert in case trigger already created it)
         const { error: profileError } = await supabaseAdmin
@@ -85,7 +73,7 @@ export async function POST(request: NextRequest) {
                 emergency_contact_phone: '',
                 best_practice_accepted: false,
                 waiver_accepted: false,
-                ...(tenantId && { tenant_id: tenantId }),
+                tenant_id: membership.tenantId,
             }, { onConflict: 'user_id' });
 
         if (profileError) {
@@ -97,6 +85,22 @@ export async function POST(request: NextRequest) {
                 error: `Failed to create user profile: ${profileError.message || profileError.code || JSON.stringify(profileError)}`
             }, { status: 500 });
         }
+
+        // Create tenant_members row for the new user
+        const { error: tmError } = await supabaseAdmin
+            .from('tenant_members')
+            .upsert({
+                tenant_id: membership.tenantId,
+                user_id: newUser.user.id,
+                role: role || 'member',
+                is_active: true,
+            }, { onConflict: 'tenant_id,user_id' });
+
+        if (tmError) {
+            console.error('Warning: Failed to create tenant_members row:', tmError.message);
+            // Non-fatal — profile already created
+        }
+
 
         return NextResponse.json({
             success: true,

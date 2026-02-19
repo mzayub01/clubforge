@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 import Stripe from 'stripe';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         console.log('Stripe checkout: Creating session for user', userId, 'membership type', membershipTypeId);
 
         // Get Stripe price ID from membership type using admin client to bypass RLS
-        const supabase = await createAdminClient();
+        const supabase = createAdminClient();
         const { data: membershipType, error: fetchError } = await supabase
             .from('membership_types')
             .select('stripe_price_id')
@@ -61,8 +62,10 @@ export async function POST(request: NextRequest) {
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-        // Get tenant context for metadata
-        const tenantId = await getTenantId();
+        // Get tenant context from authenticated user's membership
+        // userId comes from the request body (the member paying)
+        const membership = userId ? await resolveTenantForUser(userId) : null;
+        const tenantId = membership?.tenantId;
 
         // Create or get Stripe customer (required for Stripe Accounts V2)
         let customer;

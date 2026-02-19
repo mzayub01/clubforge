@@ -5,36 +5,7 @@ import { Award, Star, Trophy, Target, Calendar, Loader2, MessageSquare } from 'l
 import BJJBelt from '@/components/BJJBelt';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useDashboard } from '@/components/dashboard/DashboardProvider';
-
-const ADULT_BELT_ORDER = ['white', 'blue', 'purple', 'brown', 'black'];
-const KIDS_BELT_ORDER = [
-    'white',
-    'grey-white', 'grey', 'grey-black',
-    'yellow-white', 'yellow', 'yellow-black',
-    'orange-white', 'orange', 'orange-black',
-    'green-white', 'green', 'green-black'
-];
-
-const BELT_COLORS: Record<string, string> = {
-    white: '#FFFFFF',
-    blue: '#1E40AF',
-    purple: '#6B21A8',
-    brown: '#78350F',
-    black: '#1A1A1A',
-    // Kids belt colors
-    grey: '#6B7280',
-    'grey-white': '#9CA3AF',
-    'grey-black': '#4B5563',
-    yellow: '#EAB308',
-    'yellow-white': '#FDE047',
-    'yellow-black': '#A16207',
-    orange: '#EA580C',
-    'orange-white': '#FB923C',
-    'orange-black': '#C2410C',
-    green: '#16A34A',
-    'green-white': '#4ADE80',
-    'green-black': '#15803D',
-};
+import { useRankSchemas, getBeltColors } from '@/hooks/useRankSchemas';
 
 interface ProfileData {
     belt_rank: string;
@@ -65,6 +36,7 @@ interface FeedbackRecord {
 export default function MemberProgressPage() {
     const supabase = getSupabaseClient();
     const { selectedProfileId } = useDashboard();
+    const { getSchemaForMember, loading: schemasLoading } = useRankSchemas();
 
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
@@ -151,7 +123,7 @@ export default function MemberProgressPage() {
         }
     };
 
-    if (loading) {
+    if (loading || schemasLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 'var(--space-12)', gap: 'var(--space-3)' }}>
                 <Loader2 size={24} className="animate-spin" />
@@ -160,13 +132,19 @@ export default function MemberProgressPage() {
         );
     }
 
-    // Determine which belt order to use based on whether this is a child
+    // Get the dynamic rank schema for this member
     const isChild = profile?.is_child || false;
-    const BELT_ORDER = isChild ? KIDS_BELT_ORDER : ADULT_BELT_ORDER;
+    const schema = getSchemaForMember(isChild);
+    const rankLevels = schema.rank_levels;
 
     const currentBelt = profile?.belt_rank || 'white';
-    const currentBeltIndex = BELT_ORDER.indexOf(currentBelt);
     const currentStripes = profile?.stripes || 0;
+
+    // Find current position in the rank levels (case-insensitive match)
+    const currentLevelIndex = rankLevels.findIndex(l =>
+        l.name.toLowerCase() === currentBelt.toLowerCase() ||
+        l.name.toLowerCase().replace(/\//g, '-') === currentBelt.toLowerCase()
+    );
 
     return (
         <div>
@@ -196,14 +174,17 @@ export default function MemberProgressPage() {
                         stripes={currentStripes}
                         size="lg"
                         isChild={isChild}
+                        rankLevels={rankLevels}
                     />
                 </div>
                 <h2 style={{ textTransform: 'capitalize', marginBottom: 'var(--space-1)' }}>
-                    {currentBelt.replace('-', '/')} Belt
+                    {currentLevelIndex >= 0 ? rankLevels[currentLevelIndex].name : currentBelt.replace('-', '/')} Belt
                 </h2>
-                <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
-                    {currentStripes} stripe{currentStripes !== 1 ? 's' : ''}
-                </p>
+                {schema.has_stripes && (
+                    <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+                        {currentStripes} stripe{currentStripes !== 1 ? 's' : ''}
+                    </p>
+                )}
             </div>
 
             {/* Belt Journey */}
@@ -241,20 +222,21 @@ export default function MemberProgressPage() {
                     zIndex: 0,
                 }}>
                     <div style={{
-                        width: `${(currentBeltIndex / Math.max(BELT_ORDER.length - 1, 1)) * 100}%`,
+                        width: `${(Math.max(0, currentLevelIndex) / Math.max(rankLevels.length - 1, 1)) * 100}%`,
                         height: '100%',
                         background: 'var(--color-gold-gradient)',
                         borderRadius: 'var(--radius-full)',
                     }} />
                 </div>
 
-                {BELT_ORDER.map((belt, index) => {
-                    const isAchieved = index <= currentBeltIndex;
-                    const isCurrent = belt === currentBelt;
+                {rankLevels.map((level, index) => {
+                    const isAchieved = index <= currentLevelIndex;
+                    const isCurrent = index === currentLevelIndex;
+                    const isWhiteBelt = level.color_hex === '#F5F5F5' || level.color_hex === '#FFFFFF';
 
                     return (
                         <div
-                            key={belt}
+                            key={level.id}
                             style={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -262,15 +244,15 @@ export default function MemberProgressPage() {
                                 gap: 'var(--space-2)',
                                 position: 'relative',
                                 zIndex: 1,
-                                minWidth: isChild ? '40px' : 'auto',
+                                minWidth: rankLevels.length > 8 ? '40px' : 'auto',
                             }}
                         >
                             <div style={{
                                 width: isCurrent ? '48px' : '36px',
                                 height: isCurrent ? '48px' : '36px',
                                 borderRadius: 'var(--radius-full)',
-                                background: isAchieved ? BELT_COLORS[belt] : 'var(--bg-primary)',
-                                border: belt === 'white' && isAchieved ? '2px solid var(--border-medium)' : isAchieved ? 'none' : '2px dashed var(--border-light)',
+                                background: isAchieved ? level.color_hex : 'var(--bg-primary)',
+                                border: isWhiteBelt && isAchieved ? '2px solid var(--border-medium)' : isAchieved ? 'none' : '2px dashed var(--border-light)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -280,8 +262,8 @@ export default function MemberProgressPage() {
                                 {isAchieved && (
                                     <Star
                                         size={isCurrent ? 20 : 16}
-                                        color={belt === 'white' ? 'var(--color-gold)' : 'white'}
-                                        fill={belt === 'white' ? 'var(--color-gold)' : 'white'}
+                                        color={isWhiteBelt ? 'var(--color-gold)' : 'white'}
+                                        fill={isWhiteBelt ? 'var(--color-gold)' : 'white'}
                                     />
                                 )}
                             </div>
@@ -292,7 +274,7 @@ export default function MemberProgressPage() {
                                 color: isCurrent ? 'var(--color-gold)' : isAchieved ? 'var(--text-primary)' : 'var(--text-tertiary)',
                                 whiteSpace: 'nowrap',
                             }}>
-                                {belt.replace('-', '/')}
+                                {level.name}
                             </span>
                         </div>
                     );
@@ -323,68 +305,75 @@ export default function MemberProgressPage() {
             ) : (
                 <div className="card">
                     <div className="card-body" style={{ padding: 0 }}>
-                        {promotions.map((record, index) => (
-                            <div
-                                key={record.id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-4)',
-                                    padding: 'var(--space-4)',
-                                    borderBottom: index < promotions.length - 1 ? '1px solid var(--border-light)' : 'none',
-                                    flexWrap: 'wrap',
-                                }}
-                            >
-                                {/* Belt display */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                                    <div style={{
-                                        width: '32px',
-                                        height: '12px',
-                                        borderRadius: 'var(--radius-sm)',
-                                        background: BELT_COLORS[record.previous_belt] || '#ccc',
-                                        border: record.previous_belt === 'white' ? '1px solid var(--border-medium)' : 'none',
-                                    }} />
-                                    <span style={{ color: 'var(--text-tertiary)' }}>→</span>
-                                    <div style={{
-                                        width: '48px',
-                                        height: '16px',
-                                        borderRadius: 'var(--radius-sm)',
-                                        background: BELT_COLORS[record.new_belt] || '#ccc',
-                                        border: record.new_belt === 'white' ? '1px solid var(--border-medium)' : 'none',
-                                    }} />
-                                </div>
+                        {promotions.map((record, index) => {
+                            const prevColors = getBeltColors(record.previous_belt, rankLevels);
+                            const newColors = getBeltColors(record.new_belt, rankLevels);
+                            const isPrevWhite = prevColors.main === '#F5F5F5' || prevColors.main === '#FFFFFF';
+                            const isNewWhite = newColors.main === '#F5F5F5' || newColors.main === '#FFFFFF';
 
-                                {/* Promotion details */}
-                                <div style={{ flex: 1, minWidth: '150px' }}>
-                                    <p style={{ fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>
-                                        {record.new_belt.replace('-', '/')} Belt
-                                        {record.new_stripes > 0 && ` • ${record.new_stripes} stripe${record.new_stripes !== 1 ? 's' : ''}`}
-                                    </p>
-                                    {record.comments && (
-                                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0, marginTop: '2px' }}>
-                                            &ldquo;{record.comments}&rdquo;
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Date and professor */}
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', fontWeight: '500' }}>
-                                        <Calendar size={12} />
-                                        {new Date(record.promotion_date).toLocaleDateString('en-GB', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                        })}
+                            return (
+                                <div
+                                    key={record.id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-4)',
+                                        padding: 'var(--space-4)',
+                                        borderBottom: index < promotions.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                        flexWrap: 'wrap',
+                                    }}
+                                >
+                                    {/* Belt display */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                        <div style={{
+                                            width: '32px',
+                                            height: '12px',
+                                            borderRadius: 'var(--radius-sm)',
+                                            background: prevColors.main,
+                                            border: isPrevWhite ? '1px solid var(--border-medium)' : 'none',
+                                        }} />
+                                        <span style={{ color: 'var(--text-tertiary)' }}>→</span>
+                                        <div style={{
+                                            width: '48px',
+                                            height: '16px',
+                                            borderRadius: 'var(--radius-sm)',
+                                            background: newColors.main,
+                                            border: isNewWhite ? '1px solid var(--border-medium)' : 'none',
+                                        }} />
                                     </div>
-                                    {record.promoted_by_profile && (
-                                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0 }}>
-                                            By {record.promoted_by_profile.first_name} {record.promoted_by_profile.last_name}
+
+                                    {/* Promotion details */}
+                                    <div style={{ flex: 1, minWidth: '150px' }}>
+                                        <p style={{ fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>
+                                            {record.new_belt.replace('-', '/')} Belt
+                                            {record.new_stripes > 0 && ` • ${record.new_stripes} stripe${record.new_stripes !== 1 ? 's' : ''}`}
                                         </p>
-                                    )}
+                                        {record.comments && (
+                                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0, marginTop: '2px' }}>
+                                                &ldquo;{record.comments}&rdquo;
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Date and professor */}
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--text-sm)', fontWeight: '500' }}>
+                                            <Calendar size={12} />
+                                            {new Date(record.promotion_date).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric',
+                                            })}
+                                        </div>
+                                        {record.promoted_by_profile && (
+                                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0 }}>
+                                                By {record.promoted_by_profile.first_name} {record.promoted_by_profile.last_name}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}

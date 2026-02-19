@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -64,8 +64,9 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Get tenant context
-        const tenantId = await getTenantId();
+        // Get tenant context via tenant_members
+        const membership = await resolveTenantForUser(targetUserId);
+        const tenantId = membership?.tenantId;
 
         // Create attendance record for the target profile
         const { error } = await supabase

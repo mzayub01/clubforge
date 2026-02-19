@@ -22,14 +22,15 @@ removing one of the lockfiles if it's not needed.
 ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. 
 Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 8.2s
+Γ£ô Compiled successfully in 3.2s
   Running TypeScript ...
   Collecting page data using 21 workers ...
-  Generating static pages using 21 workers (0/94) ...
-  Generating static pages using 21 workers (23/94) 
-  Generating static pages using 21 workers (46/94) 
-  Generating static pages using 21 workers (70/94) 
-Γ£ô Generating static pages using 21 workers (94/94) in 1025.4ms
+ΓÜá Using edge runtime on a page currently disables static generation for that page
+  Generating static pages using 21 workers (0/110) ...
+  Generating static pages using 21 workers (27/110) 
+  Generating static pages using 21 workers (54/110) 
+  Generating static pages using 21 workers (82/110) 
+Γ£ô Generating static pages using 21 workers (110/110) in 1367.1ms
   Finalizing page optimization ...
 
 Route (app)
@@ -44,6 +45,8 @@ Route (app)
 Γö£ ╞Æ /admin/email-templates
 Γö£ ╞Æ /admin/events
 Γö£ ╞Æ /admin/finance
+Γö£ ╞Æ /admin/grading-settings
+Γö£ ╞Æ /admin/help
 Γö£ ╞Æ /admin/instructors
 Γö£ ╞Æ /admin/invite
 Γö£ ╞Æ /admin/locations
@@ -67,6 +70,7 @@ Route (app)
 Γö£ ╞Æ /api/attendance/checkin
 Γö£ ╞Æ /api/auth/role
 Γö£ ╞Æ /api/check-slug
+Γö£ ╞Æ /api/demo-request
 Γö£ ╞Æ /api/email/announcement
 Γö£ ╞Æ /api/email/event-confirmation
 Γö£ ╞Æ /api/email/welcome
@@ -75,7 +79,13 @@ Route (app)
 Γö£ ╞Æ /api/multisite/checkout
 Γö£ ╞Æ /api/onboard
 Γö£ ╞Æ /api/parent/add-child
+Γö£ ╞Æ /api/platform/auth
+Γö£ ╞Æ /api/platform/broadcast
+Γö£ ╞Æ /api/platform/broadcasts/active
+Γö£ ╞Æ /api/platform/stats
+Γö£ ╞Æ /api/platform/tenants
 Γö£ ╞Æ /api/profile/belt
+Γö£ ╞Æ /api/rank-schemas
 Γö£ ╞Æ /api/stripe/cancel
 Γö£ ╞Æ /api/stripe/checkout
 Γö£ ╞Æ /api/stripe/checkout-connected
@@ -85,13 +95,13 @@ Route (app)
 Γö£ ╞Æ /api/stripe/event-checkout
 Γö£ ╞Æ /api/stripe/invoices
 Γö£ ╞Æ /api/stripe/refund
+Γö£ ╞Æ /api/stripe/upgrade
 Γö£ ╞Æ /api/stripe/webhook
 Γö£ ╞Æ /api/tenant/public
 Γö£ ╞Æ /api/tenant/register
 Γö£ Γùï /apple-icon.png
 Γö£ Γùï /checkout/cancel
 Γö£ Γùï /checkout/success
-Γö£ ╞Æ /classes
 Γö£ ╞Æ /dashboard
 Γö£ ╞Æ /dashboard/add-child
 Γö£ ╞Æ /dashboard/announcements
@@ -105,7 +115,7 @@ Route (app)
 Γö£ ╞Æ /dashboard/profile
 Γö£ ╞Æ /dashboard/progress
 Γö£ ╞Æ /dashboard/videos
-Γö£ ╞Æ /demo
+Γö£ Γùï /demo
 Γö£ ╞Æ /events
 Γö£ Γùï /faq
 Γö£ Γùï /forgot-password
@@ -117,11 +127,19 @@ Route (app)
 Γö£ ╞Æ /instructor/naseeha
 Γö£ ╞Æ /instructor/students
 Γö£ Γùï /login
+Γö£ ╞Æ /opengraph-image
+Γö£ ╞Æ /platform
+Γö£ ╞Æ /platform/analytics
+Γö£ ╞Æ /platform/broadcasts
+Γö£ ╞Æ /platform/promo-codes
+Γö£ ╞Æ /platform/tenants
 Γö£ ╞Æ /pricing
 Γö£ ╞Æ /privacy
 Γö£ ╞Æ /professor
 Γö£ Γùï /register
 Γö£ Γùï /reset-password
+Γö£ Γùï /robots.txt
+Γö£ Γùï /sitemap.xml
 Γö£ Γùï /tenant-home
 Γö£ ╞Æ /terms
 Γö£ Γùï /videos

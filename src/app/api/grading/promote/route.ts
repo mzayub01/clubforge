@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -11,26 +11,27 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Verify user is professor or admin
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
+        // Resolve tenant + role via tenant_members
+        const membership = await resolveTenantForUser(user.id);
 
-        if (profile?.role !== 'professor' && profile?.role !== 'admin') {
+        if (!membership || (membership.role !== 'professor' && membership.role !== 'admin')) {
             return NextResponse.json({ success: false, error: 'Not authorized to grade' }, { status: 403 });
         }
 
         const body = await request.json();
-        const { userId, classId, previousBelt, previousStripes, newBelt, newStripes, comments } = body;
+        const {
+            userId, classId,
+            previousBelt, previousStripes, newBelt, newStripes,
+            rankLevelId, previousRankLevelId,
+            comments,
+        } = body;
 
         if (!userId || !classId || !newBelt) {
             return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
         }
 
         // For professors (not admin), verify access to the class
-        if (profile?.role === 'professor') {
+        if (membership.role === 'professor') {
             const { data: access } = await supabase
                 .from('professor_class_access')
                 .select('id')
@@ -43,10 +44,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Get tenant context
-        const tenantId = await getTenantId();
-
-        // Create promotion record
+        // Create promotion record (write both legacy + new FK columns)
         const { error: promotionError } = await supabase
             .from('promotions')
             .insert({
@@ -57,9 +55,11 @@ export async function POST(request: NextRequest) {
                 previous_stripes: previousStripes,
                 new_belt: newBelt,
                 new_stripes: newStripes,
+                ...(previousRankLevelId && { previous_rank_level_id: previousRankLevelId }),
+                ...(rankLevelId && { new_rank_level_id: rankLevelId }),
                 comments,
                 promotion_date: new Date().toISOString().split('T')[0],
-                ...(tenantId && { tenant_id: tenantId }),
+                tenant_id: membership.tenantId,
             });
 
         if (promotionError) {
@@ -67,14 +67,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Failed to save promotion' }, { status: 500 });
         }
 
-        // Update member's belt rank and stripes
+        // Update member's belt rank, stripes, and rank_level_id
+        const updatePayload: Record<string, unknown> = {
+            belt_rank: newBelt,
+            stripes: newStripes,
+            updated_at: new Date().toISOString(),
+        };
+        if (rankLevelId) {
+            updatePayload.rank_level_id = rankLevelId;
+        }
+
         const { error: updateError } = await supabase
             .from('profiles')
-            .update({
-                belt_rank: newBelt,
-                stripes: newStripes,
-                updated_at: new Date().toISOString(),
-            })
+            .update(updatePayload)
             .eq('user_id', userId);
 
         if (updateError) {
@@ -88,3 +93,4 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
     }
 }
+

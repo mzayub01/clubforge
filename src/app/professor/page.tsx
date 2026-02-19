@@ -8,6 +8,7 @@ import BJJBelt from '@/components/BJJBelt';
 import GradingModal from '@/components/grading/GradingModal';
 import FeedbackModal from '@/components/grading/FeedbackModal';
 import Avatar from '@/components/Avatar';
+import { useRankSchemas, getBeltColors } from '@/hooks/useRankSchemas';
 
 interface ClassOption {
     id: string;
@@ -33,9 +34,6 @@ interface Location {
     name: string;
 }
 
-const ADULT_BELTS = ['white', 'blue', 'purple', 'brown', 'black'];
-const KIDS_BELTS = ['white', 'grey', 'grey-white', 'yellow', 'yellow-white', 'orange', 'orange-white', 'green', 'green-white'];
-
 export default function ProfessorGradingPage() {
     const [classes, setClasses] = useState<ClassOption[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
@@ -51,6 +49,7 @@ export default function ProfessorGradingPage() {
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     const supabase = getSupabaseClient();
+    const { schemas, getSchemaForMember, loading: schemasLoading } = useRankSchemas();
 
     useEffect(() => {
         fetchAccessibleClasses();
@@ -247,7 +246,7 @@ export default function ProfessorGradingPage() {
         });
     };
 
-    if (loading) {
+    if (loading || schemasLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
                 <div className="loading-spinner" />
@@ -360,88 +359,96 @@ export default function ProfessorGradingPage() {
                         </h3>
                     </div>
                     <div className="card-body" style={{ padding: 0 }}>
-                        {filteredMembers.map((member) => (
-                            <div
-                                key={member.user_id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: 'var(--space-4)',
-                                    borderBottom: '1px solid var(--border-light)',
-                                    gap: 'var(--space-4)',
-                                    flexWrap: 'wrap',
-                                }}
-                            >
-                                {/* Avatar */}
-                                <Avatar
-                                    src={member.profile_image_url}
-                                    firstName={member.first_name}
-                                    lastName={member.last_name}
-                                    size="md"
-                                />
+                        {filteredMembers.map((member) => {
+                            const memberSchema = getSchemaForMember(member.is_kids_program);
+                            const beltColors = getBeltColors(member.belt_rank, memberSchema.rank_levels);
 
-                                {/* Member Info */}
-                                <div style={{ flex: 1, minWidth: '180px' }}>
-                                    <div style={{ fontWeight: '600', marginBottom: '2px' }}>
-                                        {member.first_name} {member.last_name}
-                                        {member.is_child && (
-                                            <span className="badge badge-gold" style={{ marginLeft: 'var(--space-2)', fontSize: '10px' }}>
-                                                {member.is_kids_program ? 'Kids Program' : 'Child'}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
-                                        <Calendar size={12} />
-                                        Last graded: {formatDate(member.last_promotion_date)}
-                                    </div>
-                                </div>
-
-                                {/* Current Belt */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                                    <BJJBelt
-                                        belt={member.belt_rank as 'white' | 'blue' | 'purple' | 'brown' | 'black'}
-                                        stripes={member.stripes}
-                                        size="sm"
-                                        isChild={member.is_kids_program}
+                            return (
+                                <div
+                                    key={member.user_id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: 'var(--space-4)',
+                                        borderBottom: '1px solid var(--border-light)',
+                                        gap: 'var(--space-4)',
+                                        flexWrap: 'wrap',
+                                    }}
+                                >
+                                    {/* Avatar */}
+                                    <Avatar
+                                        src={member.profile_image_url}
+                                        firstName={member.first_name}
+                                        lastName={member.last_name}
+                                        size="md"
                                     />
-                                    <div style={{ textAlign: 'center', minWidth: '60px' }}>
-                                        <div style={{ textTransform: 'capitalize', fontWeight: '500', fontSize: 'var(--text-sm)' }}>
-                                            {member.belt_rank}
+
+                                    {/* Member Info */}
+                                    <div style={{ flex: 1, minWidth: '180px' }}>
+                                        <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                                            {member.first_name} {member.last_name}
+                                            {member.is_child && (
+                                                <span className="badge badge-gold" style={{ marginLeft: 'var(--space-2)', fontSize: '10px' }}>
+                                                    {member.is_kids_program ? 'Kids Program' : 'Child'}
+                                                </span>
+                                            )}
                                         </div>
-                                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
-                                            {member.stripes} stripe{member.stripes !== 1 ? 's' : ''}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
+                                            <Calendar size={12} />
+                                            Last graded: {formatDate(member.last_promotion_date)}
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Action Buttons */}
-                                <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                                    {/* Feedback Button */}
-                                    <button
-                                        onClick={() => {
-                                            setFeedbackMember(member);
-                                            setShowFeedbackModal(true);
-                                        }}
-                                        className="btn btn-ghost btn-sm"
-                                        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
-                                        title="Send Feedback"
-                                    >
-                                        <MessageSquare size={16} />
-                                    </button>
+                                    {/* Current Belt */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                                        <BJJBelt
+                                            belt={member.belt_rank as 'white' | 'blue' | 'purple' | 'brown' | 'black'}
+                                            stripes={member.stripes}
+                                            size="sm"
+                                            isChild={member.is_kids_program}
+                                            rankLevels={memberSchema.rank_levels}
+                                        />
+                                        <div style={{ textAlign: 'center', minWidth: '60px' }}>
+                                            <div style={{ textTransform: 'capitalize', fontWeight: '500', fontSize: 'var(--text-sm)' }}>
+                                                {member.belt_rank}
+                                            </div>
+                                            {memberSchema.has_stripes && (
+                                                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
+                                                    {member.stripes} stripe{member.stripes !== 1 ? 's' : ''}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
 
-                                    {/* Grade Button */}
-                                    <button
-                                        onClick={() => handleGradeClick(member)}
-                                        className="btn btn-primary btn-sm"
-                                        style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
-                                    >
-                                        <Star size={16} />
-                                        Grade
-                                        <ChevronRight size={14} />
-                                    </button>
+                                    {/* Action Buttons */}
+                                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                                        {/* Feedback Button */}
+                                        <button
+                                            onClick={() => {
+                                                setFeedbackMember(member);
+                                                setShowFeedbackModal(true);
+                                            }}
+                                            className="btn btn-ghost btn-sm"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
+                                            title="Send Feedback"
+                                        >
+                                            <MessageSquare size={16} />
+                                        </button>
+
+                                        {/* Grade Button */}
+                                        <button
+                                            onClick={() => handleGradeClick(member)}
+                                            className="btn btn-primary btn-sm"
+                                            style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}
+                                        >
+                                            <Star size={16} />
+                                            Grade
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -476,3 +483,4 @@ export default function ProfessorGradingPage() {
         </div>
     );
 }
+

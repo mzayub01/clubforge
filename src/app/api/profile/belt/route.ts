@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { belt, stripes, userId } = await request.json();
+        const { belt, stripes, userId, rankLevelId } = await request.json();
 
         // Validate belt — accept any non-empty string (dynamic schemas may have any belt name)
         if (!belt || typeof belt !== 'string') {
@@ -25,24 +26,28 @@ export async function POST(request: NextRequest) {
         // Determine which user to update
         let targetUserId = user.id;
 
-        // If userId is provided, check if current user is admin
+        // If userId is provided, check if current user is admin via tenant_members
         if (userId && userId !== user.id) {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('user_id', user.id)
-                .single();
+            const membership = await resolveTenantForUser(user.id);
 
-            if (profile?.role !== 'admin') {
+            if (!membership || membership.role !== 'admin') {
                 return NextResponse.json({ error: 'Only admins can update other users' }, { status: 403 });
             }
             targetUserId = userId;
         }
 
-        // Update the belt
+        // Update the belt (write both legacy columns + rank_level_id)
+        const updatePayload: Record<string, unknown> = {
+            belt_rank: belt,
+            stripes,
+        };
+        if (rankLevelId) {
+            updatePayload.rank_level_id = rankLevelId;
+        }
+
         const { error } = await supabase
             .from('profiles')
-            .update({ belt_rank: belt, stripes })
+            .update(updatePayload)
             .eq('user_id', targetUserId);
 
         if (error) {
@@ -59,3 +64,4 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Server error' }, { status: 500 });
     }
 }
+

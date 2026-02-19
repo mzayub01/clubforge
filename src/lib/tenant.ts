@@ -5,6 +5,7 @@
 
 import { cache } from 'react';
 import { headers } from 'next/headers';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // -----------------------------------------------
 // Types
@@ -126,4 +127,56 @@ export function extractSlugFromHost(host: string): string | null {
   }
 
   return null;
+}
+
+// -----------------------------------------------
+// Shared tenant + role resolution for API routes
+// -----------------------------------------------
+
+
+
+/**
+ * Resolve tenant ID and role for a given user.
+ * 1. Tries getTenantId() from middleware headers
+ * 2. Falls back to tenant_members lookup via admin client
+ * 
+ * Returns { tenantId, role } or null if user has no tenant membership.
+ */
+export async function resolveTenantForUser(userId: string): Promise<{
+  tenantId: string;
+  role: 'member' | 'instructor' | 'professor' | 'admin';
+} | null> {
+  // Try header-based resolution first (fast path)
+  const headerTenantId = await getTenantId();
+
+  if (headerTenantId) {
+    // We have the tenant from headers; look up the user's role in that tenant
+    const admin = createAdminClient();
+    const { data: membership } = await admin
+      .from('tenant_members')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('tenant_id', headerTenantId)
+      .eq('is_active', true)
+      .single();
+
+    return membership
+      ? { tenantId: headerTenantId, role: membership.role }
+      : null;
+  }
+
+  // Fallback: look up tenant_members directly (works for admin-domain routes)
+  const admin = createAdminClient();
+  const { data: membership } = await admin
+    .from('tenant_members')
+    .select('tenant_id, role')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .single();
+
+  return membership
+    ? { tenantId: membership.tenant_id, role: membership.role }
+    : null;
 }

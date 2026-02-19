@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { resolveTenantForUser } from '@/lib/tenant';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -39,8 +38,9 @@ export async function POST(request: NextRequest) {
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-        // Get tenant context for metadata
-        const tenantId = await getTenantId();
+        // Get tenant context from user's membership (if logged in)
+        const membership = userId ? await resolveTenantForUser(userId) : null;
+        const tenantId = membership?.tenantId;
 
         // Create or get Stripe customer
         let customer;

@@ -1,15 +1,11 @@
 
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-import { getTenantId } from '@/lib/tenant';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-);
+const supabaseAdmin = createAdminClient();
 
 export async function GET(req: NextRequest) {
     try {
@@ -27,8 +23,12 @@ export async function GET(req: NextRequest) {
 
         const results: Array<{ original_user: string; new_child_id?: string; status?: string; error?: string }> = [];
 
-        // Get tenant context
-        const tenantId = await getTenantId();
+        // Get tenant context from the first candidate's membership
+        let tenantId: string | null = null;
+        if (candidates && candidates.length > 0) {
+            const membership = await resolveTenantForUser(candidates[0].user_id);
+            tenantId = membership?.tenantId ?? null;
+        }
 
         for (const candidate of candidates || []) {
             // Check if anyone points to this candidate as guardian (and is NOT the candidate themselves)

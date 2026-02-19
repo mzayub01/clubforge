@@ -1,15 +1,79 @@
-// ===============================================
-// ClubForge - Tenant Provisioning API
-// POST /api/onboard
-// Creates a new club: auth user → profile → tenant → location
-// ===============================================
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripeClient } from '@/lib/stripe';
 import { calculateTrialEndDate } from '@/lib/trial';
 import { getStripePriceId, TRIAL_DURATION_DAYS } from '@/lib/stripe-plans';
 import { rateLimit } from '@/lib/rate-limit';
+import { getRankPreset } from '@/lib/rank-presets';
+
+// -----------------------------------------------
+// clubType → rank preset IDs mapping
+// -----------------------------------------------
+const CLUB_TYPE_PRESET_MAP: Record<string, string[]> = {
+    bjj: ['bjj_adult', 'bjj_kids'],
+    mma: ['bjj_adult', 'bjj_kids'],
+    karate: ['karate'],
+    taekwondo: ['taekwondo'],
+    judo: ['judo'],
+};
+
+/**
+ * Auto-create rank schemas + levels for a new tenant during onboarding.
+ * Silently skips if no presets are defined for the given clubType.
+ */
+async function seedRankSchemasForClubType(
+    supabase: ReturnType<typeof createAdminClient>,
+    tenantId: string,
+    clubType: string,
+) {
+    const presetIds = CLUB_TYPE_PRESET_MAP[clubType];
+    if (!presetIds || presetIds.length === 0) return;
+
+    for (let i = 0; i < presetIds.length; i++) {
+        const preset = getRankPreset(presetIds[i]);
+        if (!preset) continue;
+
+        // Create the schema row
+        const { data: schema, error: schemaError } = await supabase
+            .from('rank_schemas')
+            .insert({
+                tenant_id: tenantId,
+                name: preset.name,
+                has_stripes: preset.has_stripes,
+                max_stripes: preset.max_stripes,
+                is_default: i === 0,      // First schema is the default
+                sort_order: i,
+            })
+            .select('id')
+            .single();
+
+        if (schemaError || !schema) {
+            console.error(`[Onboard] Failed to create rank schema ${preset.name}:`, schemaError?.message);
+            continue;
+        }
+
+        // Create the rank_level rows
+        const levels = preset.levels.map(level => ({
+            schema_id: schema.id,
+            name: level.name,
+            color_hex: level.color_hex,
+            bar_color_hex: level.bar_color_hex,
+            sort_order: level.sort_order,
+        }));
+
+        const { error: levelsError } = await supabase
+            .from('rank_levels')
+            .insert(levels);
+
+        if (levelsError) {
+            console.error(`[Onboard] Failed to create rank levels for ${preset.name}:`, levelsError.message);
+        }
+    }
+
+    console.log(`[Onboard] Seeded ${presetIds.length} rank schema(s) for clubType=${clubType}`);
+}
+
+
 
 interface OnboardRequest {
     // Step 1: Owner details
@@ -208,6 +272,18 @@ export async function POST(request: NextRequest) {
             if (locationError) {
                 console.error('Location creation warning:', locationError.message);
                 // Non-fatal — owner can set up location later
+            }
+
+            // -----------------------------------------------
+            // 6b. Auto-create rank schemas based on club type
+            // -----------------------------------------------
+            if (body.clubType) {
+                try {
+                    await seedRankSchemasForClubType(supabase, tenant.id, body.clubType);
+                } catch (rankError) {
+                    console.error('[Onboard] Rank schema seeding warning:', rankError);
+                    // Non-fatal — owner can configure rank system later
+                }
             }
 
             // -----------------------------------------------

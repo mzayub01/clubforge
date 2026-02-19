@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase } from '@/lib/email-templates-db';
 import { rateLimit } from '@/lib/rate-limit';
@@ -14,21 +15,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
         }
 
-        // Verify the requester is an admin
-        const supabase = await createServerClient();
+        // Verify the requester is an admin via tenant_members
+        const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { data: adminProfile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-
-        if (adminProfile?.role !== 'admin') {
+        const membership = await resolveTenantForUser(user.id);
+        if (!membership || membership.role !== 'admin') {
             return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
         }
 
@@ -39,16 +35,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Use service role client to fetch all members
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-        }
+        // Use admin client to fetch all members
+        const supabaseAdmin = createAdminClient();
 
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            { auth: { autoRefreshToken: false, persistSession: false } }
-        );
 
         // Build query to get members
         // Start with active memberships

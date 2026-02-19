@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createClient as createServerClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
         // Get authenticated user
-        const supabase = await createServerClient();
+        const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
@@ -41,8 +41,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get tenant context
-        const tenantId = await getTenantId();
+        // Get tenant context from authenticated user
+        const membership = await resolveTenantForUser(user.id);
+        const tenantId = membership?.tenantId;
 
         // Validate and sanitize gender - only allow 'male' or 'female'
         const validGender = gender === 'male' || gender === 'female' ? gender : null;
@@ -57,20 +58,8 @@ export async function POST(request: NextRequest) {
         ];
         const validBeltRank = validBeltRanks.includes(beltRank) ? beltRank : 'white';
 
-        // Use service role client for creating users/profiles
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            console.error('Missing Supabase environment variables');
-            return NextResponse.json(
-                { error: 'Server configuration error', details: 'Missing Supabase credentials' },
-                { status: 500 }
-            );
-        }
-
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            { auth: { autoRefreshToken: false, persistSession: false } }
-        );
+        // Use admin client for creating users/profiles
+        const supabaseAdmin = createAdminClient();
 
         // Get or create the guardian profile
         // Strategy: 

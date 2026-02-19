@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
                 .select('id')
                 .eq('tenant_id', tenantId)
                 .eq('name', preset.name)
+                .eq('is_active', true)
                 .single();
 
             if (existing) {

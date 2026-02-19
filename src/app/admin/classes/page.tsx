@@ -15,6 +15,7 @@ export default function AdminClassesPage() {
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [membershipTypes, setMembershipTypes] = useState<{ id: string; name: string; location_id: string }[]>([]);
     const [schemaNames, setSchemaNames] = useState<string[]>([]);
+    const [profileMap, setProfileMap] = useState<Record<string, { first_name: string; last_name: string }>>({});
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editClass, setEditClass] = useState<Class | null>(null);
@@ -46,16 +47,15 @@ export default function AdminClassesPage() {
 
     const fetchData = async () => {
         try {
-            const [classesRes, locationsRes, instructorsRes, membershipTypesRes, rankSchemasRes] = await Promise.all([
+            const [classesRes, locationsRes, instructorsRes, membershipTypesRes, rankSchemasRes, profilesRes] = await Promise.all([
                 adminFetch<Class>('classes', {
-                    select: '*, location:locations(*), instructor:instructors(*, profile:profiles(*)), class_membership_types(membership_type_id)',
+                    select: '*, location:locations(*), instructor:instructors(*), class_membership_types(membership_type_id)',
                     order: [{ column: 'day_of_week' }],
                 }),
                 adminFetch<Location>('locations', {
                     filters: [{ column: 'is_active', value: true }],
                 }),
                 adminFetch<Instructor>('instructors', {
-                    select: '*, profile:profiles(*)',
                     filters: [{ column: 'is_active', value: true }],
                 }),
                 adminFetch<{ id: string; name: string; location_id: string }>('membership_types', {
@@ -66,15 +66,25 @@ export default function AdminClassesPage() {
                     select: 'id, name',
                     filters: [{ column: 'is_active', value: true }],
                 }),
+                adminFetch<{ user_id: string; first_name: string; last_name: string }>('profiles', {
+                    select: 'user_id, first_name, last_name',
+                }),
             ]);
 
             if (classesRes.error) console.error('Classes fetch error:', classesRes.error);
+
+            // Build profile lookup map by user_id
+            const pMap: Record<string, { first_name: string; last_name: string }> = {};
+            for (const p of (profilesRes.data || [])) {
+                pMap[p.user_id] = { first_name: p.first_name, last_name: p.last_name };
+            }
 
             setClasses(classesRes.data || []);
             setLocations(locationsRes.data || []);
             setInstructors(instructorsRes.data || []);
             setMembershipTypes(membershipTypesRes.data || []);
             setSchemaNames((rankSchemasRes.data || []).map((s: { name: string }) => s.name));
+            setProfileMap(pMap);
         } catch (err) {
             console.error('fetchData error:', err);
         } finally {
@@ -286,7 +296,11 @@ export default function AdminClassesPage() {
                                                     {cls.instructor && (
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
                                                             <User size={14} />
-                                                            {(cls.instructor as unknown as { profile: { first_name: string; last_name: string } })?.profile?.first_name} {(cls.instructor as unknown as { profile: { first_name: string; last_name: string } })?.profile?.last_name}
+                                                            {(() => {
+                                                                const inst = cls.instructor as Instructor;
+                                                                const p = profileMap[inst.user_id];
+                                                                return p ? `${p.first_name} ${p.last_name}` : 'Instructor';
+                                                            })()}
                                                         </div>
                                                     )}
                                                 </div>

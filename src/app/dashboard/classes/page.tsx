@@ -83,12 +83,14 @@ export default function MemberClassesPage() {
                 return;
             }
 
-            // Get user's active membership with type
+            // Get user's membership (active or pending)
             const { data: membership } = await supabase
                 .from('memberships')
-                .select('location_id, membership_type_id, start_date')
+                .select('location_id, membership_type_id, start_date, status')
                 .eq('user_id', userId)
-                .eq('status', 'active')
+                .in('status', ['active', 'pending'])
+                .order('status', { ascending: true }) // 'active' before 'pending'
+                .limit(1)
                 .single();
 
             if (!membership) {

@@ -7,6 +7,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 
+async function getAdminTenantId(adminSupabase: any, userId: string): Promise<string | null> {
+    // Try tenant_members first (preferred)
+    const { data: tenantMember } = await adminSupabase
+        .from('tenant_members')
+        .select('tenant_id, role')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .single();
+
+    if (tenantMember && ['admin', 'instructor', 'owner'].includes(tenantMember.role)) {
+        return tenantMember.tenant_id;
+    }
+
+    // Fallback: check profile's tenant_id (for admins who may not have tenant_members row)
+    const { data: profile } = await adminSupabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('user_id', userId)
+        .single();
+
+    return profile?.tenant_id || null;
+}
+
 export async function GET(request: NextRequest) {
     try {
         // Authenticate caller
@@ -18,21 +41,11 @@ export async function GET(request: NextRequest) {
         }
 
         const adminSupabase = await createAdminClient();
+        const tenantId = await getAdminTenantId(adminSupabase, user.id);
 
-        // Check if caller is an admin
-        const { data: callerTenantMember } = await adminSupabase
-            .from('tenant_members')
-            .select('tenant_id, role')
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .in('role', ['admin', 'owner'])
-            .single();
-
-        if (!callerTenantMember) {
-            return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+        if (!tenantId) {
+            return NextResponse.json({ error: 'No tenant found for this user' }, { status: 403 });
         }
-
-        const tenantId = callerTenantMember.tenant_id;
 
         // Collect diagnostic data for this tenant
         const [membershipsRes, tenantMembersRes, profilesRes, classesRes, locationsRes] = await Promise.all([
@@ -94,21 +107,11 @@ export async function POST(request: NextRequest) {
         }
 
         const adminSupabase = await createAdminClient();
+        const tenantId = await getAdminTenantId(adminSupabase, user.id);
 
-        // Check if caller is an admin
-        const { data: callerTenantMember } = await adminSupabase
-            .from('tenant_members')
-            .select('tenant_id, role')
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .in('role', ['admin', 'owner'])
-            .single();
-
-        if (!callerTenantMember) {
-            return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+        if (!tenantId) {
+            return NextResponse.json({ error: 'No tenant found for this user' }, { status: 403 });
         }
-
-        const tenantId = callerTenantMember.tenant_id;
         const body = await request.json();
         const { action, targetUserId, locationId, membershipTypeId } = body;
 

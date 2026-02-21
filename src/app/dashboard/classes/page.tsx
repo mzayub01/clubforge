@@ -83,15 +83,17 @@ export default function MemberClassesPage() {
                 return;
             }
 
-            // Get user's membership (active or pending)
-            const { data: membership } = await supabase
-                .from('memberships')
-                .select('location_id, membership_type_id, start_date, status')
-                .eq('user_id', userId)
-                .in('status', ['active', 'pending'])
-                .order('status', { ascending: true }) // 'active' before 'pending'
-                .limit(1)
-                .single();
+            // Fetch all class data from server-side API (bypasses RLS chain issues)
+            const response = await fetch(`/api/member/classes?profileId=${userId}`);
+            const apiData = await response.json();
+
+            if (apiData.error) {
+                setError(apiData.error);
+                setLoading(false);
+                return;
+            }
+
+            const membership = apiData.membership;
 
             if (!membership) {
                 setHasActiveMembership(false);
@@ -101,19 +103,10 @@ export default function MemberClassesPage() {
 
             setHasActiveMembership(true);
 
-            // Fetch classes for member's location, including tier associations
-            const { data: classesData } = await supabase
-                .from('classes')
-                .select('*, location:locations(name), instructor:instructors(*, profile:profiles(first_name, last_name)), class_membership_types(membership_type_id)')
-                .eq('is_active', true)
-                .eq('location_id', membership.location_id)
-                .order('day_of_week')
-                .order('start_time');
-
             // Filter by membership type using junction table
             // If class has no tier associations, it's available to all members
             // If class has tier associations, member's tier must be in the list
-            const accessibleClasses = (classesData || []).filter((c: any) => {
+            const accessibleClasses = (apiData.classes || []).filter((c: any) => {
                 const classTiers = c.class_membership_types || [];
                 // No tier restrictions = available to all members at this location
                 if (classTiers.length === 0) return true;
@@ -123,15 +116,9 @@ export default function MemberClassesPage() {
                 );
             });
 
-            // Fetch ALL past attendance for this user
-            const { data: allAttendance } = await supabase
-                .from('attendance')
-                .select('class_id, class_date')
-                .eq('user_id', userId);
-
-            // Create a set for quick lookup: "classId-date"
+            // Create a set for quick attendance lookup: "classId-date"
             const attendanceSet = new Set(
-                (allAttendance || []).map((a: { class_id: string; class_date: string }) => {
+                (apiData.attendance || []).map((a: { class_id: string; class_date: string }) => {
                     // Normalize date to YYYY-MM-DD format (handle potential timezone issues)
                     const normalizedDate = a.class_date.split('T')[0];
                     return `${a.class_id}-${normalizedDate}`;

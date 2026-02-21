@@ -452,14 +452,18 @@ function RegisterPageContent() {
 
             if (membershipHasCapacity) {
                 if (isFree || !tenant?.stripe_connect_enabled) {
-                    // Free membership OR club hasn't connected Stripe → create directly
+                    // Free membership OR club hasn't connected Stripe → create via server-side API
                     const status = isFree ? 'active' : 'pending';
-                    await supabase.from('memberships').insert({
-                        user_id: authData.user.id,
-                        location_id: formData.selectedLocationId,
-                        membership_type_id: formData.selectedMembershipTypeId,
-                        status,
-                        start_date: new Date().toISOString().split('T')[0],
+                    await fetch('/api/tenant/complete-registration', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: authData.user.id,
+                            tenantId: tenant?.id,
+                            locationId: formData.selectedLocationId,
+                            membershipTypeId: formData.selectedMembershipTypeId,
+                            status,
+                        }),
                     });
 
                     // Send welcome email

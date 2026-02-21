@@ -47,6 +47,29 @@ export async function POST(request: NextRequest) {
         // Create pending membership BEFORE redirecting to Stripe
         // This ensures the dashboard doesn't show "Complete Your Membership" if the webhook is slow
         if (userId && locationId) {
+            // Ensure user is a tenant member (required for RLS policies)
+            const { data: existingTenantMember } = await adminSupabase
+                .from('tenant_members')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('tenant_id', tenantId)
+                .single();
+
+            if (!existingTenantMember) {
+                await adminSupabase.from('tenant_members').insert({
+                    user_id: userId,
+                    tenant_id: tenantId,
+                    role: 'member',
+                    is_active: true,
+                });
+            }
+
+            // Also set tenant_id on the user's profile
+            await adminSupabase
+                .from('profiles')
+                .update({ tenant_id: tenantId })
+                .eq('user_id', userId);
+
             const { data: existingMembership } = await adminSupabase
                 .from('memberships')
                 .select('id')

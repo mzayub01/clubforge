@@ -53,6 +53,30 @@ export async function POST(request: NextRequest) {
         if (userId && locationId && tenantId) {
             const supabase = await createAdminClient();
 
+            // Ensure tenant_members row exists (safety net for legacy registrations)
+            const { data: existingTenantMember } = await supabase
+                .from('tenant_members')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('tenant_id', tenantId)
+                .single();
+
+            if (!existingTenantMember) {
+                await supabase.from('tenant_members').insert({
+                    user_id: userId,
+                    tenant_id: tenantId,
+                    role: 'member',
+                    is_active: true,
+                });
+                console.log('[Connect Webhook] Created tenant_members row for:', userId);
+            }
+
+            // Set tenant_id on profile
+            await supabase
+                .from('profiles')
+                .update({ tenant_id: tenantId })
+                .eq('user_id', userId);
+
             // Check if membership already exists (created as pending during checkout)
             const { data: existingMembership } = await supabase
                 .from('memberships')

@@ -59,12 +59,13 @@ export default function AdminPromoCodesPage() {
                 return;
             }
 
-            // Get the user's membership to find their tenant
+            // Get the user's tenant membership to find their tenant
             const { data: membership } = await supabase
-                .from('memberships')
+                .from('tenant_members')
                 .select('tenant_id')
                 .eq('user_id', user.id)
                 .eq('role', 'admin')
+                .eq('is_active', true)
                 .single();
 
             if (!membership) {

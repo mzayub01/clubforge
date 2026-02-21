@@ -56,8 +56,9 @@ export default function AdminInstructorsPage() {
     const fetchData = async () => {
         try {
             const [instructorsRes, membersRes] = await Promise.all([
+                // Don't join profiles — no direct FK from instructors to profiles
                 adminFetch<Instructor>('instructors', {
-                    select: '*, profile:profiles(first_name, last_name, email, belt_rank)',
+                    select: '*',
                     order: [{ column: 'created_at', ascending: false }],
                 }),
                 adminFetch<Member>('profiles', {
@@ -66,7 +67,19 @@ export default function AdminInstructorsPage() {
                 }),
             ]);
 
-            setInstructors(instructorsRes.data || []);
+            // Build profile map by user_id for manual attachment
+            const profilesByUserId: Record<string, any> = {};
+            (membersRes.data || []).forEach((p: any) => {
+                profilesByUserId[p.user_id] = p;
+            });
+
+            // Attach profiles to instructors
+            const instructorsWithProfiles = (instructorsRes.data || []).map((inst: any) => ({
+                ...inst,
+                profile: profilesByUserId[inst.user_id] || null,
+            }));
+
+            setInstructors(instructorsWithProfiles);
             setMembers(membersRes.data || []);
         } catch (err) {
             console.error('Error fetching data:', err);

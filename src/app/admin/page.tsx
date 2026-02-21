@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
             .select('membership_type:membership_types(price)')
             .eq('status', 'active'),
         admin.from('memberships')
-            .select('id, created_at, profile:profiles(first_name, last_name), membership_type:membership_types(name)')
+            .select('id, created_at, user_id, membership_type:membership_types(name)')
             .eq('status', 'active')
             .order('created_at', { ascending: false })
             .limit(5),
@@ -77,6 +77,21 @@ export default async function AdminDashboard() {
     const mrr = allActiveMemberships.reduce((sum: number, m: any) => {
         return sum + (m.membership_type?.price || 0);
     }, 0);
+
+    // Attach profile data to recent activity (can't join profiles in PostgREST — no direct FK)
+    const recentUserIds = (recentActivity || []).map((item: any) => item.user_id).filter(Boolean);
+    let recentProfileMap: Record<string, any> = {};
+    if (recentUserIds.length > 0) {
+        const { data: recentProfiles } = await admin
+            .from('profiles')
+            .select('user_id, first_name, last_name')
+            .in('user_id', recentUserIds);
+        (recentProfiles || []).forEach((p: any) => { recentProfileMap[p.user_id] = p; });
+    }
+    const recentActivityWithProfiles = (recentActivity || []).map((item: any) => ({
+        ...item,
+        profile: recentProfileMap[item.user_id] || null,
+    }));
 
     const stats = [
         {
@@ -326,7 +341,7 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Recent Activity */}
-            {recentActivity && recentActivity.length > 0 && (
+            {recentActivityWithProfiles && recentActivityWithProfiles.length > 0 && (
                 <div>
                     <h2 style={{
                         fontSize: 'var(--text-lg)',
@@ -340,7 +355,7 @@ export default async function AdminDashboard() {
                         Recent Members
                     </h2>
                     <div className="glass-card" style={{ overflow: 'hidden' }}>
-                        {recentActivity.map((item: any, i: number) => (
+                        {recentActivityWithProfiles.map((item: any, i: number) => (
                             <div
                                 key={item.id}
                                 style={{
@@ -348,7 +363,7 @@ export default async function AdminDashboard() {
                                     alignItems: 'center',
                                     gap: 'var(--space-3)',
                                     padding: 'var(--space-3) var(--space-4)',
-                                    borderBottom: i < recentActivity.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                    borderBottom: i < recentActivityWithProfiles.length - 1 ? '1px solid var(--border-light)' : 'none',
                                 }}
                             >
                                 <div style={{

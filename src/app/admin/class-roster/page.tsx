@@ -121,8 +121,9 @@ export default function ClassRosterPage() {
             membershipFilters.push({ column: 'membership_type_id', value: classInfo.membership_type_id });
         }
 
+        // Don't join profiles — no direct FK from memberships to profiles
         const { data: memberships, error: membershipError } = await adminFetch('memberships', {
-            select: 'user_id, membership_type_id, profile:profiles(user_id, first_name, last_name, email, belt_rank, is_child, profile_image_url)',
+            select: 'user_id, membership_type_id',
             filters: membershipFilters,
         });
 
@@ -131,6 +132,19 @@ export default function ClassRosterPage() {
             setError('Failed to load class roster');
             setRosterLoading(false);
             return;
+        }
+
+        // Fetch profiles for these members separately
+        const memberUserIds = (memberships || []).map((m: any) => m.user_id).filter(Boolean);
+        let profilesByUserId: Record<string, any> = {};
+        if (memberUserIds.length > 0) {
+            const { data: profiles } = await adminFetch('profiles', {
+                select: 'user_id, first_name, last_name, email, belt_rank, is_child, profile_image_url',
+                filters: [{ column: 'user_id', operator: 'in', value: memberUserIds }],
+            });
+            (profiles || []).forEach((p: any) => {
+                profilesByUserId[p.user_id] = p;
+            });
         }
 
         // Fetch attendance for this class and date
@@ -154,9 +168,9 @@ export default function ClassRosterPage() {
 
         // Build roster with check-in status
         const rosterData: MemberStatus[] = (memberships || [])
-            .filter((m: any) => m.profile)
+            .filter((m: any) => profilesByUserId[m.user_id])
             .map((m: any) => {
-                const profile = m.profile;
+                const profile = profilesByUserId[m.user_id];
                 const att = attendanceLookup.get(profile.user_id);
                 return {
                     user_id: profile.user_id,

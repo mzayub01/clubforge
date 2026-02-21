@@ -107,7 +107,7 @@ export default function InstructorAttendancePage() {
     const fetchAttendance = async () => {
         const { data } = await supabase
             .from('attendance')
-            .select('user_id, profile:profiles(first_name, last_name, belt_rank)')
+            .select('user_id')
             .eq('class_id', selectedClass)
             .eq('class_date', selectedDate);
 

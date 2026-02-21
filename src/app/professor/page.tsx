@@ -141,9 +141,10 @@ export default function ProfessorGradingPage() {
             const tierIds = classTiers?.map(t => t.membership_type_id) || [];
 
             // Build memberships query - filter by location AND membership type(s)
+            // Don't join profiles — no direct FK from memberships to profiles
             let query = supabase
                 .from('memberships')
-                .select('user_id, membership_type_id, profile:profiles(user_id, first_name, last_name, belt_rank, stripes, is_child, is_kids_program, profile_image_url)')
+                .select('user_id, membership_type_id')
                 .eq('location_id', classInfo.location_id)
                 .eq('status', 'active');
 
@@ -162,8 +163,20 @@ export default function ProfessorGradingPage() {
             });
 
             if (memberships && memberships.length > 0) {
-                // Get last promotion dates for these members
                 const userIds = memberships.map(m => m.user_id);
+
+                // Fetch profiles separately
+                const { data: profilesData } = await supabase
+                    .from('profiles')
+                    .select('user_id, first_name, last_name, belt_rank, stripes, is_child, is_kids_program, profile_image_url')
+                    .in('user_id', userIds);
+
+                const profilesByUserId: Record<string, any> = {};
+                (profilesData || []).forEach((p: any) => {
+                    profilesByUserId[p.user_id] = p;
+                });
+
+                // Get last promotion dates for these members
                 const { data: promotions } = await supabase
                     .from('promotions')
                     .select('user_id, promotion_date')
@@ -179,30 +192,21 @@ export default function ProfessorGradingPage() {
                 });
 
                 const formattedMembers: MemberForGrading[] = memberships
-                    .filter((m: { profile: unknown }) => m.profile)
-                    .map((m: {
-                        user_id: string;
-                        profile: {
-                            user_id: string;
-                            first_name: string;
-                            last_name: string;
-                            belt_rank: string;
-                            stripes: number;
-                            is_child: boolean;
-                            is_kids_program: boolean;
-                            profile_image_url?: string;
-                        }
-                    }) => ({
-                        user_id: m.profile.user_id,
-                        first_name: m.profile.first_name,
-                        last_name: m.profile.last_name,
-                        belt_rank: m.profile.belt_rank || 'white',
-                        stripes: m.profile.stripes || 0,
-                        is_child: m.profile.is_child,
-                        is_kids_program: m.profile.is_kids_program || m.profile.is_child || false,
-                        profile_image_url: m.profile.profile_image_url,
-                        last_promotion_date: lastPromotionMap.get(m.profile.user_id),
-                    }))
+                    .filter((m: any) => profilesByUserId[m.user_id])
+                    .map((m: any) => {
+                        const profile = profilesByUserId[m.user_id];
+                        return {
+                            user_id: profile.user_id,
+                            first_name: profile.first_name,
+                            last_name: profile.last_name,
+                            belt_rank: profile.belt_rank || 'white',
+                            stripes: profile.stripes || 0,
+                            is_child: profile.is_child,
+                            is_kids_program: profile.is_kids_program || profile.is_child || false,
+                            profile_image_url: profile.profile_image_url,
+                            last_promotion_date: lastPromotionMap.get(profile.user_id),
+                        };
+                    })
                     .sort((a: MemberForGrading, b: MemberForGrading) =>
                         `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
                     );

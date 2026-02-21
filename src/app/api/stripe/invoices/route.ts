@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
     if (!isStripeConfigured()) {
@@ -48,11 +48,35 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ invoices: [], message: 'No payment history found' });
         }
 
-        // Fetch invoices from Stripe
+        // Look up the user's tenant to get the connected Stripe account ID
+        // (with Connect, customers/invoices live on the connected account, not the platform)
+        const adminSupabase = await createAdminClient();
+        const { data: tenantMember } = await adminSupabase
+            .from('tenant_members')
+            .select('tenant_id')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .limit(1)
+            .single();
+
+        let stripeAccountId: string | undefined;
+        if (tenantMember?.tenant_id) {
+            const { data: tenant } = await adminSupabase
+                .from('tenants')
+                .select('stripe_account_id, stripe_connect_enabled')
+                .eq('id', tenantMember.tenant_id)
+                .single();
+
+            if (tenant?.stripe_account_id && tenant.stripe_connect_enabled) {
+                stripeAccountId = tenant.stripe_account_id;
+            }
+        }
+
+        // Fetch invoices — from connected account if applicable, else platform
         const invoices = await stripe.invoices.list({
             customer: customerId,
             limit: 50,
-        });
+        }, stripeAccountId ? { stripeAccount: stripeAccountId } : undefined);
 
         // Transform to simpler format
         const formattedInvoices = invoices.data.map((invoice) => ({
@@ -77,3 +101,4 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+

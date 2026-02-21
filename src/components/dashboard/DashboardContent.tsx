@@ -91,12 +91,14 @@ export default function DashboardContent() {
                 .eq('user_id', selectedProfileId);
             setAttendanceCount(count || 0);
 
-            // Fetch membership for selected user
+            // Fetch membership for selected user (active or pending)
             const { data: membershipData } = await supabase
                 .from('memberships')
                 .select('status, membership_type:membership_types(id, name, price), location:locations(id, name)')
                 .eq('user_id', selectedProfileId)
-                .eq('status', 'active')
+                .in('status', ['active', 'pending'])
+                .order('status', { ascending: true }) // 'active' comes before 'pending'
+                .limit(1)
                 .single();
             setMembership(membershipData as MembershipData | null);
 

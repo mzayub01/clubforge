@@ -487,6 +487,7 @@ function RegisterPageContent() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             membershipTypeName: selectedType?.name || 'Membership',
+                            membershipTypeId: formData.selectedMembershipTypeId,
                             price: selectedType?.price || 0,
                             userId: authData.user.id,
                             locationId: formData.selectedLocationId,
@@ -500,14 +501,7 @@ function RegisterPageContent() {
                     if (data.url) {
                         window.location.href = data.url;
                     } else {
-                        // Fallback: create pending membership
-                        await supabase.from('memberships').insert({
-                            user_id: authData.user.id,
-                            location_id: formData.selectedLocationId,
-                            membership_type_id: formData.selectedMembershipTypeId,
-                            status: 'pending',
-                            start_date: new Date().toISOString().split('T')[0],
-                        });
+                        // Fallback: checkout-connected already creates pending membership
                         router.push('/dashboard?registered=true&pending=true');
                         router.refresh();
                     }

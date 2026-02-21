@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
             locationName,
             userEmail,
             tenantId,
+            membershipTypeId,
         } = body;
 
         if (!tenantId || !price || !userId) {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
         const adminSupabase = await createAdminClient();
         const { data: tenant } = await adminSupabase
             .from('tenants')
-            .select('stripe_account_id, stripe_connect_enabled, name')
+            .select('stripe_account_id, stripe_connect_enabled, name, slug')
             .eq('id', tenantId)
             .single();
 
@@ -43,11 +44,37 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Club has not completed Stripe setup' }, { status: 400 });
         }
 
+        // Create pending membership BEFORE redirecting to Stripe
+        // This ensures the dashboard doesn't show "Complete Your Membership" if the webhook is slow
+        if (userId && locationId) {
+            const { data: existingMembership } = await adminSupabase
+                .from('memberships')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('location_id', locationId)
+                .eq('tenant_id', tenantId)
+                .single();
+
+            if (!existingMembership) {
+                await adminSupabase.from('memberships').insert({
+                    user_id: userId,
+                    location_id: locationId,
+                    membership_type_id: membershipTypeId || null,
+                    status: 'pending',
+                    start_date: new Date().toISOString().split('T')[0],
+                    tenant_id: tenantId,
+                });
+            }
+        }
+
         // Calculate platform fee (2.5%)
         const priceInPence = Math.round(price * 100);
-        const platformFee = Math.round(priceInPence * (PLATFORM_FEE_PERCENT / 100));
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        // Build success URL using the tenant's subdomain so the member returns to THEIR club dashboard
+        const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
+        const protocol = appDomain.includes('localhost') ? 'http' : 'https';
+        const tenantBaseUrl = `${protocol}://${tenant.slug}.${appDomain}`;
+        const fallbackBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
         // Create checkout session on the connected account
         const session = await stripe.checkout.sessions.create({
@@ -75,14 +102,16 @@ export async function POST(request: NextRequest) {
                     user_id: userId,
                     location_id: locationId,
                     tenant_id: tenantId,
+                    membership_type_id: membershipTypeId || '',
                 },
             },
-            success_url: `${baseUrl}/dashboard?registered=true&payment=success`,
-            cancel_url: `${baseUrl}/register?payment=cancelled`,
+            success_url: `${tenantBaseUrl}/dashboard?registered=true&payment=success`,
+            cancel_url: `${tenantBaseUrl}/register?payment=cancelled`,
             metadata: {
                 user_id: userId,
                 location_id: locationId,
                 tenant_id: tenantId,
+                membership_type_id: membershipTypeId || '',
                 membership_type_name: membershipTypeName,
             },
         }, {
@@ -96,3 +125,4 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: message }, { status: 500 });
     }
 }
+

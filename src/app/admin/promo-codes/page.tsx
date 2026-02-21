@@ -59,14 +59,17 @@ export default function AdminPromoCodesPage() {
                 return;
             }
 
-            // Get the user's tenant membership to find their tenant
-            const { data: membership } = await supabase
+            // Get the user's tenant — use same pattern as useTenantId hook
+            // (no role filter; the admin layout already ensures only admins reach this page)
+            const { data: membership, error: memberError } = await supabase
                 .from('tenant_members')
                 .select('tenant_id')
                 .eq('user_id', user.id)
-                .eq('role', 'admin')
                 .eq('is_active', true)
+                .limit(1)
                 .single();
+
+            console.log('[PromoCodesPage] tenant_members lookup:', { membership, memberError: memberError?.message });
 
             if (!membership) {
                 setError('No admin membership found');
@@ -75,11 +78,13 @@ export default function AdminPromoCodesPage() {
             }
 
             // Get tenant Stripe status
-            const { data: tenant } = await supabase
+            const { data: tenant, error: tenantError } = await supabase
                 .from('tenants')
                 .select('stripe_account_id, stripe_connect_enabled')
                 .eq('id', membership.tenant_id)
                 .single();
+
+            console.log('[PromoCodesPage] tenant Stripe status:', { tenant, tenantError: tenantError?.message });
 
             if (tenant?.stripe_account_id && tenant?.stripe_connect_enabled) {
                 setStripeAccountId(tenant.stripe_account_id);
@@ -87,10 +92,15 @@ export default function AdminPromoCodesPage() {
                 // Fetch coupons from connected account
                 await fetchCoupons(tenant.stripe_account_id);
             } else {
+                console.log('[PromoCodesPage] Stripe not enabled:', {
+                    stripe_account_id: tenant?.stripe_account_id,
+                    stripe_connect_enabled: tenant?.stripe_connect_enabled,
+                });
                 setStripeEnabled(false);
                 setLoading(false);
             }
         } catch (err: any) {
+            console.error('[PromoCodesPage] Error:', err);
             setError(err.message);
             setLoading(false);
         }

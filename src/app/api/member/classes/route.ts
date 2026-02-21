@@ -37,12 +37,13 @@ export async function GET(request: NextRequest) {
         }
 
         // Fetch classes for member's location
-        const { data: classesData } = await adminSupabase
+        // Don't join instructors->profiles (no direct FK to profiles table, breaks PostgREST)
+        const { data: classesData, error: classesError } = await adminSupabase
             .from('classes')
             .select(`
                 *,
                 location:locations(name),
-                instructor:instructors(*, profile:profiles(first_name, last_name)),
+                instructor:instructors(id, user_id),
                 class_membership_types(membership_type_id)
             `)
             .eq('is_active', true)
@@ -50,6 +51,36 @@ export async function GET(request: NextRequest) {
             .eq('tenant_id', membership.tenant_id)
             .order('day_of_week')
             .order('start_time');
+
+        if (classesError) {
+            console.error('[member-classes] Classes query error:', classesError);
+        }
+
+        // Fetch instructor profiles separately and attach
+        const instructorUserIds = (classesData || [])
+            .map((c: any) => c.instructor?.user_id)
+            .filter(Boolean);
+
+        let instructorProfiles: Record<string, any> = {};
+        if (instructorUserIds.length > 0) {
+            const { data: profiles } = await adminSupabase
+                .from('profiles')
+                .select('user_id, first_name, last_name')
+                .in('user_id', instructorUserIds);
+
+            (profiles || []).forEach((p: any) => {
+                instructorProfiles[p.user_id] = p;
+            });
+        }
+
+        // Attach instructor profile data to classes
+        const classesWithInstructors = (classesData || []).map((c: any) => ({
+            ...c,
+            instructor: c.instructor ? {
+                ...c.instructor,
+                profile: instructorProfiles[c.instructor.user_id] || null,
+            } : null,
+        }));
 
         // Fetch attendance records for this user
         const { data: attendance } = await adminSupabase
@@ -64,7 +95,7 @@ export async function GET(request: NextRequest) {
                 start_date: membership.start_date,
                 status: membership.status,
             },
-            classes: classesData || [],
+            classes: classesWithInstructors,
             attendance: attendance || [],
         });
     } catch (error) {

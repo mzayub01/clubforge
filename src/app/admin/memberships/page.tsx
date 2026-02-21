@@ -76,8 +76,10 @@ export default function AdminMembershipsPage() {
     const fetchData = async () => {
         try {
             const [membershipsRes, locationsRes, membersRes] = await Promise.all([
+                // Don't join profiles here — there's no direct FK from memberships.user_id to profiles,
+                // which causes PostgREST to fail. We'll attach profiles manually below.
                 adminFetch<Membership>('memberships', {
-                    select: '*, stripe_subscription_id, profile:profiles(id, first_name, last_name, email, is_child, parent_guardian_id, stripe_customer_id), location:locations(name), membership_type:membership_types(name, is_multisite)',
+                    select: '*, location:locations(name), membership_type:membership_types(name, is_multisite)',
                     order: [{ column: 'created_at', ascending: false }],
                 }),
                 adminFetch<Location>('locations', {
@@ -85,7 +87,7 @@ export default function AdminMembershipsPage() {
                     filters: [{ column: 'is_active', value: true }],
                 }),
                 adminFetch<Member>('profiles', {
-                    select: 'id, user_id, first_name, last_name, email',
+                    select: 'id, user_id, first_name, last_name, email, is_child, parent_guardian_id, stripe_customer_id',
                     order: [{ column: 'first_name' }],
                 }),
             ]);
@@ -93,21 +95,27 @@ export default function AdminMembershipsPage() {
             const membershipsData = membershipsRes.data || [];
             const profilesData = membersRes.data || [];
 
-            // Create a map of profile IDs to emails for guardian lookup
+            // Build a map of user_id -> profile for manual attachment
+            const profilesByUserId: Record<string, any> = {};
             const profileIdToEmail: Record<string, string> = {};
             profilesData.forEach((p: any) => {
+                profilesByUserId[p.user_id] = p;
                 profileIdToEmail[p.id] = p.email;
             });
 
-            // Add guardian email to memberships with child profiles
-            const membershipsWithGuardian = membershipsData.map((m: any) => ({
-                ...m,
-                guardian_email: m.profile?.is_child && m.profile?.parent_guardian_id
-                    ? profileIdToEmail[m.profile.parent_guardian_id]
-                    : undefined,
-            }));
+            // Manually attach profile data to each membership
+            const membershipsWithProfile = membershipsData.map((m: any) => {
+                const profile = profilesByUserId[m.user_id] || null;
+                return {
+                    ...m,
+                    profile,
+                    guardian_email: profile?.is_child && profile?.parent_guardian_id
+                        ? profileIdToEmail[profile.parent_guardian_id]
+                        : undefined,
+                };
+            });
 
-            setMemberships(membershipsWithGuardian);
+            setMemberships(membershipsWithProfile);
             setLocations(locationsRes.data || []);
             setMembers(profilesData);
         } catch (err) {

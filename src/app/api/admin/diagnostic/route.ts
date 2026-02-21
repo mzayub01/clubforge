@@ -47,34 +47,55 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'No tenant found for this user' }, { status: 403 });
         }
 
-        // Collect diagnostic data for this tenant
-        const [membershipsRes, tenantMembersRes, profilesRes, classesRes, locationsRes] = await Promise.all([
-            adminSupabase.from('memberships').select('*, profile:profiles(first_name, last_name, email)').eq('tenant_id', tenantId),
+        // Get all user IDs for this tenant (from profiles)
+        const { data: profilesData } = await adminSupabase
+            .from('profiles')
+            .select('user_id, first_name, last_name, email, tenant_id')
+            .eq('tenant_id', tenantId);
+
+        const userIds = (profilesData || []).map((p: any) => p.user_id);
+
+        // Query memberships TWO ways:
+        // 1. By tenant_id (what should work)
+        const { data: membershipsByTenant } = await adminSupabase
+            .from('memberships')
+            .select('id, user_id, location_id, membership_type_id, status, tenant_id, stripe_subscription_id, start_date')
+            .eq('tenant_id', tenantId);
+
+        // 2. By user_ids (finds orphaned memberships with wrong/null tenant_id)
+        const { data: membershipsByUser } = userIds.length > 0
+            ? await adminSupabase
+                .from('memberships')
+                .select('id, user_id, location_id, membership_type_id, status, tenant_id, stripe_subscription_id, start_date')
+                .in('user_id', userIds)
+            : { data: [] };
+
+        // Find memberships with wrong tenant_id
+        const orphanedMemberships = (membershipsByUser || []).filter(
+            (m: any) => m.tenant_id !== tenantId
+        );
+
+        // Other diagnostic data
+        const [tenantMembersRes, classesRes, locationsRes] = await Promise.all([
             adminSupabase.from('tenant_members').select('user_id, role, is_active').eq('tenant_id', tenantId),
-            adminSupabase.from('profiles').select('user_id, first_name, last_name, email, tenant_id').eq('tenant_id', tenantId),
             adminSupabase.from('classes').select('id, name, location_id, is_active, tenant_id').eq('tenant_id', tenantId),
             adminSupabase.from('locations').select('id, name, is_active, tenant_id').eq('tenant_id', tenantId),
         ]);
 
-        // Find orphaned profiles (profiles with this tenant_id but no tenant_members row)
-        const tenantMemberUserIds = new Set((tenantMembersRes.data || []).map((tm: any) => tm.user_id));
-        const membershipUserIds = new Set((membershipsRes.data || []).map((m: any) => m.user_id));
-        const orphanedProfiles = (profilesRes.data || []).filter((p: any) => !tenantMemberUserIds.has(p.user_id));
-        const profilesWithoutMembership = (profilesRes.data || []).filter((p: any) => !membershipUserIds.has(p.user_id));
-
         return NextResponse.json({
             tenantId,
             memberships: {
-                count: (membershipsRes.data || []).length,
-                data: membershipsRes.data,
+                byTenant: { count: (membershipsByTenant || []).length, data: membershipsByTenant },
+                byUser: { count: (membershipsByUser || []).length, data: membershipsByUser },
+                orphaned: orphanedMemberships,
             },
             tenantMembers: {
                 count: (tenantMembersRes.data || []).length,
                 data: tenantMembersRes.data,
             },
             profiles: {
-                count: (profilesRes.data || []).length,
-                data: profilesRes.data,
+                count: (profilesData || []).length,
+                data: profilesData,
             },
             classes: {
                 count: (classesRes.data || []).length,
@@ -83,10 +104,6 @@ export async function GET(request: NextRequest) {
             locations: {
                 count: (locationsRes.data || []).length,
                 data: locationsRes.data,
-            },
-            issues: {
-                orphanedProfiles: orphanedProfiles.length > 0 ? orphanedProfiles : 'None',
-                profilesWithoutMembership: profilesWithoutMembership.length > 0 ? profilesWithoutMembership : 'None',
             },
         });
     } catch (error) {
@@ -173,6 +190,50 @@ export async function POST(request: NextRequest) {
                 }
             } else {
                 repairs.push(`Membership already exists for user ${targetUserId}`);
+            }
+        }
+
+        if (action === 'fix_all' || action === 'fix_membership_tenant') {
+            // Fix memberships with wrong/null tenant_id for users belonging to this tenant
+            const { data: profiles } = await adminSupabase
+                .from('profiles')
+                .select('user_id')
+                .eq('tenant_id', tenantId);
+
+            const userIds = (profiles || []).map((p: any) => p.user_id);
+
+            if (userIds.length > 0) {
+                // Find memberships for these users with wrong tenant_id
+                const { data: wrongMemberships } = await adminSupabase
+                    .from('memberships')
+                    .select('id, user_id, tenant_id')
+                    .in('user_id', userIds)
+                    .neq('tenant_id', tenantId);
+
+                // Also find memberships with null tenant_id
+                const { data: nullMemberships } = await adminSupabase
+                    .from('memberships')
+                    .select('id, user_id, tenant_id')
+                    .in('user_id', userIds)
+                    .is('tenant_id', null);
+
+                const allBroken = [...(wrongMemberships || []), ...(nullMemberships || [])];
+
+                for (const m of allBroken) {
+                    const { error } = await adminSupabase
+                        .from('memberships')
+                        .update({ tenant_id: tenantId })
+                        .eq('id', m.id);
+                    if (!error) {
+                        repairs.push(`Fixed tenant_id for membership ${m.id} (user: ${m.user_id}, was: ${m.tenant_id || 'NULL'})`);
+                    } else {
+                        repairs.push(`Error fixing membership ${m.id}: ${error.message}`);
+                    }
+                }
+
+                if (allBroken.length === 0) {
+                    repairs.push('No memberships with wrong tenant_id found');
+                }
             }
         }
 

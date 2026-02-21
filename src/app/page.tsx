@@ -182,7 +182,7 @@ export default async function HomePage() {
                     color: '#A88B3D', fontSize: '14px', fontWeight: '600',
                     letterSpacing: '0.05em', textTransform: 'uppercase',
                   }}>
-                    14-day free trial · No credit card required
+                    14-day free trial · Cancel anytime
                   </span>
                   <div style={{
                     width: '36px', height: '2px',
@@ -1185,7 +1185,7 @@ export default async function HomePage() {
 
             <div className="cf-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
               {[
-                { step: '01', title: 'Create Your Account', description: '60 seconds. No credit card. Full Pro features for 14 days so you can test everything.' },
+                { step: '01', title: 'Create Your Account', description: '60 seconds. Full Pro features for 14 days so you can test everything.' },
                 { step: '02', title: 'Configure Your Club', description: 'Upload your logo, add your locations, create membership tiers, set up your class schedule and belt structure.' },
                 { step: '03', title: 'Go Live', description: 'Share your branded club URL. Members self-register, book classes, and pay online. You manage it all from one dashboard.' },
               ].map((item) => (
@@ -1473,7 +1473,7 @@ export default async function HomePage() {
               marginTop: '24px', marginBottom: 0,
               color: 'rgba(15, 23, 42, 0.45)', fontSize: '0.85rem',
             }}>
-              14-day free trial · No credit card required · Cancel anytime · Switch plans whenever
+              14-day free trial · Cancel anytime · Switch plans whenever
             </p>
           </div>
         </section>

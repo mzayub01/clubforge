@@ -474,7 +474,7 @@ export default async function PricingPage() {
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ marginBottom: 'var(--space-4)' }}>Ready to get started?</h2>
                         <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                            Start your 14-day free trial. Full Pro features, no credit card required.
+                            Start your 14-day free trial. Full Pro features included.
                         </p>
                         <Link href="/register" className="btn btn-primary btn-lg">
                             Start Free Trial

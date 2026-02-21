@@ -22,6 +22,7 @@ import { getSupabaseClient } from '@/lib/supabase/client';
 import BJJBelt from '@/components/BJJBelt';
 import Avatar from '@/components/Avatar';
 import TodayClassCard from '@/components/dashboard/TodayClassCard';
+import { useRankSchemas } from '@/hooks/useRankSchemas';
 
 interface ProfileData {
     first_name: string;
@@ -39,8 +40,9 @@ interface MembershipData {
 }
 
 export default function DashboardContent() {
-    const { selectedProfileId, parentProfile, children, hasParentMembership } = useDashboard();
+    const { selectedProfileId, parentProfile, children, hasParentMembership, beltProgressEnabled } = useDashboard();
     const supabase = getSupabaseClient();
+    const { getSchemaForMember } = useRankSchemas();
 
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -118,7 +120,7 @@ export default function DashboardContent() {
         { href: '/dashboard/classes', label: 'View Classes', icon: Calendar, color: 'var(--color-gold)' },
         { href: '/dashboard/attendance', label: 'Check In', icon: CheckCircle, color: 'var(--color-green)' },
         { href: '/dashboard/videos', label: 'Watch Videos', icon: PlayCircle, color: 'var(--color-gold)' },
-        { href: '/dashboard/progress', label: 'Belt Progress', icon: Award, color: 'var(--color-green)' },
+        ...(beltProgressEnabled ? [{ href: '/dashboard/progress', label: 'Rank Progress', icon: Award, color: 'var(--color-green)' }] : []),
     ];
 
     if (loading) {
@@ -186,7 +188,7 @@ export default function DashboardContent() {
                 <div className="stat-card glass-card">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
-                            <p className="stat-label">Current Belt</p>
+                            <p className="stat-label">Current Rank</p>
                             <p className="stat-value" style={{ textTransform: 'capitalize' }}>
                                 {profile?.belt_rank || 'White'}
                                 {(profile?.stripes || 0) > 0 && (
@@ -197,10 +199,11 @@ export default function DashboardContent() {
                             </p>
                         </div>
                         <BJJBelt
-                            belt={(profile?.belt_rank as 'white' | 'blue' | 'purple' | 'brown' | 'black') || 'white'}
+                            belt={profile?.belt_rank || 'white'}
                             stripes={profile?.stripes || 0}
                             size="sm"
                             isChild={!isViewingParent}
+                            rankLevels={getSchemaForMember(!isViewingParent).rank_levels}
                         />
                     </div>
                 </div>

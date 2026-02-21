@@ -259,7 +259,7 @@ export default function ProfessorGradingPage() {
             <div className="dashboard-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
                 <div>
                     <h1 className="dashboard-title">Grading Dashboard</h1>
-                    <p className="dashboard-subtitle">Promote members to new belt ranks</p>
+                    <p className="dashboard-subtitle">Promote members to new ranks</p>
                 </div>
                 <Link href="/dashboard" className="btn btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                     <Home size={18} />
@@ -402,7 +402,7 @@ export default function ProfessorGradingPage() {
                                     {/* Current Belt */}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
                                         <BJJBelt
-                                            belt={member.belt_rank as 'white' | 'blue' | 'purple' | 'brown' | 'black'}
+                                            belt={member.belt_rank}
                                             stripes={member.stripes}
                                             size="sm"
                                             isChild={member.is_kids_program}

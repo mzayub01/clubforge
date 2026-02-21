@@ -17,7 +17,7 @@ const faqItems: FAQItem[] = [
     {
         category: 'Getting Started',
         question: 'How do I get started with ClubForge?',
-        answer: 'Sign up for a 14-day free trial — no credit card required. You\'ll get full access to Pro features so you can explore everything. Set up your club profile, add your locations, create classes, and invite your team. The whole setup takes under 10 minutes.',
+        answer: 'Sign up for a 14-day free trial. You\'ll get full access to Pro features so you can explore everything. Set up your club profile, add your locations, create classes, and invite your team. The whole setup takes under 10 minutes.',
     },
     {
         category: 'Getting Started',

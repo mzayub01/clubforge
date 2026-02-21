@@ -5,6 +5,7 @@ import { User, Mail, Phone, MapPin, Calendar, AlertCircle, Save, Shield, Heart, 
 import { getSupabaseClient } from '@/lib/supabase/client';
 import AvatarUpload from '@/components/AvatarUpload';
 import { useDashboard } from '@/components/dashboard/DashboardProvider';
+import { useRankSchemas } from '@/hooks/useRankSchemas';
 
 interface Profile {
     id: string;
@@ -27,13 +28,7 @@ interface Profile {
     created_at: string;
 }
 
-const BELT_COLORS: Record<string, string> = {
-    white: '#FFFFFF',
-    blue: '#1E40AF',
-    purple: '#6B21A8',
-    brown: '#78350F',
-    black: '#1A1A1A',
-};
+
 
 export default function ProfilePage() {
     const [profile, setProfile] = useState<Profile | null>(null);
@@ -46,6 +41,7 @@ export default function ProfilePage() {
 
     const supabase = getSupabaseClient();
     const { selectedProfileId } = useDashboard();
+    const { getSchemaForMember } = useRankSchemas();
 
     useEffect(() => {
         fetchProfile();
@@ -301,7 +297,7 @@ export default function ProfilePage() {
                     <div className="card-header">
                         <h3 style={{ margin: 0, fontSize: 'var(--text-lg)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <Award size={20} color="var(--color-gold)" />
-                            BJJ Progress
+                            Rank Progress
                         </h3>
                     </div>
                     <div className="card-body">
@@ -310,26 +306,23 @@ export default function ProfilePage() {
                                 <label className="form-label">Belt Rank</label>
                                 {isEditing ? (
                                     <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                        {(profile.is_child
-                                            ? ['white', 'grey-white', 'grey', 'grey-black', 'yellow-white', 'yellow', 'yellow-black', 'orange-white', 'orange', 'orange-black', 'green-white', 'green', 'green-black']
-                                            : ['white', 'blue', 'purple', 'brown', 'black']
-                                        ).map((belt) => (
+                                        {getSchemaForMember(profile.is_child).rank_levels.map((level) => (
                                             <button
-                                                key={belt}
+                                                key={level.id}
                                                 type="button"
-                                                onClick={() => setFormData(prev => ({ ...prev, belt_rank: belt }))}
+                                                onClick={() => setFormData(prev => ({ ...prev, belt_rank: level.name.toLowerCase().replace(/\//g, '-') }))}
                                                 style={{
                                                     padding: 'var(--space-2) var(--space-3)',
                                                     borderRadius: 'var(--radius-md)',
-                                                    border: formData.belt_rank === belt ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
-                                                    background: formData.belt_rank === belt ? 'rgba(197, 164, 86, 0.15)' : 'var(--bg-primary)',
+                                                    border: formData.belt_rank === level.name.toLowerCase().replace(/\//g, '-') ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
+                                                    background: formData.belt_rank === level.name.toLowerCase().replace(/\//g, '-') ? 'rgba(197, 164, 86, 0.15)' : 'var(--bg-primary)',
                                                     cursor: 'pointer',
                                                     textTransform: 'capitalize',
-                                                    fontWeight: formData.belt_rank === belt ? '600' : '400',
+                                                    fontWeight: formData.belt_rank === level.name.toLowerCase().replace(/\//g, '-') ? '600' : '400',
                                                     fontSize: 'var(--text-sm)',
                                                 }}
                                             >
-                                                {belt.replace('-', ' ')}
+                                                {level.name}
                                             </button>
                                         ))}
                                     </div>
@@ -341,13 +334,10 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Stripes {profile.is_child ? '(0-12)' : '(0-4)'}</label>
+                                <label className="form-label">Stripes (0-{getSchemaForMember(profile.is_child).max_stripes})</label>
                                 {isEditing ? (
                                     <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                        {(profile.is_child
-                                            ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-                                            : [0, 1, 2, 3, 4]
-                                        ).map((s) => (
+                                        {Array.from({ length: getSchemaForMember(profile.is_child).max_stripes + 1 }, (_, i) => i).map((s) => (
                                             <button
                                                 key={s}
                                                 type="button"

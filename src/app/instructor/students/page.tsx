@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { Users, Award, CheckCircle, TrendingUp, Calendar } from 'lucide-react';
+import { getBeltColors } from '@/hooks/useRankSchemas';
 
 export const metadata = {
     title: 'My Students | Instructor - ClubForge',
@@ -12,13 +13,7 @@ interface StudentAttendanceRecord {
     profiles?: { first_name: string; last_name: string; email: string; belt_rank: string };
 }
 
-const BELT_COLORS: Record<string, string> = {
-    white: '#FFFFFF',
-    blue: '#1E40AF',
-    purple: '#6B21A8',
-    brown: '#78350F',
-    black: '#1A1A1A',
-};
+
 
 export default async function InstructorStudentsPage() {
     const supabase = await createClient();
@@ -179,7 +174,7 @@ export default async function InstructorStudentsPage() {
                                                     width: '24px',
                                                     height: '8px',
                                                     borderRadius: 'var(--radius-sm)',
-                                                    background: BELT_COLORS[student.belt_rank],
+                                                    background: getBeltColors(student.belt_rank).main,
                                                     border: student.belt_rank === 'white' ? '1px solid var(--border-medium)' : 'none',
                                                 }} />
                                                 <span style={{ textTransform: 'capitalize', fontSize: 'var(--text-sm)' }}>

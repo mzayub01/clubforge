@@ -82,6 +82,7 @@ export default async function DashboardLayout({
                 }}
                 initialChildren={childProfiles || []}
                 initialHasParentMembership={hasParentMembership}
+                beltProgressEnabled={beltProgressEnabled}
             >
                 <div className="dashboard-layout">
                     <DashboardSidebar
@@ -97,7 +98,7 @@ export default async function DashboardLayout({
                     <main className="dashboard-main">
                         {children}
                     </main>
-                    <BottomNav role="member" />
+                    <BottomNav role="member" beltProgressEnabled={beltProgressEnabled} />
                 </div>
             </DashboardProvider>
         </ThemeProvider>

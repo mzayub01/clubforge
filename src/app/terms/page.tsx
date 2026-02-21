@@ -50,7 +50,7 @@ export default async function TermsPage() {
                             <p><strong>Free Trial:</strong></p>
                             <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                 <li>New accounts receive a 14-day free trial with Pro features.</li>
-                                <li>No credit card is required for the trial.</li>
+                                <li>Your first 14 days are free with full Pro features.</li>
                                 <li>At the end of the trial, you must select a paid plan to continue using the Platform.</li>
                             </ul>
                             <p><strong>Paid Plans:</strong></p>

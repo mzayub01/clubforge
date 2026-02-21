@@ -6,9 +6,10 @@ import { Home, Calendar, Award, User, CheckCircle } from 'lucide-react';
 
 interface BottomNavProps {
     role?: 'member' | 'instructor' | 'professor' | 'admin';
+    beltProgressEnabled?: boolean;
 }
 
-export default function BottomNav({ role = 'member' }: BottomNavProps) {
+export default function BottomNav({ role = 'member', beltProgressEnabled = true }: BottomNavProps) {
     const pathname = usePathname();
 
     // Member nav with central check-in button
@@ -16,7 +17,7 @@ export default function BottomNav({ role = 'member' }: BottomNavProps) {
         { href: '/dashboard', label: 'Home', icon: Home, isCheckIn: false },
         { href: '/dashboard/classes', label: 'Classes', icon: Calendar, isCheckIn: false },
         { href: '/dashboard/classes', label: 'Check In', icon: CheckCircle, isCheckIn: true },
-        { href: '/dashboard/progress', label: 'Progress', icon: Award, isCheckIn: false },
+        ...(beltProgressEnabled ? [{ href: '/dashboard/progress', label: 'Progress', icon: Award, isCheckIn: false }] : []),
         { href: '/dashboard/profile', label: 'Profile', icon: User, isCheckIn: false },
     ];
 

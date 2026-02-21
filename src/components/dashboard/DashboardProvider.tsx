@@ -25,6 +25,7 @@ interface DashboardContextType {
     selectedProfileId: string;
     setSelectedProfileId: (id: string) => void;
     hasParentMembership: boolean;
+    beltProgressEnabled: boolean;
     isLoading: boolean;
     refreshChildren: () => Promise<void>;
 }
@@ -41,6 +42,7 @@ export function useDashboard() {
             selectedProfileId: '',
             setSelectedProfileId: () => { },
             hasParentMembership: true, // Default to true for non-member contexts
+            beltProgressEnabled: true, // Default to true for non-member contexts
             isLoading: false,
             refreshChildren: async () => { },
         };
@@ -53,6 +55,7 @@ interface DashboardProviderProps {
     initialParentProfile: ParentProfile;
     initialChildren: ChildProfile[];
     initialHasParentMembership: boolean;
+    beltProgressEnabled?: boolean;
 }
 
 export function DashboardProvider({
@@ -60,6 +63,7 @@ export function DashboardProvider({
     initialParentProfile,
     initialChildren,
     initialHasParentMembership,
+    beltProgressEnabled = true,
 }: DashboardProviderProps) {
     const supabase = getSupabaseClient();
     const [parentProfile] = useState(initialParentProfile);
@@ -118,6 +122,7 @@ export function DashboardProvider({
                 selectedProfileId,
                 setSelectedProfileId,
                 hasParentMembership,
+                beltProgressEnabled,
                 isLoading,
                 refreshChildren,
             }}

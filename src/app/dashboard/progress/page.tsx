@@ -149,8 +149,8 @@ export default function MemberProgressPage() {
     return (
         <div>
             <div className="dashboard-header">
-                <h1 className="dashboard-title">Belt Progress</h1>
-                <p className="dashboard-subtitle">Track your martial arts journey</p>
+                <h1 className="dashboard-title">Rank Progress</h1>
+                <p className="dashboard-subtitle">Track your journey</p>
             </div>
 
             {/* Current Belt Display */}
@@ -170,7 +170,7 @@ export default function MemberProgressPage() {
                 </h3>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
                     <BJJBelt
-                        belt={(currentBelt as 'white' | 'blue' | 'purple' | 'brown' | 'black')}
+                        belt={currentBelt}
                         stripes={currentStripes}
                         size="lg"
                         isChild={isChild}

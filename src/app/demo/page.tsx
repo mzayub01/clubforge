@@ -325,7 +325,7 @@ export default function DemoPage() {
                         </div>
                         <h2 style={{ marginBottom: 'var(--space-4)' }}>Prefer to explore on your own?</h2>
                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-6)' }}>
-                            Skip the call. Start a 14-day free trial with full Pro features and see everything for yourself. No credit card required.
+                            Skip the call. Start a 14-day free trial with full Pro features and see everything for yourself.
                         </p>
                         <Link href="/get-started" className="btn btn-primary btn-lg">
                             Start Free Trial

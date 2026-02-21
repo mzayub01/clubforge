@@ -7,6 +7,7 @@ import { adminFetch, adminFetchOne, adminInsert, adminUpdate, adminUpdateById } 
 import type { Location, MembershipType } from '@/lib/types';
 import MemberAttendanceModal from '@/components/admin/MemberAttendanceModal';
 import Avatar from '@/components/Avatar';
+import { useRankSchemas } from '@/hooks/useRankSchemas';
 
 interface Member {
     id: string;
@@ -38,7 +39,6 @@ interface Member {
     memberships?: any[];
 }
 
-const BELT_RANKS = ['white', 'blue', 'purple', 'brown', 'black'];
 const ROLES = ['member', 'instructor', 'professor', 'admin'];
 
 export default function AdminMembersPage() {
@@ -47,6 +47,7 @@ export default function AdminMembersPage() {
     const [locations, setLocations] = useState<Location[]>([]);
     const [membershipTypes, setMembershipTypes] = useState<MembershipType[]>([]);
     const [loading, setLoading] = useState(true);
+    const { schemas, getSchemaForMember } = useRankSchemas();
 
     // Filters
     const [search, setSearch] = useState('');
@@ -541,9 +542,14 @@ export default function AdminMembersPage() {
                             value={beltFilter}
                             onChange={(e) => setBeltFilter(e.target.value)}
                         >
-                            <option value="all">All Belts</option>
-                            {BELT_RANKS.map(belt => (
-                                <option key={belt} value={belt}>{belt.charAt(0).toUpperCase() + belt.slice(1)}</option>
+                            <option value="all">All Ranks</option>
+                            {(schemas.length > 0
+                                ? schemas.flatMap(s => s.rank_levels).filter((l, i, arr) => arr.findIndex(x => x.name === l.name) === i)
+                                : [{ name: 'White' }, { name: 'Blue' }, { name: 'Purple' }, { name: 'Brown' }, { name: 'Black' }]
+                            ).map(level => (
+                                <option key={level.name} value={level.name.toLowerCase().replace(/\//g, '-')}>
+                                    {level.name}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -835,18 +841,21 @@ export default function AdminMembersPage() {
                                         value={formData.belt_rank}
                                         onChange={(e) => setFormData({ ...formData, belt_rank: e.target.value })}
                                     >
-                                        {BELT_RANKS.map(belt => (
-                                            <option key={belt} value={belt}>
-                                                {belt.charAt(0).toUpperCase() + belt.slice(1)} Belt
-                                            </option>
-                                        ))}
+                                        {(() => {
+                                            const schema = getSchemaForMember(editingMember.is_child);
+                                            return schema.rank_levels.map(level => (
+                                                <option key={level.id} value={level.name.toLowerCase().replace(/\//g, '-')}>
+                                                    {level.name}
+                                                </option>
+                                            ));
+                                        })()}
                                     </select>
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label">Stripes (0-4)</label>
-                                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                                        {[0, 1, 2, 3, 4].map((s) => (
+                                    <label className="form-label">Stripes (0-{getSchemaForMember(editingMember.is_child).max_stripes})</label>
+                                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                        {Array.from({ length: getSchemaForMember(editingMember.is_child).max_stripes + 1 }, (_, i) => i).map((s) => (
                                             <button
                                                 key={s}
                                                 type="button"

@@ -51,7 +51,7 @@ export async function GET() {
             membersResult,
             rankSchemasResult,
         ] = await Promise.all([
-            admin.from('tenants').select('name, logo_url, brand_color, stripe_account_id, stripe_connect_enabled, onboarding_completed_at, onboarding_dismissed_at, settings').eq('id', tenantId).single(),
+            admin.from('tenants').select('name, logo_url, primary_color, stripe_account_id, stripe_connect_enabled, onboarding_completed_at, onboarding_dismissed_at, settings').eq('id', tenantId).single(),
             admin.from('locations').select('id, address').eq('tenant_id', tenantId).eq('is_active', true),
             admin.from('membership_types').select('id').eq('tenant_id', tenantId).eq('is_active', true),
             admin.from('classes').select('id').eq('tenant_id', tenantId).eq('is_active', true),
@@ -109,7 +109,7 @@ export async function GET() {
                 id: 'branding',
                 title: 'Brand Your Club',
                 description: 'Upload a logo and pick your brand colour',
-                completed: !!(tenant?.logo_url || tenant?.brand_color),
+                completed: !!(tenant?.logo_url || (tenant?.primary_color && tenant.primary_color !== '#c5a456')),
                 href: '/admin/settings',
                 icon: 'palette',
             },

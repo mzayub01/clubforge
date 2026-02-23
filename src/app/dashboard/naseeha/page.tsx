@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { BookOpen, Calendar, Heart } from 'lucide-react';
+import { BookOpen, Calendar } from 'lucide-react';
 
 export const metadata = {
     title: 'Weekly Wisdom | DojoHub',
@@ -52,10 +52,10 @@ export default async function DashboardNaseehaPage() {
 
             {naseehaList.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
-                    <Heart size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
-                    <h3 style={{ marginBottom: 'var(--space-2)' }}>Coming Soon</h3>
+                    <BookOpen size={48} color="var(--text-tertiary)" style={{ margin: '0 auto var(--space-4)' }} />
+                    <h3 style={{ marginBottom: 'var(--space-2)' }}>No Wisdom Posts Yet</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: 0 }}>
-                        Weekly wisdom will be shared here soon. Check back after your next class!
+                        Your coaches haven&apos;t posted any weekly wisdom yet. Check back soon!
                     </p>
                 </div>
             ) : (

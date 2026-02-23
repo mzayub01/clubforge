@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Clock, CheckCircle, XCircle, AlertCircle, UserPlus, Trash2, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
+import UpgradePrompt from '@/components/admin/UpgradePrompt';
 
 interface WaitlistEntry {
     id: string;
@@ -38,6 +40,7 @@ interface Location {
 }
 
 export default function AdminWaitlistPage() {
+    const { can } = useFeatureGate();
     const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string>('all');
@@ -168,6 +171,8 @@ export default function AdminWaitlistPage() {
             </div>
         );
     }
+
+    if (!can('waitlist')) return <UpgradePrompt feature="Waitlist Management" description="Manage members waiting for spots at full locations." />;
 
     return (
         <div>

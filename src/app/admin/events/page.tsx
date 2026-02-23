@@ -5,6 +5,7 @@ import { Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, CheckCircle, AlertC
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import type { Event, Location } from '@/lib/types';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
+import UpgradePrompt from '@/components/admin/UpgradePrompt';
 
 const EVENT_TYPES = [
     { value: 'class', label: 'Class' },
@@ -52,7 +53,7 @@ export default function AdminEventsPage() {
     }, []);
 
     // --- Event limit enforcement ---
-    const { checkLimit, limits } = useFeatureGate();
+    const { can, checkLimit, limits } = useFeatureGate();
     const eventLimitInfo = checkLimit('maxEvents', events.length);
     const atEventLimit = !eventLimitInfo.allowed && eventLimitInfo.limit !== -1;
 
@@ -238,6 +239,8 @@ export default function AdminEventsPage() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     };
+
+    if (!can('events')) return <UpgradePrompt feature="Event Management" description="Create, manage, and take payments for events, retreats, and competitions." />;
 
     return (
         <div>

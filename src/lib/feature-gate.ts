@@ -31,6 +31,7 @@ const PRO_FEATURES = [
     'videos',
     'naseeha',
     'grading_feedback',
+    'promo_codes',
     'data_export_csv',
     'data_export_json',
 ] as const;
@@ -69,7 +70,7 @@ const TIER_LIMITS: Record<SubscriptionTier, UsageLimits> = {
     starter: {
         maxMembers: 150,
         maxLocations: 1,
-        maxEvents: 5,
+        maxEvents: 0,
         maxVideos: 0,
     },
     pro: {

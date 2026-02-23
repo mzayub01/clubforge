@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react';
 import { Plus, BookOpen, Calendar, Edit, Trash2, CheckCircle, AlertCircle, Search } from 'lucide-react';
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import type { Naseeha } from '@/lib/types';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
+import UpgradePrompt from '@/components/admin/UpgradePrompt';
 
 export default function AdminNaseehaPage() {
+    const { can } = useFeatureGate();
     const [naseehaList, setNaseehaList] = useState<Naseeha[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -113,6 +116,8 @@ export default function AdminNaseehaPage() {
             fetchNaseeha();
         }
     };
+
+    if (!can('naseeha')) return <UpgradePrompt feature="Weekly Wisdom" description="Publish weekly advice and inspiration for your coaches and members." />;
 
     return (
         <div>

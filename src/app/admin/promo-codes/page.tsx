@@ -9,6 +9,8 @@
 import { useState, useEffect } from 'react';
 import { Tag, Plus, Trash2, Percent, PoundSterling, CheckCircle, AlertCircle, CreditCard, ExternalLink, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
+import UpgradePrompt from '@/components/admin/UpgradePrompt';
 
 interface Coupon {
     id: string;
@@ -25,6 +27,7 @@ interface Coupon {
 }
 
 export default function AdminPromoCodesPage() {
+    const { can } = useFeatureGate();
     const [coupons, setCoupons] = useState<Coupon[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -188,6 +191,8 @@ export default function AdminPromoCodesPage() {
         if (coupon.duration === 'repeating') return `${coupon.duration_in_months} months`;
         return coupon.duration;
     };
+
+    if (!can('promo_codes')) return <UpgradePrompt feature="Promo Codes" description="Create discount codes for memberships and events." />;
 
     if (loading) {
         return (

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Mail, Edit, Eye, Save, X, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { adminFetch, adminUpdateById } from '@/lib/admin-api';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
+import UpgradePrompt from '@/components/admin/UpgradePrompt';
 
 interface EmailTemplate {
     id: string;
@@ -31,6 +33,7 @@ const TEMPLATE_ICONS: Record<string, string> = {
 };
 
 export default function AdminEmailTemplatesPage() {
+    const { can } = useFeatureGate();
     const [templates, setTemplates] = useState<EmailTemplate[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
@@ -244,6 +247,8 @@ export default function AdminEmailTemplatesPage() {
             </div>
         );
     }
+
+    if (!can('email_templates')) return <UpgradePrompt feature="Custom Email Templates" description="Design branded email templates for your member communications." />;
 
     return (
         <div>

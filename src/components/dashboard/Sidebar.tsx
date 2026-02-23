@@ -32,13 +32,16 @@ import {
     Receipt,
     Tag,
     Mail,
-    MessageSquare
+    MessageSquare,
+    BarChart3,
+    FileDown
 } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Avatar from '@/components/Avatar';
 import ChildSwitcher from '@/components/dashboard/ChildSwitcher';
 import { useDashboard } from '@/components/dashboard/DashboardProvider';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 
 interface SidebarProps {
     role: 'member' | 'instructor' | 'professor' | 'admin';
@@ -51,11 +54,18 @@ interface SidebarProps {
     beltProgressEnabled?: boolean;
 }
 
+interface SidebarLink {
+    href: string;
+    label: string;
+    icon: React.ComponentType<{ size?: number }>;
+    feature?: string;
+}
+
 interface SidebarSection {
     id: string;
     title: string;
     icon?: React.ComponentType<{ size?: number; color?: string }>;
-    links: { href: string; label: string; icon: React.ComponentType<{ size?: number }> }[];
+    links: SidebarLink[];
     defaultOpen?: boolean;
 }
 
@@ -282,6 +292,7 @@ function CollapsibleSection({
 }
 
 export default function DashboardSidebar({ role, userRole, userName = 'Member', profileImageUrl, hasChildren = false, tenantLogoUrl, tenantName, beltProgressEnabled }: SidebarProps) {
+    const { can } = useFeatureGate();
     const pathname = usePathname();
     const router = useRouter();
     const supabase = getSupabaseClient();
@@ -366,7 +377,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
             links: [
                 { href: '/admin/members', label: 'All Members', icon: Users },
                 { href: '/admin/memberships', label: 'Memberships', icon: CreditCard },
-                { href: '/admin/waitlist', label: 'Waitlist', icon: Users },
+                { href: '/admin/waitlist', label: 'Waitlist', icon: Users, feature: 'waitlist' },
                 { href: '/admin/instructors', label: 'Instructors', icon: Award },
                 { href: '/admin/professor-access', label: 'Professor Access', icon: GraduationCap },
                 { href: '/admin/invite', label: 'Invite Members', icon: UserPlus },
@@ -393,11 +404,11 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
             icon: Bell,
             links: [
                 { href: '/admin/announcements', label: 'Announcements', icon: Bell },
-                { href: '/admin/events', label: 'Events', icon: PartyPopper },
-                { href: '/admin/videos', label: 'Videos', icon: Video },
-                { href: '/admin/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
-                { href: '/admin/email-templates', label: 'Email Templates', icon: Mail },
-                { href: '/admin/promo-codes', label: 'Promo Codes', icon: Tag },
+                { href: '/admin/events', label: 'Events', icon: PartyPopper, feature: 'events' },
+                { href: '/admin/videos', label: 'Videos', icon: Video, feature: 'videos' },
+                { href: '/admin/naseeha', label: 'Weekly Wisdom', icon: BookOpen, feature: 'naseeha' },
+                { href: '/admin/email-templates', label: 'Email Templates', icon: Mail, feature: 'email_templates' },
+                { href: '/admin/promo-codes', label: 'Promo Codes', icon: Tag, feature: 'promo_codes' },
             ],
             defaultOpen: false,
         },
@@ -408,10 +419,18 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
             links: [
                 { href: '/admin/finance', label: 'Finance', icon: PoundSterling },
                 { href: '/admin/attendance', label: 'Attendance', icon: CheckCircle },
+                { href: '/admin/reports', label: 'Advanced Reports', icon: BarChart3, feature: 'advanced_reports' },
+                { href: '/admin/data-export', label: 'Data Export', icon: FileDown, feature: 'data_export_csv' },
             ],
             defaultOpen: false,
         },
     ];
+
+    // Filter nav links by feature gate
+    const gatedAdminSections = adminSections.map(section => ({
+        ...section,
+        links: section.links.filter(link => !link.feature || can(link.feature)),
+    })).filter(section => section.links.length > 0);
 
     // Quick access links based on user's actual role (only shown in member dashboard)
     const quickAccessLinks = role === 'member' ? [
@@ -526,7 +545,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
                     {useGroupedLayout ? (
                         /* ===== ADMIN: Grouped collapsible sections ===== */
                         <>
-                            {adminSections.map((section) => (
+                            {gatedAdminSections.map((section) => (
                                 <CollapsibleSection
                                     key={section.id}
                                     section={section}

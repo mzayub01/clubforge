@@ -304,15 +304,25 @@ export async function POST(request: NextRequest) {
             // Send payment failed notification email
             if (customerEmail) {
                 try {
-                    // Get membership details
+                    // Get membership details (don't join profiles — no FK)
                     const { data: membershipData } = await supabase
                         .from('memberships')
-                        .select('membership_type:membership_types(name), profiles(first_name)')
+                        .select('user_id, membership_type:membership_types(name)')
                         .eq('stripe_subscription_id', String(subscriptionId))
                         .single();
 
                     const membershipTypeName = (membershipData?.membership_type as unknown as { name: string } | null)?.name || 'Membership';
-                    const firstName = (membershipData?.profiles as unknown as { first_name: string } | null)?.first_name || 'Member';
+
+                    // Fetch profile separately
+                    let firstName = 'Member';
+                    if (membershipData?.user_id) {
+                        const { data: profileData } = await supabase
+                            .from('profiles')
+                            .select('first_name')
+                            .eq('user_id', membershipData.user_id)
+                            .single();
+                        firstName = profileData?.first_name || 'Member';
+                    }
 
                     const html = renderPaymentFailedEmail({
                         firstName,

@@ -91,17 +91,19 @@ From **Developers → API Keys**:
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Publishable key (pk_live_...) |
 | `STRIPE_WEBHOOK_SECRET` | From webhook endpoint (whsec_...) |
 
-### Set Up Webhook
+### Set Up Webhooks
 
+**Platform Webhook** (for platform billing & events):
 1. Go to **Developers → Webhooks**
 2. Add endpoint: `https://your-domain.com/api/stripe/webhook`
-3. Select events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_succeeded`
-   - `invoice.payment_failed`
-   - `account.updated` (for Connect)
+3. Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`
+4. Copy the signing secret → `STRIPE_WEBHOOK_SECRET`
+
+**Connect Webhook** (for member payments to clubs):
+1. In the same Webhooks page, switch to **"Connected accounts"** tab
+2. Add endpoint: `https://your-domain.com/api/stripe/webhook-connect`
+3. Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+4. Copy the signing secret → `STRIPE_CONNECT_WEBHOOK_SECRET`
 
 ---
 
@@ -130,6 +132,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
 STRIPE_SECRET_KEY=sk_live_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_CONNECT_WEBHOOK_SECRET=whsec_...
 
 # Email (Resend)
 RESEND_API_KEY=re_...
@@ -164,6 +167,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 STRIPE_SECRET_KEY=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=
+STRIPE_CONNECT_WEBHOOK_SECRET=
 
 # Email Service
 RESEND_API_KEY=
@@ -216,7 +220,8 @@ git push -u origin main
 - [ ] Created new Stripe account
 - [ ] Enabled Stripe Connect
 - [ ] Created platform subscription products
-- [ ] Set up Stripe webhook
+- [ ] Set up platform Stripe webhook
+- [ ] Set up Connect Stripe webhook (for member payments)
 - [ ] Created Vercel project
 - [ ] Added all environment variables
 - [ ] Configured domain/subdomain routing

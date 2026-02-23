@@ -334,19 +334,19 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
     const beltEnabled = beltProgressEnabled !== false; // default true
 
     // ---- MEMBER LINKS (flat like before) ----
-    const memberLinks = [
+    const memberLinks: SidebarLink[] = [
         { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
         { href: '/dashboard/attendance', label: 'Attendance', icon: CheckCircle },
         ...(beltEnabled ? [{ href: '/dashboard/progress', label: 'Rank Progress', icon: Award }] : []),
-        { href: '/dashboard/videos', label: 'Video Library', icon: Video },
-        { href: '/dashboard/naseeha', label: 'Weekly Wisdom', icon: BookOpen },
-        { href: '/dashboard/events', label: 'Events', icon: PartyPopper },
+        { href: '/dashboard/videos', label: 'Video Library', icon: Video, feature: 'videos' },
+        { href: '/dashboard/naseeha', label: 'Weekly Wisdom', icon: BookOpen, feature: 'naseeha' },
+        { href: '/dashboard/events', label: 'Events', icon: PartyPopper, feature: 'events' },
         { href: '/dashboard/announcements', label: 'Announcements', icon: Bell },
         { href: '/dashboard/membership', label: 'Membership', icon: CreditCard },
         { href: '/dashboard/payments', label: 'Payment History', icon: Receipt },
         { href: '/dashboard/add-child', label: 'Add Child', icon: UserPlus },
-    ];
+    ].filter(link => !link.feature || can(link.feature));
 
     const instructorLinks = [
         { href: '/instructor', label: 'Dashboard', icon: LayoutDashboard },

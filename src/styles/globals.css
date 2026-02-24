@@ -1741,4 +1741,8 @@ body:has(.dashboard-sidebar-overlay.open) .bottom-nav {
     padding: 4px 0 !important;
     transform: rotate(90deg);
   }
+
+  .pricing-scroll-hint {
+    display: block !important;
+  }
 }

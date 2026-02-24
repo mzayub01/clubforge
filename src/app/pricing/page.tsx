@@ -309,142 +309,156 @@ export default async function PricingPage() {
                         <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-3)' }}>
                             Full Feature Comparison
                         </h2>
-                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--space-10)', fontSize: 'var(--text-base)' }}>
+                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--space-6)', fontSize: 'var(--text-base)' }}>
                             A detailed breakdown of what&apos;s included in every plan.
                         </p>
 
-                        {/* Sticky tier header */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 120px 120px 120px',
-                            gap: '0',
-                            position: 'sticky',
-                            top: '0',
-                            zIndex: 10,
-                            background: 'var(--bg-secondary)',
-                            padding: 'var(--space-3) 0',
-                            borderBottom: '2px solid var(--border-primary)',
-                        }}>
-                            <div />
-                            <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Starter</div>
+                        {/* Scroll hint on mobile */}
+                        <p style={{
+                            textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 'var(--text-xs)',
+                            marginBottom: 'var(--space-3)', display: 'none',
+                        }} className="pricing-scroll-hint">
+                            ← Swipe to compare plans →
+                        </p>
+
+                        {/* Scrollable table wrapper */}
+                        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', margin: '0 calc(-1 * var(--space-2))', padding: '0 var(--space-2)' }}>
+
+                            {/* Sticky tier header */}
                             <div style={{
-                                textAlign: 'center', fontWeight: '700', fontSize: 'var(--text-sm)', color: 'var(--color-gold)',
-                                background: 'rgba(197, 164, 86, 0.08)', borderRadius: 'var(--radius-md)', padding: 'var(--space-1) 0',
-                            }}>Pro</div>
-                            <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Elite</div>
-                        </div>
-
-                        {/* Feature categories */}
-                        {featureCategories.map((category) => (
-                            <div key={category.title} style={{ marginBottom: 'var(--space-4)' }}>
-                                {/* Category header */}
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 80px 80px 80px',
+                                gap: '0',
+                                position: 'sticky',
+                                top: '0',
+                                zIndex: 10,
+                                background: 'var(--bg-secondary)',
+                                padding: 'var(--space-3) 0',
+                                borderBottom: '2px solid var(--border-primary)',
+                                minWidth: '480px',
+                            }}>
+                                <div />
+                                <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Starter</div>
                                 <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-2)',
-                                    padding: 'var(--space-4) 0 var(--space-2)',
-                                    borderBottom: '1px solid var(--border-primary)',
-                                }}>
-                                    <category.icon size={18} color="var(--color-gold)" />
-                                    <span style={{
-                                        fontSize: 'var(--text-sm)',
-                                        fontWeight: '700',
-                                        color: 'var(--text-primary)',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.5px',
+                                    textAlign: 'center', fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--color-gold)',
+                                    background: 'rgba(197, 164, 86, 0.08)', borderRadius: 'var(--radius-md)', padding: 'var(--space-1) 0',
+                                }}>Pro</div>
+                                <div style={{ textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Elite</div>
+                            </div>
+
+                            {/* Feature categories */}
+                            {featureCategories.map((category) => (
+                                <div key={category.title} style={{ marginBottom: 'var(--space-4)' }}>
+                                    {/* Category header */}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 'var(--space-2)',
+                                        padding: 'var(--space-4) 0 var(--space-2)',
+                                        borderBottom: '1px solid var(--border-primary)',
                                     }}>
-                                        {category.title}
-                                    </span>
-                                </div>
-
-                                {/* Feature rows */}
-                                {category.rows.map((row, i) => (
-                                    <div
-                                        key={row.name}
-                                        style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: '1fr 120px 120px 120px',
-                                            gap: '0',
-                                            padding: 'var(--space-3) 0',
-                                            borderBottom: i < category.rows.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <div style={{
+                                        <category.icon size={18} color="var(--color-gold)" />
+                                        <span style={{
                                             fontSize: 'var(--text-sm)',
+                                            fontWeight: '700',
                                             color: 'var(--text-primary)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 'var(--space-1)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px',
                                         }}>
-                                            {row.name}
-                                            {row.tooltip && (
-                                                <span title={row.tooltip} style={{ cursor: 'help' }}>
-                                                    <HelpCircle size={13} color="var(--text-tertiary)" />
-                                                </span>
-                                            )}
-                                        </div>
-                                        {(['starter', 'pro', 'elite'] as const).map((tier) => {
-                                            const val = row[tier];
-                                            return (
-                                                <div key={tier} style={{ textAlign: 'center' }}>
-                                                    {val === true ? (
-                                                        <CheckCircle2 size={18} color="var(--color-gold)" />
-                                                    ) : val === false ? (
-                                                        <X size={18} color="var(--text-tertiary)" style={{ opacity: 0.4 }} />
-                                                    ) : (
-                                                        <span style={{
-                                                            fontSize: 'var(--text-sm)',
-                                                            fontWeight: '600',
-                                                            color: tier === 'elite' ? 'var(--color-gold)' : 'var(--text-primary)',
-                                                        }}>
-                                                            {val}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
+                                            {category.title}
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
-                        ))}
 
-                        {/* Bottom CTA */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 120px 120px 120px',
-                            gap: '0',
-                            padding: 'var(--space-6) 0 var(--space-2)',
-                            borderTop: '2px solid var(--border-primary)',
-                            marginTop: 'var(--space-4)',
-                        }}>
-                            <div />
-                            <div style={{ textAlign: 'center' }}>
-                                <Link href="/get-started" style={{
-                                    fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
-                                    textDecoration: 'underline',
-                                }}>
-                                    Start Trial
-                                </Link>
+                                    {/* Feature rows */}
+                                    {category.rows.map((row, i) => (
+                                        <div
+                                            key={row.name}
+                                            style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: '1fr 80px 80px 80px',
+                                                gap: '0',
+                                                padding: 'var(--space-3) 0',
+                                                borderBottom: i < category.rows.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                                alignItems: 'center',
+                                                minWidth: '480px',
+                                            }}
+                                        >
+                                            <div style={{
+                                                fontSize: 'var(--text-sm)',
+                                                color: 'var(--text-primary)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 'var(--space-1)',
+                                            }}>
+                                                {row.name}
+                                                {row.tooltip && (
+                                                    <span title={row.tooltip} style={{ cursor: 'help' }}>
+                                                        <HelpCircle size={13} color="var(--text-tertiary)" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {(['starter', 'pro', 'elite'] as const).map((tier) => {
+                                                const val = row[tier];
+                                                return (
+                                                    <div key={tier} style={{ textAlign: 'center' }}>
+                                                        {val === true ? (
+                                                            <CheckCircle2 size={18} color="var(--color-gold)" />
+                                                        ) : val === false ? (
+                                                            <X size={18} color="var(--text-tertiary)" style={{ opacity: 0.4 }} />
+                                                        ) : (
+                                                            <span style={{
+                                                                fontSize: 'var(--text-sm)',
+                                                                fontWeight: '600',
+                                                                color: tier === 'elite' ? 'var(--color-gold)' : 'var(--text-primary)',
+                                                            }}>
+                                                                {val}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+
+                            {/* Bottom CTA */}
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 80px 80px 80px',
+                                gap: '0',
+                                padding: 'var(--space-6) 0 var(--space-2)',
+                                borderTop: '2px solid var(--border-primary)',
+                                marginTop: 'var(--space-4)',
+                                minWidth: '480px',
+                            }}>
+                                <div />
+                                <div style={{ textAlign: 'center' }}>
+                                    <Link href="/get-started" style={{
+                                        fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
+                                        textDecoration: 'underline',
+                                    }}>
+                                        Start Trial
+                                    </Link>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <Link href="/get-started" style={{
+                                        fontSize: 'var(--text-xs)', color: 'var(--color-gold)',
+                                        fontWeight: '600', textDecoration: 'underline',
+                                    }}>
+                                        Start Trial
+                                    </Link>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <Link href="/demo" style={{
+                                        fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
+                                        textDecoration: 'underline',
+                                    }}>
+                                        Book Demo
+                                    </Link>
+                                </div>
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <Link href="/get-started" style={{
-                                    fontSize: 'var(--text-xs)', color: 'var(--color-gold)',
-                                    fontWeight: '600', textDecoration: 'underline',
-                                }}>
-                                    Start Trial
-                                </Link>
-                            </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <Link href="/demo" style={{
-                                    fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
-                                    textDecoration: 'underline',
-                                }}>
-                                    Book Demo
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
+                        </div>{/* end scrollable table wrapper */}
                 </section>
 
                 {/* FAQ */}

@@ -6,11 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
+import { getStripeClient } from '@/lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-});
+const stripe = getStripeClient()!;
+
 
 const PLATFORM_FEE_PERCENT = 2.5;
 

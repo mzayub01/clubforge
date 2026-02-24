@@ -6,11 +6,10 @@
 import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { PLANS } from '@/lib/stripe-plans';
-import Stripe from 'stripe';
+import { getStripeClient } from '@/lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-});
+const stripe = getStripeClient()!;
+
 
 export async function POST() {
     try {

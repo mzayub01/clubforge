@@ -1,5 +1,8 @@
 import Stripe from 'stripe';
 
+// Unified Stripe API version — must match across all files
+const STRIPE_API_VERSION = '2024-12-18.acacia' as Stripe.LatestApiVersion;
+
 // Check if Stripe is configured
 export const isStripeConfigured = () => {
     return !!(process.env.STRIPE_SECRET_KEY && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -15,7 +18,7 @@ export const getStripeClient = (): Stripe | null => {
 
     if (!stripeClient) {
         stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-            apiVersion: '2024-06-20' as any,
+            apiVersion: STRIPE_API_VERSION,
             typescript: true,
         });
     }
@@ -23,7 +26,7 @@ export const getStripeClient = (): Stripe | null => {
     return stripeClient;
 };
 
-// Legacy export for compatibility
+// Legacy export for compatibility — uses the same shared client
 export const stripe = isStripeConfigured()
-    ? new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-12-15.clover' as const })
+    ? getStripeClient()!
     : null as unknown as Stripe;

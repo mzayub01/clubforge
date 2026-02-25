@@ -26,7 +26,7 @@ export default function PublicBottomNav() {
         '/tenant-home', '/login', '/register',
         '/pricing', '/get-started', '/faq', '/demo',
         '/waitlist', '/privacy', '/terms', '/forgot-password',
-        '/reset-password', '/platform', '/waiver',
+        '/reset-password', '/platform', '/waiver', '/docs',
     ];
     if (pathname === '/' || hiddenPrefixes.some(p => pathname.startsWith(p))) {
         return null;

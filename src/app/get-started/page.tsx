@@ -295,11 +295,15 @@ export default function GetStartedPage() {
             }
 
             // Success! Redirect to Stripe Checkout (for payment method collection)
-            // or to login if Stripe isn't configured
+            // or to tenant subdomain login if Stripe isn't configured
             if (data.stripeCheckoutUrl) {
                 window.location.href = data.stripeCheckoutUrl;
+            } else if (data.redirectUrl) {
+                window.location.href = data.redirectUrl;
             } else {
-                router.push('/login?onboarded=true&slug=' + data.slug);
+                // Fallback: redirect to tenant subdomain login
+                const tenantUrl = `https://${data.slug}.clubforgehq.com`;
+                window.location.href = `${tenantUrl}/login?onboarded=true`;
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create your club. Please try again.');

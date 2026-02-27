@@ -395,6 +395,15 @@ export async function POST(request: NextRequest) {
             let stripeCheckoutUrl: string | null = null;
             const stripe = getStripeClient();
 
+            // Build tenant subdomain URL for post-checkout redirect
+            const isLocal = process.env.NODE_ENV === 'development';
+            const tenantUrl = isLocal
+                ? `http://${body.slug}.localhost:3000`
+                : `https://${body.slug}.clubforgehq.com`;
+            const platformUrl = isLocal
+                ? 'http://localhost:3000'
+                : 'https://clubforgehq.com';
+
             if (stripe) {
                 try {
                     // Create Stripe customer
@@ -414,8 +423,8 @@ export async function POST(request: NextRequest) {
                     const priceId = getStripePriceId(body.plan, body.billingInterval);
                     console.log('[Onboard] Stripe price ID for', body.plan, body.billingInterval, ':', priceId || '(EMPTY - env vars missing?)');
 
+
                     if (priceId && priceId.startsWith('price_')) {
-                        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
                         const checkoutSession = await stripe.checkout.sessions.create({
                             customer: customer.id,
                             mode: 'subscription',
@@ -429,8 +438,8 @@ export async function POST(request: NextRequest) {
                                     plan: body.plan,
                                 },
                             },
-                            success_url: `${baseUrl}/login?onboarded=true&slug=${body.slug}`,
-                            cancel_url: `${baseUrl}/get-started?step=4`,
+                            success_url: `${tenantUrl}/login?onboarded=true`,
+                            cancel_url: `${platformUrl}/get-started?step=4`,
                             metadata: {
                                 tenant_id: tenant.id,
                                 type: 'platform_subscription',
@@ -465,7 +474,7 @@ export async function POST(request: NextRequest) {
                 stripeCustomerId,
                 stripeCheckoutUrl,
                 trialEndsAt,
-                redirectUrl: stripeCheckoutUrl || `/${body.slug}/admin`,
+                redirectUrl: stripeCheckoutUrl || `${tenantUrl}/admin`,
             });
 
         } catch (provisioningError) {

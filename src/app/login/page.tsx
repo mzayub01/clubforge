@@ -25,6 +25,7 @@ function LoginPageContent() {
         primaryColor: string;
     } | null>(null);
     const [isTenant, setIsTenant] = useState(false);
+    const [tenantLoading, setTenantLoading] = useState(true);
 
     // Detect tenant subdomain and fetch branding
     useEffect(() => {
@@ -39,7 +40,10 @@ function LoginPageContent() {
                 .then(data => {
                     if (data?.tenant) setTenantInfo(data.tenant);
                 })
-                .catch(() => { });
+                .catch(() => { })
+                .finally(() => setTenantLoading(false));
+        } else {
+            setTenantLoading(false);
         }
     }, []);
 
@@ -141,7 +145,10 @@ function LoginPageContent() {
 
                 {/* Logo / Club Branding */}
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-                    {isTenant && tenantInfo ? (
+                    {tenantLoading ? (
+                        /* Placeholder while tenant branding loads — prevents ClubForge logo flash */
+                        <div style={{ height: '80px', marginBottom: 'var(--space-4)' }} />
+                    ) : isTenant && tenantInfo ? (
                         <>
                             <Link href="/">
                                 {tenantInfo.logoUrl ? (

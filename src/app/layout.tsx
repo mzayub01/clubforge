@@ -134,6 +134,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/logo-clubforge-icon.svg" />
         <link rel="alternate" hrefLang="en" href="https://clubforgehq.com" />
+        <meta name="msvalidate.01" content="F910DE3CD3B5174E27B4D3E11E00DE9E" />
       </head>
       <body style={{ fontFamily: 'var(--font-sans)' }}>
         <OrganizationSchema />

@@ -7,9 +7,73 @@ import {
     renderEventConfirmationEmail,
     renderPaymentFailedEmail,
     renderWelcomeEmail,
+    renderSubscriptionActivatedEmail,
+    renderPlanUpgradeEmail,
 } from '@/lib/email-templates';
 import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { PLANS } from '@/lib/stripe-plans';
 import Stripe from 'stripe';
+
+// Feature highlights per tier (for email templates)
+const TIER_FEATURE_HIGHLIGHTS: Record<string, string[]> = {
+    starter: [
+        'Up to 150 members',
+        'Class scheduling & attendance',
+        'Belt progression tracking',
+        'Stripe member billing',
+        'Announcements',
+    ],
+    pro: [
+        'Up to 750 members',
+        'Up to 3 locations',
+        'Events & ticketing',
+        'Video library',
+        'Email templates',
+        'Promo codes',
+        'Advanced reports & CSV export',
+        'Grading feedback',
+    ],
+    elite: [
+        'Unlimited members & locations',
+        'Custom domain',
+        'White-label branding',
+        'API access & webhooks',
+        'Automation workflows',
+        'Priority support & SLA',
+    ],
+};
+
+// Features unlocked when upgrading between tiers
+const UPGRADE_FEATURES: Record<string, string[]> = {
+    'starter_to_pro': [
+        'Up to 750 members (from 150)',
+        'Up to 3 locations',
+        'Events & ticketing',
+        'Video library',
+        'Email templates',
+        'Promo codes',
+        'Advanced reports & CSV export',
+        'Grading feedback',
+    ],
+    'starter_to_elite': [
+        'Unlimited members & locations',
+        'Everything in Pro',
+        'Custom domain',
+        'White-label branding',
+        'API access & webhooks',
+        'Automation workflows',
+        'Priority support & SLA',
+    ],
+    'pro_to_elite': [
+        'Unlimited members (from 750)',
+        'Unlimited locations (from 3)',
+        'Custom domain',
+        'White-label branding',
+        'API access & webhooks',
+        'Automation workflows',
+        'Priority support & SLA',
+    ],
+};
 
 export async function POST(request: NextRequest) {
     if (!isStripeConfigured()) {
@@ -138,6 +202,49 @@ export async function POST(request: NextRequest) {
                     })
                     .eq('id', tenant_id);
                 console.log('[Webhook] Tenant subscription activated:', tenant_id);
+
+                // Send subscription activated email to tenant owner
+                try {
+                    const { data: tenant } = await supabase
+                        .from('tenants')
+                        .select('name, owner_user_id, subscription_tier, trial_ends_at')
+                        .eq('id', tenant_id)
+                        .single();
+
+                    if (tenant?.owner_user_id) {
+                        const { data: ownerProfile } = await supabase
+                            .from('profiles')
+                            .select('first_name, email')
+                            .eq('user_id', tenant.owner_user_id)
+                            .single();
+
+                        if (ownerProfile?.email) {
+                            const tier = tenant.subscription_tier || 'starter';
+                            const plan = PLANS[tier];
+                            const trialEndDate = tenant.trial_ends_at
+                                ? new Date(tenant.trial_ends_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                                : '14 days from now';
+
+                            const html = renderSubscriptionActivatedEmail({
+                                firstName: ownerProfile.first_name || 'there',
+                                clubName: tenant.name,
+                                planName: plan?.name || tier.charAt(0).toUpperCase() + tier.slice(1),
+                                price: plan ? `${plan.monthlyPriceDisplay}/month` : `£39/month`,
+                                trialEndDate,
+                                features: TIER_FEATURE_HIGHLIGHTS[tier] || TIER_FEATURE_HIGHLIGHTS.starter,
+                            });
+
+                            await sendEmail({
+                                to: ownerProfile.email,
+                                subject: `Welcome to ClubForge — Your ${plan?.name || 'Starter'} Plan is Active!`,
+                                html,
+                            });
+                            console.log('[Webhook] Subscription activated email sent to:', ownerProfile.email);
+                        }
+                    }
+                } catch (emailErr) {
+                    console.error('[Webhook] Failed to send subscription activated email:', emailErr);
+                }
             }
         } else if (metadata.type === 'plan_upgrade') {
             // Plan upgrade (club owner upgrading their plan)
@@ -147,20 +254,31 @@ export async function POST(request: NextRequest) {
             if (tenant_id) {
                 const supabase = await createAdminClient();
 
+                // Get previous tier before updating
+                const { data: currentTenant } = await supabase
+                    .from('tenants')
+                    .select('name, owner_user_id, subscription_tier')
+                    .eq('id', tenant_id)
+                    .single();
+
+                const previousTier = currentTenant?.subscription_tier || 'starter';
+
                 // Get the subscription to find the plan from its metadata
                 const subscriptionId = session.subscription as string;
+                let newTier: string | null = null;
+
                 if (subscriptionId) {
                     const stripeClient = getStripeClient();
                     const subscription = await stripeClient!.subscriptions.retrieve(subscriptionId);
-                    const plan = subscription.metadata?.plan || null;
+                    newTier = subscription.metadata?.plan || null;
 
                     const updateData: Record<string, any> = {
                         subscription_status: 'active',
                         stripe_subscription_id: subscriptionId,
                     };
 
-                    if (plan) {
-                        updateData.subscription_tier = plan;
+                    if (newTier) {
+                        updateData.subscription_tier = newTier;
                     }
 
                     await supabase
@@ -168,7 +286,43 @@ export async function POST(request: NextRequest) {
                         .update(updateData)
                         .eq('id', tenant_id);
 
-                    console.log('[Webhook] Tenant plan upgraded to:', plan, 'for tenant:', tenant_id);
+                    console.log('[Webhook] Tenant plan upgraded to:', newTier, 'for tenant:', tenant_id);
+                }
+
+                // Send plan upgrade email to tenant owner
+                if (currentTenant?.owner_user_id && newTier && newTier !== previousTier) {
+                    try {
+                        const { data: ownerProfile } = await supabase
+                            .from('profiles')
+                            .select('first_name, email')
+                            .eq('user_id', currentTenant.owner_user_id)
+                            .single();
+
+                        if (ownerProfile?.email) {
+                            const newPlan = PLANS[newTier];
+                            const prevPlanName = previousTier.charAt(0).toUpperCase() + previousTier.slice(1);
+                            const newPlanName = newPlan?.name || newTier.charAt(0).toUpperCase() + newTier.slice(1);
+                            const upgradeKey = `${previousTier}_to_${newTier}`;
+
+                            const html = renderPlanUpgradeEmail({
+                                firstName: ownerProfile.first_name || 'there',
+                                clubName: currentTenant.name,
+                                previousPlan: prevPlanName,
+                                newPlan: newPlanName,
+                                newPrice: newPlan ? `${newPlan.monthlyPriceDisplay}/month` : '',
+                                newFeatures: UPGRADE_FEATURES[upgradeKey] || TIER_FEATURE_HIGHLIGHTS[newTier] || [],
+                            });
+
+                            await sendEmail({
+                                to: ownerProfile.email,
+                                subject: `Plan Upgraded to ${newPlanName} — ${currentTenant.name}`,
+                                html,
+                            });
+                            console.log('[Webhook] Plan upgrade email sent to:', ownerProfile.email);
+                        }
+                    } catch (emailErr) {
+                        console.error('[Webhook] Failed to send plan upgrade email:', emailErr);
+                    }
                 }
             }
         } else {

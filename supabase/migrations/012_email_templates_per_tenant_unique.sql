@@ -18,3 +18,52 @@ CREATE UNIQUE INDEX IF NOT EXISTS email_templates_tenant_template_key_unique
 CREATE UNIQUE INDEX IF NOT EXISTS email_templates_global_template_key_unique
   ON public.email_templates (template_key)
   WHERE tenant_id IS NULL;
+
+-- ===============================================
+-- Backfill: Assign orphaned templates to existing tenants
+-- 
+-- Templates seeded before multi-tenancy have tenant_id IS NULL.
+-- For each tenant, duplicate the global templates as tenant-owned.
+-- This ensures they show up in the admin dashboard.
+-- ===============================================
+
+DO $$
+DECLARE
+  v_tenant_id UUID;
+  v_template RECORD;
+BEGIN
+  -- For each tenant that doesn't have its own templates yet
+  FOR v_tenant_id IN
+    SELECT t.id FROM public.tenants t
+    WHERE NOT EXISTS (
+      SELECT 1 FROM public.email_templates et
+      WHERE et.tenant_id = t.id
+      LIMIT 1
+    )
+  LOOP
+    -- Copy each global template for this tenant
+    FOR v_template IN
+      SELECT template_key, name, description, subject, greeting, 
+             body_intro, body_details, body_action, body_closing, 
+             signature, button_text, button_url, is_active
+      FROM public.email_templates
+      WHERE tenant_id IS NULL
+    LOOP
+      INSERT INTO public.email_templates (
+        tenant_id, template_key, name, description, subject, greeting,
+        body_intro, body_details, body_action, body_closing,
+        signature, button_text, button_url, is_active
+      ) VALUES (
+        v_tenant_id, v_template.template_key, v_template.name, 
+        v_template.description, v_template.subject, v_template.greeting,
+        v_template.body_intro, v_template.body_details, v_template.body_action,
+        v_template.body_closing, v_template.signature, v_template.button_text,
+        v_template.button_url, v_template.is_active
+      )
+      ON CONFLICT DO NOTHING;
+    END LOOP;
+    
+    RAISE NOTICE 'Seeded email templates for tenant: %', v_tenant_id;
+  END LOOP;
+END;
+$$;

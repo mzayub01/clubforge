@@ -117,7 +117,7 @@ export const metadata: Metadata = {
     apple: '/logo-clubforge-icon.svg',
   },
   other: {
-    'google-site-verification': '',
+    'google-site-verification': 'Em_y84nNO9HuptqFLHNXL4iDENYuyxArwgfxdYMxToE',
   },
 };
 

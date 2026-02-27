@@ -74,6 +74,9 @@ export default function TenantHomePage() {
                 setTenant(data.tenant);
                 setClasses(data.classes || []);
                 setLocations(data.locations || []);
+                if (data.tenant?.name) {
+                    document.title = `Welcome | ${data.tenant.name}`;
+                }
             })
             .catch(() => setError(true))
             .finally(() => setLoading(false));

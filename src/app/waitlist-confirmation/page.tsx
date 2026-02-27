@@ -9,6 +9,7 @@ interface TenantBranding {
     name: string;
     logoUrl: string | null;
     primaryColor: string;
+    contactEmail: string | null;
 }
 
 export default function WaitlistConfirmationPage() {
@@ -34,7 +35,10 @@ export default function WaitlistConfirmationPage() {
             fetch('/api/tenant/public')
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
-                    if (data?.tenant) setTenantInfo(data.tenant);
+                    if (data?.tenant) {
+                        setTenantInfo(data.tenant);
+                        document.title = `Waitlist | ${data.tenant.name}`;
+                    }
                 })
                 .catch(() => { })
                 .finally(() => setTenantLoading(false));
@@ -218,8 +222,8 @@ export default function WaitlistConfirmationPage() {
                     fontSize: 'var(--text-sm)',
                 }}>
                     Questions? Contact us at{' '}
-                    <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>
-                        support@clubforgehq.com
+                    <a href={`mailto:${isTenant && tenantInfo?.contactEmail ? tenantInfo.contactEmail : 'support@clubforgehq.com'}`} style={{ color: 'var(--color-gold)' }}>
+                        {isTenant && tenantInfo?.contactEmail ? tenantInfo.contactEmail : 'support@clubforgehq.com'}
                     </a>
                 </p>
             </div>

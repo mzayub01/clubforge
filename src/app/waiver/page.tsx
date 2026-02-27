@@ -3,15 +3,61 @@ import { ChevronRight, AlertTriangle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
+import { getTenantSlug } from '@/lib/tenant';
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { Metadata } from 'next';
 
-export const metadata = {
-    title: 'Liability Waiver | ClubForge',
-    description: 'Liability Waiver and Assumption of Risk for ClubForge martial arts training.',
-};
+// -----------------------------------------------
+// Dynamic metadata based on tenant context
+// -----------------------------------------------
+export async function generateMetadata(): Promise<Metadata> {
+    const slug = await getTenantSlug();
+    if (slug) {
+        const admin = createAdminClient();
+        const { data: tenant } = await admin
+            .from('tenants')
+            .select('name')
+            .eq('slug', slug)
+            .eq('is_active', true)
+            .single();
+        if (tenant) {
+            return {
+                title: `Liability Waiver | ${tenant.name}`,
+                description: `Liability Waiver and Assumption of Risk for ${tenant.name} training activities.`,
+            };
+        }
+    }
+    return {
+        title: 'Liability Waiver | ClubForge',
+        description: 'Liability Waiver and Assumption of Risk for ClubForge martial arts training.',
+    };
+}
+
+// -----------------------------------------------
+// Server-side tenant resolution helper
+// -----------------------------------------------
+async function getTenantInfo(): Promise<{ name: string; contactEmail: string | null } | null> {
+    const slug = await getTenantSlug();
+    if (!slug) return null;
+
+    const admin = createAdminClient();
+    const { data: tenant } = await admin
+        .from('tenants')
+        .select('name, contact_email')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .single();
+
+    return tenant ? { name: tenant.name, contactEmail: tenant.contact_email } : null;
+}
 
 export default async function WaiverPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    const tenantInfo = await getTenantInfo();
+    const orgName = tenantInfo?.name || 'ClubForge';
+    const contactEmail = tenantInfo?.contactEmail || 'support@clubforgehq.com';
 
     return (
         <>
@@ -65,7 +111,7 @@ export default async function WaiverPage() {
                                 <div>
                                     <strong style={{ color: 'var(--color-gold)' }}>Important Notice</strong>
                                     <p style={{ margin: 'var(--space-2) 0 0 0', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                                        Please read this document carefully before participating in any ClubForge activities. By registering and participating, you acknowledge that you have read, understood, and agree to the terms below.
+                                        Please read this document carefully before participating in any {orgName} activities. By registering and participating, you acknowledge that you have read, understood, and agree to the terms below.
                                     </p>
                                 </div>
                             </div>
@@ -87,12 +133,12 @@ export default async function WaiverPage() {
                                     <li>In rare cases, permanent disability or death</li>
                                 </ul>
                                 <p>
-                                    I acknowledge that these risks exist despite the reasonable safety measures implemented by ClubForge.
+                                    I acknowledge that these risks exist despite the reasonable safety measures implemented by {orgName}.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>2. Voluntary Participation</h2>
                                 <p>
-                                    I confirm that my participation in ClubForge activities is entirely voluntary. I have chosen to participate with full knowledge of the inherent risks involved.
+                                    I confirm that my participation in {orgName} activities is entirely voluntary. I have chosen to participate with full knowledge of the inherent risks involved.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>3. Physical Fitness Declaration</h2>
@@ -101,14 +147,14 @@ export default async function WaiverPage() {
                                 </p>
                                 <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                     <li>I am in good physical health and have no medical conditions that would prevent my safe participation, OR</li>
-                                    <li>I have disclosed all relevant medical conditions to ClubForge and have obtained medical clearance to participate</li>
+                                    <li>I have disclosed all relevant medical conditions to {orgName} and have obtained medical clearance to participate</li>
                                     <li>I will inform instructors immediately if I experience pain, discomfort, or illness during training</li>
                                     <li>I will not participate while under the influence of alcohol, drugs, or any substance that may impair my judgement or physical ability</li>
                                 </ul>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>4. Assumption of Risk</h2>
                                 <p>
-                                    I voluntarily assume all risks associated with participation in ClubForge activities, including risks arising from:
+                                    I voluntarily assume all risks associated with participation in {orgName} activities, including risks arising from:
                                 </p>
                                 <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                     <li>My own actions or inactions</li>
@@ -120,20 +166,20 @@ export default async function WaiverPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>5. Release and Waiver of Liability</h2>
                                 <p>
-                                    To the fullest extent permitted by law, I hereby release, waive, and discharge ClubForge, its trustees, directors, officers, employees, instructors, volunteers, agents, and affiliates from any and all liability, claims, demands, actions, or causes of action arising out of or related to any loss, damage, or injury that may be sustained during or as a result of my participation in ClubForge activities.
+                                    To the fullest extent permitted by law, I hereby release, waive, and discharge {orgName}, its trustees, directors, officers, employees, instructors, volunteers, agents, and affiliates from any and all liability, claims, demands, actions, or causes of action arising out of or related to any loss, damage, or injury that may be sustained during or as a result of my participation in {orgName} activities.
                                 </p>
                                 <p>
-                                    This release includes, but is not limited to, claims arising from negligence of ClubForge or any of the persons listed above.
+                                    This release includes, but is not limited to, claims arising from negligence of {orgName} or any of the persons listed above.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>6. Indemnification</h2>
                                 <p>
-                                    I agree to indemnify and hold harmless ClubForge and its representatives from any claims, damages, losses, or expenses (including legal fees) arising from my participation in activities or any breach of this waiver.
+                                    I agree to indemnify and hold harmless {orgName} and its representatives from any claims, damages, losses, or expenses (including legal fees) arising from my participation in activities or any breach of this waiver.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>7. Emergency Medical Treatment</h2>
                                 <p>
-                                    In the event of an emergency, I authorise ClubForge personnel to seek and consent to emergency medical treatment on my behalf (or on behalf of my child, if applicable). I understand that I am responsible for any medical expenses incurred.
+                                    In the event of an emergency, I authorise {orgName} personnel to seek and consent to emergency medical treatment on my behalf (or on behalf of my child, if applicable). I understand that I am responsible for any medical expenses incurred.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>8. Parent/Guardian Consent (for Minors)</h2>
@@ -153,7 +199,7 @@ export default async function WaiverPage() {
                                     I agree to:
                                 </p>
                                 <ul style={{ paddingLeft: 'var(--space-6)' }}>
-                                    <li>Follow all rules, policies, and instructions provided by ClubForge</li>
+                                    <li>Follow all rules, policies, and instructions provided by {orgName}</li>
                                     <li>Train in a safe and controlled manner</li>
                                     <li>Respect the safety of myself and others at all times</li>
                                     <li>Immediately stop training if instructed to do so</li>
@@ -162,7 +208,7 @@ export default async function WaiverPage() {
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>10. Insurance</h2>
                                 <p>
-                                    I understand that ClubForge maintains public liability insurance but that this does not cover personal injury claims. I am encouraged to obtain my own personal accident and medical insurance.
+                                    I understand that {orgName} maintains public liability insurance but that this does not cover personal injury claims. I am encouraged to obtain my own personal accident and medical insurance.
                                 </p>
 
                                 <h2 style={{ color: 'var(--text-primary)' }}>11. Severability</h2>
@@ -184,7 +230,7 @@ export default async function WaiverPage() {
                                     border: '1px solid var(--border-light)',
                                 }}>
                                     <p style={{ margin: 0, fontWeight: '500', color: 'var(--text-primary)' }}>
-                                        By registering for ClubForge and participating in our activities, I acknowledge that:
+                                        By registering for {orgName} and participating in our activities, I acknowledge that:
                                     </p>
                                     <ul style={{ paddingLeft: 'var(--space-6)', marginTop: 'var(--space-3)', marginBottom: 0 }}>
                                         <li>I have read and fully understand this Liability Waiver</li>
@@ -205,8 +251,8 @@ export default async function WaiverPage() {
                                     marginTop: 'var(--space-4)'
                                 }}>
                                     <p style={{ margin: 0 }}>
-                                        <strong>ClubForge</strong><br />
-                                        Email: <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a><br />
+                                        <strong>{orgName}</strong><br />
+                                        Email: <a href={`mailto:${contactEmail}`} style={{ color: 'var(--color-gold)' }}>{contactEmail}</a><br />
                                         United Kingdom
                                     </p>
                                 </div>

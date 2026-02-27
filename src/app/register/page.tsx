@@ -154,6 +154,7 @@ function RegisterPageContent() {
 
             if (data.tenant) {
                 setTenant(data.tenant as TenantInfo);
+                document.title = `Register | ${data.tenant.name}`;
             }
 
             const locs = data.locations || [];

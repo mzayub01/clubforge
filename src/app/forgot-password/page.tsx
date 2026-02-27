@@ -33,7 +33,10 @@ export default function ForgotPasswordPage() {
             fetch('/api/tenant/public')
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
-                    if (data?.tenant) setTenantInfo(data.tenant);
+                    if (data?.tenant) {
+                        setTenantInfo(data.tenant);
+                        document.title = `Reset Password | ${data.tenant.name}`;
+                    }
                 })
                 .catch(() => { })
                 .finally(() => setTenantLoading(false));

@@ -38,7 +38,10 @@ function LoginPageContent() {
             fetch('/api/tenant/public')
                 .then(res => res.ok ? res.json() : null)
                 .then(data => {
-                    if (data?.tenant) setTenantInfo(data.tenant);
+                    if (data?.tenant) {
+                        setTenantInfo(data.tenant);
+                        document.title = `Sign In | ${data.tenant.name}`;
+                    }
                 })
                 .catch(() => { })
                 .finally(() => setTenantLoading(false));

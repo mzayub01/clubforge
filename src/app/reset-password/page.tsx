@@ -3,9 +3,14 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Lock, Eye, EyeOff, CheckCircle, Mail } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+
+interface TenantBranding {
+    name: string;
+    logoUrl: string | null;
+    primaryColor: string;
+}
 
 function ResetPasswordForm() {
     const [email, setEmail] = useState('');
@@ -320,6 +325,30 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+    // Tenant branding state
+    const [tenantInfo, setTenantInfo] = useState<TenantBranding | null>(null);
+    const [isTenant, setIsTenant] = useState(false);
+    const [tenantLoading, setTenantLoading] = useState(true);
+
+    useEffect(() => {
+        const hostname = window.location.hostname;
+        const isSubdomain = hostname.includes('.') && !hostname.startsWith('www.');
+        const isLocalSubdomain = hostname.endsWith('.localhost') && hostname !== 'localhost';
+
+        if (isSubdomain || isLocalSubdomain) {
+            setIsTenant(true);
+            fetch('/api/tenant/public')
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.tenant) setTenantInfo(data.tenant);
+                })
+                .catch(() => { })
+                .finally(() => setTenantLoading(false));
+        } else {
+            setTenantLoading(false);
+        }
+    }, []);
+
     return (
         <div
             style={{
@@ -339,18 +368,46 @@ export default function ResetPasswordPage() {
                     padding: 'var(--space-8)',
                 }}
             >
-                {/* Logo */}
+                {/* Logo / Club Branding */}
                 <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-                    <Link href="/">
-                        <Image
-                            src="/logo-clubforge-final.svg"
-                            alt="ClubForge"
-                            width={160}
-                            height={80}
-                            priority
-                            style={{ height: '70px', width: 'auto', margin: '0 auto' }}
-                        />
-                    </Link>
+                    {tenantLoading ? (
+                        <div style={{ height: '70px', marginBottom: 'var(--space-4)' }} />
+                    ) : isTenant && tenantInfo ? (
+                        <Link href="/">
+                            {tenantInfo.logoUrl ? (
+                                <img
+                                    src={tenantInfo.logoUrl}
+                                    alt={tenantInfo.name}
+                                    style={{ height: '70px', width: 'auto', margin: '0 auto', borderRadius: '16px' }}
+                                />
+                            ) : (
+                                <div style={{
+                                    width: '70px',
+                                    height: '70px',
+                                    borderRadius: '16px',
+                                    background: `linear-gradient(135deg, ${tenantInfo.primaryColor}30, ${tenantInfo.primaryColor}10)`,
+                                    border: `2px solid ${tenantInfo.primaryColor}40`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '1.8rem',
+                                    fontWeight: 700,
+                                    color: tenantInfo.primaryColor,
+                                    margin: '0 auto',
+                                }}>
+                                    {tenantInfo.name.charAt(0)}
+                                </div>
+                            )}
+                        </Link>
+                    ) : (
+                        <Link href="/">
+                            <img
+                                src="/logo-clubforge-final.svg"
+                                alt="ClubForge"
+                                style={{ height: '70px', width: 'auto', margin: '0 auto' }}
+                            />
+                        </Link>
+                    )}
                     <h1 style={{
                         fontSize: 'var(--text-2xl)',
                         marginTop: 'var(--space-4)',

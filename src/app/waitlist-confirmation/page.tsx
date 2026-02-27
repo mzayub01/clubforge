@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Clock, CheckCircle, Mail, ArrowRight } from 'lucide-react';
+import { Clock, Mail, ArrowRight } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+
+interface TenantBranding {
+    name: string;
+    logoUrl: string | null;
+    primaryColor: string;
+}
 
 export default function WaitlistConfirmationPage() {
     const [position, setPosition] = useState<number | null>(null);
@@ -12,7 +17,31 @@ export default function WaitlistConfirmationPage() {
     const [locationName, setLocationName] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
+    // Tenant branding state
+    const [tenantInfo, setTenantInfo] = useState<TenantBranding | null>(null);
+    const [isTenant, setIsTenant] = useState(false);
+    const [tenantLoading, setTenantLoading] = useState(true);
+
     const supabase = getSupabaseClient();
+
+    useEffect(() => {
+        const hostname = window.location.hostname;
+        const isSubdomain = hostname.includes('.') && !hostname.startsWith('www.');
+        const isLocalSubdomain = hostname.endsWith('.localhost') && hostname !== 'localhost';
+
+        if (isSubdomain || isLocalSubdomain) {
+            setIsTenant(true);
+            fetch('/api/tenant/public')
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data?.tenant) setTenantInfo(data.tenant);
+                })
+                .catch(() => { })
+                .finally(() => setTenantLoading(false));
+        } else {
+            setTenantLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         fetchWaitlistInfo();
@@ -46,6 +75,8 @@ export default function WaitlistConfirmationPage() {
         }
     };
 
+    const displayName = isTenant && tenantInfo ? tenantInfo.name : 'ClubForge';
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -56,17 +87,45 @@ export default function WaitlistConfirmationPage() {
             background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)',
         }}>
             <div style={{ maxWidth: '500px', width: '100%', textAlign: 'center' }}>
-                {/* Logo */}
-                <Link href="/">
-                    <Image
-                        src="/logo-clubforge-final.svg"
-                        alt="ClubForge"
-                        width={140}
-                        height={70}
-                        priority
-                        style={{ height: '60px', width: 'auto', margin: '0 auto var(--space-8)' }}
-                    />
-                </Link>
+                {/* Logo / Club Branding */}
+                {tenantLoading ? (
+                    <div style={{ height: '60px', marginBottom: 'var(--space-8)' }} />
+                ) : isTenant && tenantInfo ? (
+                    <Link href="/">
+                        {tenantInfo.logoUrl ? (
+                            <img
+                                src={tenantInfo.logoUrl}
+                                alt={tenantInfo.name}
+                                style={{ height: '60px', width: 'auto', margin: '0 auto var(--space-8)', borderRadius: '16px' }}
+                            />
+                        ) : (
+                            <div style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: '16px',
+                                background: `linear-gradient(135deg, ${tenantInfo.primaryColor}30, ${tenantInfo.primaryColor}10)`,
+                                border: `2px solid ${tenantInfo.primaryColor}40`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1.5rem',
+                                fontWeight: 700,
+                                color: tenantInfo.primaryColor,
+                                margin: '0 auto var(--space-8)',
+                            }}>
+                                {tenantInfo.name.charAt(0)}
+                            </div>
+                        )}
+                    </Link>
+                ) : (
+                    <Link href="/">
+                        <img
+                            src="/logo-clubforge-final.svg"
+                            alt="ClubForge"
+                            style={{ height: '60px', width: 'auto', margin: '0 auto var(--space-8)' }}
+                        />
+                    </Link>
+                )}
 
                 {/* Success Card */}
                 <div className="glass-card" style={{ padding: 'var(--space-8)' }}>
@@ -100,7 +159,7 @@ export default function WaitlistConfirmationPage() {
                                 marginBottom: 'var(--space-6)',
                                 fontSize: 'var(--text-lg)',
                             }}>
-                                Thank you for registering with ClubForge.
+                                Thank you for registering with {displayName}.
                             </p>
 
                             {position && (

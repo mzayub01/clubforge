@@ -287,6 +287,108 @@ export async function POST(request: NextRequest) {
             }
 
             // -----------------------------------------------
+            // 6c. Seed default email templates for the tenant
+            // -----------------------------------------------
+            try {
+                const clubUrl = `https://${body.slug}.clubforgehq.com`;
+                const defaultTemplates = [
+                    {
+                        tenant_id: tenant.id,
+                        template_key: 'welcome',
+                        name: 'Welcome Email',
+                        description: 'Sent to new members after registration',
+                        subject: `Welcome to ${body.clubName}, {{firstName}}!`,
+                        greeting: 'Hi {{firstName}},',
+                        body_intro: `We're thrilled to welcome you to our martial arts family! Your registration at **{{locationName}}** has been successfully completed.`,
+                        body_details: '📍 **Location:** {{locationName}}\n🏷️ **Membership:** {{membershipType}}',
+                        body_action: 'Before your first class, please remember to:\n✅ Bring a clean Gi (uniform)\n✅ Trim your finger and toe nails\n✅ Arrive 10 minutes early\n✅ Bring water and a positive attitude!',
+                        body_closing: 'If you have any questions, please don\'t hesitate to reach out to us. See you on the mats!',
+                        signature: `The ${body.clubName} Team`,
+                        button_text: 'Go to Dashboard',
+                        button_url: `${clubUrl}/dashboard`,
+                        is_active: true,
+                    },
+                    {
+                        tenant_id: tenant.id,
+                        template_key: 'event_confirmation',
+                        name: 'Event Confirmation',
+                        description: 'Sent after event booking/payment',
+                        subject: 'Booking Confirmed: {{eventTitle}}',
+                        greeting: 'Hi {{firstName}},',
+                        body_intro: 'Great news! Your booking for **{{eventTitle}}** has been confirmed.',
+                        body_details: '📅 **Date:** {{eventDate}}\n🕐 **Time:** {{eventTime}}\n📍 **Location:** {{eventLocation}}\n💳 **Amount Paid:** {{amountPaid}}',
+                        body_action: 'Please arrive at least 15 minutes before the event starts.',
+                        body_closing: 'We look forward to seeing you there!',
+                        signature: `The ${body.clubName} Team`,
+                        button_text: 'View Event Details',
+                        button_url: `${clubUrl}/events`,
+                        is_active: true,
+                    },
+                    {
+                        tenant_id: tenant.id,
+                        template_key: 'membership_activated',
+                        name: 'Membership Activated',
+                        description: 'Sent after successful Stripe payment',
+                        subject: `Your ${body.clubName} Membership is Now Active!`,
+                        greeting: 'Hi {{firstName}},',
+                        body_intro: 'Your payment has been processed successfully and your membership is now active!',
+                        body_details: '📍 **Location:** {{locationName}}\n🏷️ **Plan:** {{membershipType}}\n💳 **Monthly:** {{price}}\n📅 **Started:** {{startDate}}',
+                        body_action: 'Your subscription will automatically renew each month. You can manage your membership at any time from your dashboard.',
+                        body_closing: 'Thank you for joining our martial arts community!',
+                        signature: `The ${body.clubName} Team`,
+                        button_text: 'Go to Dashboard',
+                        button_url: `${clubUrl}/dashboard`,
+                        is_active: true,
+                    },
+                    {
+                        tenant_id: tenant.id,
+                        template_key: 'payment_failed',
+                        name: 'Payment Failed',
+                        description: 'Sent when subscription payment fails',
+                        subject: 'Action Required: Payment Failed for Your Membership',
+                        greeting: 'Hi {{firstName}},',
+                        body_intro: 'We were unable to process your payment for your **{{membershipType}}** membership.',
+                        body_details: '💳 **Amount Due:** {{amountDue}}\n🔄 **Attempt:** {{attemptCount}} of 3\n📅 **Next Attempt:** {{nextAttemptDate}}',
+                        body_action: 'Please update your payment method to avoid any interruption to your membership.',
+                        body_closing: 'If you have any questions or need assistance, please don\'t hesitate to contact us.',
+                        signature: `The ${body.clubName} Team`,
+                        button_text: 'Update Payment Method',
+                        button_url: `${clubUrl}/dashboard/membership`,
+                        is_active: true,
+                    },
+                    {
+                        tenant_id: tenant.id,
+                        template_key: 'announcement_notification',
+                        name: 'Announcement Notification',
+                        description: 'Sent when admin publishes an announcement',
+                        subject: '📢 {{announcementTitle}}',
+                        greeting: 'Hi {{firstName}},',
+                        body_intro: '{{announcementMessage}}',
+                        body_details: null,
+                        body_action: null,
+                        body_closing: 'Thank you for being part of our community!',
+                        signature: `The ${body.clubName} Team`,
+                        button_text: 'View Dashboard',
+                        button_url: `${clubUrl}/dashboard`,
+                        is_active: true,
+                    },
+                ];
+
+                const { error: templateError } = await supabase
+                    .from('email_templates')
+                    .insert(defaultTemplates);
+
+                if (templateError) {
+                    console.error('[Onboard] Template seeding warning:', templateError.message);
+                } else {
+                    console.log(`[Onboard] Seeded ${defaultTemplates.length} email templates for tenant`);
+                }
+            } catch (templateSeedError) {
+                console.error('[Onboard] Email template seeding warning:', templateSeedError);
+                // Non-fatal — club owner can create templates manually
+            }
+
+            // -----------------------------------------------
             // 7. Create Stripe customer + subscription (with trial)
             // -----------------------------------------------
             let stripeCustomerId: string | null = null;

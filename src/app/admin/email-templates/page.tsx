@@ -41,10 +41,22 @@ export default function AdminEmailTemplatesPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [tenantName, setTenantName] = useState('ClubForge');
+    const [tenantLogo, setTenantLogo] = useState('/logo-clubforge-final.svg');
+    const [tenantColor, setTenantColor] = useState('#c5a456');
 
 
     useEffect(() => {
         fetchTemplates();
+        // Fetch tenant branding
+        adminFetch<{ name: string; logo_url: string | null; primary_color: string | null }>('tenants', { limit: 1 })
+            .then(({ data }) => {
+                if (data?.[0]) {
+                    setTenantName(data[0].name || 'ClubForge');
+                    if (data[0].logo_url) setTenantLogo(data[0].logo_url);
+                    if (data[0].primary_color) setTenantColor(data[0].primary_color);
+                }
+            });
     }, []);
 
     const fetchTemplates = async () => {
@@ -150,8 +162,8 @@ export default function AdminEmailTemplatesPage() {
                     {/* Logo */}
                     <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
                         <img
-                            src="/logo-clubforge-final.svg"
-                            alt="ClubForge"
+                            src={tenantLogo}
+                            alt={tenantName}
                             style={{ height: '60px', width: 'auto' }}
                         />
                     </div>
@@ -201,7 +213,7 @@ export default function AdminEmailTemplatesPage() {
                         <div style={{ textAlign: 'center', margin: 'var(--space-6) 0' }}>
                             <span style={{
                                 display: 'inline-block',
-                                background: 'linear-gradient(135deg, #c5a456, #a68935)',
+                                background: `linear-gradient(135deg, ${tenantColor}, ${tenantColor}cc)`,
                                 color: '#000',
                                 padding: 'var(--space-3) var(--space-6)',
                                 borderRadius: 'var(--radius-md)',
@@ -232,8 +244,8 @@ export default function AdminEmailTemplatesPage() {
                         color: '#888',
                         fontSize: 'var(--text-sm)',
                     }}>
-                        <p style={{ margin: '0 0 4px' }}>ClubForge</p>
-                        <p style={{ margin: 0 }}>Club Management Platform</p>
+                        <p style={{ margin: '0 0 4px' }}>{tenantName}</p>
+                        <p style={{ margin: 0 }}>Powered by ClubForge</p>
                     </div>
                 </div>
             </div>

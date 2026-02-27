@@ -10,7 +10,7 @@ import {
     renderSubscriptionActivatedEmail,
     renderPlanUpgradeEmail,
 } from '@/lib/email-templates';
-import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { PLANS } from '@/lib/stripe-plans';
 import Stripe from 'stripe';
 
@@ -168,20 +168,41 @@ export async function POST(request: NextRequest) {
 
                 if (eventData && userEmail) {
                     const eventDate = new Date(eventData.event_date);
-                    const html = renderEventConfirmationEmail({
-                        firstName: userName?.split(' ')[0] || 'Guest',
-                        eventTitle: eventData.title,
-                        eventDate: eventDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-                        eventTime: eventDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-                        eventLocation: eventData.location || 'TBC',
-                        amountPaid: eventData.price ? `£${eventData.price}` : 'Free',
-                    });
+                    const firstName = userName?.split(' ')[0] || 'Guest';
+                    const formattedDate = eventDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    const formattedTime = eventDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                    const formattedPrice = eventData.price ? `£${eventData.price}` : 'Free';
 
-                    await sendEmail({
-                        to: userEmail,
-                        subject: `Booking Confirmed: ${eventData.title}`,
-                        html,
-                    });
+                    // Try DB template with tenant branding first
+                    const branding = tenantId ? await getTenantBranding(tenantId) : null;
+                    const dbEmail = await renderEmailFromDatabase('event_confirmation', {
+                        firstName,
+                        eventTitle: eventData.title,
+                        eventDate: formattedDate,
+                        eventTime: formattedTime,
+                        eventLocation: eventData.location || 'TBC',
+                        amountPaid: formattedPrice,
+                    }, tenantId || undefined, branding || undefined);
+
+                    let html: string;
+                    let subject: string;
+
+                    if (dbEmail) {
+                        html = dbEmail.html;
+                        subject = dbEmail.subject;
+                    } else {
+                        html = renderEventConfirmationEmail({
+                            firstName,
+                            eventTitle: eventData.title,
+                            eventDate: formattedDate,
+                            eventTime: formattedTime,
+                            eventLocation: eventData.location || 'TBC',
+                            amountPaid: formattedPrice,
+                        });
+                        subject = `Booking Confirmed: ${eventData.title}`;
+                    }
+
+                    await sendEmail({ to: userEmail, subject, html });
                     console.log('Event confirmation email sent to:', userEmail);
                 }
             } catch (emailErr) {
@@ -392,19 +413,40 @@ export async function POST(request: NextRequest) {
                         .single();
 
                     if (profileData?.email) {
-                        const html = renderMembershipActivatedEmail({
-                            firstName: profileData.first_name || 'Member',
-                            locationName: locationData?.name || 'ClubForge',
-                            membershipType: membershipTypeData?.name || 'Membership',
-                            price: membershipTypeData?.price ? `£${membershipTypeData.price}/month` : 'N/A',
-                            startDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
-                        });
+                        const firstName = profileData.first_name || 'Member';
+                        const locationName = locationData?.name || 'the club';
+                        const membershipType = membershipTypeData?.name || 'Membership';
+                        const price = membershipTypeData?.price ? `£${membershipTypeData.price}/month` : 'N/A';
+                        const startDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-                        await sendEmail({
-                            to: profileData.email,
-                            subject: 'Your ClubForge Membership is Now Active!',
-                            html,
-                        });
+                        // Try DB template with tenant branding first
+                        const branding = membershipTenantId ? await getTenantBranding(membershipTenantId) : null;
+                        const dbEmail = await renderEmailFromDatabase('membership_activated', {
+                            firstName,
+                            locationName,
+                            membershipType,
+                            price,
+                            startDate,
+                        }, membershipTenantId || undefined, branding || undefined);
+
+                        let html: string;
+                        let subject: string;
+
+                        if (dbEmail) {
+                            html = dbEmail.html;
+                            subject = dbEmail.subject;
+                        } else {
+                            html = renderMembershipActivatedEmail({
+                                firstName,
+                                locationName,
+                                membershipType,
+                                price,
+                                startDate,
+                            });
+                            subject = `Your ${branding?.name || 'ClubForge'} Membership is Now Active!`;
+                        }
+
+                        await sendEmail({ to: profileData.email, subject, html });
                         console.log('Membership activation email sent to:', profileData.email);
                     }
                 } catch (emailErr) {
@@ -461,11 +503,12 @@ export async function POST(request: NextRequest) {
                     // Get membership details (don't join profiles — no FK)
                     const { data: membershipData } = await supabase
                         .from('memberships')
-                        .select('user_id, membership_type:membership_types(name)')
+                        .select('user_id, tenant_id, membership_type:membership_types(name)')
                         .eq('stripe_subscription_id', String(subscriptionId))
                         .single();
 
                     const membershipTypeName = (membershipData?.membership_type as unknown as { name: string } | null)?.name || 'Membership';
+                    const memberTenantId = membershipData?.tenant_id;
 
                     // Fetch profile separately
                     let firstName = 'Member';
@@ -478,21 +521,39 @@ export async function POST(request: NextRequest) {
                         firstName = profileData?.first_name || 'Member';
                     }
 
-                    const html = renderPaymentFailedEmail({
+                    const amountDue = `£${((invoice.amount_due || 0) / 100).toFixed(2)}`;
+                    const nextAttemptDate = invoice.next_payment_attempt
+                        ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                        : undefined;
+
+                    // Try DB template with tenant branding first
+                    const branding = memberTenantId ? await getTenantBranding(memberTenantId) : null;
+                    const dbEmail = await renderEmailFromDatabase('payment_failed', {
                         firstName,
                         membershipType: membershipTypeName,
-                        amountDue: `£${((invoice.amount_due || 0) / 100).toFixed(2)}`,
-                        attemptCount,
-                        nextAttemptDate: invoice.next_payment_attempt
-                            ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-                            : undefined,
-                    });
+                        amountDue,
+                        attemptCount: String(attemptCount),
+                        ...(nextAttemptDate && { nextAttemptDate }),
+                    }, memberTenantId || undefined, branding || undefined);
 
-                    await sendEmail({
-                        to: customerEmail,
-                        subject: `Action Required: Payment Failed for Your Membership`,
-                        html,
-                    });
+                    let html: string;
+                    let subject: string;
+
+                    if (dbEmail) {
+                        html = dbEmail.html;
+                        subject = dbEmail.subject;
+                    } else {
+                        html = renderPaymentFailedEmail({
+                            firstName,
+                            membershipType: membershipTypeName,
+                            amountDue,
+                            attemptCount,
+                            nextAttemptDate,
+                        });
+                        subject = `Action Required: Payment Failed for Your Membership`;
+                    }
+
+                    await sendEmail({ to: customerEmail, subject, html });
                     console.log('Payment failed email sent to:', customerEmail);
                 } catch (emailErr) {
                     console.error('Failed to send payment failed email:', emailErr);

@@ -15,16 +15,43 @@ export interface EmailTemplateData {
     is_active: boolean;
 }
 
+export interface TenantBranding {
+    name: string;
+    logoUrl?: string;
+    primaryColor?: string;
+    websiteUrl?: string;
+}
+
 /**
- * Fetch an email template from the database
+ * Fetch an email template from the database.
+ * If tenantId is provided, fetches the tenant-specific template.
+ * Falls back to a global template (tenant_id IS NULL) if no tenant-specific one exists.
  */
-export async function getEmailTemplate(templateKey: string): Promise<EmailTemplateData | null> {
+export async function getEmailTemplate(
+    templateKey: string,
+    tenantId?: string
+): Promise<EmailTemplateData | null> {
     const supabase = await createAdminClient();
 
+    // Try tenant-specific template first
+    if (tenantId) {
+        const { data: tenantTemplate } = await supabase
+            .from('email_templates')
+            .select('*')
+            .eq('template_key', templateKey)
+            .eq('tenant_id', tenantId)
+            .eq('is_active', true)
+            .single();
+
+        if (tenantTemplate) return tenantTemplate;
+    }
+
+    // Fall back to global template
     const { data, error } = await supabase
         .from('email_templates')
         .select('*')
         .eq('template_key', templateKey)
+        .is('tenant_id', null)
         .eq('is_active', true)
         .single();
 
@@ -52,13 +79,19 @@ export function replacePlaceholders(text: string, data: Record<string, string>):
 }
 
 /**
- * Render an email template to HTML with the ClubForge branding
+ * Render an email template to HTML.
+ * Uses tenant branding when provided, falls back to ClubForge branding.
  */
 export function renderTemplateToHtml(
     template: EmailTemplateData,
     data: Record<string, string>,
-    logoUrl: string = 'https://clubforgehq.com/logo-clubforge-final.svg'
+    branding?: TenantBranding
 ): string {
+    const orgName = branding?.name || 'ClubForge';
+    const logoUrl = branding?.logoUrl || 'https://clubforgehq.com/logo-clubforge-final.svg';
+    const primaryColor = branding?.primaryColor || '#c5a456';
+    const websiteUrl = branding?.websiteUrl || 'https://clubforgehq.com';
+
     const subject = replacePlaceholders(template.subject, data);
     const greeting = replacePlaceholders(template.greeting, data);
     const bodyIntro = replacePlaceholders(template.body_intro, data);
@@ -88,7 +121,7 @@ export function renderTemplateToHtml(
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td style="text-align: center; padding-bottom: 24px;">
-                                        <img src="${logoUrl}" alt="ClubForge" height="60" style="height: 60px; width: auto;">
+                                        <img src="${logoUrl}" alt="${orgName}" height="60" style="height: 60px; width: auto;">
                                     </td>
                                 </tr>
                             </table>
@@ -133,7 +166,7 @@ export function renderTemplateToHtml(
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 24px 0;">
                                 <tr>
                                     <td style="text-align: center;">
-                                        <a href="${buttonUrl}" style="display: inline-block; background: linear-gradient(135deg, #c5a456, #a68935); color: #000000; font-size: 16px; font-weight: 600; text-decoration: none; padding: 14px 28px; border-radius: 8px;">
+                                        <a href="${buttonUrl}" style="display: inline-block; background: linear-gradient(135deg, ${primaryColor}, ${primaryColor}cc); color: #000000; font-size: 16px; font-weight: 600; text-decoration: none; padding: 14px 28px; border-radius: 8px;">
                                             ${buttonText}
                                         </a>
                                     </td>
@@ -158,12 +191,12 @@ export function renderTemplateToHtml(
                     <tr>
                         <td style="padding-top: 24px; text-align: center;">
                             <p style="font-size: 14px; color: #888888; margin: 0 0 4px;">
-                                ClubForge
+                                ${orgName}
                             </p>
                             <p style="font-size: 14px; color: #888888; margin: 0 0 8px;">
-                                Club Management Platform
+                                Powered by ClubForge
                             </p>
-                            <a href="https://clubforgehq.com" style="font-size: 14px; color: #c5a456; text-decoration: none;">
+                            <a href="${websiteUrl}" style="font-size: 14px; color: ${primaryColor}; text-decoration: none;">
                                 Visit our website
                             </a>
                         </td>
@@ -178,20 +211,44 @@ export function renderTemplateToHtml(
 }
 
 /**
- * Convenience function to fetch and render a template
+ * Convenience function to fetch and render a template with tenant branding.
  */
 export async function renderEmailFromDatabase(
     templateKey: string,
-    data: Record<string, string>
+    data: Record<string, string>,
+    tenantId?: string,
+    branding?: TenantBranding
 ): Promise<{ html: string; subject: string } | null> {
-    const template = await getEmailTemplate(templateKey);
+    const template = await getEmailTemplate(templateKey, tenantId);
 
     if (!template) {
         return null;
     }
 
-    const html = renderTemplateToHtml(template, data);
+    const html = renderTemplateToHtml(template, data, branding);
     const subject = replacePlaceholders(template.subject, data);
 
     return { html, subject };
+}
+
+/**
+ * Fetch tenant branding info for email templates.
+ */
+export async function getTenantBranding(tenantId: string): Promise<TenantBranding | null> {
+    const supabase = await createAdminClient();
+
+    const { data: tenant } = await supabase
+        .from('tenants')
+        .select('name, logo_url, primary_color, slug')
+        .eq('id', tenantId)
+        .single();
+
+    if (!tenant) return null;
+
+    return {
+        name: tenant.name,
+        logoUrl: tenant.logo_url || undefined,
+        primaryColor: tenant.primary_color || undefined,
+        websiteUrl: tenant.slug ? `https://${tenant.slug}.clubforgehq.com` : undefined,
+    };
 }

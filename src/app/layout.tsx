@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import PublicBottomNav from "@/components/PublicBottomNav";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { OrganizationSchema, WebSiteSchema } from "@/components/structured-data";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,21 +35,40 @@ export const metadata: Metadata = {
   },
   description: 'The all-in-one SaaS platform for martial arts gyms, dojos, and academies. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and more — all from one dashboard.',
   keywords: [
+    // Primary — high-volume
     'gym management software',
     'martial arts software',
-    'dojo management',
-    'membership management',
-    'class scheduling software',
-    'belt progression tracking',
-    'BJJ software',
-    'karate club management',
-    'martial arts gym app',
-    'fitness club software',
-    'ClubForge',
-    'club management platform',
-    'attendance tracking',
-    'Stripe payments for gyms',
+    'club management software',
+    'dojo management system',
+    'fitness studio software',
+    // Discipline-specific
+    'BJJ gym management software',
+    'MMA gym software',
+    'karate dojo management',
+    'taekwondo club software',
+    'judo club management',
+    'boxing gym software',
+    'muay thai gym app',
+    // Feature-based long-tail
+    'gym membership management software',
+    'class scheduling software for gyms',
+    'belt progression tracking software',
+    'gym attendance tracking app',
+    'gym billing software with Stripe',
+    'martial arts school management system',
+    'online gym management system',
+    'gym CRM software',
+    'sports club management platform',
     'multi-location gym software',
+    'gym member portal',
+    'white label gym software',
+    // Commercial intent
+    'best gym management software 2026',
+    'best martial arts software UK',
+    'affordable gym management app',
+    'gym software with free trial',
+    'ClubForge',
+    'clubforgehq',
   ],
   authors: [{ name: 'ClubForge', url: 'https://clubforgehq.com' }],
   creator: 'ClubForge',
@@ -74,6 +94,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ClubForge — The Operating System for Martial Arts Clubs',
     description: 'The all-in-one platform for martial arts gyms. Manage members, classes, belt ranks, and payments from one dashboard.',
+    site: '@clubforgehq',
+    creator: '@clubforgehq',
   },
   robots: {
     index: true,
@@ -94,6 +116,9 @@ export const metadata: Metadata = {
     shortcut: '/logo-clubforge-icon.svg',
     apple: '/logo-clubforge-icon.svg',
   },
+  other: {
+    'google-site-verification': '',
+  },
 };
 
 export default function RootLayout({
@@ -108,8 +133,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/logo-clubforge-icon.svg" />
+        <link rel="alternate" hrefLang="en" href="https://clubforgehq.com" />
       </head>
       <body style={{ fontFamily: 'var(--font-sans)' }}>
+        <OrganizationSchema />
+        <WebSiteSchema />
         {children}
         <PublicBottomNav />
         <Analytics />

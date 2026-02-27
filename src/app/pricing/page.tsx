@@ -29,16 +29,24 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'Pricing — Plans for Every Club Size',
-    description: 'Simple, honest pricing for martial arts clubs of every size. Starter from £49/mo, Pro from £129/mo, Elite from £349/mo. No hidden fees, no per-member charges. Start your 14-day free trial.',
+    title: 'Pricing — Gym Management Software Plans for Every Club Size',
+    description: 'Simple, honest pricing for martial arts clubs and gym management. Starter from £39/mo, Pro from £129/mo, Elite from £349/mo. No hidden fees, no per-member charges. Compare all features. Start your 14-day free trial.',
     alternates: {
         canonical: 'https://clubforgehq.com/pricing',
     },
     openGraph: {
-        title: 'ClubForge Pricing — Plans for Every Club Size',
-        description: 'From £49/mo. No hidden fees, no per-member charges. Start free.',
+        title: 'ClubForge Pricing — Gym Management Software Plans',
+        description: 'From £39/mo. No hidden fees, no per-member charges. Start free.',
         url: 'https://clubforgehq.com/pricing',
     },
+    keywords: [
+        'gym management software pricing',
+        'martial arts software cost',
+        'club management software plans',
+        'affordable gym software',
+        'gym software free trial',
+        'ClubForge pricing',
+    ],
 };
 
 // -----------------------------------------------

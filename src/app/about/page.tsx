@@ -8,8 +8,16 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'About | ClubForge',
-    description: 'ClubForge was born from running a real club. We know the chaos of spreadsheets, WhatsApp, and duct-taped admin — so we built something better.',
+    title: 'About ClubForge — Built by Club Owners, for Club Owners',
+    description: 'ClubForge was born from running a real martial arts club. We know the chaos of spreadsheets, WhatsApp groups, and duct-taped admin — so we built the management platform we always wished existed.',
+    alternates: {
+        canonical: 'https://clubforgehq.com/about',
+    },
+    openGraph: {
+        title: 'About ClubForge — Built by Club Owners, for Club Owners',
+        description: 'Born from running a real club. We built the gym management platform we always wished existed.',
+        url: 'https://clubforgehq.com/about',
+    },
 };
 
 export default async function AboutPage() {

@@ -13,6 +13,7 @@ import {
     BarChart3,
     Megaphone,
     Tag,
+    Mail,
     LogOut,
     Menu,
     X,
@@ -31,6 +32,7 @@ const navItems = [
     { href: '/platform/tenants', label: 'Tenants', icon: Building2 },
     { href: '/platform/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/platform/promo-codes', label: 'Promo Codes', icon: Tag },
+    { href: '/platform/mail-merge', label: 'Mail Merge', icon: Mail },
     { href: '/platform/broadcasts', label: 'Broadcasts', icon: Megaphone },
 ];
 

@@ -22,6 +22,13 @@ import {
     FileText,
     X,
     Users,
+    Bold,
+    Italic,
+    Link,
+    Heading2,
+    Heading3,
+    List,
+    Minus,
 } from 'lucide-react';
 
 interface Recipient {
@@ -37,6 +44,7 @@ export default function MailMergePage() {
     const [pasteText, setPasteText] = useState('');
     const [parseError, setParseError] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const bodyRef = useRef<HTMLTextAreaElement>(null);
 
     // Template
     const [subject, setSubject] = useState('');
@@ -188,8 +196,89 @@ export default function MailMergePage() {
         if (target === 'subject') {
             setSubject(prev => prev + '{{club_name}}');
         } else {
-            setBodyTemplate(prev => prev + '{{club_name}}');
+            wrapSelection('{{club_name}}', '');
         }
+    };
+
+    // ── Format toolbar helpers ──────────────────────────────
+    const wrapSelection = (before: string, after: string) => {
+        const textarea = bodyRef.current;
+        if (!textarea) {
+            setBodyTemplate(prev => prev + before + after);
+            return;
+        }
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = bodyTemplate;
+        const selected = text.substring(start, end);
+
+        const newText = text.substring(0, start) + before + selected + after + text.substring(end);
+        setBodyTemplate(newText);
+
+        // Restore cursor position after React re-render
+        requestAnimationFrame(() => {
+            textarea.focus();
+            const cursorPos = selected
+                ? start + before.length + selected.length + after.length
+                : start + before.length;
+            textarea.setSelectionRange(cursorPos, cursorPos);
+        });
+    };
+
+    const insertAtCursor = (text: string) => {
+        const textarea = bodyRef.current;
+        if (!textarea) {
+            setBodyTemplate(prev => prev + text);
+            return;
+        }
+        const start = textarea.selectionStart;
+        const newText = bodyTemplate.substring(0, start) + text + bodyTemplate.substring(start);
+        setBodyTemplate(newText);
+        requestAnimationFrame(() => {
+            textarea.focus();
+            textarea.setSelectionRange(start + text.length, start + text.length);
+        });
+    };
+
+    const handleFormat = (type: string) => {
+        switch (type) {
+            case 'bold': wrapSelection('**', '**'); break;
+            case 'italic': wrapSelection('*', '*'); break;
+            case 'h2': insertAtCursor('\n## '); break;
+            case 'h3': insertAtCursor('\n### '); break;
+            case 'bullet': insertAtCursor('\n- '); break;
+            case 'hr': insertAtCursor('\n---\n'); break;
+            case 'link': {
+                const textarea = bodyRef.current;
+                const selected = textarea ? bodyTemplate.substring(textarea.selectionStart, textarea.selectionEnd) : '';
+                wrapSelection('[' + (selected || 'link text') + '](', ')');
+                break;
+            }
+        }
+    };
+
+    // ── Render markdown preview ─────────────────────────────
+    const renderPreviewHtml = (text: string): string => {
+        return text
+            .split('\n')
+            .map(line => {
+                const t = line.trim();
+                if (/^---+$/.test(t)) return '<hr style="border:none;border-top:1px solid #3f3f46;margin:12px 0;">';
+                if (t.startsWith('## ')) return `<h2 style="font-size:17px;font-weight:700;color:#e4e4e7;margin:16px 0 4px;">${fmtInline(t.slice(3))}</h2>`;
+                if (t.startsWith('### ')) return `<h3 style="font-size:14px;font-weight:600;color:#d4d4d8;margin:12px 0 4px;">${fmtInline(t.slice(4))}</h3>`;
+                if (/^[-•]\s/.test(t)) return `<div style="padding-left:14px;margin:2px 0;"><span style="color:#a78bfa;margin-right:6px;">•</span>${fmtInline(t.slice(2))}</div>`;
+                if (!t) return '<div style="height:8px;"></div>';
+                return `<p style="margin:0 0 4px;">${fmtInline(t)}</p>`;
+            })
+            .join('');
+    };
+
+    const fmtInline = (text: string): string => {
+        return text
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#a78bfa;text-decoration:underline;">$1</a>');
     };
 
     // ── Render ──────────────────────────────────────────────
@@ -424,12 +513,26 @@ export default function MailMergePage() {
                                         + Insert {'{{club_name}}'}
                                     </button>
                                 </label>
+                                <div className="editor-toolbar">
+                                    <button type="button" title="Bold" onClick={() => handleFormat('bold')}><Bold size={14} /></button>
+                                    <button type="button" title="Italic" onClick={() => handleFormat('italic')}><Italic size={14} /></button>
+                                    <div className="toolbar-sep" />
+                                    <button type="button" title="Heading" onClick={() => handleFormat('h2')}><Heading2 size={14} /></button>
+                                    <button type="button" title="Subheading" onClick={() => handleFormat('h3')}><Heading3 size={14} /></button>
+                                    <div className="toolbar-sep" />
+                                    <button type="button" title="Bullet list" onClick={() => handleFormat('bullet')}><List size={14} /></button>
+                                    <button type="button" title="Link" onClick={() => handleFormat('link')}><Link size={14} /></button>
+                                    <button type="button" title="Horizontal rule" onClick={() => handleFormat('hr')}><Minus size={14} /></button>
+                                </div>
                                 <textarea
-                                    placeholder={`Hi {{club_name}},\n\nI came across your club and wanted to reach out...\n\nBest regards,\nThe ClubForge Team`}
+                                    ref={bodyRef}
+                                    placeholder={`Hi {{club_name}},\n\nI came across your club and wanted to reach out...\n\n## What We Offer\n\n- **Easy member management**\n- Online bookings & payments\n- [Learn more](https://clubforgehq.com)\n\nBest regards`}
                                     value={bodyTemplate}
                                     onChange={e => setBodyTemplate(e.target.value)}
-                                    rows={12}
+                                    rows={14}
+                                    className="editor-textarea"
                                 />
+                                <span className="hint">Supports **bold**, *italic*, [links](url), ## headings, - bullets, --- dividers</span>
                             </div>
                         </div>
 
@@ -465,11 +568,7 @@ export default function MailMergePage() {
                                         <span className="preview-value">{previewSubject || '(no subject)'}</span>
                                     </div>
                                     <div className="preview-divider" />
-                                    <div className="preview-body">
-                                        {previewBody.split('\n').map((line, i) => (
-                                            <p key={i}>{line || '\u00A0'}</p>
-                                        ))}
-                                    </div>
+                                    <div className="preview-body" dangerouslySetInnerHTML={{ __html: renderPreviewHtml(previewBody) }} />
                                 </div>
                             )}
                         </div>
@@ -538,11 +637,7 @@ export default function MailMergePage() {
                                             <span className="preview-value">{previewSubject}</span>
                                         </div>
                                         <div className="preview-divider" />
-                                        <div className="preview-body">
-                                            {previewBody.split('\n').map((line, i) => (
-                                                <p key={i}>{line || '\u00A0'}</p>
-                                            ))}
-                                        </div>
+                                        <div className="preview-body" dangerouslySetInnerHTML={{ __html: renderPreviewHtml(previewBody) }} />
                                     </div>
                                 </div>
 
@@ -853,6 +948,49 @@ export default function MailMergePage() {
 
                 .sender-fields .form-group {
                     margin-bottom: 0;
+                }
+
+                /* Editor toolbar */
+                .editor-toolbar {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    padding: 6px 8px;
+                    background: #0a0a0f;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-bottom: none;
+                    border-radius: 8px 8px 0 0;
+                }
+
+                .editor-toolbar button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 30px;
+                    height: 28px;
+                    background: transparent;
+                    border: none;
+                    border-radius: 4px;
+                    color: #71717a;
+                    cursor: pointer;
+                    transition: all 0.1s ease;
+                }
+
+                .editor-toolbar button:hover {
+                    background: rgba(167, 139, 250, 0.12);
+                    color: #a78bfa;
+                }
+
+                .toolbar-sep {
+                    width: 1px;
+                    height: 18px;
+                    background: rgba(255,255,255,0.08);
+                    margin: 0 4px;
+                }
+
+                .editor-textarea {
+                    border-top-left-radius: 0 !important;
+                    border-top-right-radius: 0 !important;
                 }
 
                 /* Action button */

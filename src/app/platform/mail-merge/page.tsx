@@ -29,6 +29,7 @@ import {
     Heading3,
     List,
     Minus,
+    Palette,
 } from 'lucide-react';
 
 interface Recipient {
@@ -57,6 +58,7 @@ export default function MailMergePage() {
     const [sending, setSending] = useState(false);
     const [result, setResult] = useState<{ sent: number; failed: number; errors?: string[] } | null>(null);
     const [error, setError] = useState('');
+    const [showColorPicker, setShowColorPicker] = useState(false);
 
     // ── Parse recipients from text ──────────────────────────
     const parseRecipients = useCallback((text: string): Recipient[] => {
@@ -258,6 +260,22 @@ export default function MailMergePage() {
         }
     };
 
+    const handleColorFormat = (color: string) => {
+        wrapSelection(`{color:${color}}`, '{/color}');
+        setShowColorPicker(false);
+    };
+
+    const COLOR_SWATCHES = [
+        { color: '#e53e3e', label: 'Red' },
+        { color: '#dd6b20', label: 'Orange' },
+        { color: '#d69e2e', label: 'Yellow' },
+        { color: '#38a169', label: 'Green' },
+        { color: '#3182ce', label: 'Blue' },
+        { color: '#805ad5', label: 'Purple' },
+        { color: '#d53f8c', label: 'Pink' },
+        { color: '#718096', label: 'Grey' },
+    ];
+
     // ── Render markdown preview ─────────────────────────────
     const renderPreviewHtml = (text: string): string => {
         return text
@@ -276,6 +294,7 @@ export default function MailMergePage() {
 
     const fmtInline = (text: string): string => {
         return text
+            .replace(/\{color:(#[0-9a-fA-F]{3,6})\}(.+?)\{\/color\}/g, '<span style="color:$1">$2</span>')
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.+?)\*/g, '<em>$1</em>')
             .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#a78bfa;text-decoration:underline;">$1</a>');
@@ -523,6 +542,27 @@ export default function MailMergePage() {
                                     <button type="button" title="Bullet list" onClick={() => handleFormat('bullet')}><List size={14} /></button>
                                     <button type="button" title="Link" onClick={() => handleFormat('link')}><Link size={14} /></button>
                                     <button type="button" title="Horizontal rule" onClick={() => handleFormat('hr')}><Minus size={14} /></button>
+                                    <div className="toolbar-sep" />
+                                    <div className="color-picker-wrap">
+                                        <button type="button" title="Text colour" onClick={() => setShowColorPicker(!showColorPicker)}><Palette size={14} /></button>
+                                        {showColorPicker && (
+                                            <div className="color-picker-dropdown">
+                                                <span className="color-picker-label">Text Colour</span>
+                                                <div className="color-swatches">
+                                                    {COLOR_SWATCHES.map(s => (
+                                                        <button
+                                                            key={s.color}
+                                                            type="button"
+                                                            className="color-swatch"
+                                                            title={s.label}
+                                                            style={{ background: s.color }}
+                                                            onClick={() => handleColorFormat(s.color)}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <textarea
                                     ref={bodyRef}
@@ -532,7 +572,7 @@ export default function MailMergePage() {
                                     rows={14}
                                     className="editor-textarea"
                                 />
-                                <span className="hint">Supports **bold**, *italic*, [links](url), ## headings, - bullets, --- dividers</span>
+                                <span className="hint">Supports **bold**, *italic*, [links](url), ## headings, - bullets, --- dividers, text colours</span>
                             </div>
                         </div>
 
@@ -991,6 +1031,54 @@ export default function MailMergePage() {
                 .editor-textarea {
                     border-top-left-radius: 0 !important;
                     border-top-right-radius: 0 !important;
+                }
+
+                /* Color picker */
+                .color-picker-wrap {
+                    position: relative;
+                }
+
+                .color-picker-dropdown {
+                    position: absolute;
+                    top: 36px;
+                    left: 0;
+                    background: #1a1a24;
+                    border: 1px solid rgba(255,255,255,0.1);
+                    border-radius: 10px;
+                    padding: 10px 12px;
+                    z-index: 50;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+                    min-width: 150px;
+                }
+
+                .color-picker-label {
+                    font-size: 11px;
+                    color: #71717a;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    font-weight: 500;
+                    margin-bottom: 8px;
+                    display: block;
+                }
+
+                .color-swatches {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 6px;
+                }
+
+                .color-swatch {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+                    border: 2px solid transparent;
+                    cursor: pointer;
+                    transition: all 0.1s ease;
+                }
+
+                .color-swatch:hover {
+                    border-color: white;
+                    transform: scale(1.15);
                 }
 
                 /* Action button */

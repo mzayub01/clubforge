@@ -72,9 +72,14 @@ function markdownToEmailHtml(text: string): string {
         .join('\n');
 }
 
-/** Format inline markdown: **bold**, *italic*, [text](url) */
+/** Format inline markdown: {color:#hex}text{/color}, **bold**, *italic*, [text](url) */
 function formatInline(text: string): string {
     return text
+        // Colored text: {color:#hex}text{/color}
+        .replace(
+            /\{color:(#[0-9a-fA-F]{3,6})\}(.+?)\{\/color\}/g,
+            '<span style="color: $1">$2</span>'
+        )
         // Bold: **text**
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         // Italic: *text*

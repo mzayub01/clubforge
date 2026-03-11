@@ -193,8 +193,8 @@ export async function POST(request: NextRequest) {
                     errors.push(`${recipient.email}: ${result.error}`);
                 }
 
-                // 100ms delay to respect Resend rate limits
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Resend free tier allows 2 requests/second — 600ms gap keeps us safely under
+                await new Promise(resolve => setTimeout(resolve, 600));
 
             } catch (err) {
                 failed++;

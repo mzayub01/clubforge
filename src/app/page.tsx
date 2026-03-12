@@ -34,6 +34,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { SoftwareApplicationSchema, BreadcrumbSchema } from '@/components/structured-data';
+import CurrencyPrice from '@/components/CurrencyPrice';
 
 export const metadata = {
   title: 'ClubForge — The #1 Gym & Martial Arts Club Management Software',
@@ -1212,7 +1213,7 @@ export default async function HomePage() {
                   Starter
                 </h3>
                 <div style={{ marginBottom: '8px' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}>£39</span>
+                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}><CurrencyPrice tier="starter" period="monthly" /></span>
                   <span style={{ color: '#64748B', fontSize: '1rem' }}>/month</span>
                 </div>
                 <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginBottom: '28px', lineHeight: '1.6' }}>
@@ -1255,7 +1256,7 @@ export default async function HomePage() {
                   Pro
                 </h3>
                 <div style={{ marginBottom: '8px' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}>£129</span>
+                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}><CurrencyPrice tier="pro" period="monthly" /></span>
                   <span style={{ color: '#64748B', fontSize: '1rem' }}>/month</span>
                 </div>
                 <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginBottom: '28px', lineHeight: '1.6' }}>
@@ -1291,7 +1292,7 @@ export default async function HomePage() {
                   Elite
                 </h3>
                 <div style={{ marginBottom: '8px' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}>£349</span>
+                  <span style={{ fontSize: '3rem', fontWeight: '800', color: '#FFFFFF' }}><CurrencyPrice tier="elite" period="monthly" /></span>
                   <span style={{ color: '#64748B', fontSize: '1rem' }}>/month</span>
                 </div>
                 <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginBottom: '28px', lineHeight: '1.6' }}>

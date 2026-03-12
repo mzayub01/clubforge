@@ -27,6 +27,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
+import CurrencyPrice, { CurrencyAnnualNote } from '@/components/CurrencyPrice';
 
 export const metadata = {
     title: 'Pricing — Gym Management Software Plans for Every Club Size',
@@ -207,11 +208,11 @@ export default async function PricingPage() {
                                     Starter
                                 </h3>
                                 <div style={{ marginBottom: 'var(--space-2)' }}>
-                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£39</span>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="starter" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
                                 <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
-                                    or £31/mo billed annually
+                                    <CurrencyAnnualNote tier="starter" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                                     For new and small clubs getting started.
@@ -246,11 +247,11 @@ export default async function PricingPage() {
                                     Pro
                                 </h3>
                                 <div style={{ marginBottom: 'var(--space-2)' }}>
-                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£129</span>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="pro" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
                                 <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
-                                    or £103/mo billed annually
+                                    <CurrencyAnnualNote tier="pro" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                                     For established clubs ready to scale.
@@ -278,11 +279,11 @@ export default async function PricingPage() {
                                     Elite
                                 </h3>
                                 <div style={{ marginBottom: 'var(--space-2)' }}>
-                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}>£349</span>
+                                    <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="elite" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
                                 <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
-                                    or £279/mo billed annually
+                                    <CurrencyAnnualNote tier="elite" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                                     For large academies and franchises.

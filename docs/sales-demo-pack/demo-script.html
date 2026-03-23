@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Script — ClubForge Sales Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAFBFC;
+            color: #334155;
+            line-height: 1.7
+        }
+
+        .nav {
+            background: #0F172A;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .nav a:hover {
+            color: #C5A456
+        }
+
+        .nav .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .nav .brand span {
+            color: #C5A456
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            color: #94A3B8;
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 80px
+        }
+
+        .checklist {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px
+        }
+
+        .checklist h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 14px
+        }
+
+        .check-item:last-child {
+            border-bottom: none
+        }
+
+        .check-item::before {
+            content: "☐";
+            font-size: 16px;
+            color: #C5A456
+        }
+
+        .act {
+            margin-bottom: 48px
+        }
+
+        .act-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E2E8F0
+        }
+
+        .act-num {
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            color: #0F172A;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .act-header h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0F172A
+        }
+
+        .act-header .time {
+            font-size: 12px;
+            color: #94A3B8;
+            font-weight: 600;
+            margin-left: auto;
+            background: #F1F5F9;
+            padding: 4px 10px;
+            border-radius: 6px
+        }
+
+        .talk {
+            background: #F0FDF4;
+            border-left: 4px solid #22C55E;
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 16px 0;
+            font-style: italic;
+            color: #15803D;
+            font-size: 14px;
+            line-height: 1.8
+        }
+
+        .talk::before {
+            content: "💬 SAY:";
+            font-style: normal;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            letter-spacing: .5px
+        }
+
+        .wow {
+            background: linear-gradient(135deg, rgba(197, 164, 86, 0.08), rgba(197, 164, 86, 0.04));
+            border: 1px solid rgba(197, 164, 86, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0
+        }
+
+        .wow::before {
+            content: "💥 WOW MOMENT";
+            font-weight: 800;
+            font-size: 11px;
+            color: #A88B3D;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px
+        }
+
+        .wow p {
+            font-style: italic;
+            color: #92400E;
+            font-size: 14px;
+            line-height: 1.7
+        }
+
+        .action {
+            background: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 12px 0;
+            font-size: 13px;
+            color: #1E40AF
+        }
+
+        .action::before {
+            content: "👆 DO:";
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            letter-spacing: .5px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px
+        }
+
+        th {
+            background: #F8FAFC;
+            text-align: left;
+            padding: 10px 14px;
+            font-weight: 700;
+            color: #0F172A;
+            border-bottom: 2px solid #E2E8F0;
+            font-size: 12px
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #F1F5F9
+        }
+
+        .price-table td:first-child {
+            font-weight: 600;
+            color: #0F172A
+        }
+
+        p {
+            margin: 10px 0;
+            font-size: 14px
+        }
+
+        h3 {
+            font-size: 15px;
+            color: #0F172A;
+            font-weight: 700;
+            margin: 20px 0 8px
+        }
+
+        .tip {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #92400E;
+            margin: 16px 0
+        }
+
+        .tip::before {
+            content: "💡 TIP: ";
+            font-weight: 700
+        }
+
+        .donts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0
+        }
+
+        .do,
+        .dont {
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 13px
+        }
+
+        .do {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0
+        }
+
+        .dont {
+            background: #FEF2F2;
+            border: 1px solid #FECACA
+        }
+
+        .do h4,
+        .dont h4 {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .do h4 {
+            color: #16A34A
+        }
+
+        .dont h4 {
+            color: #DC2626
+        }
+
+        .do li,
+        .dont li {
+            padding: 4px 0;
+            color: #334155;
+            list-style: none
+        }
+
+        .do li::before {
+            content: "✅ "
+        }
+
+        .dont li::before {
+            content: "❌ "
+        }
+
+        .followup {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0
+        }
+
+        .followup h3 {
+            margin-top: 0
+        }
+
+        .followup-item {
+            display: flex;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #F1F5F9
+        }
+
+        .followup-item:last-child {
+            border-bottom: none
+        }
+
+        .followup-day {
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            height: fit-content;
+            white-space: nowrap
+        }
+
+        .followup-msg {
+            font-size: 13px;
+            color: #475569
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav">
+        <span class="brand">Club<span>Forge</span> Sales Pack</span>
+        <a href="index.html">← Back to Index</a>
+    </nav>
+
+    <div class="hero">
+        <h1>🎬 Demo <span>Script</span></h1>
+        <p>Your 30-minute step-by-step playbook for turning prospects into customers.</p>
+    </div>
+
+    <div class="container">
+
+        <div class="checklist">
+            <h3>⏱️ Pre-Demo Checklist (5 min before)</h3>
+            <div class="check-item">Log in as Admin → demo-admin@clubforgehq.com / ClubForge2026!</div>
+            <div class="check-item">Open incognito tab as Member → demo-member@clubforgehq.com / ClubForge2026!</div>
+            <div class="check-item">Confirm demo data looks fresh (7 members, 5 classes, belt progressions)</div>
+            <div class="check-item">Close all unrelated browser tabs</div>
+            <div class="check-item">Have the prospect's club name, size, and discipline written down</div>
+        </div>
+
+        <!-- ACT 1 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">1</div>
+                <h2>The Hook</h2><span class="time">2 min</span>
+            </div>
+            <div class="talk">Thanks for making time, [Name]. Before I show you anything — quick question: how many
+                hours a week would you say you spend on admin? Chasing payments, updating spreadsheets, answering
+                WhatsApp messages about class times?</div>
+            <p><strong>Wait for their answer.</strong> Most say 8–15 hours. Use their number.</p>
+            <div class="talk">That's about [X] hours you're not coaching, not growing your club, and not getting paid
+                for. ClubForge was built to give you those hours back. Let me show you exactly how.</div>
+            <div class="talk">We built this for club owners like you — people who are amazing coaches but never signed
+                up to be accountants and customer service reps. What you're about to see isn't another tool. It's your
+                club's operating system.</div>
+            <div class="tip">Goal: Make them feel understood. They should be nodding before you show a single screen.
+            </div>
+        </div>
+
+        <!-- ACT 2 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">2</div>
+                <h2>The Command Centre</h2><span class="time">5 min</span>
+            </div>
+            <div class="action">Navigate to /admin — the Admin Dashboard</div>
+            <div class="talk">This is your command centre. Everything that matters about your club — in one glance.
+            </div>
+            <table>
+                <tr>
+                    <th>Point At</th>
+                    <th>What to Say</th>
+                </tr>
+                <tr>
+                    <td>Total Members</td>
+                    <td>"247 members across all your programmes — adults, kids, trial members — segmented and
+                        searchable."</td>
+                </tr>
+                <tr>
+                    <td>Monthly Revenue</td>
+                    <td>"£8,420 this month. Not a guess — it pulls directly from your live Stripe data."</td>
+                </tr>
+                <tr>
+                    <td>Attendance Rate</td>
+                    <td>"87% attendance rate. You'll know instantly if a class is dying or a member is drifting."</td>
+                </tr>
+                <tr>
+                    <td>Classes This Week</td>
+                    <td>"18 classes running this week, 3 today. Your schedule, live."</td>
+                </tr>
+            </table>
+            <div class="wow">
+                <p>"Tell me — right now, without looking anything up, do you know exactly how much revenue your club
+                    made last month? Or which members haven't shown up in 3 weeks? This is what ClubForge gives you from
+                    day one."</p>
+            </div>
+        </div>
+
+        <!-- ACT 3 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">3</div>
+                <h2>Member Management</h2><span class="time">5 min</span>
+            </div>
+            <div class="action">Navigate to /admin/members — scroll the list, click a profile, highlight family accounts
+            </div>
+            <div class="talk">Let's look at your members. Every profile, every membership, every grading — all in one
+                place.</div>
+            <div class="action">Navigate to /admin/invite — show the branded registration link</div>
+            <div class="talk">Getting new members on board? You share this link. They register, accept the waiver, pick
+                their membership, and pay — all without you touching a thing. No paper forms. No chasing bank transfers.
+            </div>
+            <div class="wow">
+                <p>"Think about the last time you onboarded a new member. How many texts did it take? How many days
+                    before they actually paid? With ClubForge, it's one link, five minutes, done."</p>
+            </div>
+        </div>
+
+        <!-- ACT 4 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">4</div>
+                <h2>Classes & Attendance</h2><span class="time">4 min</span>
+            </div>
+            <div class="action">Navigate to /admin/classes, then /admin/class-roster, then /admin/attendance</div>
+            <div class="talk">Here's your class timetable. Every class, every instructor, every capacity limit. Click
+                into any class and you see exactly who's checked in and how full you are.</div>
+            <div class="wow">
+                <p>"Imagine knowing, before the month ends, that 12 members haven't trained in 3 weeks. That's 12
+                    cancellations you can prevent with one message. ClubForge makes that invisible pattern visible."</p>
+            </div>
+        </div>
+
+        <!-- ACT 5 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">5</div>
+                <h2>Billing & Finance</h2><span class="time">5 min</span>
+            </div>
+            <div class="action">Navigate to /admin/finance, then /admin/membership-types, then /admin/promo-codes</div>
+            <div class="talk">Money. The thing nobody wants to talk about but everyone needs to manage. You set up your
+                tiers — Adults, Kids, All-Access — Stripe handles the rest. Recurring billing, invoicing, failed payment
+                recovery — all automatic.</div>
+            <div class="talk">Running a Black Friday deal? Create a promo code in 10 seconds. It integrates directly
+                with Stripe.</div>
+            <div class="wow">
+                <p>"How much revenue are you losing right now to failed payments, expired cards, and members who just
+                    'forget' to pay? Stripe handles all of that automatically — retry logic, card updates, dunning
+                    emails. You just see the money arrive."</p>
+            </div>
+        </div>
+
+        <!-- ACT 6 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">6</div>
+                <h2>Belt Progression</h2><span class="time">4 min</span>
+            </div>
+            <div class="action">Navigate to /admin/grading-settings — show adult and kids belt schemes</div>
+            <div class="talk">This is where ClubForge really separates from generic gym software. Adult belts, kids
+                belts with a 13-rank progression, professor access controls, grading feedback — all built in.</div>
+            <div class="wow">
+                <p>"Your members can see their belt history, grading feedback, and what they need to work on — from
+                    their phone. No more 'Sensei, when's my next grading?' messages."</p>
+            </div>
+            <div class="talk">Here's why this matters commercially: a member who can visualize their progress is a
+                member who stays. Belt tracking turns abstract loyalty into visible momentum.</div>
+        </div>
+
+        <!-- ACT 7 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">7</div>
+                <h2>The Member Experience</h2><span class="time">3 min</span>
+            </div>
+            <div class="action">Switch to the Member incognito tab — navigate to /dashboard</div>
+            <div class="talk">Now let me show you what YOUR members see. Sarah logged in — she can see her classes, belt
+                progress, attendance streak, announcements. Clean, branded, mobile-friendly.</div>
+            <table>
+                <tr>
+                    <th>Screen</th>
+                    <th>What to Say</th>
+                </tr>
+                <tr>
+                    <td>Dashboard home</td>
+                    <td>"One dashboard. Their entire club life."</td>
+                </tr>
+                <tr>
+                    <td>Class schedule</td>
+                    <td>"Full timetable, check availability, one-tap check-in."</td>
+                </tr>
+                <tr>
+                    <td>Belt progress</td>
+                    <td>"Their rank, stripes, and grading history — all visible."</td>
+                </tr>
+                <tr>
+                    <td>Announcements</td>
+                    <td>"You post an announcement, it's here instantly. No WhatsApp spam."</td>
+                </tr>
+            </table>
+            <div class="wow">
+                <p>"This is what your members will show their friends. 'Look at my club's app — I can check into class
+                    from my phone.' That's organic marketing that costs you nothing."</p>
+            </div>
+        </div>
+
+        <!-- ACT 8 -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">8</div>
+                <h2>White-Label Branding</h2><span class="time">2 min</span>
+            </div>
+            <div class="action">Navigate to /admin/settings — show colours, logo, tenant branding</div>
+            <div class="talk">Everything your members see is branded to you. Your club name, your colours, your logo.
+                When they log in, they see YOUR club — not ClubForge. We just power it.</div>
+        </div>
+
+        <!-- ACT 9 — THE CLOSE -->
+        <div class="act">
+            <div class="act-header">
+                <div class="act-num">9</div>
+                <h2>The Close</h2><span class="time">4 min</span>
+            </div>
+            <div class="talk">So here's the thing, [Name]. Everything you just saw — the dashboard, the member portal,
+                the billing, the belt tracking — that all comes in our Starter plan at £39 a month.</div>
+            <table class="price-table">
+                <tr>
+                    <th></th>
+                    <th>Starter</th>
+                    <th>Pro ⭐</th>
+                    <th>Elite</th>
+                </tr>
+                <tr>
+                    <td>Price</td>
+                    <td>£39/mo</td>
+                    <td>£129/mo</td>
+                    <td>£349/mo</td>
+                </tr>
+                <tr>
+                    <td>Annual</td>
+                    <td>£31/mo</td>
+                    <td>£103/mo</td>
+                    <td>£279/mo</td>
+                </tr>
+                <tr>
+                    <td>Members</td>
+                    <td>Up to 150</td>
+                    <td>Up to 750</td>
+                    <td>Unlimited</td>
+                </tr>
+                <tr>
+                    <td>Locations</td>
+                    <td>1</td>
+                    <td>Up to 3</td>
+                    <td>Unlimited</td>
+                </tr>
+            </table>
+            <div class="talk">Most clubs go with Pro — multi-location, analytics, video library, 24-hour support. But
+                Starter has everything you need to get going today.</div>
+            <div class="talk">Here's what I'd suggest: start a 14-day free trial — full Pro features, no card required.
+                Set it up with your real club name, invite a few members, and see how it feels. If it's not saving you
+                hours by day 3, I'll buy you a coffee.</div>
+            <p style="text-align:center;margin:20px 0"><strong style="font-size:16px;color:#0F172A">👉
+                    clubforgehq.com/get-started</strong></p>
+        </div>
+
+        <!-- FOLLOW UP -->
+        <div class="followup">
+            <h3>📧 Post-Demo Follow-Up Cadence</h3>
+            <div class="followup-item"><span class="followup-day">Same Day</span>
+                <div class="followup-msg">Thank-you email with trial link, pricing page link, and your direct contact
+                    info.</div>
+            </div>
+            <div class="followup-item"><span class="followup-day">Day 3</span>
+                <div class="followup-msg">"Hey [Name], did you get a chance to set up your club? Happy to jump on a
+                    quick call if you need help."</div>
+            </div>
+            <div class="followup-item"><span class="followup-day">Day 7</span>
+                <div class="followup-msg">"Your trial is halfway through. How's it going? Any features you'd like me to
+                    walk through?"</div>
+            </div>
+            <div class="followup-item"><span class="followup-day">Day 12</span>
+                <div class="followup-msg">"Trial wraps up in 2 days. Ready to lock in? I can apply a 20% annual discount
+                    if you go yearly."</div>
+            </div>
+        </div>
+
+        <!-- DO's and DON'Ts -->
+        <div class="donts">
+            <div class="do">
+                <h4>✅ Do</h4>
+                <ul>
+                    <li>Ask about their setup first</li>
+                    <li>Use their club name in examples</li>
+                    <li>Pause after wow moments</li>
+                    <li>Show admin AND member views</li>
+                    <li>Relate features to their pain</li>
+                    <li>Follow up within 2 hours</li>
+                </ul>
+            </div>
+            <div class="dont">
+                <h4>❌ Don't</h4>
+                <ul>
+                    <li>Jump straight into features</li>
+                    <li>Call it "the demo tenant"</li>
+                    <li>Rush through every screen</li>
+                    <li>Only show the admin side</li>
+                    <li>List features like a brochure</li>
+                    <li>End with "any questions?" only</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,36 +1,36 @@
-﻿node.exe : ΓÜá Warning: Next.js inferred your workspace root, but it may not be 
-correct.
+﻿node.exe : ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
 At line:1 char:1
 + & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:Strin 
-   g) [], RemoteException
+    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:String) [],  
+   RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
  We detected multiple lockfiles and selected the directory of 
 C:\Users\user\package-lock.json as the root directory.
- To silence this warning, set `turbopack.root` in your Next.js config, or consider 
-removing one of the lockfiles if it's not needed.
-   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root
--directory for more information.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing 
+one of the lockfiles if it's not needed.
+   See 
+https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory 
+for more information.
  Detected additional lockfiles: 
    * C:\Users\user\dev\dojohub\package-lock.json
 
 Γû▓ Next.js 16.1.1 (Turbopack)
 - Environments: .env.local
 
-ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. 
-Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: 
+https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 3.2s
+Γ£ô Compiled successfully in 5.2s
   Running TypeScript ...
   Collecting page data using 21 workers ...
 ΓÜá Using edge runtime on a page currently disables static generation for that page
-  Generating static pages using 21 workers (0/110) ...
-  Generating static pages using 21 workers (27/110) 
-  Generating static pages using 21 workers (54/110) 
-  Generating static pages using 21 workers (82/110) 
-Γ£ô Generating static pages using 21 workers (110/110) in 1367.1ms
+  Generating static pages using 21 workers (0/137) ...
+  Generating static pages using 21 workers (34/137) 
+  Generating static pages using 21 workers (68/137) 
+  Generating static pages using 21 workers (102/137) 
+Γ£ô Generating static pages using 21 workers (137/137) in 1240.0ms
   Finalizing page optimization ...
 
 Route (app)
@@ -42,6 +42,7 @@ Route (app)
 Γö£ ╞Æ /admin/attendance
 Γö£ ╞Æ /admin/class-roster
 Γö£ ╞Æ /admin/classes
+Γö£ ╞Æ /admin/data-export
 Γö£ ╞Æ /admin/email-templates
 Γö£ ╞Æ /admin/events
 Γö£ ╞Æ /admin/finance
@@ -56,11 +57,13 @@ Route (app)
 Γö£ ╞Æ /admin/naseeha
 Γö£ ╞Æ /admin/professor-access
 Γö£ ╞Æ /admin/promo-codes
+Γö£ ╞Æ /admin/reports
 Γö£ ╞Æ /admin/settings
 Γö£ ╞Æ /admin/videos
 Γö£ ╞Æ /admin/waitlist
 Γö£ ╞Æ /api/admin/create-user
 Γö£ ╞Æ /api/admin/crud
+Γö£ ╞Æ /api/admin/diagnostic
 Γö£ ╞Æ /api/admin/fix-migration
 Γö£ ╞Æ /api/admin/locations
 Γö£ ╞Æ /api/admin/members
@@ -75,6 +78,7 @@ Route (app)
 Γö£ ╞Æ /api/email/event-confirmation
 Γö£ ╞Æ /api/email/welcome
 Γö£ ╞Æ /api/grading/promote
+Γö£ ╞Æ /api/member/classes
 Γö£ ╞Æ /api/multisite/available-locations
 Γö£ ╞Æ /api/multisite/checkout
 Γö£ ╞Æ /api/onboard
@@ -82,6 +86,7 @@ Route (app)
 Γö£ ╞Æ /api/platform/auth
 Γö£ ╞Æ /api/platform/broadcast
 Γö£ ╞Æ /api/platform/broadcasts/active
+Γö£ ╞Æ /api/platform/mail-merge
 Γö£ ╞Æ /api/platform/stats
 Γö£ ╞Æ /api/platform/tenants
 Γö£ ╞Æ /api/profile/belt
@@ -97,6 +102,8 @@ Route (app)
 Γö£ ╞Æ /api/stripe/refund
 Γö£ ╞Æ /api/stripe/upgrade
 Γö£ ╞Æ /api/stripe/webhook
+Γö£ ╞Æ /api/stripe/webhook-connect
+Γö£ ╞Æ /api/tenant/complete-registration
 Γö£ ╞Æ /api/tenant/public
 Γö£ ╞Æ /api/tenant/register
 Γö£ Γùï /apple-icon.png
@@ -116,8 +123,26 @@ Route (app)
 Γö£ ╞Æ /dashboard/progress
 Γö£ ╞Æ /dashboard/videos
 Γö£ Γùï /demo
+Γö£ Γùï /docs/salespack
+Γö£ Γùï /docs/salespack/demo-script
+Γö£ Γùï /docs/salespack/features
+Γö£ Γùï /docs/salespack/objections
+Γö£ Γùï /docs/salespack/pricing
+Γö£ Γùï /docs/salespack/quickstart
+Γö£ Γùï /docs/salespack/screen-walk
 Γö£ ╞Æ /events
 Γö£ Γùï /faq
+Γö£ ╞Æ /features
+Γö£ ╞Æ /features/attendance-tracking
+Γö£ ╞Æ /features/belt-progression
+Γö£ ╞Æ /features/class-scheduling
+Γö£ ╞Æ /features/member-management
+Γö£ ╞Æ /features/multi-location
+Γö£ ╞Æ /features/payments-billing
+Γö£ ╞Æ /for/bjj
+Γö£ ╞Æ /for/boxing-mma
+Γö£ ╞Æ /for/fitness-studios
+Γö£ ╞Æ /for/martial-arts
 Γö£ Γùï /forgot-password
 Γö£ Γùï /get-started
 Γö£ Γùï /icon.png
@@ -126,11 +151,13 @@ Route (app)
 Γö£ ╞Æ /instructor/classes
 Γö£ ╞Æ /instructor/naseeha
 Γö£ ╞Æ /instructor/students
+Γö£ ╞Æ /llms.txt
 Γö£ Γùï /login
 Γö£ ╞Æ /opengraph-image
 Γö£ ╞Æ /platform
 Γö£ ╞Æ /platform/analytics
 Γö£ ╞Æ /platform/broadcasts
+Γö£ ╞Æ /platform/mail-merge
 Γö£ ╞Æ /platform/promo-codes
 Γö£ ╞Æ /platform/tenants
 Γö£ ╞Æ /pricing

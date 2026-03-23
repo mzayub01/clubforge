@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Overview — ClubForge Sales Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAFBFC;
+            color: #334155;
+            line-height: 1.7
+        }
+
+        .nav {
+            background: #0F172A;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .nav a:hover {
+            color: #C5A456
+        }
+
+        .nav .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .nav .brand span {
+            color: #C5A456
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            color: #94A3B8;
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 24px 80px
+        }
+
+        .feature-section {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            transition: box-shadow .2s
+        }
+
+        .feature-section:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06)
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(197, 164, 86, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0
+        }
+
+        .feature-header h2 {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0F172A
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #F8FAFC;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: #C5A456;
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .feature-list .detail {
+            font-size: 12px;
+            color: #94A3B8;
+            display: block
+        }
+
+        .snapshot {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 32px;
+            color: #fff
+        }
+
+        .snapshot h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #C5A456;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px
+        }
+
+        .snap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px
+        }
+
+        .snap-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px
+        }
+
+        .snap-item .val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px
+        }
+
+        .snap-item .lbl {
+            font-size: 11px;
+            color: #94A3B8;
+            font-weight: 500
+        }
+
+        .cta {
+            text-align: center;
+            margin-top: 40px;
+            padding: 32px;
+            background: #fff;
+            border: 2px solid #E2E8F0;
+            border-radius: 16px
+        }
+
+        .cta h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 8px
+        }
+
+        .cta p {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 16px
+        }
+
+        .cta a {
+            display: inline-block;
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            color: #0F172A;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 15px
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav"><span class="brand">Club<span>Forge</span> Sales Pack</span><a href="index.html">← Back to
+            Index</a></nav>
+    <div class="hero">
+        <h1>⚡ Feature <span>Overview</span></h1>
+        <p>Everything ClubForge does — at a glance. Share this with prospects as a leave-behind.</p>
+    </div>
+    <div class="container">
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">🏋️</div>
+                <h2>Member Management</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Searchable member directory with role, belt rank, and membership status</li>
+                <li>Family accounts — parents manage all children from one login</li>
+                <li>Self-registration with branded sign-up link, waiver, and payment</li>
+                <li>One-click email invitations with branded onboarding</li>
+                <li>CSV/JSON data export for offline analysis or migration</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">📅</div>
+                <h2>Class Scheduling & Attendance</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Recurring and one-off classes with day, time, instructor, and capacity</li>
+                <li>Class roster — see who's enrolled, checked in, or absent</li>
+                <li>One-tap member check-in from any phone</li>
+                <li>Attendance analytics — spot trends, fading members, packed classes</li>
+                <li>Instructor assignment to specific classes and time slots</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">💳</div>
+                <h2>Billing & Payments (Stripe)</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Recurring subscriptions — set tiers, Stripe handles the rest</li>
+                <li>Automatic invoicing with real-time webhook status updates</li>
+                <li>Promo codes created in seconds, tied directly to Stripe</li>
+                <li>Finance dashboard — revenue overview, pending invoices, subscription statuses</li>
+                <li>Failed payment recovery — Stripe auto-retry and dunning emails</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">🥋</div>
+                <h2>Belt Progression & Grading</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Adult belt scheme — White → Blue → Purple → Brown → Black (with stripes)</li>
+                <li>Kids belt scheme — 13-belt progression for younger students</li>
+                <li>Full grading history with date, stripe count, and who awarded it</li>
+                <li>Professor feedback — written grading notes visible to the member</li>
+                <li>Professor access controls — class-specific promotion authority</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">📊</div>
+                <h2>Dashboard & Reports</h2>
+            </div>
+            <ul class="feature-list">
+                <li>KPI cards — total members, monthly revenue, attendance rate, classes</li>
+                <li>Basic reports — counts, attendance summaries, revenue (all tiers)</li>
+                <li>Advanced analytics — retention, forecasting, deep breakdowns <span class="detail">Pro+</span></li>
+                <li>Data export — CSV, JSON, and API access <span class="detail">by tier</span></li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">📢</div>
+                <h2>Communication & Engagement</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Announcements visible on every member's dashboard</li>
+                <li>Branded email templates <span class="detail">Pro+</span></li>
+                <li>Event management with payments <span class="detail">Pro+</span></li>
+                <li>Video library for technique drills <span class="detail">Pro+</span></li>
+                <li>Waitlist management for oversubscribed classes <span class="detail">Pro+</span></li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">🎨</div>
+                <h2>White-Label Branding</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Custom colours, logo, and brand identity</li>
+                <li>Branded member portal — members see YOUR club, not ClubForge</li>
+                <li>Custom subdomain — yourclub.clubforgehq.com <span class="detail">Elite</span></li>
+                <li>Custom waiver, etiquette, and registration messages</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">🏢</div>
+                <h2>Multi-Location Support</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Multiple venues from one dashboard (up to 3 Pro, unlimited Elite)</li>
+                <li>Location-specific classes, memberships, and announcements</li>
+                <li>Members can hold memberships at multiple sites</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <div class="feature-header">
+                <div class="feature-icon">🔒</div>
+                <h2>Security & Compliance</h2>
+            </div>
+            <ul class="feature-list">
+                <li>Enterprise PostgreSQL with row-level security</li>
+                <li>Stripe PCI-DSS Level 1 compliant payment processing</li>
+                <li>GDPR compliant — data export, deletion, consent mangement</li>
+                <li>Role-based access — admin, instructor, professor, member</li>
+            </ul>
+        </div>
+
+        <div class="snapshot">
+            <h3>📈 Platform Snapshot</h3>
+            <div class="snap-grid">
+                <div class="snap-item">
+                    <div class="val">99.9%</div>
+                    <div class="lbl">SLA Uptime (Elite)</div>
+                </div>
+                <div class="snap-item">
+                    <div class="val">15 min</div>
+                    <div class="lbl">Setup Time</div>
+                </div>
+                <div class="snap-item">
+                    <div class="val">14 days</div>
+                    <div class="lbl">Free Trial (No Card)</div>
+                </div>
+                <div class="snap-item">
+                    <div class="val">Any Device</div>
+                    <div class="lbl">Fully Responsive</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta">
+            <h3>Stop running your club with spreadsheets.</h3>
+            <p>Start your 14-day free trial — full Pro features, no card required.</p><a
+                href="https://clubforgehq.com/get-started">Start Free Trial →</a>
+        </div>
+
+    </div>
+</body>
+
+</html>

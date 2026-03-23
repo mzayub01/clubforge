@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Quickstart — ClubForge Sales Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAFBFC;
+            color: #334155;
+            line-height: 1.7
+        }
+
+        .nav {
+            background: #0F172A;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .nav a:hover {
+            color: #C5A456
+        }
+
+        .nav .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .nav .brand span {
+            color: #C5A456
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            color: #94A3B8;
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 80px
+        }
+
+        .cred-card {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px;
+            color: #fff
+        }
+
+        .cred-card h3 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .cred-card .admin-badge {
+            color: #C5A456
+        }
+
+        .cred-card .member-badge {
+            color: #3B82F6
+        }
+
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08)
+        }
+
+        .cred-row:last-child {
+            border-bottom: none
+        }
+
+        .cred-label {
+            font-size: 13px;
+            color: #94A3B8
+        }
+
+        .cred-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 12px;
+            border-radius: 6px
+        }
+
+        .tip {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: #92400E;
+            margin: 20px 0
+        }
+
+        .tip strong {
+            display: block;
+            margin-bottom: 4px
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px
+        }
+
+        .section h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #F8FAFC;
+            font-weight: 700;
+            color: #0F172A;
+            border-bottom: 2px solid #E2E8F0;
+            font-size: 12px
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #F1F5F9
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: #0F172A
+        }
+
+        .url-table td:nth-child(2) {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #3B82F6
+        }
+
+        .warn {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: #991B1B;
+            margin: 20px 0
+        }
+
+        .warn strong {
+            display: block;
+            margin-bottom: 4px
+        }
+
+        .trouble {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px
+        }
+
+        .trouble-row {
+            padding: 14px 20px;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 13px
+        }
+
+        .trouble-row:last-child {
+            border-bottom: none
+        }
+
+        .trouble-row strong {
+            color: #0F172A;
+            display: block;
+            margin-bottom: 2px
+        }
+
+        .trouble-row span {
+            color: #64748B
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav"><span class="brand">Club<span>Forge</span> Sales Pack</span><a href="index.html">← Back to
+            Index</a></nav>
+    <div class="hero">
+        <h1>🚀 Demo <span>Quickstart</span></h1>
+        <p>Get the demo environment running in under 2 minutes.</p>
+    </div>
+    <div class="container">
+
+        <div class="cred-card">
+            <h3 class="admin-badge">👤 Admin Login</h3>
+            <div class="cred-row"><span class="cred-label">Email</span><span
+                    class="cred-value">demo-admin@clubforgehq.com</span></div>
+            <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">ClubForge2026!</span>
+            </div>
+            <div class="cred-row"><span class="cred-label">Name</span><span class="cred-value">James Rodriguez</span>
+            </div>
+            <div class="cred-row"><span class="cred-label">After login</span><span class="cred-value">Go to
+                    /admin</span></div>
+        </div>
+
+        <div class="cred-card">
+            <h3 class="member-badge">👥 Member Login</h3>
+            <div class="cred-row"><span class="cred-label">Email</span><span
+                    class="cred-value">demo-member@clubforgehq.com</span></div>
+            <div class="cred-row"><span class="cred-label">Password</span><span class="cred-value">ClubForge2026!</span>
+            </div>
+            <div class="cred-row"><span class="cred-label">Name</span><span class="cred-value">Sarah Chen</span></div>
+            <div class="cred-row"><span class="cred-label">After login</span><span class="cred-value">Go to
+                    /dashboard</span></div>
+        </div>
+
+        <div class="tip"><strong>💡 Pro Tip</strong>Open Admin in a normal browser window and Member in an
+            incognito/private window. This lets you flip between both views during the demo.</div>
+
+        <div class="section">
+            <h3>🏢 Demo Tenant Details</h3>
+            <table>
+                <tr>
+                    <td>Club Name</td>
+                    <td>Apex MMA Academy</td>
+                </tr>
+                <tr>
+                    <td>Slug</td>
+                    <td>apex-mma</td>
+                </tr>
+                <tr>
+                    <td>Tagline</td>
+                    <td>Train Hard. Fight Smart.</td>
+                </tr>
+                <tr>
+                    <td>Colour</td>
+                    <td style="color:#e63946;font-weight:700">#e63946 (Red)</td>
+                </tr>
+                <tr>
+                    <td>Tier</td>
+                    <td>Pro (active)</td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>42 Warrior Lane, Manchester M1 4BT</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>👥 Pre-Seeded Members (7)</h3>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Belt</th>
+                    <th>Membership</th>
+                </tr>
+                <tr>
+                    <td>James Rodriguez</td>
+                    <td>Admin</td>
+                    <td>—</td>
+                    <td>All-Access</td>
+                </tr>
+                <tr>
+                    <td>Sarah Chen</td>
+                    <td>Member</td>
+                    <td>White</td>
+                    <td>Adults</td>
+                </tr>
+                <tr>
+                    <td>Tom Wilson</td>
+                    <td>Member</td>
+                    <td>Blue</td>
+                    <td>Adults</td>
+                </tr>
+                <tr>
+                    <td>Emma Taylor</td>
+                    <td>Member</td>
+                    <td>White (2 stripes)</td>
+                    <td>Adults</td>
+                </tr>
+                <tr>
+                    <td>Liam Patel</td>
+                    <td>Member</td>
+                    <td>Purple</td>
+                    <td>All-Access</td>
+                </tr>
+                <tr>
+                    <td>Olivia Jones</td>
+                    <td>Member (kid)</td>
+                    <td>—</td>
+                    <td>Kids</td>
+                </tr>
+                <tr>
+                    <td>Noah Smith</td>
+                    <td>Member (kid)</td>
+                    <td>—</td>
+                    <td>Kids</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>📅 Pre-Seeded Classes (5)</h3>
+            <table>
+                <tr>
+                    <th>Class</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                </tr>
+                <tr>
+                    <td>Fundamentals BJJ</td>
+                    <td>Monday</td>
+                    <td>18:00–19:30</td>
+                    <td>BJJ</td>
+                </tr>
+                <tr>
+                    <td>Advanced No-Gi</td>
+                    <td>Wednesday</td>
+                    <td>19:00–20:30</td>
+                    <td>No-Gi</td>
+                </tr>
+                <tr>
+                    <td>Kids Jiu-Jitsu</td>
+                    <td>Saturday</td>
+                    <td>10:00–11:00</td>
+                    <td>Kids</td>
+                </tr>
+                <tr>
+                    <td>Muay Thai</td>
+                    <td>Tuesday</td>
+                    <td>18:00–19:30</td>
+                    <td>Striking</td>
+                </tr>
+                <tr>
+                    <td>Open Mat</td>
+                    <td>Friday</td>
+                    <td>17:30–19:00</td>
+                    <td>Open</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🔗 Key Admin Pages</h3>
+            <table class="url-table">
+                <tr>
+                    <th>Page</th>
+                    <th>URL</th>
+                </tr>
+                <tr>
+                    <td>Dashboard</td>
+                    <td>/admin</td>
+                </tr>
+                <tr>
+                    <td>Members</td>
+                    <td>/admin/members</td>
+                </tr>
+                <tr>
+                    <td>Classes</td>
+                    <td>/admin/classes</td>
+                </tr>
+                <tr>
+                    <td>Attendance</td>
+                    <td>/admin/attendance</td>
+                </tr>
+                <tr>
+                    <td>Finance</td>
+                    <td>/admin/finance</td>
+                </tr>
+                <tr>
+                    <td>Membership Types</td>
+                    <td>/admin/membership-types</td>
+                </tr>
+                <tr>
+                    <td>Grading Settings</td>
+                    <td>/admin/grading-settings</td>
+                </tr>
+                <tr>
+                    <td>Promo Codes</td>
+                    <td>/admin/promo-codes</td>
+                </tr>
+                <tr>
+                    <td>Invite Members</td>
+                    <td>/admin/invite</td>
+                </tr>
+                <tr>
+                    <td>Settings</td>
+                    <td>/admin/settings</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🔗 Key Member Pages</h3>
+            <table class="url-table">
+                <tr>
+                    <th>Page</th>
+                    <th>URL</th>
+                </tr>
+                <tr>
+                    <td>Dashboard</td>
+                    <td>/dashboard</td>
+                </tr>
+                <tr>
+                    <td>Classes</td>
+                    <td>/dashboard/classes</td>
+                </tr>
+                <tr>
+                    <td>Belt Progress</td>
+                    <td>/dashboard/progress</td>
+                </tr>
+                <tr>
+                    <td>Profile</td>
+                    <td>/dashboard/profile</td>
+                </tr>
+                <tr>
+                    <td>Payments</td>
+                    <td>/dashboard/payments</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="warn"><strong>⚠️ Resetting Demo Data</strong>If the demo gets messy, run
+            <code>supabase/seed_demo_tenant.sql</code> in the Supabase SQL Editor. It's safe to re-run — uses ON
+            CONFLICT DO NOTHING.</div>
+
+        <div class="section">
+            <h3>🔧 Troubleshooting</h3>
+            <div class="trouble">
+                <div class="trouble-row"><strong>Can't log in?</strong><span>Check credentials above. Password is
+                        case-sensitive.</span></div>
+                <div class="trouble-row"><strong>Data looks empty?</strong><span>Re-run seed_demo_tenant.sql in Supabase
+                        SQL Editor.</span></div>
+                <div class="trouble-row"><strong>"Tenant not found" error?</strong><span>Ensure the tenant record exists
+                        in public.tenants table.</span></div>
+                <div class="trouble-row"><strong>Stripe features show errors?</strong><span>Expected in demo — Stripe
+                        price IDs are fake. Finance dashboard still works.</span></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

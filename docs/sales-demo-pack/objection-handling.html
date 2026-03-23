@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objection Handling — ClubForge Sales Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAFBFC;
+            color: #334155;
+            line-height: 1.7
+        }
+
+        .nav {
+            background: #0F172A;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .nav a:hover {
+            color: #C5A456
+        }
+
+        .nav .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .nav .brand span {
+            color: #C5A456
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            color: #94A3B8;
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 80px
+        }
+
+        .objection {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow .2s
+        }
+
+        .objection:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06)
+        }
+
+        .obj-header {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .obj-num {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            color: #0F172A;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+            flex-shrink: 0
+        }
+
+        .obj-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0F172A;
+            flex: 1
+        }
+
+        .obj-subtitle {
+            font-size: 12px;
+            color: #94A3B8;
+            font-style: italic;
+            margin-top: 2px
+        }
+
+        .obj-toggle {
+            color: #94A3B8;
+            font-size: 18px;
+            font-weight: 700;
+            transition: transform .2s
+        }
+
+        .obj-body {
+            padding: 0 24px 24px;
+            display: none
+        }
+
+        .objection.open .obj-body {
+            display: block
+        }
+
+        .objection.open .obj-toggle {
+            transform: rotate(180deg)
+        }
+
+        .response {
+            background: #F0FDF4;
+            border-left: 4px solid #22C55E;
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 12px 0;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #15803D
+        }
+
+        .response::before {
+            content: "💬 RESPOND:";
+            font-weight: 700;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            letter-spacing: .5px;
+            font-style: normal
+        }
+
+        .response em {
+            font-style: italic
+        }
+
+        .clincher {
+            background: linear-gradient(135deg, rgba(197, 164, 86, 0.08), rgba(197, 164, 86, 0.04));
+            border: 1px solid rgba(197, 164, 86, 0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            font-size: 14px
+        }
+
+        .clincher::before {
+            content: "🎯 CLINCHER:";
+            font-weight: 800;
+            font-size: 11px;
+            color: #A88B3D;
+            letter-spacing: .5px;
+            display: block;
+            margin-bottom: 4px
+        }
+
+        .clincher p {
+            font-style: italic;
+            color: #92400E;
+            font-size: 14px
+        }
+
+        .safety {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border-radius: 16px;
+            padding: 28px;
+            color: #fff;
+            margin-top: 40px
+        }
+
+        .safety h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #C5A456;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px
+        }
+
+        .safety p {
+            font-size: 14px;
+            color: #E2E8F0;
+            font-style: italic;
+            line-height: 1.8
+        }
+
+        .safety .note {
+            font-size: 13px;
+            color: #94A3B8;
+            margin-top: 12px;
+            font-style: normal;
+            font-weight: 600
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav"><span class="brand">Club<span>Forge</span> Sales Pack</span><a href="index.html">← Back to
+            Index</a></nav>
+    <div class="hero">
+        <h1>🛡️ Objection <span>Handling</span></h1>
+        <p>9 common objections with ready-made responses. Keep this open during every sales call.</p>
+    </div>
+    <div class="container">
+
+        <div class="objection open">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">1</div>
+                <div>
+                    <div class="obj-title">"We already use spreadsheets / WhatsApp / pen and paper"</div>
+                    <div class="obj-subtitle">They're saying: "Our current system works well enough."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"I totally get it — every club starts there. It works… until it doesn't. The
+                        problem with spreadsheets is you don't see what you're losing. You can't see the members who
+                        quietly drifted away, the payments that silently failed, or the 12 hours a week you spend on
+                        admin instead of coaching.</em><br><br><em>ClubForge doesn't replace your coaching — it replaces
+                        the 4-5 tools you're duct-taping together. One platform, everything connected. Most owners tell
+                        us they save 8-10 hours per week in the first month."</em></div>
+                <div class="clincher">
+                    <p>"Club owners typically spend 12+ hours/week on admin. ClubForge gets that to near-zero."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">2</div>
+                <div>
+                    <div class="obj-title">"It's too expensive"</div>
+                    <div class="obj-subtitle">They're saying: "I don't see the ROI yet."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"I hear you — every pound matters. Let me put it this way: how much do you
+                        lose each month to members who cancel because they felt disconnected? Or payments that failed
+                        and never got chased?</em><br><br><em>Most clubs recover the cost in the first month just by
+                        reducing payment failures. Stripe's automated retry recovers revenue you're currently losing
+                        silently.</em><br><br><em>At £39/month for Starter — that's less than one membership. If
+                        ClubForge prevents even one cancellation per month, it pays for itself four times over."</em>
+                </div>
+                <div class="clincher">
+                    <p>"26 pence per member per month. That's less than the cost of one member's water bottle."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">3</div>
+                <div>
+                    <div class="obj-title">"My members won't use it"</div>
+                    <div class="obj-subtitle">They're saying: "I'm worried about adoption."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"That's actually the best part — there's nothing to install. It's a web app
+                        that works on any phone. They tap a link, log in, done.</em><br><br><em>The member portal is
+                        simpler than WhatsApp. Check schedule, tap to check in, see belt progress. So simple that the
+                        8-year-olds in our demo club use it.</em><br><br><em>The real question: what are your members
+                        using right now? WhatsApp for schedules? Texts for payment reminders? ClubForge gives them
+                        something better — a branded portal that makes your club look professional."</em></div>
+                <div class="clincher">
+                    <p>"Members don't adopt tools. They adopt experiences they enjoy. A member who can see their belt
+                        journey is a member who's engaged."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">4</div>
+                <div>
+                    <div class="obj-title">"We're too small for this"</div>
+                    <div class="obj-subtitle">They're saying: "We're not sure we're ready."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"Actually, that's exactly when you should start. The clubs that struggle most
+                        are the ones that try to implement systems when they're already at 200 members and
+                        drowning.</em><br><br><em>Starter is designed for clubs under 150 members. £39/month — less than
+                        a pair of boxing gloves. And when you grow, everything scales with you."</em></div>
+                <div class="clincher">
+                    <p>"You're at the perfect stage. Building on the right foundation now means you'll never have to
+                        migrate or rebuild later."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">5</div>
+                <div>
+                    <div class="obj-title">"What about data security?"</div>
+                    <div class="obj-subtitle">They're saying: "Can I trust you with my members' data?"</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"Great question — more secure than a spreadsheet on your
+                        laptop.</em><br><br><em>Built on Supabase: enterprise PostgreSQL with row-level security. Every
+                        club's data is completely isolated. Payments through Stripe directly — PCI-DSS Level 1. We never
+                        see card numbers. GDPR compliant with full data export and deletion."</em></div>
+                <div class="clincher">
+                    <p>"Enterprise security, not enterprise pricing. ✅ Supabase RLS • ✅ Stripe PCI-DSS • ✅ GDPR • ✅ Full
+                        data isolation"</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">6</div>
+                <div>
+                    <div class="obj-title">"Can I try before I commit?"</div>
+                    <div class="obj-subtitle">They're saying: "I'm interested but nervous."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"Absolutely. 14 days, full Pro features, no credit card required. Set up your
+                        real club, invite a few members, see how it feels.</em><br><br><em>After 14 days, if it's not
+                        for you, your account simply pauses. No charges, no pressure. We don't even take a card
+                        upfront.</em><br><br><em>Most people know by day 3. Once you see your dashboard with your real
+                        members and classes, it clicks."</em></div>
+                <div class="clincher">
+                    <p>"Let's get you set up right now — takes 10 minutes. 👉 clubforgehq.com/get-started"</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">7</div>
+                <div>
+                    <div class="obj-title">"I've tried gym software before and it was terrible"</div>
+                    <div class="obj-subtitle">They're saying: "I've been burned and I'm skeptical."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"I hear that a lot. Most gym software is built for big-box fitness chains —
+                        treadmill bookings and smoothie bars. Not for you.</em><br><br><em>ClubForge is built
+                        specifically for martial arts. Belt progression, kids schemes, professor access, grading
+                        feedback — you won't find that in MindBody or GymMaster.</em><br><br><em>And the trial is free.
+                        No contract, no setup fee, no card. The worst that happens is you waste 10 minutes."</em></div>
+                <div class="clincher">
+                    <p>"Generic gym software doesn't know what a purple belt is. We do."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">8</div>
+                <div>
+                    <div class="obj-title">"I need to talk to my partner / co-owner"</div>
+                    <div class="obj-subtitle">They're saying: "I need backup to make this decision."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"Of course — smart move. Would it help if I sent a quick summary they can
+                        review? I can include the pricing, features, and a trial link so they can poke around
+                        themselves.</em><br><br><em>Better yet — when would be a good time for all of us to jump on a
+                        quick 15-minute call?"</em></div>
+                <div class="clincher">
+                    <p>Send the Feature Overview + Pricing docs. Book a follow-up within 3 days. Don't let this go cold.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="objection">
+            <div class="obj-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="obj-num">9</div>
+                <div>
+                    <div class="obj-title">"Can you integrate with [X]?"</div>
+                    <div class="obj-subtitle">They're saying: "I have a workflow I don't want to lose."</div>
+                </div><span class="obj-toggle">▼</span>
+            </div>
+            <div class="obj-body">
+                <div class="response"><em>"We integrate natively with Stripe for payments. Elite plan offers full API
+                        access and webhooks.</em><br><br><em>But honestly — most clubs find they don't need integrations
+                        because ClubForge already handles what they were using 4-5 separate tools for. What specifically
+                        are you looking to connect?"</em></div>
+                <div class="clincher">
+                    <p>Email → "Built-in announcements + templates." Scheduling → "Full class scheduling included."
+                        Accounting → "Stripe + CSV export."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="safety">
+            <h3>🛟 Universal Safety Net</h3>
+            <p>"That's a fair point. Let me make a note of that and get you a proper answer rather than guessing. In the
+                meantime — the trial is free and there's zero commitment. Why don't you take it for a spin while I dig
+                into that for you?"</p>
+            <div class="note">⚡ Never leave a conversation without a clear next step.</div>
+        </div>
+
+    </div>
+    <script>
+        // All objections start collapsed except #1
+    </script>
+</body>
+
+</html>

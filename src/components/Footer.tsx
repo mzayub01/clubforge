@@ -47,10 +47,38 @@ export default function Footer() {
                         Product
                     </h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/#features" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Features</Link></li>
+                        <li><Link href="/features" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>All Features</Link></li>
                         <li><Link href="/pricing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Pricing</Link></li>
                         <li><Link href="/demo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Book a Demo</Link></li>
                         <li><Link href="/get-started" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Start Free Trial</Link></li>
+                    </ul>
+                </div>
+
+                {/* Features */}
+                <div>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
+                        Features
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <li><Link href="/features/member-management" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Member Management</Link></li>
+                        <li><Link href="/features/class-scheduling" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Class Scheduling</Link></li>
+                        <li><Link href="/features/belt-progression" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Belt Progression</Link></li>
+                        <li><Link href="/features/attendance-tracking" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Attendance Tracking</Link></li>
+                        <li><Link href="/features/payments-billing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Payments & Billing</Link></li>
+                        <li><Link href="/features/multi-location" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Multi-Location</Link></li>
+                    </ul>
+                </div>
+
+                {/* Built For */}
+                <div>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
+                        Built For
+                    </h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                        <li><Link href="/for/martial-arts" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Martial Arts Clubs</Link></li>
+                        <li><Link href="/for/bjj" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>BJJ Academies</Link></li>
+                        <li><Link href="/for/boxing-mma" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Boxing & MMA Gyms</Link></li>
+                        <li><Link href="/for/fitness-studios" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Fitness Studios</Link></li>
                     </ul>
                 </div>
 

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing & ROI — ClubForge Sales Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAFBFC;
+            color: #334155;
+            line-height: 1.7
+        }
+
+        .nav {
+            background: #0F172A;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .nav a:hover {
+            color: #C5A456
+        }
+
+        .nav .brand {
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .nav .brand span {
+            color: #C5A456
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            color: #fff;
+            padding: 60px 24px 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .hero p {
+            color: #94A3B8;
+            font-size: 1rem;
+            max-width: 550px;
+            margin: 0 auto
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 80px
+        }
+
+        .plans {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 40px
+        }
+
+        @media(max-width:700px) {
+            .plans {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .plan {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            position: relative;
+            transition: box-shadow .2s
+        }
+
+        .plan:hover {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08)
+        }
+
+        .plan.featured {
+            border: 2px solid #C5A456;
+            box-shadow: 0 4px 24px rgba(197, 164, 86, 0.15)
+        }
+
+        .plan.featured::before {
+            content: "MOST POPULAR";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            color: #0F172A;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 100px;
+            letter-spacing: 1px
+        }
+
+        .plan-name {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94A3B8;
+            margin-bottom: 4px
+        }
+
+        .plan-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #0F172A
+        }
+
+        .plan-price span {
+            font-size: 14px;
+            color: #94A3B8;
+            font-weight: 500
+        }
+
+        .plan-annual {
+            font-size: 12px;
+            color: #22C55E;
+            font-weight: 600;
+            margin: 4px 0 16px
+        }
+
+        .plan-detail {
+            font-size: 13px;
+            color: #64748B;
+            padding: 6px 0;
+            border-top: 1px solid #F1F5F9
+        }
+
+        .plan-detail strong {
+            color: #0F172A
+        }
+
+        .section {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 20px
+        }
+
+        .section h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #F8FAFC;
+            font-weight: 700;
+            color: #0F172A;
+            border-bottom: 2px solid #E2E8F0;
+            font-size: 12px
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #F1F5F9
+        }
+
+        .saved {
+            color: #22C55E;
+            font-weight: 700
+        }
+
+        .cost-highlight {
+            background: linear-gradient(135deg, rgba(197, 164, 86, 0.08), rgba(197, 164, 86, 0.04));
+            border: 1px solid rgba(197, 164, 86, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            margin-bottom: 20px
+        }
+
+        .cost-highlight .big {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #0F172A;
+            margin: 8px 0
+        }
+
+        .cost-highlight .big span {
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .cost-highlight .label {
+            font-size: 14px;
+            color: #64748B
+        }
+
+        .roi-card {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px
+        }
+
+        .roi-card h3 {
+            color: #15803D;
+            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 700
+        }
+
+        .roi-card .stat {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0F172A;
+            margin: 8px 0
+        }
+
+        .roi-card p {
+            font-size: 14px;
+            color: #334155
+        }
+
+        .vs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px
+        }
+
+        @media(max-width:600px) {
+            .vs {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .vs-col {
+            padding: 24px;
+            font-size: 13px
+        }
+
+        .vs-col:first-child {
+            background: #FEF2F2
+        }
+
+        .vs-col:last-child {
+            background: #F0FDF4
+        }
+
+        .vs-col h4 {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05)
+        }
+
+        .vs-col:first-child h4 {
+            color: #991B1B
+        }
+
+        .vs-col:last-child h4 {
+            color: #166534
+        }
+
+        .vs-col li {
+            list-style: none;
+            padding: 5px 0;
+            color: #334155
+        }
+
+        .vs-col:first-child li::before {
+            content: "✗ ";
+            color: #DC2626;
+            font-weight: 700
+        }
+
+        .vs-col:last-child li::before {
+            content: "✓ ";
+            color: #22C55E;
+            font-weight: 700
+        }
+
+        .faq {
+            border-top: 1px solid #E2E8F0;
+            padding: 14px 0
+        }
+
+        .faq strong {
+            color: #0F172A;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 14px
+        }
+
+        .faq span {
+            color: #64748B;
+            font-size: 13px
+        }
+
+        .script-box {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border-radius: 16px;
+            padding: 28px;
+            color: #fff;
+            margin-top: 32px
+        }
+
+        .script-box h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #C5A456;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px
+        }
+
+        .script-box p {
+            font-size: 14px;
+            color: #E2E8F0;
+            font-style: italic;
+            line-height: 1.8;
+            margin-bottom: 12px
+        }
+
+        .script-box .link {
+            font-size: 16px;
+            font-weight: 700;
+            color: #C5A456;
+            font-style: normal;
+            text-align: center;
+            display: block;
+            margin-top: 16px
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav"><span class="brand">Club<span>Forge</span> Sales Pack</span><a href="index.html">← Back to
+            Index</a></nav>
+    <div class="hero">
+        <h1>💰 Pricing & <span>ROI</span></h1>
+        <p>Your quick-reference for pricing conversations, ROI talking points, and competitive positioning.</p>
+    </div>
+    <div class="container">
+
+        <!-- PRICING PLANS -->
+        <div class="plans">
+            <div class="plan">
+                <div class="plan-name">🟢 Starter</div>
+                <div class="plan-price">£39<span>/mo</span></div>
+                <div class="plan-annual">Annual: £31/mo (save 20%)</div>
+                <div class="plan-detail"><strong>Up to 150</strong> members</div>
+                <div class="plan-detail"><strong>1</strong> location</div>
+                <div class="plan-detail"><strong>5</strong> events</div>
+                <div class="plan-detail">Email support (48h)</div>
+            </div>
+            <div class="plan featured">
+                <div class="plan-name">⭐ Pro</div>
+                <div class="plan-price">£129<span>/mo</span></div>
+                <div class="plan-annual">Annual: £103/mo (save 20%)</div>
+                <div class="plan-detail"><strong>Up to 750</strong> members</div>
+                <div class="plan-detail"><strong>Up to 3</strong> locations</div>
+                <div class="plan-detail"><strong>50</strong> events + <strong>30</strong> videos</div>
+                <div class="plan-detail">Priority support (24h)</div>
+            </div>
+            <div class="plan">
+                <div class="plan-name">🔵 Elite</div>
+                <div class="plan-price">£349<span>/mo</span></div>
+                <div class="plan-annual">Annual: £279/mo (save 20%)</div>
+                <div class="plan-detail"><strong>Unlimited</strong> members</div>
+                <div class="plan-detail"><strong>Unlimited</strong> locations</div>
+                <div class="plan-detail"><strong>Unlimited</strong> everything</div>
+                <div class="plan-detail">Dedicated account manager</div>
+            </div>
+        </div>
+
+        <!-- PER MEMBER COST -->
+        <div class="cost-highlight">
+            <div class="label">Per-member cost (Starter at capacity)</div>
+            <div class="big"><span>26p</span></div>
+            <div class="label">per member, per month — less than a water bottle</div>
+        </div>
+
+        <div class="section">
+            <h3>📊 Per-Member Cost Breakdown</h3>
+            <table>
+                <tr>
+                    <th>Plan</th>
+                    <th>Monthly</th>
+                    <th>Per Member (half cap)</th>
+                    <th>Per Member (at cap)</th>
+                    <th>Daily Cost</th>
+                </tr>
+                <tr>
+                    <td><strong>Starter</strong></td>
+                    <td>£39</td>
+                    <td>52p</td>
+                    <td class="saved">26p</td>
+                    <td>£1.30</td>
+                </tr>
+                <tr>
+                    <td><strong>Pro</strong></td>
+                    <td>£129</td>
+                    <td>34p</td>
+                    <td class="saved">17p</td>
+                    <td>£4.30</td>
+                </tr>
+                <tr>
+                    <td><strong>Elite</strong></td>
+                    <td>£349</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>£11.63</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ROI TALKING POINTS -->
+        <div class="roi-card">
+            <h3>⏱️ Time Saved</h3>
+            <div class="stat">8–13 hours saved per week</div>
+            <p>Over a year, that's 400–650 hours — the equivalent of 50–80 full working days back in the owner's life.
+                Admin tasks that disappear: chasing payments, updating spreadsheets, answering schedule questions,
+                onboarding, attendance tracking, belt admin.</p>
+        </div>
+
+        <div class="roi-card">
+            <h3>💷 Revenue Recovery</h3>
+            <div class="stat">£600–1,800 recovered per month</div>
+            <p>Failed payments auto-retried by Stripe. Fading members caught early by attendance alerts. Trial members
+                converted by automated onboarding. Even recovering 2–3 failed payments per month covers the Starter
+                plan.</p>
+        </div>
+
+        <div class="roi-card">
+            <h3>🎯 The One-Cancellation Test</h3>
+            <div class="stat">1 retained member = ClubForge paid for itself</div>
+            <p>If ClubForge prevents just ONE membership cancellation per month (~£40), that's £480/year against
+                Starter's £468 annual cost. Net positive from a single save. At 3 saves/month = +£972/year net gain.</p>
+        </div>
+
+        <!-- COMPETITIVE POSITIONING -->
+        <div class="vs">
+            <div class="vs-col">
+                <h4>❌ Spreadsheets / Manual</h4>
+                <ul>
+                    <li>Manual payment chasing</li>
+                    <li>Unstructured member data</li>
+                    <li>Paper attendance or nothing</li>
+                    <li>Belt tracking by memory</li>
+                    <li>No revenue visibility</li>
+                    <li>WhatsApp group = chaos</li>
+                    <li>8-14 hours/week admin</li>
+                </ul>
+            </div>
+            <div class="vs-col">
+                <h4>✅ ClubForge</h4>
+                <ul>
+                    <li>Automatic Stripe billing</li>
+                    <li>Searchable, role-based profiles</li>
+                    <li>One-tap digital check-in</li>
+                    <li>Structured belt progression</li>
+                    <li>Real-time revenue dashboard</li>
+                    <li>Branded member portal</li>
+                    <li>~30 minutes/week admin</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="vs">
+            <div class="vs-col">
+                <h4>❌ Generic Gym Software</h4>
+                <ul>
+                    <li>No belt progression</li>
+                    <li>No kids belt schemes</li>
+                    <li>No professor access controls</li>
+                    <li>No grading feedback</li>
+                    <li>Built for treadmill bookings</li>
+                    <li>£100–300+/mo pricing</li>
+                    <li>Per-member fees common</li>
+                    <li>12–24 month contracts</li>
+                </ul>
+            </div>
+            <div class="vs-col">
+                <h4>✅ ClubForge</h4>
+                <ul>
+                    <li>Full adult belt scheme</li>
+                    <li>13-belt kids progression</li>
+                    <li>Class-specific grading authority</li>
+                    <li>Written coach feedback</li>
+                    <li>Built for martial arts clubs</li>
+                    <li>From £39/mo flat</li>
+                    <li>No per-member charges</li>
+                    <li>Month-to-month, cancel anytime</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- FAQs -->
+        <div class="section">
+            <h3>❓ Pricing FAQs</h3>
+            <div class="faq"><strong>"Do you charge per member?"</strong><span>No. Flat monthly fee. Member limits by
+                    tier.</span></div>
+            <div class="faq"><strong>"What's the platform fee?"</strong><span>2.5% on member payments via Stripe (all
+                    tiers), on top of Stripe's own fees.</span></div>
+            <div class="faq"><strong>"Do you take a card for the trial?"</strong><span>No. 14 days free, no card
+                    required.</span></div>
+            <div class="faq"><strong>"Can I change plans later?"</strong><span>Yes. Upgrade or downgrade anytime,
+                    prorated automatically.</span></div>
+            <div class="faq"><strong>"Is there an annual discount?"</strong><span>Yes. Save 20% by paying
+                    annually.</span></div>
+            <div class="faq"><strong>"What happens after the trial?"</strong><span>Choose a plan or your account pauses.
+                    No surprise charges.</span></div>
+            <div class="faq"><strong>"Is there a setup fee?"</strong><span>No.</span></div>
+            <div class="faq"><strong>"Is there a contract?"</strong><span>No. Month-to-month. Cancel anytime.</span>
+            </div>
+        </div>
+
+        <!-- PRICING CLOSE SCRIPT -->
+        <div class="script-box">
+            <h3>💬 Quick Pricing Script</h3>
+            <p>"Everything you've just seen — the dashboard, billing, belt tracking, member portal — starts at £39 a
+                month. Less than one membership at most clubs.</p>
+            <p>Most clubs go with Pro at £129 for multi-location, events, and the video library. But Starter has
+                everything you need to launch.</p>
+            <p>Start your 14-day free trial — full Pro features, no card, no commitment. If it's not saving you hours by
+                day 3, you've lost nothing."</p>
+            <span class="link">👉 clubforgehq.com/get-started</span>
+        </div>
+
+    </div>
+</body>
+
+</html>

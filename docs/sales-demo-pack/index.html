@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubForge — Sales Demo Pack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0F172A;
+            color: #E2E8F0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #D4B86A, #A88B3D);
+            color: #0F172A;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 12px
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #D4B86A, #C5A456, #A88B3D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #94A3B8;
+            line-height: 1.7;
+            margin-bottom: 48px;
+            max-width: 600px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 48px
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 28px;
+            text-decoration: none;
+            color: #E2E8F0;
+            transition: all .2s;
+            cursor: pointer;
+            display: block
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(197, 164, 86, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(197, 164, 86, 0.1)
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 12px
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px
+        }
+
+        .card p {
+            font-size: 13px;
+            color: #94A3B8;
+            line-height: 1.6
+        }
+
+        .creds {
+            background: rgba(197, 164, 86, 0.08);
+            border: 1px solid rgba(197, 164, 86, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px
+        }
+
+        .creds h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #C5A456;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px
+        }
+
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06)
+        }
+
+        .cred-row:last-child {
+            border-bottom: none
+        }
+
+        .cred-label {
+            font-size: 13px;
+            color: #94A3B8;
+            font-weight: 500
+        }
+
+        .cred-value {
+            font-size: 13px;
+            color: #fff;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 6px
+        }
+
+        .footer {
+            text-align: center;
+            color: #475569;
+            font-size: 12px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="badge">Sales Demo Pack</div>
+        <h1>ClubForge <span>Demo Kit</span></h1>
+        <p class="subtitle">Everything your team needs to run polished product demos and close deals. Open any document
+            below to get started.</p>
+
+        <div class="grid">
+            <a class="card" href="demo-script.html">
+                <div class="card-icon">🎬</div>
+                <h3>Demo Script</h3>
+                <p>30-minute guided walkthrough with talk tracks, wow moments, and a closing sequence. Your step-by-step
+                    playbook.</p>
+            </a>
+            <a class="card" href="feature-overview.html">
+                <div class="card-icon">⚡</div>
+                <h3>Feature Overview</h3>
+                <p>One-page summary of every platform feature. Perfect as a leave-behind or quick reference during
+                    calls.</p>
+            </a>
+            <a class="card" href="demo-quickstart.html">
+                <div class="card-icon">🚀</div>
+                <h3>Demo Quickstart</h3>
+                <p>Login credentials, pre-loaded data, key URLs, and reset instructions. Get the demo running in 2
+                    minutes.</p>
+            </a>
+            <a class="card" href="objection-handling.html">
+                <div class="card-icon">🛡️</div>
+                <h3>Objection Handling</h3>
+                <p>9 common objections with empathetic, ready-made responses. Keep this open during every sales call.
+                </p>
+            </a>
+            <a class="card" href="pricing-roi.html">
+                <div class="card-icon">💰</div>
+                <h3>Pricing & ROI</h3>
+                <p>Tier comparison, per-member cost breakdowns, ROI calculator, and competitive positioning.</p>
+            </a>
+        </div>
+
+        <div class="creds">
+            <h3>🔑 Quick Access — Demo Credentials</h3>
+            <div class="cred-row"><span class="cred-label">Admin Email</span><span
+                    class="cred-value">demo-admin@clubforgehq.com</span></div>
+            <div class="cred-row"><span class="cred-label">Member Email</span><span
+                    class="cred-value">demo-member@clubforgehq.com</span></div>
+            <div class="cred-row"><span class="cred-label">Password (both)</span><span
+                    class="cred-value">ClubForge2026!</span></div>
+            <div class="cred-row"><span class="cred-label">Free Trial Link</span><span
+                    class="cred-value">clubforgehq.com/get-started</span></div>
+        </div>
+
+        <div class="footer">ClubForge Sales Demo Pack · v1.0 · February 2026</div>
+    </div>
+</body>
+
+</html>

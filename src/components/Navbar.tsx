@@ -59,11 +59,12 @@ export default function Navbar({ user }: NavbarProps) {
         ];
 
     return (
-        <>
+        <div style={{ position: 'sticky', top: 0, zIndex: 100 }}>
         {!user && <PromoBanner />}
         <nav
             className="navbar"
             style={{
+                position: 'relative',
                 background: isScrolled
                     ? 'rgba(255, 255, 255, 0.85)'
                     : isLightHero
@@ -218,6 +219,6 @@ export default function Navbar({ user }: NavbarProps) {
                 </div>
             )}
         </nav>
-        </>
+        </div>
     );
 }

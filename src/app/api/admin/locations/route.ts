@@ -1,66 +1,16 @@
-// ===============================================
-// DojoHub - Admin Locations API
-// GET  /api/admin/locations  — Fetch all locations for tenant
-// POST /api/admin/locations  — Create a new location
-// PUT  /api/admin/locations  — Update an existing location
-// Uses admin client (service role) to bypass RLS
-// ===============================================
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient as createServerClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { cookies } from 'next/headers';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
-// Helper: authenticate user and verify they are a tenant admin
-async function authenticateAdmin() {
-    const cookieStore = await cookies();
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-    const { createClient } = await import('@/lib/supabase/server');
-    let user;
+
+export async function GET(request: NextRequest) {
     try {
-        const supabase = await createClient();
-        const { data } = await supabase.auth.getUser();
-        user = data.user;
-    } catch {
-        // Fallback: try getting user directly from cookie
-        const supabase = createServerClient(supabaseUrl, supabaseKey, {
-            global: {
-                headers: {
-                    cookie: cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; '),
-                },
-            },
-            auth: { autoRefreshToken: false, persistSession: false },
-        });
-        const { data } = await supabase.auth.getUser();
-        user = data.user;
-    }
+        // Rate limit: 20 per minute
+        const rateLimited = checkRateLimit(request, 'admin-locations-get', 20);
+        if (rateLimited) return rateLimited;
 
-    if (!user) {
-        return { error: 'Unauthorized', status: 401, tenantId: null };
-    }
-
-    const adminSupabase = createAdminClient();
-    const { data: tenantMember } = await adminSupabase
-        .from('tenant_members')
-        .select('tenant_id, role')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .single();
-
-    if (!tenantMember || tenantMember.role !== 'admin') {
-        return { error: 'Forbidden', status: 403, tenantId: null };
-    }
-
-    return { error: null, status: 200, tenantId: tenantMember.tenant_id };
-}
-
-
-// GET: Fetch all locations for the admin's tenant
-export async function GET() {
-    try {
-        const auth = await authenticateAdmin();
+        const auth = await requireAdmin();
         if (auth.error) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
@@ -74,24 +24,27 @@ export async function GET() {
 
         if (error) {
             console.error('Locations fetch error:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to fetch locations' }, { status: 500 });
         }
 
         return NextResponse.json({ locations: data || [] });
     } catch (err) {
         console.error('Locations GET error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }
 }
 
 
-// POST: Create a new location
 export async function POST(request: NextRequest) {
     try {
-        const auth = await authenticateAdmin();
+        // Rate limit: 10 per minute
+        const rateLimited = checkRateLimit(request, 'admin-locations-post', 10);
+        if (rateLimited) return rateLimited;
+
+        const auth = await requireAdmin();
         if (auth.error) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
@@ -123,24 +76,27 @@ export async function POST(request: NextRequest) {
 
         if (error) {
             console.error('Location create error:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to create location' }, { status: 500 });
         }
 
         return NextResponse.json({ location: data }, { status: 201 });
     } catch (err) {
         console.error('Locations POST error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }
 }
 
 
-// PUT: Update an existing location
 export async function PUT(request: NextRequest) {
     try {
-        const auth = await authenticateAdmin();
+        // Rate limit: 10 per minute
+        const rateLimited = checkRateLimit(request, 'admin-locations-put', 10);
+        if (rateLimited) return rateLimited;
+
+        const auth = await requireAdmin();
         if (auth.error) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
@@ -186,14 +142,14 @@ export async function PUT(request: NextRequest) {
 
         if (error) {
             console.error('Location update error:', error);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to update location' }, { status: 500 });
         }
 
         return NextResponse.json({ location: data });
     } catch (err) {
         console.error('Locations PUT error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }

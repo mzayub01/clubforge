@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
+    // Rate limit: 10 per minute
+    const rateLimited = checkRateLimit(request, 'stripe-cancel', 10);
+    if (rateLimited) return rateLimited;
+
+    // Require admin authentication
+    const auth = await requireAdmin();
+    if (auth.error) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     if (!isStripeConfigured()) {
         return NextResponse.json(
             { error: 'Stripe is not configured' },
@@ -28,11 +39,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('Cancelling subscription:', subscriptionId);
+        // Verify the membership belongs to the admin's tenant before cancelling
+        if (membershipId) {
+            const supabase = await createAdminClient();
+            const { data: membership } = await supabase
+                .from('memberships')
+                .select('id, tenant_id')
+                .eq('id', membershipId)
+                .eq('tenant_id', auth.tenantId)
+                .single();
+
+            if (!membership) {
+                return NextResponse.json({ error: 'Membership not found in your tenant' }, { status: 404 });
+            }
+        }
 
         // Cancel the subscription in Stripe
         const cancelledSubscription = await stripe.subscriptions.cancel(subscriptionId);
-        console.log('Subscription cancelled:', cancelledSubscription.id, cancelledSubscription.status);
 
         // Update membership status in database
         if (membershipId) {
@@ -40,7 +63,8 @@ export async function POST(request: NextRequest) {
             await supabase
                 .from('memberships')
                 .update({ status: 'cancelled' })
-                .eq('id', membershipId);
+                .eq('id', membershipId)
+                .eq('tenant_id', auth.tenantId); // Tenant isolation
         }
 
         return NextResponse.json({
@@ -51,10 +75,10 @@ export async function POST(request: NextRequest) {
                 status: cancelledSubscription.status,
             },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error cancelling subscription:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to cancel subscription' },
+            { error: safeErrorResponse(error, 'Failed to cancel subscription') },
             { status: 500 }
         );
     }

@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { resolveTenantForUser } from '@/lib/tenant';
 import Stripe from 'stripe';
 import { rateLimit } from '@/lib/rate-limit';
+import { safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
     // Rate limit: 10 requests per minute
@@ -44,21 +45,33 @@ export async function POST(request: NextRequest) {
             userEmail,
         } = body;
 
-        console.log('Stripe checkout: Creating session for user', userId, 'membership type', membershipTypeId);
+        console.log('Stripe checkout: Creating session for membership type', membershipTypeId);
 
-        // Get Stripe price ID from membership type using admin client to bypass RLS
-        const supabase = createAdminClient();
-        const { data: membershipType, error: fetchError } = await supabase
+        // Authenticate: the caller must be logged in
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized', url: null }, { status: 401 });
+        }
+
+        // Security: the authenticated user must match the userId in the body
+        if (user.id !== userId) {
+            return NextResponse.json({ error: 'Forbidden: User mismatch', url: null }, { status: 403 });
+        }
+
+        const adminSupabase = createAdminClient();
+        const { data: membershipType, error: fetchError } = await adminSupabase
             .from('membership_types')
             .select('stripe_price_id')
             .eq('id', membershipTypeId)
             .single();
 
         if (fetchError) {
-            console.error('Stripe checkout: Error fetching membership type:', fetchError);
+            console.error('Stripe checkout: Error fetching membership type:', fetchError.code);
         }
 
-        console.log('Stripe checkout: Membership type data:', membershipType);
+
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -78,7 +91,6 @@ export async function POST(request: NextRequest) {
 
             if (existingCustomers.data.length > 0) {
                 customer = existingCustomers.data[0];
-                console.log('Stripe checkout: Found existing customer:', customer.id);
             } else {
                 // Create new customer
                 customer = await stripe.customers.create({
@@ -88,7 +100,6 @@ export async function POST(request: NextRequest) {
                         locationId,
                     },
                 });
-                console.log('Stripe checkout: Created new customer:', customer.id);
             }
         } catch (customerError) {
             console.error('Stripe checkout: Error creating customer:', customerError);
@@ -113,13 +124,11 @@ export async function POST(request: NextRequest) {
 
         // Use existing Stripe Price ID if available, otherwise create price data
         if (membershipType?.stripe_price_id) {
-            console.log('Stripe checkout: Using stored price ID:', membershipType.stripe_price_id);
             sessionParams.line_items = [{
                 price: membershipType.stripe_price_id,
                 quantity: 1,
             }];
         } else {
-            console.log('Stripe checkout: Using inline price_data for price:', price);
             // Create inline price (for testing or when no Stripe Price ID is set)
             sessionParams.line_items = [{
                 price_data: {
@@ -138,14 +147,12 @@ export async function POST(request: NextRequest) {
         }
 
         const session = await stripe.checkout.sessions.create(sessionParams);
-        console.log('Stripe checkout: Session created with URL:', session.url);
 
         return NextResponse.json({ url: session.url });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Stripe checkout error:', error);
-        const errorMessage = error?.message || error?.raw?.message || 'Failed to create checkout session';
         return NextResponse.json(
-            { error: errorMessage, url: null },
+            { error: safeErrorResponse(error, 'Failed to create checkout session'), url: null },
             { status: 500 }
         );
     }

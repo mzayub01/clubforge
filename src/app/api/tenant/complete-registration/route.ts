@@ -7,9 +7,23 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 10 requests per minute
+        const rateLimited = checkRateLimit(request, 'complete-reg', 10);
+        if (rateLimited) return rateLimited;
+
+        // Authenticate: the caller must be logged in
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await request.json();
         const {
             userId,
@@ -23,7 +37,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        // Security: the authenticated user must match the userId in the body
+        if (user.id !== userId) {
+            return NextResponse.json({ error: 'Forbidden: User mismatch' }, { status: 403 });
+        }
+
         const adminSupabase = await createAdminClient();
+
+        // Verify the tenant exists and is active
+        const { data: tenant } = await adminSupabase
+            .from('tenants')
+            .select('id')
+            .eq('id', tenantId)
+            .eq('is_active', true)
+            .single();
+
+        if (!tenant) {
+            return NextResponse.json({ error: 'Invalid tenant' }, { status: 400 });
+        }
 
         // 1. Ensure tenant_members row exists (required for RLS policies)
         const { data: existingTenantMember } = await adminSupabase
@@ -77,7 +108,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('[complete-registration] Error:', error);
-        const message = error instanceof Error ? error.message : 'Registration completion failed';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: safeErrorResponse(error, 'Registration completion failed') }, { status: 500 });
     }
 }

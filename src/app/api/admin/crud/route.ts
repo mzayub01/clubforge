@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServerClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
+import { safeErrorResponse } from '@/lib/auth-guard';
 
 // Whitelist of tables admins can access
 const ALLOWED_TABLES = [
@@ -59,6 +60,49 @@ interface CrudRequest {
     single?: boolean;
     count?: 'exact' | 'planned' | 'estimated';
     head?: boolean;
+}
+
+// Columns that should NEVER be returned to the client from the tenants table
+const TENANTS_SENSITIVE_COLUMNS = [
+    'stripe_customer_id',
+    'stripe_subscription_id',
+];
+
+// Validate and sanitise the select parameter to prevent join traversal
+function sanitiseSelect(select: string | undefined): string {
+    if (!select) return '*';
+    // Block Supabase relationship traversal syntax (parentheses)
+    // e.g. "*, tenants(*)" or "id, other_table!inner(secret)"
+    if (/[()]/.test(select)) {
+        // Allow known safe join patterns used by the app
+        const safePatterns = [
+            'membership_type:membership_types(name)',
+            'membership_type:membership_types(name,price)',
+            'profile:profiles!inner(first_name,email,role,is_child)',
+            'profiles!inner(first_name, email, role, is_child)',
+        ];
+        const isSafe = safePatterns.some(p => select.includes(p));
+        if (!isSafe) {
+            return '*'; // Fall back to wildcard if unsanctioned join detected
+        }
+    }
+    return select;
+}
+
+// Strip sensitive columns from tenants table results
+function stripSensitiveFields(table: string, data: any): any {
+    if (table !== 'tenants') return data;
+    if (Array.isArray(data)) {
+        return data.map(row => stripSensitiveFields(table, row));
+    }
+    if (data && typeof data === 'object') {
+        const cleaned = { ...data };
+        for (const col of TENANTS_SENSITIVE_COLUMNS) {
+            delete cleaned[col];
+        }
+        return cleaned;
+    }
+    return data;
 }
 
 // Authenticate user and get tenant context
@@ -152,9 +196,10 @@ export async function POST(request: NextRequest) {
 
         switch (action) {
             case 'select': {
+                const safeSelect = sanitiseSelect(selectCols);
                 let query = adminSupabase
                     .from(table)
-                    .select(selectCols || '*', count ? { count, head: head || false } : undefined);
+                    .select(safeSelect, count ? { count, head: head || false } : undefined);
 
                 // Auto-scope to tenant
                 if (tenantFilter) {
@@ -225,9 +270,9 @@ export async function POST(request: NextRequest) {
 
                 if (error) {
                     console.error(`Insert error on ${table}:`, error);
-                    return NextResponse.json({ error: error.message }, { status: 500 });
+                    return NextResponse.json({ error: 'Insert failed' }, { status: 500 });
                 }
-                return NextResponse.json({ data: result }, { status: 201 });
+                return NextResponse.json({ data: stripSensitiveFields(table, result) }, { status: 201 });
             }
 
             case 'update': {
@@ -251,9 +296,9 @@ export async function POST(request: NextRequest) {
 
                 if (error) {
                     console.error(`Update error on ${table}:`, error);
-                    return NextResponse.json({ error: error.message }, { status: 500 });
+                    return NextResponse.json({ error: 'Update failed' }, { status: 500 });
                 }
-                return NextResponse.json({ data: result });
+                return NextResponse.json({ data: stripSensitiveFields(table, result) });
             }
 
             case 'upsert': {
@@ -270,9 +315,9 @@ export async function POST(request: NextRequest) {
 
                 if (error) {
                     console.error(`Upsert error on ${table}:`, error);
-                    return NextResponse.json({ error: error.message }, { status: 500 });
+                    return NextResponse.json({ error: 'Upsert failed' }, { status: 500 });
                 }
-                return NextResponse.json({ data: result });
+                return NextResponse.json({ data: stripSensitiveFields(table, result) });
             }
 
             case 'delete': {
@@ -296,7 +341,7 @@ export async function POST(request: NextRequest) {
 
                 if (error) {
                     console.error(`Delete error on ${table}:`, error);
-                    return NextResponse.json({ error: error.message }, { status: 500 });
+                    return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
                 }
                 return NextResponse.json({ success: true });
             }
@@ -307,7 +352,7 @@ export async function POST(request: NextRequest) {
     } catch (err) {
         console.error('Admin CRUD error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }

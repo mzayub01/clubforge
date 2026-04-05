@@ -6,15 +6,31 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { getStripeClient } from '@/lib/stripe';
-
-const stripe = getStripeClient()!;
-
+import { checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 const PLATFORM_FEE_PERCENT = 2.5;
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 10 requests per minute
+        const rateLimited = checkRateLimit(request, 'checkout-connected', 10);
+        if (rateLimited) return rateLimited;
+
+        // Authenticate: the caller must be logged in
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const stripe = getStripeClient();
+        if (!stripe) {
+            return NextResponse.json({ error: 'Stripe not configured' }, { status: 400 });
+        }
+
         const body = await request.json();
         const {
             membershipTypeName,
@@ -29,6 +45,11 @@ export async function POST(request: NextRequest) {
 
         if (!tenantId || !price || !userId) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // Security: the authenticated user must match the userId in the body
+        if (user.id !== userId) {
+            return NextResponse.json({ error: 'Forbidden: User mismatch' }, { status: 403 });
         }
 
         // Get tenant's connected Stripe account
@@ -96,7 +117,6 @@ export async function POST(request: NextRequest) {
         const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
         const protocol = appDomain.includes('localhost') ? 'http' : 'https';
         const tenantBaseUrl = `${protocol}://${tenant.slug}.${appDomain}`;
-        const fallbackBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
         // Create checkout session on the connected account
         const session = await stripe.checkout.sessions.create({
@@ -143,8 +163,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ url: session.url });
     } catch (error) {
         console.error('Connected checkout error:', error);
-        const message = error instanceof Error ? error.message : 'Checkout failed';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: safeErrorResponse(error, 'Checkout failed') }, { status: 500 });
     }
 }
-

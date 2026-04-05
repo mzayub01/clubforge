@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { rateLimit } from '@/lib/rate-limit';
+import { escapeHtml } from '@/lib/auth-guard';
 
 const DEMO_RECIPIENT = 'clubforgehq@gmail.com';
 
@@ -25,6 +26,12 @@ export async function POST(request: NextRequest) {
         if (!name || !email) {
             return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 });
         }
+
+        // H5: Sanitise user inputs before HTML interpolation
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safePhone = phone ? escapeHtml(phone) : '';
+        const safeClubName = clubName ? escapeHtml(clubName) : '';
 
         const clubTypeLabels: Record<string, string> = {
             'bjj': 'BJJ / Jiu-Jitsu',
@@ -47,38 +54,36 @@ export async function POST(request: NextRequest) {
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr style="border-bottom: 1px solid #F1F5F9;">
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px; width: 140px;">Name</td>
-                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${name}</td>
+                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${safeName}</td>
                         </tr>
                         <tr style="border-bottom: 1px solid #F1F5F9;">
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px;">Email</td>
                             <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">
-                                <a href="mailto:${email}" style="color: #C5A456; text-decoration: none;">${email}</a>
+                                <a href="mailto:${safeEmail}" style="color: #C5A456; text-decoration: none;">${safeEmail}</a>
                             </td>
                         </tr>
-                        ${phone ? `
+                        ${safePhone ? `
                         <tr style="border-bottom: 1px solid #F1F5F9;">
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px;">Phone</td>
-                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">
-                                <a href="tel:${phone.replace(/\s/g, '')}" style="color: #C5A456; text-decoration: none;">${phone}</a>
-                            </td>
+                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${safePhone}</td>
                         </tr>
                         ` : ''}
                         <tr style="border-bottom: 1px solid #F1F5F9;">
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px;">Club Name</td>
-                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${clubName || 'Not provided'}</td>
+                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${safeClubName || 'Not provided'}</td>
                         </tr>
                         <tr style="border-bottom: 1px solid #F1F5F9;">
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px;">Club Type</td>
-                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${clubTypeLabels[clubType] || clubType || 'Not selected'}</td>
+                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${clubTypeLabels[clubType] || escapeHtml(clubType || '') || 'Not selected'}</td>
                         </tr>
                         <tr>
                             <td style="padding: 12px 0; color: #64748B; font-size: 14px;">Members</td>
-                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${memberCount || 'Not selected'}</td>
+                            <td style="padding: 12px 0; color: #0F172A; font-size: 14px; font-weight: 600;">${escapeHtml(memberCount || '') || 'Not selected'}</td>
                         </tr>
                     </table>
                     <div style="margin-top: 24px; padding: 16px; background: #F8FAFC; border-radius: 8px; text-align: center;">
-                        <a href="mailto:${email}" style="display: inline-block; padding: 10px 24px; background: #C5A456; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-                            Reply to ${name.split(' ')[0]}
+                        <a href="mailto:${safeEmail}" style="display: inline-block; padding: 10px 24px; background: #C5A456; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                            Reply to ${safeName.split(' ')[0]}
                         </a>
                     </div>
                 </div>
@@ -87,7 +92,7 @@ export async function POST(request: NextRequest) {
 
         const internalResult = await sendEmail({
             to: DEMO_RECIPIENT,
-            subject: `🎯 Demo Request: ${clubName || name} (${clubTypeLabels[clubType] || 'Club'})`,
+            subject: `🎯 Demo Request: ${safeClubName || safeName} (${clubTypeLabels[clubType] || 'Club'})`,
             html: internalHtml,
             replyTo: email,
         });
@@ -98,7 +103,7 @@ export async function POST(request: NextRequest) {
         }
 
         // ---- 2. Confirmation email to the requestor ----
-        const firstName = name.split(' ')[0];
+        const safeFirstName = safeName.split(' ')[0];
         const confirmationHtml = `
             <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
                 <!-- Header -->
@@ -106,7 +111,7 @@ export async function POST(request: NextRequest) {
                     <img src="https://clubforgehq.com/logo-clubforge-final.png" alt="ClubForge" style="height: 36px; margin-bottom: 16px;" />
                     <h1 style="margin: 0; font-size: 24px; color: #0F172A; font-weight: 700;">We&rsquo;ve received your request</h1>
                     <p style="margin: 12px 0 0; color: #64748B; font-size: 15px; line-height: 1.6;">
-                        Thank you for your interest in ClubForge, ${firstName}.
+                        Thank you for your interest in ClubForge, ${safeFirstName}.
                     </p>
                 </div>
 
@@ -129,7 +134,7 @@ export async function POST(request: NextRequest) {
                             </td>
                             <td style="padding: 14px 0;">
                                 <p style="margin: 0 0 2px; font-size: 14px; font-weight: 600; color: #0F172A;">Tailored to your club</p>
-                                <p style="margin: 0; font-size: 13px; color: #64748B; line-height: 1.5;">We&rsquo;ll focus on the features most relevant to ${clubName ? `<strong>${clubName}</strong>` : 'your club'} and how you operate.</p>
+                                <p style="margin: 0; font-size: 13px; color: #64748B; line-height: 1.5;">We&rsquo;ll focus on the features most relevant to ${safeClubName ? `<strong>${safeClubName}</strong>` : 'your club'} and how you operate.</p>
                             </td>
                         </tr>
                         <tr>
@@ -176,7 +181,7 @@ export async function POST(request: NextRequest) {
         // Send confirmation (non-blocking — don't fail the request if this fails)
         sendEmail({
             to: email,
-            subject: `Thanks ${firstName} — your ClubForge demo request is confirmed`,
+            subject: `Thanks ${safeFirstName} \u2014 your ClubForge demo request is confirmed`,
             html: confirmationHtml,
             replyTo: 'clubforgehq@gmail.com',
         }).catch(err => {

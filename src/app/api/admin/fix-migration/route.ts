@@ -2,33 +2,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { resolveTenantForUser } from '@/lib/tenant';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export const dynamic = 'force-dynamic';
 
-const supabaseAdmin = createAdminClient();
-
 export async function GET(req: NextRequest) {
     try {
+        // Rate limit: 5 per minute
+        const rateLimited = checkRateLimit(req, 'fix-migration', 5);
+        if (rateLimited) return rateLimited;
+
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
+        }
+
+        const supabaseAdmin = createAdminClient();
+
         console.log('Starting retrospective migration via API...');
 
         // Find candidate profiles: is_child=true
         const { data: candidates, error } = await supabaseAdmin
             .from('profiles')
             .select('id, user_id, first_name, last_name, email, parent_guardian_id')
-            .eq('is_child', true);
+            .eq('is_child', true)
+            .eq('tenant_id', auth.tenantId); // Scope to admin's tenant
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: safeErrorResponse(error, 'Query failed') }, { status: 500 });
         }
 
         const results: Array<{ original_user: string; new_child_id?: string; status?: string; error?: string }> = [];
-
-        // Get tenant context from the first candidate's membership
-        let tenantId: string | null = null;
-        if (candidates && candidates.length > 0) {
-            const membership = await resolveTenantForUser(candidates[0].user_id);
-            tenantId = membership?.tenantId ?? null;
-        }
 
         for (const candidate of candidates || []) {
             // Check if anyone points to this candidate as guardian (and is NOT the candidate themselves)
@@ -40,7 +45,7 @@ export async function GET(req: NextRequest) {
 
             if (count && count > 0) {
                 console.log(`Migrating ${candidate.first_name}...`);
-                const result = await performMigration(candidate, tenantId);
+                const result = await performMigration(supabaseAdmin, candidate, auth.tenantId);
                 results.push(result);
             }
         }
@@ -51,12 +56,16 @@ export async function GET(req: NextRequest) {
             results
         });
 
-    } catch (e: any) {
-        return NextResponse.json({ error: e.message }, { status: 500 });
+    } catch (e) {
+        return NextResponse.json({ error: safeErrorResponse(e, 'Migration failed') }, { status: 500 });
     }
 }
 
-async function performMigration(currentProfile: any, tenantId: string | null) {
+async function performMigration(
+    supabaseAdmin: ReturnType<typeof createAdminClient>,
+    currentProfile: any,
+    tenantId: string | null
+) {
     try {
         // 1. Create Phantom Auth User
         const childEmail = `child-${Date.now()}-${Math.random().toString(36).substring(7)}@child.clubforge.local`;
@@ -74,7 +83,7 @@ async function performMigration(currentProfile: any, tenantId: string | null) {
             },
         });
 
-        if (authError || !childAuth.user) throw new Error('Auth creation failed: ' + authError?.message);
+        if (authError || !childAuth.user) throw new Error('Auth creation failed');
 
         // 2. Create New Profile (Copy data)
         const { data: currentFullProfile } = await supabaseAdmin
@@ -115,7 +124,7 @@ async function performMigration(currentProfile: any, tenantId: string | null) {
 
         if (profileError) {
             await supabaseAdmin.auth.admin.deleteUser(childAuth.user.id);
-            throw new Error('Profile creation failed: ' + profileError.message);
+            throw new Error('Profile creation failed');
         }
 
         // 3. Move Linked Data
@@ -149,7 +158,7 @@ async function performMigration(currentProfile: any, tenantId: string | null) {
             })
             .eq('id', currentProfile.id);
 
-        if (updateError) throw new Error('Failed to update guardian profile: ' + updateError.message);
+        if (updateError) throw new Error('Failed to update guardian profile');
 
         return {
             original_user: currentProfile.user_id,

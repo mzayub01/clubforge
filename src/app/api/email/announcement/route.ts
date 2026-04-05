@@ -1,31 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { resolveTenantForUser } from '@/lib/tenant';
 import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase } from '@/lib/email-templates-db';
-import { rateLimit } from '@/lib/rate-limit';
+import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
     try {
         // Rate limit: 10 requests per minute
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-        const { success: allowed } = rateLimit(`email - announce:${ip} `, { maxRequests: 10, windowMs: 60_000 });
-        if (!allowed) {
-            return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-        }
+        const rateLimited = checkRateLimit(request, 'email-announce', 10);
+        if (rateLimited) return rateLimited;
 
-        // Verify the requester is an admin via tenant_members
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const membership = await resolveTenantForUser(user.id);
-        if (!membership || membership.role !== 'admin') {
-            return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
         const body = await request.json();
@@ -34,6 +22,10 @@ export async function POST(request: NextRequest) {
         if (!announcementTitle || !announcementMessage) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
+
+        // H5: Sanitise user inputs before HTML interpolation
+        const safeTitle = escapeHtml(announcementTitle);
+        const safeMessage = escapeHtml(announcementMessage);
 
         // Use admin client to fetch all members
         const supabaseAdmin = createAdminClient();
@@ -44,7 +36,8 @@ export async function POST(request: NextRequest) {
         let query = supabaseAdmin
             .from('memberships')
             .select('user_id, profile:profiles!inner(first_name, email, role, is_child)')
-            .eq('status', 'active');
+            .eq('status', 'active')
+            .eq('tenant_id', auth.tenantId); // H2: Tenant isolation
 
         // Filter by location if specified
         if (locationId) {
@@ -113,22 +106,22 @@ export async function POST(request: NextRequest) {
             try {
                 // Render the email template
                 const templateData = {
-                    firstName: recipient.firstName,
-                    announcementTitle,
-                    announcementMessage: announcementMessage.replace(/\n/g, '<br>'),
+                    firstName: escapeHtml(recipient.firstName),
+                    announcementTitle: safeTitle,
+                    announcementMessage: safeMessage.replace(/\n/g, '<br>'),
                 };
 
                 const emailContent = await renderEmailFromDatabase('announcement_notification', templateData);
 
                 if (!emailContent) {
                     // Fallback if template not in database
-                    const fallbackSubject = `📢 ${announcementTitle} `;
+                    const fallbackSubject = `📢 ${safeTitle}`;
                     const fallbackHtml = `
-    < p > Hi ${recipient.firstName}, </p>
-        < p > We have an important announcement: </p>
-            < h2 > ${announcementTitle} </h2>
-                < p > ${announcementMessage.replace(/\n/g, '<br>')} </p>
-                    < p > Best regards, <br>The ClubForge Team </p>
+    <p>Hi ${escapeHtml(recipient.firstName)},</p>
+        <p>We have an important announcement:</p>
+            <h2>${safeTitle}</h2>
+                <p>${safeMessage.replace(/\n/g, '<br>')}</p>
+                    <p>Best regards,<br>The ClubForge Team</p>
                         `;
                     const result = await sendEmail({
                         to: recipient.email,
@@ -177,7 +170,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Announcement email API error:', error);
         return NextResponse.json(
-            { error: 'Failed to send announcement emails' },
+            { error: safeErrorResponse(error, 'Failed to send announcement emails') },
             { status: 500 }
         );
     }

@@ -3,16 +3,23 @@
 // Opens Stripe Customer Portal or creates upgrade checkout
 // ===============================================
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { PLANS } from '@/lib/stripe-plans';
 import { getStripeClient } from '@/lib/stripe';
+import { checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
-const stripe = getStripeClient()!;
 
-
-export async function POST() {
+export async function POST(request: NextRequest) {
     try {
+        // Rate limit: 5 per minute
+        const rateLimited = checkRateLimit(request, 'stripe-upgrade', 5);
+        if (rateLimited) return rateLimited;
+
+        const stripe = getStripeClient();
+        if (!stripe) {
+            return NextResponse.json({ error: 'Stripe not configured' }, { status: 400 });
+        }
         // 1. Authenticate user
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -106,7 +113,6 @@ export async function POST() {
         return NextResponse.json({ url: portalSession.url });
     } catch (error) {
         console.error('Upgrade/billing error:', error);
-        const message = error instanceof Error ? error.message : 'Failed to open billing portal';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: safeErrorResponse(error, 'Failed to open billing portal') }, { status: 500 });
     }
 }

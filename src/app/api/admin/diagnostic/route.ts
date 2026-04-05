@@ -5,47 +5,23 @@
 // ===============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
-
-async function getAdminTenantId(adminSupabase: any, userId: string): Promise<string | null> {
-    // Try tenant_members first (preferred)
-    const { data: tenantMember } = await adminSupabase
-        .from('tenant_members')
-        .select('tenant_id, role')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .single();
-
-    if (tenantMember && ['admin', 'instructor', 'owner'].includes(tenantMember.role)) {
-        return tenantMember.tenant_id;
-    }
-
-    // Fallback: check profile's tenant_id (for admins who may not have tenant_members row)
-    const { data: profile } = await adminSupabase
-        .from('profiles')
-        .select('tenant_id')
-        .eq('user_id', userId)
-        .single();
-
-    return profile?.tenant_id || null;
-}
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function GET(request: NextRequest) {
     try {
-        // Authenticate caller
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        // Rate limit: 10 per minute
+        const rateLimited = checkRateLimit(request, 'diagnostic', 10);
+        if (rateLimited) return rateLimited;
 
-        if (!user) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
+        const tenantId = auth.tenantId;
         const adminSupabase = await createAdminClient();
-        const tenantId = await getAdminTenantId(adminSupabase, user.id);
-
-        if (!tenantId) {
-            return NextResponse.json({ error: 'No tenant found for this user' }, { status: 403 });
-        }
 
         // Get all user IDs for this tenant (from profiles)
         const { data: profilesData } = await adminSupabase
@@ -108,27 +84,25 @@ export async function GET(request: NextRequest) {
         });
     } catch (error) {
         console.error('[Diagnostic] Error:', error);
-        const message = error instanceof Error ? error.message : 'Diagnostic failed';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: safeErrorResponse(error, 'Diagnostic failed') }, { status: 500 });
     }
 }
 
 // POST: Repair missing data
 export async function POST(request: NextRequest) {
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        // Rate limit: 5 per minute
+        const rateLimited = checkRateLimit(request, 'diagnostic-repair', 5);
+        if (rateLimited) return rateLimited;
 
-        if (!user) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
+        const tenantId = auth.tenantId;
         const adminSupabase = await createAdminClient();
-        const tenantId = await getAdminTenantId(adminSupabase, user.id);
-
-        if (!tenantId) {
-            return NextResponse.json({ error: 'No tenant found for this user' }, { status: 403 });
-        }
         const body = await request.json();
         const { action, targetUserId, locationId, membershipTypeId } = body;
 
@@ -240,7 +214,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ repairs, success: true });
     } catch (error) {
         console.error('[Diagnostic] Repair error:', error);
-        const message = error instanceof Error ? error.message : 'Repair failed';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: safeErrorResponse(error, 'Repair failed') }, { status: 500 });
     }
 }

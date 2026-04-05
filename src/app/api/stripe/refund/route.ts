@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
+    // Rate limit: 5 per minute
+    const rateLimited = checkRateLimit(request, 'stripe-refund', 5);
+    if (rateLimited) return rateLimited;
+
+    // Require admin authentication
+    const auth = await requireAdmin();
+    if (auth.error) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     if (!isStripeConfigured()) {
         return NextResponse.json(
             { error: 'Stripe is not configured' },
@@ -28,7 +39,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('Processing refund:', { paymentIntentId, chargeId, amount, reason });
+        console.log('Processing refund for tenant:', auth.tenantId);
 
         // Create refund params
         const refundParams: any = {
@@ -48,7 +59,6 @@ export async function POST(request: NextRequest) {
 
         // Create the refund in Stripe
         const refund = await stripe.refunds.create(refundParams);
-        console.log('Refund created:', refund.id, refund.status);
 
         return NextResponse.json({
             success: true,
@@ -60,10 +70,10 @@ export async function POST(request: NextRequest) {
                 currency: refund.currency,
             },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error processing refund:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to process refund' },
+            { error: safeErrorResponse(error, 'Failed to process refund') },
             { status: 500 }
         );
     }

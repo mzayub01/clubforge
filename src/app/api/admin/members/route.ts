@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { resolveTenantForUser } from '@/lib/tenant';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function DELETE(request: NextRequest) {
     try {
-        // Get authenticated user and verify admin role via tenant_members
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        // Rate limit: 10 per minute
+        const rateLimited = checkRateLimit(request, 'admin-members-delete', 10);
+        if (rateLimited) return rateLimited;
 
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const membership = await resolveTenantForUser(user.id);
-        if (!membership || membership.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
         const { searchParams } = new URL(request.url);
@@ -26,30 +22,39 @@ export async function DELETE(request: NextRequest) {
         }
 
         // Prevent self-deletion
-        if (userId === user.id) {
+        if (userId === auth.userId) {
             return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 });
         }
 
-        // Use admin client for service-role operations
         const supabaseAdmin = createAdminClient();
 
+        // H1 FIX: Verify the target user belongs to the admin's tenant
+        const { data: targetMember } = await supabaseAdmin
+            .from('tenant_members')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('tenant_id', auth.tenantId)
+            .single();
 
-        // Delete related records first (memberships, attendance, etc.)
-        await supabaseAdmin.from('attendance').delete().eq('user_id', userId);
-        await supabaseAdmin.from('memberships').delete().eq('user_id', userId);
+        if (!targetMember) {
+            return NextResponse.json({ error: 'Member not found in your tenant' }, { status: 404 });
+        }
 
-        // Delete the profile
+        // Delete related records first — scoped to tenant
+        await supabaseAdmin.from('attendance').delete().eq('user_id', userId).eq('tenant_id', auth.tenantId);
+        await supabaseAdmin.from('memberships').delete().eq('user_id', userId).eq('tenant_id', auth.tenantId);
+        await supabaseAdmin.from('tenant_members').delete().eq('user_id', userId).eq('tenant_id', auth.tenantId);
+
+        // Delete the profile (tenant-scoped)
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
             .delete()
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .eq('tenant_id', auth.tenantId);
 
         if (profileError) {
             console.error('Profile deletion error:', profileError);
-            return NextResponse.json(
-                { error: 'Failed to delete profile', details: profileError.message },
-                { status: 500 }
-            );
+            return NextResponse.json({ error: 'Failed to delete member' }, { status: 500 });
         }
 
         // Delete the auth user
@@ -57,10 +62,7 @@ export async function DELETE(request: NextRequest) {
 
         if (authError) {
             console.error('Auth deletion error:', authError);
-            return NextResponse.json(
-                { error: 'Failed to delete auth user', details: authError.message },
-                { status: 500 }
-            );
+            return NextResponse.json({ error: 'Failed to delete member account' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true, message: 'Member deleted successfully' });
@@ -68,7 +70,7 @@ export async function DELETE(request: NextRequest) {
     } catch (error) {
         console.error('Delete member error:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: safeErrorResponse(error, 'Internal server error') },
             { status: 500 }
         );
     }

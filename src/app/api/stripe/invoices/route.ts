@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function GET(request: NextRequest) {
+    // Rate limit: 20 per minute
+    const rateLimited = checkRateLimit(request, 'stripe-invoices', 20);
+    if (rateLimited) return rateLimited;
+
     if (!isStripeConfigured()) {
         return NextResponse.json(
             { error: 'Stripe is not configured', invoices: [] },
@@ -93,10 +98,10 @@ export async function GET(request: NextRequest) {
         }));
 
         return NextResponse.json({ invoices: formattedInvoices });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error fetching invoices:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to fetch invoices', invoices: [] },
+            { error: safeErrorResponse(error, 'Failed to fetch invoices'), invoices: [] },
             { status: 500 }
         );
     }

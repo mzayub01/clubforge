@@ -1,63 +1,36 @@
-// ===============================================
-// DojoHub - Admin Settings API
-// PUT /api/admin/settings
-// Updates tenant settings using admin client (bypasses RLS)
-// ===============================================
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient as createServerClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { cookies } from 'next/headers';
+import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
+
+// Columns that should NEVER be returned to the client from the tenants table
+const SENSITIVE_FIELDS = ['stripe_customer_id', 'stripe_subscription_id', 'stripe_account_id'];
+
+function stripSensitive(tenant: any) {
+    if (!tenant) return tenant;
+    const cleaned = { ...tenant };
+    for (const field of SENSITIVE_FIELDS) {
+        delete cleaned[field];
+    }
+    return cleaned;
+}
 
 
 export async function PUT(request: NextRequest) {
     try {
-        // 1. Verify the user is authenticated
-        const cookieStore = await cookies();
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+        // Rate limit: 10 per minute
+        const rateLimited = checkRateLimit(request, 'admin-settings-put', 10);
+        if (rateLimited) return rateLimited;
 
-        // Create a server-side client to check auth (reads the user's session cookie)
-        const { createClient } = await import('@/lib/supabase/server');
-        let user;
-        try {
-            const supabase = await createClient();
-            const { data } = await supabase.auth.getUser();
-            user = data.user;
-        } catch {
-            // Fallback: try getting user directly
-            const supabase = createServerClient(supabaseUrl, supabaseKey, {
-                global: {
-                    headers: {
-                        cookie: cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; '),
-                    },
-                },
-                auth: { autoRefreshToken: false, persistSession: false },
-            });
-            const { data } = await supabase.auth.getUser();
-            user = data.user;
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // 2. Verify user is an admin
+        const tenantId = auth.tenantId;
         const adminSupabase = createAdminClient();
-        const { data: tenantMember } = await adminSupabase
-            .from('tenant_members')
-            .select('tenant_id, role')
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .single();
 
-        if (!tenantMember || tenantMember.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-
-        const tenantId = tenantMember.tenant_id;
-
-        // 3. Parse the request body
+        // Parse the request body
         const body = await request.json();
         const { section, data } = body;
 
@@ -65,7 +38,7 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'Missing section or data' }, { status: 400 });
         }
 
-        // 4. Perform the update using admin client (bypasses RLS)
+        // Perform the update using admin client (bypasses RLS)
         let updatePayload: Record<string, unknown> = {};
 
         if (section === 'general') {
@@ -129,71 +102,42 @@ export async function PUT(request: NextRequest) {
 
         if (updateError) {
             console.error('Settings update error:', updateError);
-            return NextResponse.json({ error: updateError.message }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
         }
 
-        // 5. Return the updated tenant data
+        // Return the updated tenant data (strip sensitive fields)
         const { data: updatedTenant } = await adminSupabase
             .from('tenants')
             .select('*')
             .eq('id', tenantId)
             .single();
 
-        return NextResponse.json({ success: true, tenant: updatedTenant });
+        return NextResponse.json({ success: true, tenant: stripSensitive(updatedTenant) });
 
     } catch (err) {
         console.error('Settings API error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }
 }
 
-// GET: Fetch tenant settings (avoids RLS issues on client)
+// GET: Fetch tenant settings
 export async function GET(request: NextRequest) {
     try {
-        const cookieStore = await cookies();
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+        // Rate limit: 20 per minute
+        const rateLimited = checkRateLimit(request, 'admin-settings-get', 20);
+        if (rateLimited) return rateLimited;
 
-        const { createClient } = await import('@/lib/supabase/server');
-        let user;
-        try {
-            const supabase = await createClient();
-            const { data } = await supabase.auth.getUser();
-            user = data.user;
-        } catch {
-            const supabase = createServerClient(supabaseUrl, supabaseKey, {
-                global: {
-                    headers: {
-                        cookie: cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; '),
-                    },
-                },
-                auth: { autoRefreshToken: false, persistSession: false },
-            });
-            const { data } = await supabase.auth.getUser();
-            user = data.user;
+        // Require admin authentication
+        const auth = await requireAdmin();
+        if (auth.error) {
+            return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
+        const tenantId = auth.tenantId;
         const adminSupabase = createAdminClient();
-
-        const { data: tenantMember } = await adminSupabase
-            .from('tenant_members')
-            .select('tenant_id, role')
-            .eq('user_id', user.id)
-            .eq('is_active', true)
-            .single();
-
-        if (!tenantMember || tenantMember.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
-
-        const tenantId = tenantMember.tenant_id;
 
         const { data: tenant } = await adminSupabase
             .from('tenants')
@@ -219,7 +163,7 @@ export async function GET(request: NextRequest) {
         ]);
 
         return NextResponse.json({
-            tenant,
+            tenant: stripSensitive(tenant),
             stats: {
                 totalMembers: totalMembers || 0,
                 activeMembers: activeMembers || 0,
@@ -232,7 +176,7 @@ export async function GET(request: NextRequest) {
     } catch (err) {
         console.error('Settings GET error:', err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : 'Internal server error' },
+            { error: safeErrorResponse(err, 'Internal server error') },
             { status: 500 }
         );
     }

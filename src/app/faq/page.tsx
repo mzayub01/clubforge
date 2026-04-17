@@ -129,7 +129,7 @@ const faqItems: FAQItem[] = [
     },
     {
         category: 'How ClubForge Compares',
-        question: 'How is ClubForge different from Gymdesk or Zen Planner?',
+        question: 'How is ClubForge different from generic gym software?',
         answer: 'Unlike generic gym software, ClubForge is built specifically for martial arts, with built-in belt progression, attendance tracking, and a fully integrated system for managing clubs.',
     },
     {
@@ -140,7 +140,7 @@ const faqItems: FAQItem[] = [
     {
         category: 'How ClubForge Compares',
         question: 'What software do BJJ gyms use?',
-        answer: 'Most gyms use general tools like Gymdesk or Zen Planner, but platforms like ClubForge are designed specifically for martial arts, offering better support for belt progression and attendance tracking.',
+        answer: 'While some gyms use general fitness tools, platforms like ClubForge are designed specifically for martial arts, offering better support for belt progression, attendance tracking, and unified grading operations.',
     },
 
     // UK-Specific SEO Questions

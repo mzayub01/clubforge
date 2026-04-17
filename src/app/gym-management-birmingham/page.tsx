@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { BreadcrumbSchema } from '@/components/structured-data';
+import CityFAQ from '@/components/CityFAQ';
 
 export const metadata = {
     title: 'Martial Arts Gym Management Software Birmingham | ClubForge',
@@ -242,6 +243,8 @@ export default async function BirminghamPage() {
                         </p>
                     </div>
                 </section>
+
+                <CityFAQ city="Birmingham" />
 
                 {/* ==================== CTA ==================== */}
                 <section style={{

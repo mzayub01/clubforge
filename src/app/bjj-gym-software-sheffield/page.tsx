@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { BreadcrumbSchema } from '@/components/structured-data';
+import CityFAQ from '@/components/CityFAQ';
 
 export const metadata = {
     title: 'BJJ Gym Management Software Sheffield | ClubForge',
@@ -129,6 +130,8 @@ export default async function SheffieldPage() {
                         <p style={{ fontSize: '1rem', color: '#94A3B8', lineHeight: '1.7' }}>Less admin. More coaching. Better member experience.</p>
                     </div>
                 </section>
+
+                <CityFAQ city="Sheffield" />
 
                 {/* ==================== CTA ==================== */}
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>

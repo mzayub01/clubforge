@@ -33,7 +33,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
-import { SoftwareApplicationSchema, BreadcrumbSchema } from '@/components/structured-data';
+import { SoftwareApplicationSchema, BreadcrumbSchema, FAQPageSchema } from '@/components/structured-data';
 import CurrencyPrice from '@/components/CurrencyPrice';
 
 export const metadata = {
@@ -1374,6 +1374,87 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ==================== HOMEPAGE FAQ ==================== */}
+        <section style={{
+          background: '#FFFFFF',
+          padding: '100px 24px',
+          borderTop: '1px solid #F1F5F9',
+        }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <p style={{
+              fontSize: '14px', fontWeight: '600', color: '#C5A456',
+              textTransform: 'uppercase', letterSpacing: '1.5px',
+              marginBottom: '16px', textAlign: 'center',
+            }}>
+              Frequently Asked Questions
+            </p>
+            <h2 style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2.2rem)',
+              fontWeight: '800', color: '#0F172A',
+              textAlign: 'center', marginBottom: '48px', lineHeight: '1.2',
+            }}>
+              Everything you need to know
+            </h2>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                { q: 'What is ClubForge?', a: 'ClubForge is an all-in-one martial arts club management platform designed for BJJ, MMA, Karate and Judo academies. It helps manage memberships, payments, attendance, and belt progression in one system.' },
+                { q: 'Can ClubForge handle membership payments?', a: 'Yes, ClubForge includes automated billing and subscription payments via Stripe, allowing clubs to manage memberships and reduce missed or failed payments.' },
+                { q: 'Does ClubForge support belt and rank tracking?', a: 'Yes, ClubForge includes built-in belt and rank progression systems for BJJ, Karate, Judo and other disciplines, with grading history and instructor feedback.' },
+                { q: 'Is ClubForge suitable for kids classes and family accounts?', a: 'Yes, ClubForge supports family accounts, allowing parents to manage multiple children under one login.' },
+                { q: 'How do members check in to classes?', a: 'Members can check in using a simple one-tap mobile system, with attendance tracked automatically.' },
+                { q: 'How long does it take to set up ClubForge?', a: 'Most clubs can set up their branded portal, schedule, and memberships in under 5\u201310 minutes.' },
+              ].map((faq, i) => (
+                <details
+                  key={i}
+                  style={{
+                    border: '1px solid #F1F5F9',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    background: '#FFFFFF',
+                  }}
+                >
+                  <summary style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '18px 20px', cursor: 'pointer',
+                    fontSize: '0.95rem', fontWeight: '600', color: '#0F172A',
+                    listStyle: 'none',
+                  }}>
+                    {faq.q}
+                  </summary>
+                  <div style={{
+                    padding: '0 20px 18px',
+                    borderTop: '1px solid #F1F5F9',
+                    paddingTop: '14px',
+                  }}>
+                    <p style={{ color: '#64748B', margin: 0, lineHeight: '1.7', fontSize: '0.9rem' }}>
+                      {faq.a}
+                    </p>
+                  </div>
+                </details>
+              ))}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '32px' }}>
+              <Link href="/faq" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                color: '#C5A456', fontWeight: '600', fontSize: '0.95rem', textDecoration: 'none',
+              }}>
+                View all FAQs <ChevronRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <FAQPageSchema faqs={[
+          { question: 'What is ClubForge?', answer: 'ClubForge is an all-in-one martial arts club management platform designed for BJJ, MMA, Karate and Judo academies. It helps manage memberships, payments, attendance, and belt progression in one system.' },
+          { question: 'Can ClubForge handle membership payments?', answer: 'Yes, ClubForge includes automated billing and subscription payments via Stripe, allowing clubs to manage memberships and reduce missed or failed payments.' },
+          { question: 'Does ClubForge support belt and rank tracking?', answer: 'Yes, ClubForge includes built-in belt and rank progression systems for BJJ, Karate, Judo and other disciplines, with grading history and instructor feedback.' },
+          { question: 'Is ClubForge suitable for kids classes and family accounts?', answer: 'Yes, ClubForge supports family accounts, allowing parents to manage multiple children under one login.' },
+          { question: 'How do members check in to classes?', answer: 'Members can check in using a simple one-tap mobile system, with attendance tracked automatically.' },
+          { question: 'How long does it take to set up ClubForge?', answer: 'Most clubs can set up their branded portal, schedule, and memberships in under 5-10 minutes.' },
+        ]} />
 
         {/* ==================== FINAL CTA ==================== */}
         <section style={{

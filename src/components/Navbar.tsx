@@ -54,6 +54,7 @@ export default function Navbar({ user }: NavbarProps) {
         : [
             { href: '/#features', label: 'Features' },
             { href: '/pricing', label: 'Pricing' },
+            { href: '/faq', label: 'FAQ' },
             { href: '/demo', label: 'Demo' },
             { href: '/about', label: 'About' },
         ];

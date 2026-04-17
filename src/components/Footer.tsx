@@ -7,11 +7,42 @@ export default function Footer() {
 
     return (
         <footer className="footer" style={{ background: 'var(--color-gray-900)', color: 'var(--color-gray-300)' }}>
+            {/* Locations — full-width row */}
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'var(--space-16) var(--space-6) 0' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-4)', flexWrap: 'wrap', paddingBottom: 'var(--space-10)', borderBottom: '1px solid var(--color-gray-800)' }}>
+                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', margin: 0, whiteSpace: 'nowrap' }}>
+                        Locations
+                    </h4>
+                    <nav style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
+                        {[
+                            { href: '/martial-arts-software-london', label: 'London' },
+                            { href: '/bjj-gym-software-manchester', label: 'Manchester' },
+                            { href: '/gym-management-birmingham', label: 'Birmingham' },
+                            { href: '/martial-arts-software-leeds', label: 'Leeds' },
+                            { href: '/bjj-gym-software-liverpool', label: 'Liverpool' },
+                            { href: '/martial-arts-software-glasgow', label: 'Glasgow' },
+                            { href: '/gym-management-edinburgh', label: 'Edinburgh' },
+                            { href: '/martial-arts-software-bristol', label: 'Bristol' },
+                            { href: '/bjj-gym-software-sheffield', label: 'Sheffield' },
+                            { href: '/martial-arts-software-nottingham', label: 'Nottingham' },
+                            { href: '/gym-management-leicester', label: 'Leicester' },
+                            { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
+                        ].map((city, i) => (
+                            <span key={city.href} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                {i > 0 && <span style={{ color: 'var(--color-gray-700)' }}>·</span>}
+                                <Link href={city.href} style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>{city.label}</Link>
+                            </span>
+                        ))}
+                    </nav>
+                </div>
+            </div>
+
+            {/* Main footer grid */}
             <div
                 style={{
                     maxWidth: '1200px',
                     margin: '0 auto',
-                    padding: 'var(--space-16) var(--space-6) var(--space-8)',
+                    padding: 'var(--space-10) var(--space-6) var(--space-8)',
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                     gap: 'var(--space-10)',

@@ -2,17 +2,13 @@
 At line:1 char:1
 + & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:String) [],  
-   RemoteException
+    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
- We detected multiple lockfiles and selected the directory of 
-C:\Users\user\package-lock.json as the root directory.
- To silence this warning, set `turbopack.root` in your Next.js config, or consider removing 
-one of the lockfiles if it's not needed.
-   See 
-https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory 
-for more information.
+ We detected multiple lockfiles and selected the directory of C:\Users\user\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if 
+it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
  Detected additional lockfiles: 
    * C:\Users\user\dev\dojohub\package-lock.json
 
@@ -26,11 +22,11 @@ https://nextjs.org/docs/messages/middleware-to-proxy
   Running TypeScript ...
   Collecting page data using 21 workers ...
 ΓÜá Using edge runtime on a page currently disables static generation for that page
-  Generating static pages using 21 workers (0/137) ...
-  Generating static pages using 21 workers (34/137) 
-  Generating static pages using 21 workers (68/137) 
-  Generating static pages using 21 workers (102/137) 
-Γ£ô Generating static pages using 21 workers (137/137) in 1240.0ms
+  Generating static pages using 21 workers (0/149) ...
+  Generating static pages using 21 workers (37/149) 
+  Generating static pages using 21 workers (74/149) 
+  Generating static pages using 21 workers (111/149) 
+Γ£ô Generating static pages using 21 workers (149/149) in 1573.4ms
   Finalizing page optimization ...
 
 Route (app)
@@ -107,6 +103,9 @@ Route (app)
 Γö£ ╞Æ /api/tenant/public
 Γö£ ╞Æ /api/tenant/register
 Γö£ Γùï /apple-icon.png
+Γö£ ╞Æ /bjj-gym-software-liverpool
+Γö£ ╞Æ /bjj-gym-software-manchester
+Γö£ ╞Æ /bjj-gym-software-sheffield
 Γö£ Γùï /checkout/cancel
 Γö£ Γùï /checkout/success
 Γö£ ╞Æ /dashboard
@@ -145,6 +144,9 @@ Route (app)
 Γö£ ╞Æ /for/martial-arts
 Γö£ Γùï /forgot-password
 Γö£ Γùï /get-started
+Γö£ ╞Æ /gym-management-birmingham
+Γö£ ╞Æ /gym-management-edinburgh
+Γö£ ╞Æ /gym-management-leicester
 Γö£ Γùï /icon.png
 Γö£ ╞Æ /instructor
 Γö£ ╞Æ /instructor/attendance
@@ -153,6 +155,12 @@ Route (app)
 Γö£ ╞Æ /instructor/students
 Γö£ ╞Æ /llms.txt
 Γö£ Γùï /login
+Γö£ ╞Æ /martial-arts-software-bristol
+Γö£ ╞Æ /martial-arts-software-glasgow
+Γö£ ╞Æ /martial-arts-software-leeds
+Γö£ ╞Æ /martial-arts-software-london
+Γö£ ╞Æ /martial-arts-software-newcastle
+Γö£ ╞Æ /martial-arts-software-nottingham
 Γö£ ╞Æ /opengraph-image
 Γö£ ╞Æ /platform
 Γö£ ╞Æ /platform/analytics

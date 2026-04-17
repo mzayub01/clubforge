@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "@/styles/globals.css";
 import PublicBottomNav from "@/components/PublicBottomNav";
+import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { OrganizationSchema, WebSiteSchema } from "@/components/structured-data";
@@ -141,6 +142,7 @@ export default function RootLayout({
         <WebSiteSchema />
         {children}
         <PublicBottomNav />
+        <CookieConsent />
         <Analytics />
         <SpeedInsights />
       </body>

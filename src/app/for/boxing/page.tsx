@@ -52,9 +52,9 @@ export default async function BoxingPage() {
                             🥊 Built For Boxing Clubs
                         </p>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
-                            Boxing Club Software{' '}
+                            Boxing Club Management{' '}
                             <span style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                                That Packs a Punch
+                                Software UK
                             </span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>

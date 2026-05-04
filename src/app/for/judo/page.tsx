@@ -47,8 +47,8 @@ export default async function JudoPage() {
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
                         <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>🥋 Built For Judo Clubs</p>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
-                            Judo Club Software{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Built for the Gentle Way</span>
+                            Judo Club Management{' '}
+                            <span style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Software UK</span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>Run your judo club with software that understands kyu/dan gradings, randori scheduling, automated payments, and attendance — so you can focus on developing judoka.</p>
                         <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px' }}>Community judo clubs, competition academies, and multi-mat dojos.</p>

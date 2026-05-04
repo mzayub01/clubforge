@@ -45,13 +45,13 @@ export default async function AboutPage() {
                 }}>
                     <div className="container" style={{ maxWidth: '750px', margin: '0 auto' }}>
                         <h1 style={{ marginBottom: 'var(--space-4)' }}>
-                            Built by club operators,{' '}
+                            About ClubForge — Martial Arts Club{' '}
                             <span style={{
                                 background: 'var(--color-gold-gradient)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
-                            }}>for club operators</span>
+                            }}>Management Software</span>
                         </h1>
                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xl)', lineHeight: '1.7' }}>
                             ClubForge wasn&apos;t designed in a boardroom. It was born from the chaos of actually running a club — managing members in spreadsheets, chasing payments on WhatsApp, and losing hours every week to admin that should have been automated.
@@ -62,7 +62,7 @@ export default async function AboutPage() {
                 {/* Origin Story */}
                 <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)' }}>
                     <div style={{ maxWidth: '750px', margin: '0 auto' }}>
-                        <h2 style={{ marginBottom: 'var(--space-6)' }}>The problem we lived</h2>
+                        <h2 style={{ marginBottom: 'var(--space-6)' }}>Why We Built Martial Arts Club Management Software</h2>
                         <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-lg)', lineHeight: '1.8' }}>
                             <p>
                                 We ran a martial arts club. It started small — 20 members, one location, weekly classes. Simple enough.
@@ -91,7 +91,7 @@ export default async function AboutPage() {
                         }}>
                             <Target size={28} color="var(--color-black)" />
                         </div>
-                        <h2 style={{ marginBottom: 'var(--space-4)' }}>Our mission</h2>
+                        <h2 style={{ marginBottom: 'var(--space-4)' }}>Our Mission: Software Built for Real Club Owners</h2>
                         <p style={{
                             color: 'var(--text-secondary)', fontSize: 'var(--text-xl)',
                             lineHeight: '1.8', maxWidth: '700px', margin: '0 auto',
@@ -104,7 +104,7 @@ export default async function AboutPage() {
                 {/* Values */}
                 <section style={{ background: 'var(--bg-primary)', padding: 'var(--space-16) var(--space-6)' }}>
                     <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>What we believe</h2>
+                        <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>What Makes ClubForge Different</h2>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-6)' }}>
                             {[
                                 {

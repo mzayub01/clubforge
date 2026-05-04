@@ -144,12 +144,12 @@ export default async function FeaturesPage() {
                             fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800',
                             lineHeight: '1.1', color: '#0F172A', marginBottom: '20px',
                         }}>
-                            Everything your club needs.{' '}
+                            Gym Management Software{' '}
                             <span style={{
                                 background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
                                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                             }}>
-                                Nothing it doesn&apos;t.
+                                Features
                             </span>
                         </h1>
                         <p style={{

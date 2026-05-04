@@ -146,7 +146,7 @@ export default async function HomePage() {
                   color: '#0F172A',
                   letterSpacing: '-0.03em',
                 }}>
-                  Stop running your club{' '}
+                  Martial Arts & Gym{' '}
                   <br />
                   <span style={{
                     background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 50%, #A88B3D 100%)',
@@ -154,7 +154,7 @@ export default async function HomePage() {
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                   }}>
-                    with spreadsheets
+                    Management Software
                   </span>
                 </h1>
 
@@ -430,7 +430,7 @@ export default async function HomePage() {
               color: '#0F172A', fontWeight: '700',
               marginBottom: '40px',
             }}>
-              Whatever you run, ClubForge runs it better
+              Gym Management Software for Every Martial Art
             </h2>
 
             <div style={{
@@ -486,12 +486,12 @@ export default async function HomePage() {
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '20px',
               }}>
-                Your members get<br />
+                Branded Member Portal{' '}<br />
                 <span style={{
                   background: 'linear-gradient(135deg, #C5A456, #D4B86A)',
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                }}>their own portal too</span>
+                }}>for Your Gym</span>
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', lineHeight: '1.8', marginBottom: '32px' }}>
                 Every member gets a branded mobile-friendly dashboard. They can check in to class, track their belt progression, view schedules, and stay connected — without a single WhatsApp message to you.
@@ -687,12 +687,12 @@ export default async function HomePage() {
                 color: '#FFFFFF', fontWeight: '800', lineHeight: '1.1',
                 marginBottom: '20px',
               }}>
-                Still running your club{' '}
+                Replace Spreadsheets with{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #EF4444, #F97316)',
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 }}>
-                  like this?
+                  Club Management Software
                 </span>
               </h2>
               <p style={{ color: '#94A3B8', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>
@@ -869,12 +869,12 @@ export default async function HomePage() {
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Everything your club needs.{' '}
+                Scheduling, Payments, Belt Tracking{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 }}>
-                  Nothing it doesn&apos;t.
+                  & More
                 </span>
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
@@ -946,7 +946,7 @@ export default async function HomePage() {
                 color: '#FFFFFF', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Built for trust. Built to last.
+                Trusted by Martial Arts Clubs Across the UK
               </h2>
               <p style={{ color: '#94A3B8', fontSize: '1.05rem', maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
                 Your members trust you with their data. We take that as seriously as you do. Professional infrastructure for professional clubs.
@@ -1001,12 +1001,12 @@ export default async function HomePage() {
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Not just software.{' '}
+                One Platform for Members, Classes,{' '}
                 <span style={{
                   background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 }}>
-                  A system.
+                  Payments & Belt Progression
                 </span>
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto', lineHeight: '1.7' }}>
@@ -1064,7 +1064,7 @@ export default async function HomePage() {
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Built to help your club grow
+                Grow Your Martial Arts Academy with ClubForge
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
                 ClubForge isn&apos;t just about reducing admin. It&apos;s about giving you the visibility and control to grow with confidence.
@@ -1123,7 +1123,7 @@ export default async function HomePage() {
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Live in under 10 minutes
+                Set Up Your Gym Software in Under 10 Minutes
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '480px', margin: '0 auto', lineHeight: '1.7' }}>
                 From signup to your first member check-in. No technical skills required. No onboarding call needed.
@@ -1339,7 +1339,7 @@ export default async function HomePage() {
               color: '#0F172A', fontWeight: '800', lineHeight: '1.2',
               marginBottom: '24px',
             }}>
-              Built from a real club. For real clubs.
+              Built by Club Owners for Martial Arts Academies
             </h2>
             <div style={{ maxWidth: '650px', margin: '0 auto' }}>
               <p style={{
@@ -1394,7 +1394,7 @@ export default async function HomePage() {
               fontWeight: '800', color: '#0F172A',
               textAlign: 'center', marginBottom: '48px', lineHeight: '1.2',
             }}>
-              Everything you need to know
+              Gym Management Software FAQ
             </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

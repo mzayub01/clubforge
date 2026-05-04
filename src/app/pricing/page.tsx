@@ -186,7 +186,7 @@ export default async function PricingPage() {
                 }}>
                     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
                         <h1 style={{ marginBottom: 'var(--space-4)' }}>
-                            Simple, honest pricing
+                            Gym Management Software Pricing
                         </h1>
                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xl)' }}>
                             No hidden fees. No per-member charges. One flat price for your entire club. Start with a 14-day free trial.

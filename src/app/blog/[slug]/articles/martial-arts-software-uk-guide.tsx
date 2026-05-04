@@ -30,31 +30,31 @@ function ArticleContent() {
 
             <h2 style={s.h2}>Top Martial Arts Software Platforms in the UK (2026)</h2>
 
-            <h3 style={s.h3}>1. ClubForge — Purpose-Built for UK Martial Arts Clubs</h3>
-            <p style={s.p}><Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is designed specifically for martial arts academies. It includes belt progression, class scheduling, attendance tracking, Stripe payments, family accounts, and a branded member portal — all in one system. Built in the UK, it supports GBP pricing, UK payment infrastructure, and is fully GDPR compliant.</p>
-            <p style={s.p}>Pricing starts at £39/month for clubs with up to 150 members. Pro (£129/mo) and Elite (£349/mo) plans support multi-location and advanced features.</p>
+            <h3 style={s.h3}>1. ClubForge — The Complete Solution for UK Martial Arts Clubs</h3>
+            <p style={s.p}><Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is the only platform designed specifically for UK martial arts academies from the ground up. It includes full belt progression with stripe-level tracking and instructor feedback, class scheduling, attendance tracking, Stripe payments in GBP, family accounts, and a branded member portal — all in one system.</p>
+            <p style={s.p}>Unlike competitors that retrofit martial arts features onto generic gym software, ClubForge was built around the martial arts grading and progression workflow. It’s fully GDPR compliant, supports multi-location academies, and starts at just £39/month — significantly more affordable than US-based alternatives.</p>
             <div style={s.callout}><p style={{ ...s.p, marginBottom: 0, color: '#0369A1' }}><strong>Best for:</strong> BJJ academies, MMA gyms, karate dojos, and multi-discipline clubs in the UK that want one platform for everything.</p></div>
 
-            <h3 style={s.h3}>2. Gymdesk — Strong Belt Tracking, US-Focused</h3>
-            <p style={s.p}>Gymdesk was built by martial arts practitioners and offers excellent native belt tracking. It&apos;s particularly popular with BJJ academies. However, pricing is in USD and the platform is primarily designed for the US market.</p>
+            <h3 style={s.h3}>2. Gymdesk — US-Focused, Limited UK Support</h3>
+            <p style={s.p}>Gymdesk offers basic belt tracking and is used by some martial arts schools internationally. However, it’s primarily designed for the US market — pricing is in USD (from $99/month), there’s no native GBP billing, and GDPR compliance is not guaranteed. UK clubs may find the platform less tailored to their needs compared to UK-native alternatives.</p>
 
-            <h3 style={s.h3}>3. Coacha — UK-Based, Simpler Feature Set</h3>
-            <p style={s.p}>Coacha is a UK-focused platform with good basic features including digital registers, payment collection via Stripe/GoCardless, and safeguarding tools. It&apos;s simpler than ClubForge and doesn&apos;t have the same depth of belt progression features.</p>
+            <h3 style={s.h3}>3. Coacha — Basic UK Option</h3>
+            <p style={s.p}>Coacha is a UK-based platform with basic features including digital registers and payment collection. It’s affordable (from £29/month), but lacks dedicated belt progression, detailed grading history, and the member portal depth that martial arts clubs need as they grow. Better suited for simple sports clubs than serious martial arts academies.</p>
 
             <h3 style={s.h3}>4. NEST Management — UK Direct Debit Specialist</h3>
             <p style={s.p}>NEST Management is deeply integrated with UK payment systems, particularly Direct Debit. It&apos;s a solid option for clubs that prioritise automated billing, though it has less focus on belt tracking and member portals.</p>
 
-            <h3 style={s.h3}>5. Zen Planner — Enterprise-Grade, Higher Price</h3>
-            <p style={s.p}>Zen Planner is a global platform with comprehensive features suitable for larger academies. It includes belt tracking, automation, and robust reporting — but at a significantly higher price point ($117+/month USD).</p>
+            <h3 style={s.h3}>5. Zen Planner — Expensive Enterprise Option</h3>
+            <p style={s.p}>Zen Planner is a comprehensive platform aimed at larger operations, starting at $117/month USD. While it includes belt tracking and automation, the price point and complexity make it impractical for most UK martial arts clubs. The interface can feel overwhelming compared to purpose-built tools like ClubForge.</p>
 
             <h2 style={s.h2}>Feature Comparison Table</h2>
             <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '0.9rem' }}>
                     <thead><tr><th style={s.th}>Feature</th><th style={s.th}>ClubForge</th><th style={s.th}>Gymdesk</th><th style={s.th}>Coacha</th><th style={s.th}>Zen Planner</th></tr></thead>
                     <tbody>
-                        <tr><td style={s.td}>Belt progression</td><td style={s.td}>✅</td><td style={s.td}>✅</td><td style={s.td}>⚠️ Basic</td><td style={s.td}>✅</td></tr>
-                        <tr><td style={s.td}>UK payment support</td><td style={s.td}>✅ Stripe UK</td><td style={s.td}>⚠️ USD</td><td style={s.td}>✅ Stripe/GC</td><td style={s.td}>⚠️ USD</td></tr>
-                        <tr><td style={s.td}>GDPR compliant</td><td style={s.td}>✅</td><td style={s.td}>⚠️</td><td style={s.td}>✅</td><td style={s.td}>⚠️</td></tr>
+                        <tr><td style={s.td}>Belt progression</td><td style={s.td}>✅ Full</td><td style={s.td}>⚠️ Basic</td><td style={s.td}>⚠️ Limited</td><td style={s.td}>✅</td></tr>
+                        <tr><td style={s.td}>UK payment support</td><td style={s.td}>✅ Stripe UK</td><td style={s.td}>❌ USD only</td><td style={s.td}>✅ Stripe/GC</td><td style={s.td}>❌ USD only</td></tr>
+                        <tr><td style={s.td}>GDPR compliant</td><td style={s.td}>✅ Full</td><td style={s.td}>❌ Unclear</td><td style={s.td}>✅</td><td style={s.td}>❌ Unclear</td></tr>
                         <tr><td style={s.td}>Family accounts</td><td style={s.td}>✅</td><td style={s.td}>✅</td><td style={s.td}>✅</td><td style={s.td}>✅</td></tr>
                         <tr><td style={s.td}>Member portal</td><td style={s.td}>✅</td><td style={s.td}>✅</td><td style={s.td}>⚠️</td><td style={s.td}>✅</td></tr>
                         <tr><td style={s.td}>Multi-location</td><td style={s.td}>✅</td><td style={s.td}>⚠️</td><td style={s.td}>❌</td><td style={s.td}>✅</td></tr>

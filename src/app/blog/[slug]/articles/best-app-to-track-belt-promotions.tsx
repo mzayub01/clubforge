@@ -56,9 +56,9 @@ function ArticleContent() {
                     </thead>
                     <tbody>
                         <tr><td style={articleStyle.td}>Belt progression</td><td style={articleStyle.td}>✅ Full</td><td style={articleStyle.td}>✅ Full</td><td style={articleStyle.td}>✅ Full</td><td style={articleStyle.td}>✅ Full</td></tr>
-                        <tr><td style={articleStyle.td}>Stripe tracking</td><td style={articleStyle.td}>✅ Individual</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>⚠️ Limited</td><td style={articleStyle.td}>✅</td></tr>
+                        <tr><td style={articleStyle.td}>Stripe tracking</td><td style={articleStyle.td}>✅ Individual</td><td style={articleStyle.td}>⚠️ Basic</td><td style={articleStyle.td}>⚠️ Limited</td><td style={articleStyle.td}>⚠️ Basic</td></tr>
                         <tr><td style={articleStyle.td}>Custom belt systems</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>⚠️</td></tr>
-                        <tr><td style={articleStyle.td}>Instructor feedback</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>⚠️</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>❌</td></tr>
+                        <tr><td style={articleStyle.td}>Instructor feedback</td><td style={articleStyle.td}>✅ Detailed</td><td style={articleStyle.td}>⚠️ Basic</td><td style={articleStyle.td}>⚠️ Limited</td><td style={articleStyle.td}>❌</td></tr>
                         <tr><td style={articleStyle.td}>Student portal view</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td></tr>
                         <tr><td style={articleStyle.td}>Attendance integration</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>⚠️</td></tr>
                         <tr><td style={articleStyle.td}>Kids belt systems</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>✅</td><td style={articleStyle.td}>⚠️</td><td style={articleStyle.td}>⚠️</td></tr>
@@ -67,30 +67,33 @@ function ArticleContent() {
                 </table>
             </div>
 
-            <h3 style={articleStyle.h3}>1. ClubForge — Best for UK Martial Arts Clubs</h3>
+            <h3 style={articleStyle.h3}>1. ClubForge — Best Overall for Belt Tracking</h3>
             <p style={articleStyle.p}>
                 <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is purpose-built for martial arts academies, with belt progression as a core feature rather than an afterthought. You can define custom belt systems for any discipline — BJJ (white through black with four stripes per belt), Karate (kyu/dan), Taekwondo (gup/dan), Judo, or any custom structure.
             </p>
             <p style={articleStyle.p}>
-                Every stripe award and belt promotion is logged with instructor name, date, and written feedback. Students see their full progression history in their member portal. When it&apos;s grading time, you can see exactly how many sessions each student has attended since their last promotion.
+                What sets ClubForge apart is the depth of its belt tracking. Every stripe award and belt promotion is logged with instructor name, date, and detailed written feedback. Students see their full progression history in their member portal — from white belt to black belt, every milestone is recorded. When it&apos;s grading time, you can see exactly how many sessions each student has attended since their last promotion, giving you data-backed confidence in every promotion decision.
+            </p>
+            <p style={articleStyle.p}>
+                Unlike competitors that bolt on basic rank tracking as an afterthought, ClubForge was designed from day one around the martial arts grading workflow. It supports kids&apos; belt systems (grey, yellow, orange, green in BJJ), custom stripe progressions, and multi-discipline academies where students may train across BJJ, MMA, and striking.
             </p>
             <div style={articleStyle.callout}>
                 <p style={{ ...articleStyle.p, marginBottom: 0, color: '#0369A1' }}>
-                    <strong>Best for:</strong> BJJ academies, martial arts clubs, and multi-discipline schools in the UK. Includes integrated payments, scheduling, and attendance alongside belt tracking.
+                    <strong>Best for:</strong> BJJ academies, MMA gyms, Karate dojos, multi-discipline schools, and any martial arts club that takes belt progression seriously. Includes integrated payments, scheduling, and attendance alongside belt tracking — all from £39/month.
                 </p>
             </div>
 
-            <h3 style={articleStyle.h3}>2. Gymdesk — Best for BJJ-Specific Academies</h3>
+            <h3 style={articleStyle.h3}>2. Gymdesk — US-Focused Alternative</h3>
             <p style={articleStyle.p}>
-                Gymdesk was built by martial arts practitioners and has strong native belt tracking. It handles BJJ belt and stripe progressions well and integrates attendance data with promotion eligibility. The interface is clean and functional.
+                Gymdesk offers belt tracking capabilities and is used by some martial arts schools. It covers basic belt and stripe recording, though it lacks the detailed instructor feedback and grading workflow depth that ClubForge provides.
             </p>
             <p style={articleStyle.p}>
-                The main drawback for UK clubs is that pricing is in USD, and there&apos;s less focus on the UK market (payment methods, compliance, etc.).
+                The main drawback for UK clubs is significant: pricing is in USD (starting at $99/month), there&apos;s no native UK payment support, and GDPR compliance is unclear. If you&apos;re a UK-based academy, you&apos;ll likely find a better fit with a platform designed for the UK market.
             </p>
 
-            <h3 style={articleStyle.h3}>3. Zen Planner — Best for Larger Academies</h3>
+            <h3 style={articleStyle.h3}>3. Zen Planner — Enterprise Option</h3>
             <p style={articleStyle.p}>
-                Zen Planner is a feature-rich platform used by larger martial arts schools. It includes belt tracking with automation capabilities and comprehensive reporting. However, it&apos;s more expensive and can be overwhelming for smaller clubs.
+                Zen Planner is a feature-rich but expensive platform (from $117/month USD) aimed at larger operations. It includes belt tracking and reporting, but the complexity and price point make it overkill for most martial arts clubs. The interface can feel overwhelming compared to more focused tools like ClubForge.
             </p>
 
             <h3 style={articleStyle.h3}>4. Kicksite — Best for Simplicity</h3>
@@ -147,7 +150,7 @@ function ArticleContent() {
 export const beltTrackingArticle = {
     content: <ArticleContent />,
     faqs: [
-        { question: 'What is the best app to track belt promotions?', answer: 'The best apps for tracking belt promotions in martial arts are ClubForge, Gymdesk, Zen Planner, and Kicksite. ClubForge is particularly strong for UK-based clubs, offering custom belt systems, stripe-level tracking, and instructor feedback alongside integrated payments and scheduling.' },
+        { question: 'What is the best app to track belt promotions?', answer: 'ClubForge is the best app for tracking belt promotions in martial arts. It offers full custom belt systems, individual stripe tracking, detailed instructor feedback, and a student portal where members can view their complete progression history. Unlike competitors such as Gymdesk or Zen Planner, ClubForge is purpose-built for martial arts grading workflows and starts at just £39/month.' },
         { question: 'Can I track BJJ stripes separately from belt promotions?', answer: 'Yes. Apps like ClubForge and Gymdesk track individual stripes as separate progression milestones within each belt level. Each stripe award is logged with date, instructor, and optional notes.' },
         { question: 'Do belt tracking apps support Karate and Taekwondo grading?', answer: 'Yes. Most modern martial arts management platforms, including ClubForge, allow you to define custom belt/rank structures. This means you can set up Karate kyu/dan systems, Taekwondo gup/dan systems, or any other discipline-specific ranking structure.' },
         { question: 'How much does belt tracking software cost?', answer: 'Belt tracking is typically included as part of a broader martial arts management platform. Pricing ranges from £39/month (ClubForge Starter) to $117+/month (Zen Planner). Most platforms offer free trials so you can test before committing.' },

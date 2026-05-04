@@ -18,15 +18,15 @@ it's not needed.
 ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: 
 https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-Γ£ô Compiled successfully in 4.4s
+Γ£ô Compiled successfully in 4.7s
   Running TypeScript ...
   Collecting page data using 21 workers ...
 ΓÜá Using edge runtime on a page currently disables static generation for that page
-  Generating static pages using 21 workers (0/153) ...
-  Generating static pages using 21 workers (38/153) 
-  Generating static pages using 21 workers (76/153) 
-  Generating static pages using 21 workers (114/153) 
-Γ£ô Generating static pages using 21 workers (153/153) in 2.1s
+  Generating static pages using 21 workers (0/158) ...
+  Generating static pages using 21 workers (39/158) 
+  Generating static pages using 21 workers (78/158) 
+  Generating static pages using 21 workers (118/158) 
+Γ£ô Generating static pages using 21 workers (158/158) in 1926.1ms
   Finalizing page optimization ...
 
 Route (app)
@@ -141,9 +141,14 @@ Route (app)
 Γö£ ╞Æ /features/multi-location
 Γö£ ╞Æ /features/payments-billing
 Γö£ ╞Æ /for/bjj
+Γö£ ╞Æ /for/boxing
 Γö£ ╞Æ /for/boxing-mma
 Γö£ ╞Æ /for/fitness-studios
+Γö£ ╞Æ /for/judo
+Γö£ ╞Æ /for/karate
+Γö£ ╞Æ /for/kickboxing
 Γö£ ╞Æ /for/martial-arts
+Γö£ ╞Æ /for/taekwondo
 Γö£ Γùï /forgot-password
 Γö£ Γùï /get-started
 Γö£ ╞Æ /gym-management-birmingham

@@ -134,6 +134,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
         // City landing pages
         {
+            url: `${baseUrl}/for/boxing`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/for/kickboxing`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/for/karate`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/for/taekwondo`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/for/judo`,
+            lastModified: now,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        // City landing pages
+        {
             url: `${baseUrl}/martial-arts-software-london`,
             lastModified: now,
             changeFrequency: 'monthly',

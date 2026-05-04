@@ -109,6 +109,11 @@ export default function Footer() {
                         <li><Link href="/for/martial-arts" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Martial Arts Clubs</Link></li>
                         <li><Link href="/for/bjj" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>BJJ Academies</Link></li>
                         <li><Link href="/for/boxing-mma" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Boxing & MMA Gyms</Link></li>
+                        <li><Link href="/for/boxing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Boxing Clubs</Link></li>
+                        <li><Link href="/for/kickboxing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Kickboxing Clubs</Link></li>
+                        <li><Link href="/for/karate" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Karate Dojos</Link></li>
+                        <li><Link href="/for/taekwondo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Taekwondo Clubs</Link></li>
+                        <li><Link href="/for/judo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Judo Clubs</Link></li>
                         <li><Link href="/for/fitness-studios" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Fitness Studios</Link></li>
                     </ul>
                 </div>

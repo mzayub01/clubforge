@@ -1,11 +1,9 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
-import { ChevronDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { FAQPageSchema } from '@/components/structured-data';
+import { FAQPageSchema, BreadcrumbSchema } from '@/components/structured-data';
+import { createClient } from '@/lib/supabase/server';
 
 interface FAQItem {
     question: string;
@@ -156,15 +154,41 @@ const faqItems: FAQItem[] = [
     },
 ];
 
-export default function FAQPage() {
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
+export const metadata = {
+    title: 'FAQ — Martial Arts Club Management Software Questions Answered | ClubForge',
+    description: 'Answers to the most common questions about ClubForge martial arts club management software. Learn about belt tracking, membership payments, class scheduling, attendance, and more for BJJ, MMA, Karate & Judo academies.',
+    alternates: {
+        canonical: 'https://clubforgehq.com/faq',
+    },
+    openGraph: {
+        title: 'ClubForge FAQ — Martial Arts Club Management Software',
+        description: 'Everything gym owners need to know about ClubForge. Belt tracking, payments, scheduling, attendance & more.',
+        url: 'https://clubforgehq.com/faq',
+    },
+    keywords: [
+        'ClubForge FAQ',
+        'martial arts software questions',
+        'gym management software FAQ',
+        'BJJ software questions',
+        'belt tracking software FAQ',
+        'gym membership software FAQ',
+    ],
+};
+
+export default async function FAQPage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     const categories = [...new Set(faqItems.map(item => item.category))];
 
     return (
         <>
-            <Navbar />
+            <Navbar user={user ? { id: user.id, email: user.email! } : null} />
             <FAQPageSchema faqs={faqItems.map(f => ({ question: f.question, answer: f.answer }))} />
+            <BreadcrumbSchema items={[
+                { name: 'Home', url: 'https://clubforgehq.com' },
+                { name: 'FAQ', url: 'https://clubforgehq.com/faq' },
+            ]} />
 
             <main>
                 {/* Hero */}
@@ -184,7 +208,7 @@ export default function FAQPage() {
                             marginBottom: '20px',
                             color: '#FFFFFF',
                         }}>
-                            ClubForge FAQ – Martial Arts Club Management Software
+                            Martial Arts Club Management Software — FAQ
                         </h1>
                         <p style={{ color: '#94A3B8', fontSize: '1.1rem', lineHeight: '1.7', maxWidth: '600px', margin: '0 auto' }}>
                             ClubForge is an all-in-one martial arts club management software designed for BJJ, MMA, Karate, Judo and combat sports academies. Below are answers to the most common questions from gym owners.
@@ -192,7 +216,7 @@ export default function FAQPage() {
                     </div>
                 </section>
 
-                {/* FAQ Content */}
+                {/* FAQ Content — Server-rendered with CSS-only accordions */}
                 <section style={{ background: '#FFFFFF', padding: '80px 24px' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         {categories.map((category) => (
@@ -218,72 +242,55 @@ export default function FAQPage() {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     {faqItems
                                         .filter(item => item.category === category)
-                                        .map((item) => {
-                                            const globalIndex = faqItems.indexOf(item);
-                                            const isOpen = openIndex === globalIndex;
-                                            return (
-                                                <div
-                                                    key={globalIndex}
+                                        .map((item, idx) => (
+                                            <details
+                                                key={idx}
+                                                style={{
+                                                    border: '1px solid #F1F5F9',
+                                                    borderRadius: '12px',
+                                                    overflow: 'hidden',
+                                                    background: '#FFFFFF',
+                                                }}
+                                            >
+                                                <summary
                                                     style={{
-                                                        border: '1px solid #F1F5F9',
-                                                        borderRadius: '12px',
-                                                        overflow: 'hidden',
-                                                        background: isOpen ? '#FAFBFC' : '#FFFFFF',
-                                                        transition: 'background 0.2s ease',
+                                                        padding: '18px 20px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.95rem',
+                                                        fontWeight: '600',
+                                                        color: '#0F172A',
+                                                        listStyle: 'none',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
                                                     }}
                                                 >
-                                                    <button
-                                                        onClick={() => setOpenIndex(isOpen ? null : globalIndex)}
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'space-between',
-                                                            width: '100%',
-                                                            padding: '18px 20px',
-                                                            gap: '16px',
-                                                            background: 'none',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            textAlign: 'left',
-                                                        }}
-                                                    >
-                                                        <span style={{
-                                                            fontSize: '0.95rem',
-                                                            fontWeight: '600',
-                                                            color: '#0F172A',
-                                                            flex: 1,
-                                                        }}>
-                                                            {item.question}
-                                                        </span>
-                                                        <ChevronDown
-                                                            size={18}
-                                                            color="#94A3B8"
-                                                            style={{
-                                                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                                transition: 'transform 0.2s ease',
-                                                                flexShrink: 0,
-                                                            }}
-                                                        />
-                                                    </button>
-                                                    {isOpen && (
-                                                        <div style={{
-                                                            padding: '0 20px 18px',
-                                                            borderTop: '1px solid #F1F5F9',
-                                                            paddingTop: '14px',
-                                                        }}>
-                                                            <p style={{
-                                                                color: '#64748B',
-                                                                margin: 0,
-                                                                lineHeight: '1.7',
-                                                                fontSize: '0.9rem',
-                                                            }}>
-                                                                {item.answer}
-                                                            </p>
-                                                        </div>
-                                                    )}
+                                                    <span>{item.question}</span>
+                                                    <span style={{
+                                                        color: '#94A3B8',
+                                                        fontSize: '18px',
+                                                        fontWeight: '400',
+                                                        flexShrink: 0,
+                                                        marginLeft: '16px',
+                                                        transition: 'transform 0.2s ease',
+                                                    }}>+</span>
+                                                </summary>
+                                                <div style={{
+                                                    padding: '0 20px 18px',
+                                                    borderTop: '1px solid #F1F5F9',
+                                                    paddingTop: '14px',
+                                                }}>
+                                                    <p style={{
+                                                        color: '#64748B',
+                                                        margin: 0,
+                                                        lineHeight: '1.7',
+                                                        fontSize: '0.9rem',
+                                                    }}>
+                                                        {item.answer}
+                                                    </p>
                                                 </div>
-                                            );
-                                        })}
+                                            </details>
+                                        ))}
                                 </div>
                             </div>
                         ))}

@@ -37,14 +37,14 @@ import { SoftwareApplicationSchema, BreadcrumbSchema, FAQPageSchema } from '@/co
 import CurrencyPrice from '@/components/CurrencyPrice';
 
 export const metadata = {
-  title: 'ClubForge — The #1 Gym & Martial Arts Club Management Software',
-  description: 'Build, run, and grow your gym, dojo, or martial arts academy with one powerful platform. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and multi-location support. Start your free 14-day trial.',
+  title: 'ClubForge — Martial Arts & Gym Management Software UK | Free Trial',
+  description: 'Purpose-built for martial arts clubs & gyms. Manage members, classes, belt progression, Stripe payments & attendance from one dashboard. Trusted by BJJ, MMA & Karate academies across the UK. Start your free 14-day trial today.',
   alternates: {
     canonical: 'https://clubforgehq.com',
   },
   openGraph: {
-    title: 'ClubForge — The #1 Gym & Martial Arts Club Management Software',
-    description: 'The all-in-one operating system for gyms, dojos, and martial arts academies. Members, classes, belt progression, payments — one dashboard.',
+    title: 'ClubForge — Martial Arts & Gym Management Software UK',
+    description: 'The all-in-one operating system for gyms, dojos, and martial arts academies. Members, classes, belt progression, payments — one dashboard. Free trial.',
     url: 'https://clubforgehq.com',
   },
 };

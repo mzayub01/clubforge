@@ -20,10 +20,15 @@ export function OrganizationSchema() {
         logo: LOGO_URL,
         description: 'The all-in-one management platform for martial arts clubs, gyms, dojos, and fitness academies. Member management, class scheduling, belt progression, payments, and more.',
         foundingDate: '2025',
-        sameAs: [],
+        sameAs: [
+            'https://twitter.com/clubforgehq',
+            'https://linkedin.com/company/clubforge',
+            'https://www.capterra.co.uk/software/clubforge',
+        ],
         contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'sales',
+            email: 'support@clubforgehq.com',
             url: `${SITE_URL}/demo`,
             availableLanguage: ['English'],
         },
@@ -122,12 +127,6 @@ export function SoftwareApplicationSchema() {
                 description: 'For large academies and franchises. Unlimited everything.',
             },
         ],
-        aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.9',
-            ratingCount: '47',
-            bestRating: '5',
-        },
     };
 
     return (

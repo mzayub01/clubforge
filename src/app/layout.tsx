@@ -22,8 +22,6 @@ const outfit = Outfit({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: '#C5A456',
   viewportFit: 'cover',
 };
@@ -31,10 +29,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://clubforgehq.com'),
   title: {
-    default: 'ClubForge — The Operating System for Martial Arts Clubs',
+    default: 'ClubForge — Martial Arts & Gym Management Software UK',
     template: '%s | ClubForge',
   },
-  description: 'The all-in-one SaaS platform for martial arts gyms, dojos, and academies. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and more — all from one dashboard.',
+  description: 'Purpose-built management platform for martial arts clubs, gyms, dojos, and combat sports academies. Member management, class scheduling, belt progression, Stripe payments, attendance tracking, and multi-location support — all from one dashboard.',
   keywords: [
     // Primary — high-volume
     'gym management software',

@@ -8,16 +8,24 @@ import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata = {
-    title: 'About ClubForge — Built by Club Owners, for Club Owners',
-    description: 'ClubForge was born from running a real martial arts club. We know the chaos of spreadsheets, WhatsApp groups, and duct-taped admin — so we built the management platform we always wished existed.',
+    title: 'About ClubForge — Martial Arts Club Management Software Built by Real Gym Owners',
+    description: 'ClubForge was built by martial arts club owners who were tired of spreadsheets, WhatsApp groups, and disconnected tools. Purpose-built gym management software for BJJ, MMA, Karate & Judo academies in the UK.',
     alternates: {
         canonical: 'https://clubforgehq.com/about',
     },
     openGraph: {
-        title: 'About ClubForge — Built by Club Owners, for Club Owners',
-        description: 'Born from running a real club. We built the gym management platform we always wished existed.',
+        title: 'About ClubForge — Built by Real Club Owners',
+        description: 'Born from running a real martial arts club. We built the gym management platform we always wished existed. Purpose-built for BJJ, MMA, Karate & combat sports academies.',
         url: 'https://clubforgehq.com/about',
     },
+    keywords: [
+        'about ClubForge',
+        'gym management software company',
+        'martial arts software UK',
+        'club management platform',
+        'BJJ academy software',
+        'gym software built by gym owners',
+    ],
 };
 
 export default async function AboutPage() {

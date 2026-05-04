@@ -4,6 +4,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { BreadcrumbSchema, FAQPageSchema } from '@/components/structured-data';
+import RelatedDisciplines from '@/components/RelatedDisciplines';
+import RelatedFeatures from '@/components/RelatedFeatures';
 
 export const metadata = {
     title: 'Belt Progression & Grading Tracking Software | ClubForge',
@@ -139,6 +141,13 @@ export default async function BeltProgressionPage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                <section style={{ background: '#FFFFFF', padding: '60px 24px' }}>
+                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        <RelatedFeatures currentHref="/features/belt-progression" />
+                        <RelatedDisciplines currentHref="" maxItems={4} />
                     </div>
                 </section>
 

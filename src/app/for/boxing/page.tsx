@@ -4,6 +4,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { BreadcrumbSchema, FAQPageSchema } from '@/components/structured-data';
+import RelatedDisciplines from '@/components/RelatedDisciplines';
+import RelatedFeatures from '@/components/RelatedFeatures';
 
 export const metadata = {
     title: 'Boxing Club Management Software — Scheduling, Payments & Attendance | ClubForge',
@@ -111,6 +113,13 @@ export default async function BoxingPage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                <section style={{ background: '#FFFFFF', padding: '60px 24px' }}>
+                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        <RelatedDisciplines currentHref="/for/boxing" />
+                        <RelatedFeatures />
                     </div>
                 </section>
 

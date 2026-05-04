@@ -4,6 +4,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import { BreadcrumbSchema, FAQPageSchema } from '@/components/structured-data';
+import RelatedDisciplines from '@/components/RelatedDisciplines';
+import RelatedFeatures from '@/components/RelatedFeatures';
 
 export const metadata = {
     title: 'Multi-Location Gym Management Software | ClubForge',
@@ -104,6 +106,13 @@ export default async function MultiLocationPage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                <section style={{ background: '#FFFFFF', padding: '60px 24px' }}>
+                    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                        <RelatedFeatures currentHref="/features/multi-location" />
+                        <RelatedDisciplines currentHref="" maxItems={4} />
                     </div>
                 </section>
 

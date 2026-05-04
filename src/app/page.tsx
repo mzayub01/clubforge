@@ -105,37 +105,22 @@ export default async function HomePage() {
             background: 'radial-gradient(circle, rgba(15,23,42,0.04) 0%, transparent 70%)',
             bottom: '-200px', left: '-100px', pointerEvents: 'none',
           }} />
-          {/* Grid pattern overlay */}
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.03,
-            backgroundImage: 'linear-gradient(rgba(15,23,42,1) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }} />
+
 
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '140px 24px 80px', position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '60px', alignItems: 'center' }}>
               {/* Hero content */}
               <div style={{ textAlign: 'center', maxWidth: '850px', margin: '0 auto' }}>
                 {/* Badge */}
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '12px',
-                  marginBottom: '32px',
+                <p style={{
+                  display: 'inline-block',
+                  marginBottom: '28px',
+                  color: '#64748B', fontSize: '14px', fontWeight: '500',
+                  letterSpacing: '0.02em',
+                  background: '#F1F5F9', padding: '8px 20px', borderRadius: '100px',
                 }}>
-                  <div style={{
-                    width: '36px', height: '2px',
-                    background: 'linear-gradient(to right, transparent, #C5A456)',
-                  }} />
-                  <span style={{
-                    color: '#A88B3D', fontSize: '14px', fontWeight: '600',
-                    letterSpacing: '0.05em', textTransform: 'uppercase',
-                  }}>
-                    14-day free trial · Cancel anytime
-                  </span>
-                  <div style={{
-                    width: '36px', height: '2px',
-                    background: 'linear-gradient(to left, transparent, #C5A456)',
-                  }} />
-                </div>
+                  14-day free trial · No card required
+                </p>
 
                 {/* Headline */}
                 <h1 style={{
@@ -419,9 +404,9 @@ export default async function HomePage() {
         <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
             <p style={{
-              fontSize: '14px', fontWeight: '600', color: '#C5A456',
-              textTransform: 'uppercase', letterSpacing: '1.5px',
-              marginBottom: '16px',
+              fontSize: '13px', fontWeight: '600', color: '#94A3B8',
+              letterSpacing: '0.04em',
+              marginBottom: '12px',
             }}>
               Built for serious clubs
             </p>
@@ -445,22 +430,15 @@ export default async function HomePage() {
                 { icon: Heart, label: 'Youth & Community Orgs', desc: 'After-school, camps, youth sports' },
               ].map((item) => (
                 <div key={item.label} style={{
-                  padding: '32px 24px', borderRadius: '16px',
-                  border: '1px solid #F1F5F9',
-                  background: '#FAFBFC',
-                  textAlign: 'center',
+                  padding: '28px 24px', borderRadius: '14px',
+                  background: '#FFFFFF',
+                  textAlign: 'left',
                   transition: 'all 0.2s ease',
+                  boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
                 }}>
-                  <div style={{
-                    width: '52px', height: '52px', borderRadius: '14px',
-                    background: 'rgba(197, 164, 86, 0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px',
-                  }}>
-                    <item.icon size={24} color="#C5A456" />
-                  </div>
+                  <item.icon size={22} color="#C5A456" style={{ marginBottom: '14px' }} />
                   <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.label}</h4>
-                  <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0, lineHeight: '1.5' }}>{item.desc}</p>
+                  <p style={{ fontSize: '13px', color: '#64748B', margin: 0, lineHeight: '1.6' }}>{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -475,9 +453,8 @@ export default async function HomePage() {
             {/* Left: Text */}
             <div>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '600', color: '#C5A456',
+                marginBottom: '12px',
               }}>
                 The member experience
               </p>
@@ -487,24 +464,20 @@ export default async function HomePage() {
                 marginBottom: '20px',
               }}>
                 Branded Member Portal{' '}<br />
-                <span style={{
-                  background: 'linear-gradient(135deg, #C5A456, #D4B86A)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>for Your Gym</span>
+                <span style={{ color: '#C5A456' }}>for Your Gym</span>
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', lineHeight: '1.8', marginBottom: '32px' }}>
                 Every member gets a branded mobile-friendly dashboard. They can check in to class, track their belt progression, view schedules, and stay connected — without a single WhatsApp message to you.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
-                  { emoji: '📱', title: 'One-tap class check-in', desc: 'Members check in from their phone. You see who showed up instantly.' },
-                  { emoji: '🥋', title: 'Belt progress & grading history', desc: 'Members see their rank, grading feedback, and what\'s next — without asking.' },
-                  { emoji: '📅', title: 'Class schedule & booking', desc: 'Full timetable with spot availability. Members manage themselves.' },
-                  { emoji: '👨‍👩‍👧', title: 'Family accounts', desc: 'Parents manage all their children from one login. You manage one family.' },
+                  { title: 'One-tap class check-in', desc: 'Members check in from their phone. You see who showed up instantly.' },
+                  { title: 'Belt progress & grading history', desc: 'Members see their rank, grading feedback, and what\'s next — without asking.' },
+                  { title: 'Class schedule & booking', desc: 'Full timetable with spot availability. Members manage themselves.' },
+                  { title: 'Family accounts', desc: 'Parents manage all their children from one login. You manage one family.' },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '14px' }}>
-                    <span style={{ fontSize: '24px', flexShrink: 0, marginTop: '2px' }}>{item.emoji}</span>
+                  <div key={i} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#C5A456', flexShrink: 0, marginTop: '8px' }} />
                     <div>
                       <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#0F172A', marginBottom: '4px' }}>{item.title}</h4>
                       <p style={{ color: '#64748B', fontSize: '13px', margin: 0, lineHeight: '1.6' }}>{item.desc}</p>
@@ -856,26 +829,19 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)', fontWeight: '800',
-                background: 'linear-gradient(135deg, #D4B86A, #C5A456, #A88B3D)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                letterSpacing: '0.5px',
+                fontSize: '13px', fontWeight: '600',
+                color: '#94A3B8',
+                letterSpacing: '0.04em',
                 marginBottom: '12px',
               }}>
-                ClubForge is
+                Platform features
               </p>
               <h2 style={{
                 fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
                 color: '#0F172A', fontWeight: '800', lineHeight: '1.15',
                 marginBottom: '16px',
               }}>
-                Scheduling, Payments, Belt Tracking{' '}
-                <span style={{
-                  background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                }}>
-                  & More
-                </span>
+                Scheduling, Payments, Belt Tracking <span style={{ color: '#C5A456' }}>&amp; More</span>
               </h2>
               <p style={{ color: '#64748B', fontSize: '1.05rem', maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
                 One system that replaces your spreadsheet, your booking tool, your payment processor, and your WhatsApp group.
@@ -935,9 +901,9 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '500', color: '#64748B',
+                letterSpacing: '0.04em',
+                marginBottom: '12px',
               }}>
                 Enterprise-grade infrastructure
               </p>
@@ -990,9 +956,8 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '600', color: '#C5A456',
+                marginBottom: '12px',
               }}>
                 Beyond software
               </p>
@@ -1002,10 +967,7 @@ export default async function HomePage() {
                 marginBottom: '16px',
               }}>
                 One Platform for Members, Classes,{' '}
-                <span style={{
-                  background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                }}>
+                <span style={{ color: '#C5A456' }}>
                   Payments & Belt Progression
                 </span>
               </h2>
@@ -1033,12 +995,12 @@ export default async function HomePage() {
                   background: '#FFFFFF',
                 }}>
                   <div style={{
-                    width: '44px', height: '44px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
+                    width: '40px', height: '40px', borderRadius: '10px',
+                    background: '#F1F5F9',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     marginBottom: '16px',
                   }}>
-                    <item.icon size={22} color="#0F172A" />
+                    <item.icon size={20} color="#C5A456" />
                   </div>
                   <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>{item.title}</h4>
                   <p style={{ color: '#64748B', margin: 0, fontSize: '0.9rem', lineHeight: '1.7' }}>{item.desc}</p>
@@ -1053,9 +1015,9 @@ export default async function HomePage() {
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '600', color: '#94A3B8',
+                letterSpacing: '0.04em',
+                marginBottom: '12px',
               }}>
                 Growth
               </p>
@@ -1112,9 +1074,8 @@ export default async function HomePage() {
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '600', color: '#C5A456',
+                marginBottom: '12px',
               }}>
                 Getting started
               </p>
@@ -1180,9 +1141,9 @@ export default async function HomePage() {
           <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
               <p style={{
-                fontSize: '14px', fontWeight: '600', color: '#C5A456',
-                textTransform: 'uppercase', letterSpacing: '1.5px',
-                marginBottom: '16px',
+                fontSize: '13px', fontWeight: '500', color: '#64748B',
+                letterSpacing: '0.04em',
+                marginBottom: '12px',
               }}>
                 Pricing
               </p>
@@ -1328,9 +1289,9 @@ export default async function HomePage() {
         <section style={{ background: '#FFFFFF', padding: '100px 24px' }}>
           <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
             <p style={{
-              fontSize: '14px', fontWeight: '600', color: '#C5A456',
-              textTransform: 'uppercase', letterSpacing: '1.5px',
-              marginBottom: '16px',
+              fontSize: '13px', fontWeight: '600', color: '#94A3B8',
+              letterSpacing: '0.04em',
+              marginBottom: '12px',
             }}>
               Our story
             </p>
@@ -1383,9 +1344,9 @@ export default async function HomePage() {
         }}>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <p style={{
-              fontSize: '14px', fontWeight: '600', color: '#C5A456',
-              textTransform: 'uppercase', letterSpacing: '1.5px',
-              marginBottom: '16px', textAlign: 'center',
+              fontSize: '13px', fontWeight: '500', color: '#94A3B8',
+              letterSpacing: '0.04em',
+              marginBottom: '12px', textAlign: 'center',
             }}>
               Frequently Asked Questions
             </p>

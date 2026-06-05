@@ -72,7 +72,7 @@ export async function POST() {
         }
 
         // 5. Create account link for onboarding
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
         const accountLink = await stripe.accountLinks.create({
             account: accountId,
             refresh_url: `${baseUrl}/admin/settings?tab=payments&connect=refresh`,

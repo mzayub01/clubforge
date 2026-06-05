@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Already a member at this location' }, { status: 400 });
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
 
         // Get tenant context from user's membership
         const membership = await resolveTenantForUser(userId);

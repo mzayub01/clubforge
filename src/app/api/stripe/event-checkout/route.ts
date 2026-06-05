@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
         console.log('Event checkout: Creating session for event', eventId, 'price', price);
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clubforgehq.com';
 
         // Get tenant context from user's membership (if logged in)
         const membership = userId ? await resolveTenantForUser(userId) : null;

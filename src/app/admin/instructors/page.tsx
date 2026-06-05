@@ -13,6 +13,8 @@ interface Member {
     role: string;
     belt_rank: string;
     created_at: string;
+    // tenant_members fields (when fetched from tenant_members)
+    tenant_member_id?: string;
 }
 
 interface Instructor {
@@ -61,17 +63,49 @@ export default function AdminInstructorsPage() {
                     select: '*',
                     order: [{ column: 'created_at', ascending: false }],
                 }),
-                adminFetch<Member>('profiles', {
-                    filters: [{ column: 'role', operator: 'in', value: ['member', 'instructor'] }],
-                    order: [{ column: 'first_name' }],
+                // Fetch tenant_members (source of truth for roles) instead of filtering on profiles.role
+                adminFetch<any>('tenant_members', {
+                    filters: [
+                        { column: 'role', operator: 'eq', value: 'member' },
+                        { column: 'is_active', operator: 'eq', value: true },
+                    ],
+                    order: [{ column: 'created_at', ascending: false }],
                 }),
             ]);
 
             // Build profile map by user_id for manual attachment
             const profilesByUserId: Record<string, any> = {};
-            (membersRes.data || []).forEach((p: any) => {
+
+            // Fetch profile data for each tenant_member to get names/emails
+            const tenantMemberData = membersRes.data || [];
+            const userIds = tenantMemberData.map((tm: any) => tm.user_id).filter(Boolean);
+
+            let profilesList: any[] = [];
+            if (userIds.length > 0) {
+                const profilesRes = await adminFetch<any>('profiles', {
+                    filters: [{ column: 'user_id', operator: 'in', value: userIds }],
+                });
+                profilesList = profilesRes.data || [];
+            }
+            profilesList.forEach((p: any) => {
                 profilesByUserId[p.user_id] = p;
             });
+
+            // Build member list from tenant_members + profiles
+            const memberList: Member[] = tenantMemberData.map((tm: any) => {
+                const profile = profilesByUserId[tm.user_id];
+                return {
+                    id: profile?.id || tm.id,
+                    user_id: tm.user_id,
+                    first_name: profile?.first_name || '',
+                    last_name: profile?.last_name || '',
+                    email: profile?.email || '',
+                    role: tm.role,
+                    belt_rank: profile?.belt_rank || '',
+                    created_at: tm.created_at,
+                    tenant_member_id: tm.id,
+                };
+            }).filter((m: Member) => m.first_name || m.last_name || m.email); // Skip orphaned records
 
             // Attach profiles to instructors
             const instructorsWithProfiles = (instructorsRes.data || []).map((inst: any) => ({
@@ -80,7 +114,7 @@ export default function AdminInstructorsPage() {
             }));
 
             setInstructors(instructorsWithProfiles);
-            setMembers(membersRes.data || []);
+            setMembers(memberList);
         } catch (err) {
             console.error('Error fetching data:', err);
         } finally {
@@ -141,9 +175,14 @@ export default function AdminInstructorsPage() {
 
             if (instructorError) throw new Error(instructorError);
 
-            // Update profile role
+            // Update tenant_members role (source of truth)
+            if (member.tenant_member_id) {
+                await adminUpdateById('tenant_members', member.tenant_member_id, { role: 'instructor' });
+            }
+
+            // Also update legacy profile role for backwards compatibility
             await adminUpdate('profiles', { role: 'instructor' }, [
-                { column: 'id', value: selectedMember },
+                { column: 'user_id', value: member.user_id },
             ]);
 
             setSuccess(`${member.first_name} ${member.last_name} is now an instructor!`);

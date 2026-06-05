@@ -57,16 +57,18 @@ export default async function AdminDashboard() {
         { data: recentActivity },
     ] = await Promise.all([
         admin.from('profiles').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-        admin.from('memberships').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        admin.from('classes').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        admin.from('attendance').select('*', { count: 'exact', head: true })
+        admin.from('memberships').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('status', 'active'),
+        admin.from('classes').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_active', true),
+        admin.from('attendance').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
             .gte('class_date', new Date().toISOString().split('T')[0]),
-        admin.from('waitlist').select('*', { count: 'exact', head: true }),
+        admin.from('waitlist').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
         admin.from('memberships')
             .select('membership_type:membership_types(price)')
+            .eq('tenant_id', tenantId)
             .eq('status', 'active'),
         admin.from('memberships')
             .select('id, created_at, user_id, membership_type:membership_types(name)')
+            .eq('tenant_id', tenantId)
             .eq('status', 'active')
             .order('created_at', { ascending: false })
             .limit(5),

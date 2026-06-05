@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 import {
     PoundSterling,
     Users,
@@ -35,8 +36,18 @@ interface RevenueByType {
 
 export default async function AdminFinancePage() {
     const supabase = await createAdminClient();
+    const tenantId = await getTenantId();
 
-    // Fetch all memberships with their types and locations
+    if (!tenantId) {
+        return (
+            <div style={{ padding: 'var(--space-12)', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <h2>No club context</h2>
+                <p>Unable to determine which club you belong to. Please log in again.</p>
+            </div>
+        );
+    }
+
+    // Fetch all memberships with their types and locations for THIS tenant
     const { data: memberships } = await supabase
         .from('memberships')
         .select(`
@@ -51,9 +62,10 @@ export default async function AdminFinancePage() {
             location:locations(id, name),
             membership_type:membership_types(id, name, price)
         `)
+        .eq('tenant_id', tenantId)
         .in('status', ['active', 'pending', 'cancelled']);
 
-    // Fetch paid event RSVPs with event details
+    // Fetch paid event RSVPs with event details for THIS tenant
     const { data: eventRsvps } = await supabase
         .from('event_rsvps')
         .select(`
@@ -63,6 +75,7 @@ export default async function AdminFinancePage() {
             created_at,
             event:events(id, title, price)
         `)
+        .eq('tenant_id', tenantId)
         .eq('payment_status', 'paid');
 
     // Calculate event revenue by event

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
                 .update({ tenant_id: tenantId })
                 .eq('user_id', userId);
 
-            // Check if membership already exists (created as pending during checkout)
+            // Check if membership already exists (idempotency guard)
             const { data: existingMembership } = await supabase
                 .from('memberships')
                 .select('id')

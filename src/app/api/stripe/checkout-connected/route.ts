@@ -64,51 +64,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Club has not completed Stripe setup' }, { status: 400 });
         }
 
-        // Create pending membership BEFORE redirecting to Stripe
-        // This ensures the dashboard doesn't show "Complete Your Membership" if the webhook is slow
-        if (userId && locationId) {
-            // Ensure user is a tenant member (required for RLS policies)
-            const { data: existingTenantMember } = await adminSupabase
-                .from('tenant_members')
-                .select('id')
-                .eq('user_id', userId)
-                .eq('tenant_id', tenantId)
-                .single();
-
-            if (!existingTenantMember) {
-                await adminSupabase.from('tenant_members').insert({
-                    user_id: userId,
-                    tenant_id: tenantId,
-                    role: 'member',
-                    is_active: true,
-                });
-            }
-
-            // Also set tenant_id on the user's profile
-            await adminSupabase
-                .from('profiles')
-                .update({ tenant_id: tenantId })
-                .eq('user_id', userId);
-
-            const { data: existingMembership } = await adminSupabase
-                .from('memberships')
-                .select('id')
-                .eq('user_id', userId)
-                .eq('location_id', locationId)
-                .eq('tenant_id', tenantId)
-                .single();
-
-            if (!existingMembership) {
-                await adminSupabase.from('memberships').insert({
-                    user_id: userId,
-                    location_id: locationId,
-                    membership_type_id: membershipTypeId || null,
-                    status: 'pending',
-                    start_date: new Date().toISOString().split('T')[0],
-                    tenant_id: tenantId,
-                });
-            }
-        }
+        // NOTE: Membership creation is handled by the webhook-connect handler
+        // after Stripe confirms payment. We intentionally do NOT create
+        // pending memberships here to avoid ghost records from abandoned checkouts.
 
         // Calculate platform fee (2.5%)
         const priceInPence = Math.round(price * 100);

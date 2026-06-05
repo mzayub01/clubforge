@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { createAdminClient } from '@/lib/supabase/admin';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
@@ -48,8 +48,33 @@ export default async function AdminLayout({
 
     console.log('[AdminLayout] user:', user.id, 'tenantMember:', tenantMember, 'error:', tmError?.message);
 
+    // Platform admin override: if user isn't a tenant admin, check if they're a platform admin
+    let isPlatformAdmin = false;
+    let resolvedTenantId = tenantMember?.tenant_id || null;
+    let resolvedRole = tenantMember?.role || null;
+
     if (tenantMember?.role !== 'admin') {
-        redirect('/dashboard');
+        const { data: platformAdmin } = await adminSupabase
+            .from('platform_admins')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
+
+        if (platformAdmin) {
+            isPlatformAdmin = true;
+            resolvedRole = 'admin';
+            // Resolve tenant from subdomain header (set by middleware)
+            const headerStore = await headers();
+            resolvedTenantId = headerStore.get('x-tenant-id') || null;
+            console.log('[AdminLayout] Platform admin access, tenant from header:', resolvedTenantId);
+
+            if (!resolvedTenantId) {
+                // Platform admin without tenant context — redirect to platform dashboard
+                redirect('/platform');
+            }
+        } else {
+            redirect('/dashboard');
+        }
     }
 
     // Get user name from profiles
@@ -68,11 +93,11 @@ export default async function AdminLayout({
     let tenantTagline: string | undefined;
     let subscriptionTier: SubscriptionTier = 'starter';
     let beltProgressEnabled: boolean | undefined;
-    if (tenantMember?.tenant_id) {
+    if (resolvedTenantId) {
         const { data: tenant } = await adminSupabase
             .from('tenants')
             .select('logo_url, name, primary_color, tagline, subscription_tier, settings')
-            .eq('id', tenantMember.tenant_id)
+            .eq('id', resolvedTenantId)
             .single();
         tenantLogoUrl = tenant?.logo_url || undefined;
         tenantName = tenant?.name || undefined;

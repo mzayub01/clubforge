@@ -142,17 +142,45 @@ async function authenticateAdmin() {
         .eq('is_active', true)
         .single();
 
-    if (!tenantMember || !['admin', 'instructor'].includes(tenantMember.role)) {
-        return { error: 'Forbidden', status: 403, tenantId: null, role: null, userId: null };
+    if (tenantMember && ['admin', 'instructor'].includes(tenantMember.role)) {
+        return {
+            error: null,
+            status: 200,
+            tenantId: tenantMember.tenant_id as string,
+            role: tenantMember.role as string,
+            userId: user.id,
+        };
     }
 
-    return {
-        error: null,
-        status: 200,
-        tenantId: tenantMember.tenant_id as string,
-        role: tenantMember.role as string,
-        userId: user.id,
-    };
+    // Fallback: check if user is a platform admin
+    const { data: platformAdmin } = await adminSupabase
+        .from('platform_admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (platformAdmin) {
+        // Platform admin — resolve tenant from subdomain header
+        const { headers: getHeaders } = await import('next/headers');
+        const headerStore = await getHeaders();
+        const headerTenantId = headerStore.get('x-tenant-id');
+
+        if (headerTenantId) {
+            console.log('[CRUD] Platform admin access for tenant:', headerTenantId);
+            return {
+                error: null,
+                status: 200,
+                tenantId: headerTenantId,
+                role: 'admin' as string,
+                userId: user.id,
+            };
+        }
+
+        // Platform admin but no tenant context (e.g. on main domain)
+        return { error: 'No tenant context. Visit a club subdomain.', status: 400, tenantId: null, role: null, userId: null };
+    }
+
+    return { error: 'Forbidden', status: 403, tenantId: null, role: null, userId: null };
 }
 
 

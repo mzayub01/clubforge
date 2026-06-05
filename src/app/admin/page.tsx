@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
@@ -35,7 +35,21 @@ export default async function AdminDashboard() {
         .eq('is_active', true)
         .single();
 
-    const tenantId = membership?.tenant_id;
+    let tenantId = membership?.tenant_id;
+
+    // Platform admin fallback: resolve tenant from subdomain header
+    if (!tenantId) {
+        const { data: platformAdmin } = await admin
+            .from('platform_admins')
+            .select('id')
+            .eq('user_id', user!.id)
+            .single();
+
+        if (platformAdmin) {
+            const headerStore = await headers();
+            tenantId = headerStore.get('x-tenant-id') || undefined;
+        }
+    }
 
     // Get owner's first name
     const { data: profile } = await admin

@@ -419,11 +419,14 @@ export default function AdminClassesPage() {
                                     <label className="form-label">Instructor</label>
                                     <select className="form-input" value={formData.instructor_id} onChange={(e) => setFormData({ ...formData, instructor_id: e.target.value })}>
                                         <option value="">Select instructor</option>
-                                        {instructors.map((inst) => (
-                                            <option key={inst.id} value={inst.id}>
-                                                {(inst as unknown as { profile: { first_name: string; last_name: string } })?.profile?.first_name} {(inst as unknown as { profile: { first_name: string; last_name: string } })?.profile?.last_name}
-                                            </option>
-                                        ))}
+                                        {instructors.map((inst) => {
+                                            const p = profileMap[inst.user_id];
+                                            return (
+                                                <option key={inst.id} value={inst.id}>
+                                                    {p ? `${p.first_name} ${p.last_name}` : `Instructor (${inst.id.slice(0, 8)})`}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
 

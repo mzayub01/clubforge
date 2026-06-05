@@ -1,5 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
-import { getTenantId } from '@/lib/tenant';
+import { createAdminClient as createAdminClientDirect } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
 import {
     PoundSterling,
     Users,
@@ -36,7 +38,39 @@ interface RevenueByType {
 
 export default async function AdminFinancePage() {
     const supabase = await createAdminClient();
-    const tenantId = await getTenantId();
+    const admin = createAdminClientDirect();
+
+    // Resolve tenant from the user's actual tenant_members record (not headers)
+    const userSupabase = await createClient();
+    const { data: { user } } = await userSupabase.auth.getUser();
+
+    let tenantId: string | null = null;
+
+    if (user) {
+        const { data: membership } = await admin
+            .from('tenant_members')
+            .select('tenant_id')
+            .eq('user_id', user.id)
+            .in('role', ['admin', 'professor'])
+            .eq('is_active', true)
+            .single();
+
+        tenantId = membership?.tenant_id || null;
+
+        // Platform admin fallback: resolve tenant from subdomain header
+        if (!tenantId) {
+            const { data: platformAdmin } = await admin
+                .from('platform_admins')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+
+            if (platformAdmin) {
+                const headerStore = await headers();
+                tenantId = headerStore.get('x-tenant-id') || null;
+            }
+        }
+    }
 
     if (!tenantId) {
         return (

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Eye, EyeOff, CheckCircle, Mail } from 'lucide-react';
+import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface TenantBranding {
@@ -13,54 +13,47 @@ interface TenantBranding {
 }
 
 function ResetPasswordForm() {
-    const [email, setEmail] = useState('');
-    const [token, setToken] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [step, setStep] = useState<'verify' | 'reset'>('verify');
+    const [sessionReady, setSessionReady] = useState(false);
+    const [checking, setChecking] = useState(true);
 
     const router = useRouter();
-    const searchParams = useSearchParams();
     const supabase = getSupabaseClient();
 
     useEffect(() => {
-        // Pre-fill the token from URL if available
-        const codeFromUrl = searchParams.get('code');
-        if (codeFromUrl) {
-            setToken(codeFromUrl);
-        }
-    }, [searchParams]);
-
-    const handleVerifyCode = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            // Verify the OTP code
-            const { error } = await supabase.auth.verifyOtp({
-                email: email,
-                token: token,
-                type: 'recovery',
-            });
-
-            if (error) {
-                setError(error.message);
-                return;
+        // Listen for the PASSWORD_RECOVERY event from the email link
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (event) => {
+                if (event === 'PASSWORD_RECOVERY') {
+                    // Supabase has verified the recovery token and established a session
+                    setSessionReady(true);
+                    setChecking(false);
+                }
             }
+        );
 
-            // Successfully verified, move to password reset step
-            setStep('reset');
-        } catch {
-            setError('An unexpected error occurred');
-        } finally {
-            setLoading(false);
-        }
-    };
+        // Also check if there's already a session (user may have already clicked the link)
+        const checkExistingSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                setSessionReady(true);
+            }
+            setChecking(false);
+        };
+
+        // Give the auth listener a moment to process the URL hash, then check
+        const timer = setTimeout(checkExistingSession, 1500);
+
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(timer);
+        };
+    }, [supabase]);
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -128,94 +121,28 @@ function ResetPasswordForm() {
         );
     }
 
-    if (step === 'verify') {
+    if (checking) {
         return (
-            <>
-                {error && (
-                    <div className="alert alert-error" style={{ marginBottom: 'var(--space-4)' }}>
-                        {error}
-                    </div>
-                )}
+            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                <div className="spinner" style={{ width: '40px', height: '40px', margin: '0 auto var(--space-4)' }} />
+                <p style={{ color: 'var(--text-secondary)' }}>Verifying your reset link...</p>
+            </div>
+        );
+    }
 
-                <form onSubmit={handleVerifyCode}>
-                    <div className="form-group">
-                        <label className="form-label" htmlFor="email">
-                            Email Address
-                        </label>
-                        <div style={{ position: 'relative' }}>
-                            <Mail
-                                size={18}
-                                style={{
-                                    position: 'absolute',
-                                    left: '14px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    color: 'var(--text-tertiary)',
-                                }}
-                            />
-                            <input
-                                id="email"
-                                type="email"
-                                className="form-input"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                style={{ paddingLeft: '42px' }}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group" style={{ marginTop: 'var(--space-4)' }}>
-                        <label className="form-label" htmlFor="token">
-                            Reset Code
-                        </label>
-                        <input
-                            id="token"
-                            type="text"
-                            className="form-input"
-                            placeholder="Enter the code from your email"
-                            value={token}
-                            onChange={(e) => setToken(e.target.value)}
-                            required
-                            style={{ textAlign: 'center', fontSize: 'var(--text-lg)', letterSpacing: '4px' }}
-                        />
-                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', marginTop: 'var(--space-2)' }}>
-                            Check your email for the 8-digit reset code
-                        </p>
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="btn btn-primary btn-lg"
-                        style={{ width: '100%', marginTop: 'var(--space-6)' }}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <span className="spinner" style={{ width: '20px', height: '20px' }} />
-                        ) : (
-                            'Verify Code'
-                        )}
-                    </button>
-                </form>
-
-                <p style={{
-                    textAlign: 'center',
-                    marginTop: 'var(--space-6)',
-                    color: 'var(--text-secondary)',
-                }}>
-                    Didn&apos;t receive a code?{' '}
-                    <Link
-                        href="/forgot-password"
-                        style={{
-                            color: 'var(--color-gold)',
-                            fontWeight: '600',
-                        }}
-                    >
-                        Request New Code
-                    </Link>
+    if (!sessionReady) {
+        return (
+            <div style={{ textAlign: 'center' }}>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+                    This page requires a valid password reset link. Please click the link in your email to continue.
                 </p>
-            </>
+                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
+                    If your link has expired, you can request a new one.
+                </p>
+                <Link href="/forgot-password" className="btn btn-primary" style={{ width: '100%' }}>
+                    Request New Reset Link
+                </Link>
+            </div>
         );
     }
 
@@ -229,7 +156,7 @@ function ResetPasswordForm() {
 
             <div className="alert alert-success" style={{ marginBottom: 'var(--space-4)' }}>
                 <CheckCircle size={18} />
-                Code verified! Now set your new password.
+                Identity verified! Now set your new password.
             </div>
 
             <form onSubmit={handleResetPassword}>
@@ -418,7 +345,7 @@ export default function ResetPasswordPage() {
                         Reset Password
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', marginTop: 'var(--space-2)' }}>
-                        Enter your email and the code from your email
+                        Set a new password for your account
                     </p>
                 </div>
 

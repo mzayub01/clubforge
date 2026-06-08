@@ -312,6 +312,18 @@ function RegisterPageContent() {
                         setError('Please fill in all parent/guardian details');
                         return false;
                     }
+                    if (!formData.password) {
+                        setError('Password is required for the parent/guardian account');
+                        return false;
+                    }
+                    if (formData.password.length < 6) {
+                        setError('Password must be at least 6 characters');
+                        return false;
+                    }
+                    if (formData.password !== formData.confirmPassword) {
+                        setError('Passwords do not match');
+                        return false;
+                    }
                 }
                 if (tenant?.settings?.require_profile_photo && !profileImageFile) {
                     setError('Please upload a profile picture');
@@ -761,6 +773,34 @@ function RegisterPageContent() {
                                                     onChange={e => updateField('parentPhone', e.target.value)} />
                                             </div>
                                         </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                            <div className="form-group">
+                                                <label className="form-label">Password *</label>
+                                                <div style={{ position: 'relative' }}>
+                                                    <input className="form-input" type={showPassword ? 'text' : 'password'}
+                                                        value={formData.password}
+                                                        onChange={e => updateField('password', e.target.value)}
+                                                        placeholder="Min. 6 characters"
+                                                        style={{ paddingRight: 'var(--space-10)' }} />
+                                                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                                        style={{
+                                                            position: 'absolute', right: 'var(--space-3)', top: '50%',
+                                                            transform: 'translateY(-50%)', background: 'none', border: 'none',
+                                                            cursor: 'pointer', color: 'var(--text-tertiary)',
+                                                        }}>
+                                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="form-group">
+                                                <label className="form-label">Confirm Password *</label>
+                                                <input className="form-input" type="password" value={formData.confirmPassword}
+                                                    onChange={e => updateField('confirmPassword', e.target.value)} />
+                                            </div>
+                                        </div>
+                                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-1)' }}>
+                                            This creates your parent/guardian account to manage your child&apos;s membership.
+                                        </p>
                                     </div>
                                 )}
 

@@ -23,11 +23,13 @@ export async function POST(request: NextRequest) {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
+            console.error('[Checkout-Connected] Auth failed:', authError?.message);
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const stripe = getStripeClient();
         if (!stripe) {
+            console.error('[Checkout-Connected] Stripe not configured');
             return NextResponse.json({ error: 'Stripe not configured' }, { status: 400 });
         }
 
@@ -43,12 +45,23 @@ export async function POST(request: NextRequest) {
             membershipTypeId,
         } = body;
 
-        if (!tenantId || !price || !userId) {
+        console.log('[Checkout-Connected] Request received:', {
+            tenantId,
+            userId,
+            price,
+            membershipTypeName,
+            locationId,
+            userEmail,
+        });
+
+        if (!tenantId || price === undefined || price === null || !userId) {
+            console.error('[Checkout-Connected] Missing required fields:', { tenantId, price, userId });
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         // Security: the authenticated user must match the userId in the body
         if (user.id !== userId) {
+            console.error('[Checkout-Connected] User mismatch:', { authUserId: user.id, bodyUserId: userId });
             return NextResponse.json({ error: 'Forbidden: User mismatch' }, { status: 403 });
         }
 
@@ -60,7 +73,18 @@ export async function POST(request: NextRequest) {
             .eq('id', tenantId)
             .single();
 
+        console.log('[Checkout-Connected] Tenant lookup:', {
+            found: !!tenant,
+            stripeAccountId: tenant?.stripe_account_id,
+            stripeConnectEnabled: tenant?.stripe_connect_enabled,
+            slug: tenant?.slug,
+        });
+
         if (!tenant?.stripe_account_id || !tenant.stripe_connect_enabled) {
+            console.error('[Checkout-Connected] Club Stripe not ready:', {
+                hasAccountId: !!tenant?.stripe_account_id,
+                connectEnabled: tenant?.stripe_connect_enabled,
+            });
             return NextResponse.json({ error: 'Club has not completed Stripe setup' }, { status: 400 });
         }
 
@@ -75,6 +99,12 @@ export async function POST(request: NextRequest) {
         const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
         const protocol = appDomain.includes('localhost') ? 'http' : 'https';
         const tenantBaseUrl = `${protocol}://${tenant.slug}.${appDomain}`;
+
+        console.log('[Checkout-Connected] Creating Stripe session:', {
+            priceInPence,
+            stripeAccount: tenant.stripe_account_id,
+            successUrl: `${tenantBaseUrl}/dashboard?registered=true&payment=success`,
+        });
 
         // Create checkout session on the connected account
         const session = await stripe.checkout.sessions.create({
@@ -118,9 +148,11 @@ export async function POST(request: NextRequest) {
             stripeAccount: tenant.stripe_account_id,
         });
 
+        console.log('[Checkout-Connected] Session created successfully:', { sessionId: session.id, url: !!session.url });
         return NextResponse.json({ url: session.url });
     } catch (error) {
-        console.error('Connected checkout error:', error);
-        return NextResponse.json({ error: safeErrorResponse(error, 'Checkout failed') }, { status: 500 });
+        console.error('[Checkout-Connected] ERROR:', error);
+        const message = error instanceof Error ? error.message : 'Checkout failed';
+        return NextResponse.json({ error: safeErrorResponse(error, 'Checkout failed'), details: message }, { status: 500 });
     }
 }

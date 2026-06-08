@@ -88,22 +88,28 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Club has not completed Stripe setup' }, { status: 400 });
         }
 
-        // NOTE: Membership creation is handled by the webhook-connect handler
-        // after Stripe confirms payment. We intentionally do NOT create
-        // pending memberships here to avoid ghost records from abandoned checkouts.
+        // NOTE: Membership creation is handled by the checkout-success handler
+        // when the user returns from Stripe. We use this instead of webhooks
+        // because Standard connected accounts don't forward checkout.session.completed
+        // events to the platform webhook.
 
         // Calculate platform fee (2.5%)
         const priceInPence = Math.round(price * 100);
 
-        // Build success URL using the tenant's subdomain so the member returns to THEIR club dashboard
+        // Build success URL that routes through our checkout-success handler
+        // which processes the payment and creates DB records before redirecting to dashboard
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://clubforgehq.com`;
         const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
         const protocol = appDomain.includes('localhost') ? 'http' : 'https';
         const tenantBaseUrl = `${protocol}://${tenant.slug}.${appDomain}`;
 
+        // Use {CHECKOUT_SESSION_ID} template — Stripe replaces this with the actual session ID
+        const successUrl = `${appUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&tenant_id=${tenantId}&account_id=${tenant.stripe_account_id}`;
+
         console.log('[Checkout-Connected] Creating Stripe session:', {
             priceInPence,
             stripeAccount: tenant.stripe_account_id,
-            successUrl: `${tenantBaseUrl}/dashboard?registered=true&payment=success`,
+            successUrl,
         });
 
         // Create checkout session on the connected account
@@ -135,7 +141,7 @@ export async function POST(request: NextRequest) {
                     membership_type_id: membershipTypeId || '',
                 },
             },
-            success_url: `${tenantBaseUrl}/dashboard?registered=true&payment=success`,
+            success_url: successUrl,
             cancel_url: `${tenantBaseUrl}/register?payment=cancelled`,
             metadata: {
                 user_id: userId,

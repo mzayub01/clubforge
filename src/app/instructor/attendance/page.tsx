@@ -120,7 +120,7 @@ export default function InstructorAttendancePage() {
             const isPresent = attendance.some(a => a.user_id === userId);
 
             if (isPresent) {
-                // Remove attendance
+                // Remove attendance via direct client (instructor has admin_manage RLS policy)
                 await supabase
                     .from('attendance')
                     .delete()
@@ -128,15 +128,19 @@ export default function InstructorAttendancePage() {
                     .eq('class_date', selectedDate)
                     .eq('user_id', userId);
             } else {
-                // Add attendance
-                await supabase
-                    .from('attendance')
-                    .insert({
-                        class_id: selectedClass,
-                        user_id: userId,
-                        class_date: selectedDate,
-                        check_in_time: new Date().toISOString(),
-                    });
+                // Add attendance via server-side API to ensure tenant_id is set
+                const response = await fetch('/api/attendance/checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        classId: selectedClass,
+                        profileId: userId,
+                    }),
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    console.error('Check-in API error:', result.error);
+                }
             }
 
             await fetchAttendance();

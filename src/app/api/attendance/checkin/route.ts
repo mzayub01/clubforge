@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
+        // Authenticate via regular client (respects auth cookies)
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -20,35 +21,67 @@ export async function POST(request: NextRequest) {
         // Use provided profileId or fall back to authenticated user
         let targetUserId = profileId || user.id;
 
-        // If checking in for a different profile, validate parent-child relationship
+        // If checking in for a different profile, validate authorization
         if (profileId && profileId !== user.id) {
-            // First get the parent's profile ID (not user_id)
-            const { data: parentProfile } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('user_id', user.id)
-                .single();
+            // Use admin client for authorization checks (bypasses RLS)
+            const adminSupabaseAuth = await createAdminClient();
 
-            if (!parentProfile) {
-                return NextResponse.json({ error: 'Parent profile not found' }, { status: 403 });
+            // Check if the caller is an instructor/admin/owner in the tenant
+            const callerMembership = await resolveTenantForUser(user.id);
+            let isStaff = false;
+
+            if (callerMembership?.tenantId) {
+                const { data: callerRole } = await adminSupabaseAuth
+                    .from('tenant_members')
+                    .select('role')
+                    .eq('user_id', user.id)
+                    .eq('tenant_id', callerMembership.tenantId)
+                    .eq('is_active', true)
+                    .single();
+
+                isStaff = callerRole?.role === 'admin' || callerRole?.role === 'owner' || callerRole?.role === 'instructor';
             }
 
-            // Check if the child profile has this parent as their guardian
-            const { data: childProfile } = await supabase
-                .from('profiles')
-                .select('id, parent_guardian_id')
-                .eq('user_id', profileId)
-                .single();
+            if (!isStaff) {
+                // Not staff — check parent-child relationship
+                const { data: parentProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .single();
 
-            // Verify the authenticated user is the guardian of this profile
-            if (!childProfile || childProfile.parent_guardian_id !== parentProfile.id) {
-                return NextResponse.json({ error: 'Not authorized to check in for this profile' }, { status: 403 });
+                if (!parentProfile) {
+                    return NextResponse.json({ error: 'Not authorized to check in for this profile' }, { status: 403 });
+                }
+
+                const { data: childProfile } = await supabase
+                    .from('profiles')
+                    .select('id, parent_guardian_id')
+                    .eq('user_id', profileId)
+                    .single();
+
+                if (!childProfile || childProfile.parent_guardian_id !== parentProfile.id) {
+                    return NextResponse.json({ error: 'Not authorized to check in for this profile' }, { status: 403 });
+                }
             }
         }
 
+        // Resolve tenant — required for attendance records to be visible
+        const membership = await resolveTenantForUser(targetUserId);
+        const tenantId = membership?.tenantId;
+
+        if (!tenantId) {
+            console.error('Check-in: Could not resolve tenant for user:', targetUserId);
+            return NextResponse.json({ error: 'Could not determine your club. Please contact your admin.' }, { status: 400 });
+        }
+
+        // Use admin client for DB operations to bypass RLS
+        // (RLS policies require tenant context that client-side calls don't have)
+        const adminSupabase = await createAdminClient();
+
         // Check if already checked in today for this class AND this profile
         const today = new Date().toISOString().split('T')[0];
-        const { data: existing } = await supabase
+        const { data: existing } = await adminSupabase
             .from('attendance')
             .select('id')
             .eq('class_id', classId)
@@ -64,19 +97,16 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Get tenant context via tenant_members
-        const membership = await resolveTenantForUser(targetUserId);
-        const tenantId = membership?.tenantId;
-
-        // Create attendance record for the target profile
-        const { error } = await supabase
+        // Create attendance record with tenant_id always set
+        const { error } = await adminSupabase
             .from('attendance')
             .insert({
                 class_id: classId,
                 user_id: targetUserId,
                 class_date: today,
                 check_in_time: new Date().toISOString(),
-                ...(tenantId && { tenant_id: tenantId }),
+                tenant_id: tenantId,
+                checked_in_by: user.id,
             });
 
         if (error) {

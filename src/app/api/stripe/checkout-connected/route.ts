@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         const adminSupabase = await createAdminClient();
         const { data: tenant } = await adminSupabase
             .from('tenants')
-            .select('stripe_account_id, stripe_connect_enabled, name, slug, custom_domain')
+            .select('stripe_account_id, stripe_connect_enabled, name, slug')
             .eq('id', tenantId)
             .single();
 
@@ -101,9 +101,10 @@ export async function POST(request: NextRequest) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://clubforgehq.com`;
         const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
         const protocol = appDomain.includes('localhost') ? 'http' : 'https';
-        // Use custom domain if available, otherwise subdomain
-        const tenantBaseUrl = tenant.custom_domain
-            ? `https://${tenant.custom_domain}`
+        // Use custom domain if available (field may not exist until migration is run)
+        const customDomain = (tenant as Record<string, unknown>).custom_domain as string | undefined;
+        const tenantBaseUrl = customDomain
+            ? `https://${customDomain}`
             : `${protocol}://${tenant.slug}.${appDomain}`;
 
         // Use {CHECKOUT_SESSION_ID} template — Stripe replaces this with the actual session ID

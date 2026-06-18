@@ -70,12 +70,14 @@ export async function GET(request: NextRequest) {
             const supabaseAdmin = await createAdminClient();
             const { data: tenant } = await supabaseAdmin
                 .from('tenants')
-                .select('slug, custom_domain')
+                .select('slug')
                 .eq('id', sessionTenantId)
                 .single();
 
-            if (tenant?.custom_domain) {
-                redirectUrl = `https://${tenant.custom_domain}/dashboard?registered=true&payment=success`;
+            // Check for custom domain (field may not exist until migration is run)
+            const customDomain = (tenant as Record<string, unknown> | null)?.custom_domain as string | undefined;
+            if (customDomain) {
+                redirectUrl = `https://${customDomain}/dashboard?registered=true&payment=success`;
             } else if (tenant?.slug) {
                 redirectUrl = `${protocol}://${tenant.slug}.${appDomain}/dashboard?registered=true&payment=success`;
             }

@@ -86,27 +86,32 @@ export async function middleware(request: NextRequest) {
                 },
             });
 
-            // Use service role for this lookup if available, otherwise anon key
-            // The anon key query will work if RLS allows reading the tenants table
-            const { data: tenant } = await adminSupabase
-                .from('tenants')
-                .select('id, slug, custom_domain')
-                .eq('custom_domain', hostname)
-                .eq('is_active', true)
-                .single();
+            // Query custom_domain column — wrapped in try-catch because the column
+            // may not exist yet if the migration hasn't been run
+            try {
+                const { data: tenant } = await adminSupabase
+                    .from('tenants')
+                    .select('id, slug')
+                    .eq('custom_domain', hostname)
+                    .eq('is_active', true)
+                    .single();
 
-            if (tenant) {
-                slug = tenant.slug;
-                customDomainTenantId = tenant.id;
-                isCustomDomain = true;
-                setCachedDomain(hostname, {
-                    slug: tenant.slug,
-                    tenantId: tenant.id,
-                    customDomain: tenant.custom_domain!,
-                    timestamp: Date.now(),
-                });
-            } else {
-                // Negative cache — this hostname is not a custom domain
+                if (tenant) {
+                    slug = tenant.slug;
+                    customDomainTenantId = tenant.id;
+                    isCustomDomain = true;
+                    setCachedDomain(hostname, {
+                        slug: tenant.slug,
+                        tenantId: tenant.id,
+                        customDomain: hostname,
+                        timestamp: Date.now(),
+                    });
+                } else {
+                    // Negative cache — this hostname is not a custom domain
+                    setCachedDomain(hostname, null);
+                }
+            } catch {
+                // custom_domain column likely doesn't exist yet — negative cache
                 setCachedDomain(hostname, null);
             }
         }
@@ -195,7 +200,7 @@ export async function middleware(request: NextRequest) {
                 } else {
                     const { data: tenant } = await supabase
                         .from('tenants')
-                        .select('id, custom_domain')
+                        .select('id')
                         .eq('slug', slug)
                         .eq('is_active', true)
                         .single();
@@ -203,26 +208,6 @@ export async function middleware(request: NextRequest) {
                     if (tenant) {
                         rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
                         requestHeaders.set(TENANT_ID_HEADER, tenant.id);
-
-                        // SEO redirect check for homepage: if tenant has custom_domain, redirect
-                        if (tenant.custom_domain && !isCustomDomain) {
-                            const redirectUrl = request.nextUrl.clone();
-                            redirectUrl.host = tenant.custom_domain;
-                            redirectUrl.port = '';
-                            redirectUrl.pathname = '/';
-                            redirectUrl.protocol = 'https';
-                            // Cache this for future requests
-                            setCachedDomain(`_slug_${slug}`, {
-                                slug,
-                                tenantId: tenant.id,
-                                customDomain: tenant.custom_domain,
-                                timestamp: Date.now(),
-                            });
-                            return NextResponse.redirect(redirectUrl, 301);
-                        } else {
-                            // Cache that this tenant has no custom domain
-                            setCachedDomain(`_slug_${slug}`, null);
-                        }
                     }
                 }
             }
@@ -285,31 +270,12 @@ export async function middleware(request: NextRequest) {
         } else {
             const { data: tenant } = await supabase
                 .from('tenants')
-                .select('id, custom_domain')
+                .select('id')
                 .eq('slug', slug)
                 .eq('is_active', true)
                 .single();
 
             if (tenant) {
-                // SEO redirect: if tenant has custom_domain and user is on subdomain, redirect
-                if (tenant.custom_domain && !isCustomDomain) {
-                    const redirectUrl = request.nextUrl.clone();
-                    redirectUrl.host = tenant.custom_domain;
-                    redirectUrl.port = '';
-                    redirectUrl.protocol = 'https';
-                    // Cache for future
-                    setCachedDomain(`_slug_${slug}`, {
-                        slug,
-                        tenantId: tenant.id,
-                        customDomain: tenant.custom_domain,
-                        timestamp: Date.now(),
-                    });
-                    return NextResponse.redirect(redirectUrl, 301);
-                }
-
-                // No custom domain — cache negative result and proceed normally
-                setCachedDomain(`_slug_${slug}`, null);
-
                 // Set tenant ID in response headers for downstream server components
                 response.headers.set(TENANT_ID_HEADER, tenant.id);
                 // Also set on the forwarded request headers

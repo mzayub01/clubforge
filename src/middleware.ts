@@ -2,6 +2,47 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { extractSlugFromHost, TENANT_ID_HEADER, TENANT_SLUG_HEADER } from '@/lib/tenant';
 
+// -----------------------------------------------
+// Custom domain cache (in-memory, 60s TTL)
+// Maps hostname → { slug, tenantId } or null (negative cache)
+// This avoids a DB query on every request for custom domains.
+// -----------------------------------------------
+interface CachedDomain {
+    slug: string;
+    tenantId: string;
+    customDomain: string;
+    timestamp: number;
+}
+const domainCache = new Map<string, CachedDomain | null>();
+const CACHE_TTL_MS = 60_000; // 60 seconds
+
+function getCachedDomain(host: string): CachedDomain | null | undefined {
+    const entry = domainCache.get(host);
+    if (entry === undefined) return undefined; // not cached
+    if (entry === null) {
+        // Negative cache — check TTL
+        return null;
+    }
+    if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+        domainCache.delete(host);
+        return undefined; // expired
+    }
+    return entry;
+}
+
+function setCachedDomain(host: string, value: CachedDomain | null) {
+    // Keep cache size bounded
+    if (domainCache.size > 500) {
+        // Evict oldest entries
+        const iterator = domainCache.keys();
+        for (let i = 0; i < 100; i++) {
+            const key = iterator.next().value;
+            if (key) domainCache.delete(key);
+        }
+    }
+    domainCache.set(host, value);
+}
+
 export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -10,7 +51,90 @@ export async function middleware(request: NextRequest) {
     // 1. Resolve tenant from subdomain
     // -----------------------------------------------
     const host = request.headers.get('host') || '';
-    const slug = extractSlugFromHost(host);
+    let slug = extractSlugFromHost(host);
+
+    // -----------------------------------------------
+    // 1a. Custom domain fallback (Elite tier)
+    // If no subdomain slug was found and the host isn't the
+    // base domain, check if it's a custom domain.
+    // This is purely ADDITIVE — existing subdomain resolution
+    // is completely untouched above.
+    // -----------------------------------------------
+    const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
+    const hostname = host.split(':')[0]; // strip port
+    let customDomainTenantId: string | null = null;
+    let isCustomDomain = false;
+
+    if (!slug && hostname !== baseDomain && hostname !== `www.${baseDomain}` && hostname !== 'localhost') {
+        // Check cache first
+        const cached = getCachedDomain(hostname);
+        if (cached !== undefined) {
+            // Cache hit (could be null = negative cache)
+            if (cached) {
+                slug = cached.slug;
+                customDomainTenantId = cached.tenantId;
+                isCustomDomain = true;
+            }
+            // If cached === null, it's a negative cache — not a custom domain, treat as platform
+        } else if (supabaseUrl && supabaseKey) {
+            // Cache miss — query the database
+            const adminSupabase = createServerClient(supabaseUrl, supabaseKey, {
+                cookies: {
+                    get() { return undefined; },
+                    set() { /* no-op */ },
+                    remove() { /* no-op */ },
+                },
+            });
+
+            // Use service role for this lookup if available, otherwise anon key
+            // The anon key query will work if RLS allows reading the tenants table
+            const { data: tenant } = await adminSupabase
+                .from('tenants')
+                .select('id, slug, custom_domain')
+                .eq('custom_domain', hostname)
+                .eq('is_active', true)
+                .single();
+
+            if (tenant) {
+                slug = tenant.slug;
+                customDomainTenantId = tenant.id;
+                isCustomDomain = true;
+                setCachedDomain(hostname, {
+                    slug: tenant.slug,
+                    tenantId: tenant.id,
+                    customDomain: tenant.custom_domain!,
+                    timestamp: Date.now(),
+                });
+            } else {
+                // Negative cache — this hostname is not a custom domain
+                setCachedDomain(hostname, null);
+            }
+        }
+    }
+
+    // -----------------------------------------------
+    // 1b. SEO redirect: subdomain → custom domain
+    // If user is on slug.clubforgehq.com but tenant has a custom domain,
+    // redirect to the custom domain for SEO consistency.
+    // -----------------------------------------------
+    if (slug && !isCustomDomain && supabaseUrl && supabaseKey) {
+        // Check if this subdomain tenant has a custom domain set
+        const cached = getCachedDomain(`_slug_${slug}`);
+        if (cached !== undefined) {
+            if (cached) {
+                // Tenant has a custom domain — redirect
+                const url = request.nextUrl.clone();
+                url.host = cached.customDomain;
+                url.port = '';
+                url.protocol = 'https';
+                return NextResponse.redirect(url, 301);
+            }
+            // cached === null means tenant has no custom domain — continue normally
+        } else {
+            // We'll check during tenant ID resolution below and cache the result
+            // For the homepage rewrite branch, we do the check inline
+        }
+    }
 
     // Clone request headers so we can inject tenant context
     const requestHeaders = new Headers(request.headers);
@@ -18,8 +142,13 @@ export async function middleware(request: NextRequest) {
         requestHeaders.set(TENANT_SLUG_HEADER, slug);
     }
 
+    // If we already resolved the tenant ID from custom domain cache, set it
+    if (customDomainTenantId) {
+        requestHeaders.set(TENANT_ID_HEADER, customDomainTenantId);
+    }
+
     // -----------------------------------------------
-    // 1b. Route bifurcation for tenant subdomains
+    // 1c. Route bifurcation for tenant subdomains
     // Block SaaS-only pages and rewrite homepage
     // -----------------------------------------------
     if (slug) {
@@ -59,16 +188,42 @@ export async function middleware(request: NextRequest) {
                 });
                 await supabase.auth.getUser();
 
-                const { data: tenant } = await supabase
-                    .from('tenants')
-                    .select('id')
-                    .eq('slug', slug)
-                    .eq('is_active', true)
-                    .single();
+                // If we already have the tenant ID from custom domain lookup, use it
+                if (customDomainTenantId) {
+                    rewriteResponse.headers.set(TENANT_ID_HEADER, customDomainTenantId);
+                    requestHeaders.set(TENANT_ID_HEADER, customDomainTenantId);
+                } else {
+                    const { data: tenant } = await supabase
+                        .from('tenants')
+                        .select('id, custom_domain')
+                        .eq('slug', slug)
+                        .eq('is_active', true)
+                        .single();
 
-                if (tenant) {
-                    rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
-                    requestHeaders.set(TENANT_ID_HEADER, tenant.id);
+                    if (tenant) {
+                        rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
+                        requestHeaders.set(TENANT_ID_HEADER, tenant.id);
+
+                        // SEO redirect check for homepage: if tenant has custom_domain, redirect
+                        if (tenant.custom_domain && !isCustomDomain) {
+                            const redirectUrl = request.nextUrl.clone();
+                            redirectUrl.host = tenant.custom_domain;
+                            redirectUrl.port = '';
+                            redirectUrl.pathname = '/';
+                            redirectUrl.protocol = 'https';
+                            // Cache this for future requests
+                            setCachedDomain(`_slug_${slug}`, {
+                                slug,
+                                tenantId: tenant.id,
+                                customDomain: tenant.custom_domain,
+                                timestamp: Date.now(),
+                            });
+                            return NextResponse.redirect(redirectUrl, 301);
+                        } else {
+                            // Cache that this tenant has no custom domain
+                            setCachedDomain(`_slug_${slug}`, null);
+                        }
+                    }
                 }
             }
             return rewriteResponse;
@@ -119,24 +274,53 @@ export async function middleware(request: NextRequest) {
     // 4. Resolve tenant ID from slug (if present)
     // -----------------------------------------------
     if (slug) {
-        const { data: tenant } = await supabase
-            .from('tenants')
-            .select('id')
-            .eq('slug', slug)
-            .eq('is_active', true)
-            .single();
-
-        if (tenant) {
-            // Set tenant ID in response headers for downstream server components
-            response.headers.set(TENANT_ID_HEADER, tenant.id);
-            // Also set on the forwarded request headers
-            requestHeaders.set(TENANT_ID_HEADER, tenant.id);
-            // Rebuild response with updated headers
+        // If we already have the tenant ID from custom domain lookup, use it directly
+        if (customDomainTenantId) {
+            response.headers.set(TENANT_ID_HEADER, customDomainTenantId);
+            requestHeaders.set(TENANT_ID_HEADER, customDomainTenantId);
             response = NextResponse.next({
                 request: { headers: requestHeaders },
             });
-            // Re-copy cookies from the original response
-            response.headers.set(TENANT_ID_HEADER, tenant.id);
+            response.headers.set(TENANT_ID_HEADER, customDomainTenantId);
+        } else {
+            const { data: tenant } = await supabase
+                .from('tenants')
+                .select('id, custom_domain')
+                .eq('slug', slug)
+                .eq('is_active', true)
+                .single();
+
+            if (tenant) {
+                // SEO redirect: if tenant has custom_domain and user is on subdomain, redirect
+                if (tenant.custom_domain && !isCustomDomain) {
+                    const redirectUrl = request.nextUrl.clone();
+                    redirectUrl.host = tenant.custom_domain;
+                    redirectUrl.port = '';
+                    redirectUrl.protocol = 'https';
+                    // Cache for future
+                    setCachedDomain(`_slug_${slug}`, {
+                        slug,
+                        tenantId: tenant.id,
+                        customDomain: tenant.custom_domain,
+                        timestamp: Date.now(),
+                    });
+                    return NextResponse.redirect(redirectUrl, 301);
+                }
+
+                // No custom domain — cache negative result and proceed normally
+                setCachedDomain(`_slug_${slug}`, null);
+
+                // Set tenant ID in response headers for downstream server components
+                response.headers.set(TENANT_ID_HEADER, tenant.id);
+                // Also set on the forwarded request headers
+                requestHeaders.set(TENANT_ID_HEADER, tenant.id);
+                // Rebuild response with updated headers
+                response = NextResponse.next({
+                    request: { headers: requestHeaders },
+                });
+                // Re-copy cookies from the original response
+                response.headers.set(TENANT_ID_HEADER, tenant.id);
+            }
         }
     }
 

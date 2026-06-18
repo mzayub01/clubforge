@@ -32,6 +32,7 @@ interface TenantData {
     subscription_status: string;
     trial_ends_at: string | null;
     settings: Record<string, unknown>;
+    custom_domain?: string | null;
 }
 
 interface AppStats {
@@ -55,6 +56,12 @@ export default function AdminSettingsPage() {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [connectLoading, setConnectLoading] = useState(false);
+
+    // Custom domain state (Elite tier)
+    const [customDomain, setCustomDomain] = useState('');
+    const [domainSaving, setDomainSaving] = useState(false);
+    const [dnsStatus, setDnsStatus] = useState<'idle' | 'checking' | 'active' | 'pending' | 'error'>('idle');
+    const [dnsMessage, setDnsMessage] = useState('');
 
     // Form fields
     const [name, setName] = useState('');
@@ -108,6 +115,7 @@ export default function AdminSettingsPage() {
                 setRegistrationMessage((settings.registration_message as string) || '');
                 setRequireProfilePhoto((settings.require_profile_photo as boolean) || false);
                 setMembershipLocationMode((settings.membership_location_mode as 'per_location' | 'all_locations') || 'per_location');
+                setCustomDomain(tenantData.custom_domain || '');
             }
 
             if (result.stats) {
@@ -889,6 +897,156 @@ export default function AdminSettingsPage() {
                             </button>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Custom Domain — Elite tier only */}
+            {activeTab === 'subscription' && tenant?.subscription_tier === 'elite' && (
+                <div style={{
+                    background: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--space-6)', border: '1px solid var(--border-light)',
+                    marginTop: 'var(--space-6)',
+                }}>
+                    <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: '600', marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                        <Globe size={20} /> Custom Domain
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
+                        Use your own domain (e.g., myclub.com) instead of {tenant?.slug}.clubforgehq.com
+                    </p>
+
+                    {/* Domain input */}
+                    <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                        <input
+                            className="form-input"
+                            type="text"
+                            placeholder="myclub.com"
+                            value={customDomain}
+                            onChange={e => setCustomDomain(e.target.value.trim().toLowerCase())}
+                            style={{ flex: 1 }}
+                        />
+                        <button
+                            className="btn btn-primary"
+                            disabled={domainSaving}
+                            onClick={async () => {
+                                setDomainSaving(true);
+                                setError('');
+                                setSuccess('');
+                                try {
+                                    const res = await fetch('/api/tenant/custom-domain', {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ domain: customDomain }),
+                                    });
+                                    const data = await res.json();
+                                    if (!res.ok) throw new Error(data.error);
+                                    setSuccess(customDomain ? 'Custom domain saved! Follow the DNS setup below.' : 'Custom domain removed.');
+                                    if (tenant) setTenant({ ...tenant, custom_domain: customDomain || null });
+                                } catch (err) {
+                                    setError(err instanceof Error ? err.message : 'Failed to save domain');
+                                } finally {
+                                    setDomainSaving(false);
+                                }
+                            }}
+                            style={{ cursor: 'pointer', border: 'none', whiteSpace: 'nowrap' }}
+                        >
+                            {domainSaving ? <Loader2 size={16} className="spin" /> : <Save size={16} />}
+                            {domainSaving ? 'Saving...' : 'Save Domain'}
+                        </button>
+                    </div>
+
+                    {/* DNS Instructions */}
+                    {(customDomain || tenant?.custom_domain) && (
+                        <div style={{
+                            background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
+                            padding: 'var(--space-4)', marginBottom: 'var(--space-4)',
+                        }}>
+                            <h4 style={{ fontSize: 'var(--text-sm)', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+                                DNS Setup Instructions
+                            </h4>
+                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-3)' }}>
+                                Add the following DNS record with your domain registrar:
+                            </p>
+                            <div style={{
+                                display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: 'var(--space-2)',
+                                fontSize: 'var(--text-sm)',
+                            }}>
+                                <div style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Type</div>
+                                <div style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Host</div>
+                                <div style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Value</div>
+                                <div style={{ fontFamily: 'monospace' }}>CNAME</div>
+                                <div style={{ fontFamily: 'monospace' }}>@</div>
+                                <div style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>cname.vercel-dns.com</div>
+                            </div>
+                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-3)' }}>
+                                DNS changes can take up to 48 hours to propagate.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Verify DNS button + status */}
+                    {(customDomain || tenant?.custom_domain) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                            <button
+                                className="btn"
+                                disabled={dnsStatus === 'checking'}
+                                onClick={async () => {
+                                    const domainToCheck = customDomain || tenant?.custom_domain || '';
+                                    if (!domainToCheck) return;
+                                    setDnsStatus('checking');
+                                    setDnsMessage('');
+                                    try {
+                                        const res = await fetch('/api/tenant/custom-domain', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ domain: domainToCheck }),
+                                        });
+                                        const data = await res.json();
+                                        setDnsStatus(data.status || 'error');
+                                        setDnsMessage(data.message || '');
+                                    } catch {
+                                        setDnsStatus('error');
+                                        setDnsMessage('Failed to verify DNS');
+                                    }
+                                }}
+                                style={{
+                                    cursor: 'pointer', border: '1px solid var(--border-light)',
+                                    background: 'var(--bg-secondary)', display: 'flex', gap: '6px',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                {dnsStatus === 'checking' ? <Loader2 size={16} className="spin" /> : <Shield size={16} />}
+                                {dnsStatus === 'checking' ? 'Checking...' : 'Verify DNS'}
+                            </button>
+
+                            {dnsStatus === 'active' && (
+                                <span style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-sm)' }}>
+                                    <CheckCircle size={16} /> {dnsMessage}
+                                </span>
+                            )}
+                            {dnsStatus === 'pending' && (
+                                <span style={{ color: 'var(--warning, #f59e0b)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-sm)' }}>
+                                    ⏳ {dnsMessage}
+                                </span>
+                            )}
+                            {dnsStatus === 'error' && (
+                                <span style={{ color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-sm)' }}>
+                                    <AlertCircle size={16} /> {dnsMessage}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Activation note */}
+                    {tenant?.custom_domain && (
+                        <p style={{
+                            fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)',
+                            marginTop: 'var(--space-4)', padding: 'var(--space-3)',
+                            background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
+                        }}>
+                            After verifying DNS, please contact ClubForge support to activate your custom domain on the platform.
+                            Your subdomain ({tenant.slug}.clubforgehq.com) will continue to work as a fallback.
+                        </p>
+                    )}
                 </div>
             )}
         </div>

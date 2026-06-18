@@ -28,6 +28,7 @@ export interface Tenant {
   trial_ends_at?: string;
   onboarding_completed: boolean;
   tagline?: string;
+  custom_domain?: string;
   settings: Record<string, unknown>;
   is_active: boolean;
   created_at: string;

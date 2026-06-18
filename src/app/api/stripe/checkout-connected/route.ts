@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         const adminSupabase = await createAdminClient();
         const { data: tenant } = await adminSupabase
             .from('tenants')
-            .select('stripe_account_id, stripe_connect_enabled, name, slug')
+            .select('stripe_account_id, stripe_connect_enabled, name, slug, custom_domain')
             .eq('id', tenantId)
             .single();
 
@@ -101,7 +101,10 @@ export async function POST(request: NextRequest) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://clubforgehq.com`;
         const appDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
         const protocol = appDomain.includes('localhost') ? 'http' : 'https';
-        const tenantBaseUrl = `${protocol}://${tenant.slug}.${appDomain}`;
+        // Use custom domain if available, otherwise subdomain
+        const tenantBaseUrl = tenant.custom_domain
+            ? `https://${tenant.custom_domain}`
+            : `${protocol}://${tenant.slug}.${appDomain}`;
 
         // Use {CHECKOUT_SESSION_ID} template — Stripe replaces this with the actual session ID
         const successUrl = `${appUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}&tenant_id=${tenantId}&account_id=${tenant.stripe_account_id}`;

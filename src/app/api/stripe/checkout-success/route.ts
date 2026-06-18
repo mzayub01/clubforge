@@ -70,11 +70,13 @@ export async function GET(request: NextRequest) {
             const supabaseAdmin = await createAdminClient();
             const { data: tenant } = await supabaseAdmin
                 .from('tenants')
-                .select('slug')
+                .select('slug, custom_domain')
                 .eq('id', sessionTenantId)
                 .single();
 
-            if (tenant?.slug) {
+            if (tenant?.custom_domain) {
+                redirectUrl = `https://${tenant.custom_domain}/dashboard?registered=true&payment=success`;
+            } else if (tenant?.slug) {
                 redirectUrl = `${protocol}://${tenant.slug}.${appDomain}/dashboard?registered=true&payment=success`;
             }
         }

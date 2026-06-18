@@ -200,7 +200,7 @@ export async function middleware(request: NextRequest) {
                 } else {
                     const { data: tenant } = await supabase
                         .from('tenants')
-                        .select('id')
+                        .select('id, custom_domain')
                         .eq('slug', slug)
                         .eq('is_active', true)
                         .single();
@@ -208,6 +208,24 @@ export async function middleware(request: NextRequest) {
                     if (tenant) {
                         rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
                         requestHeaders.set(TENANT_ID_HEADER, tenant.id);
+
+                        // SEO redirect: if tenant has custom_domain and user is on subdomain, redirect
+                        if (tenant.custom_domain && !isCustomDomain) {
+                            const redirectUrl = request.nextUrl.clone();
+                            redirectUrl.host = tenant.custom_domain;
+                            redirectUrl.port = '';
+                            redirectUrl.pathname = '/';
+                            redirectUrl.protocol = 'https';
+                            setCachedDomain(`_slug_${slug}`, {
+                                slug,
+                                tenantId: tenant.id,
+                                customDomain: tenant.custom_domain,
+                                timestamp: Date.now(),
+                            });
+                            return NextResponse.redirect(redirectUrl, 301);
+                        } else {
+                            setCachedDomain(`_slug_${slug}`, null);
+                        }
                     }
                 }
             }
@@ -270,12 +288,30 @@ export async function middleware(request: NextRequest) {
         } else {
             const { data: tenant } = await supabase
                 .from('tenants')
-                .select('id')
+                .select('id, custom_domain')
                 .eq('slug', slug)
                 .eq('is_active', true)
                 .single();
 
             if (tenant) {
+                // SEO redirect: if tenant has custom_domain and user is on subdomain, redirect
+                if (tenant.custom_domain && !isCustomDomain) {
+                    const redirectUrl = request.nextUrl.clone();
+                    redirectUrl.host = tenant.custom_domain;
+                    redirectUrl.port = '';
+                    redirectUrl.protocol = 'https';
+                    setCachedDomain(`_slug_${slug}`, {
+                        slug,
+                        tenantId: tenant.id,
+                        customDomain: tenant.custom_domain,
+                        timestamp: Date.now(),
+                    });
+                    return NextResponse.redirect(redirectUrl, 301);
+                }
+
+                // No custom domain — cache negative result and proceed normally
+                setCachedDomain(`_slug_${slug}`, null);
+
                 // Set tenant ID in response headers for downstream server components
                 response.headers.set(TENANT_ID_HEADER, tenant.id);
                 // Also set on the forwarded request headers

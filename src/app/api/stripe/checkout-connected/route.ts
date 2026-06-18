@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
             membershipTypeId,
         } = body;
 
+        // Trim membership type name — some tenants have names with trailing whitespace
+        const trimmedMembershipTypeName = (membershipTypeName || 'Membership').trim();
+
         console.log('[Checkout-Connected] Request received:', {
             tenantId,
             userId,
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
                     price_data: {
                         currency: 'gbp',
                         product_data: {
-                            name: membershipTypeName || 'Membership',
+                            name: trimmedMembershipTypeName,
                             description: `${tenant.name} — ${locationName || 'Membership'}`,
                         },
                         unit_amount: priceInPence,
@@ -152,7 +155,7 @@ export async function POST(request: NextRequest) {
                 location_id: locationId,
                 tenant_id: tenantId,
                 membership_type_id: membershipTypeId || '',
-                membership_type_name: membershipTypeName,
+                membership_type_name: trimmedMembershipTypeName,
             },
         }, {
             stripeAccount: tenant.stripe_account_id,

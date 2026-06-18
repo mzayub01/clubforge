@@ -130,7 +130,9 @@ function RegisterPageContent() {
 
     // Determine number of steps based on tenant settings
     const hasEtiquette = Boolean(tenant?.settings?.etiquette_text);
-    const totalSteps = hasEtiquette ? 5 : 4;
+    // Step 3 shows agreements (etiquette + waiver combined)
+    // Step 4 (totalSteps) shows membership selection
+    const totalSteps = 4;
     const locationMode = (tenant?.settings?.membership_location_mode as string) || 'per_location';
 
     useEffect(() => {
@@ -570,20 +572,12 @@ function RegisterPageContent() {
     };
 
     // Build step definitions
-    const steps = hasEtiquette
-        ? [
-            { number: 1, title: 'Personal', icon: User },
-            { number: 2, title: 'Contact', icon: Phone },
-            { number: 3, title: 'Agreements', icon: Shield },
-            { number: 4, title: 'Plan', icon: CreditCard },
-            // Extra step for etiquette, but it's merged into step 3
-        ]
-        : [
-            { number: 1, title: 'Personal', icon: User },
-            { number: 2, title: 'Contact', icon: Phone },
-            { number: 3, title: 'Agreements', icon: Shield },
-            { number: 4, title: 'Plan', icon: CreditCard },
-        ];
+    const steps = [
+        { number: 1, title: 'Personal', icon: User },
+        { number: 2, title: 'Contact', icon: Phone },
+        { number: 3, title: 'Agreements', icon: Shield },
+        { number: 4, title: 'Plan', icon: CreditCard },
+    ];
 
     const clubName = tenant?.name || 'Club';
     const accentColor = tenant?.primary_color || '#c5a456';

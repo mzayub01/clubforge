@@ -13,19 +13,26 @@ interface CachedDomain {
     customDomain: string;
     timestamp: number;
 }
-const domainCache = new Map<string, CachedDomain | null>();
+interface NegativeCache {
+    timestamp: number;
+}
+const domainCache = new Map<string, CachedDomain | NegativeCache>();
 const CACHE_TTL_MS = 60_000; // 60 seconds
+
+function isNegativeCache(entry: CachedDomain | NegativeCache): entry is NegativeCache {
+    return !('slug' in entry);
+}
 
 function getCachedDomain(host: string): CachedDomain | null | undefined {
     const entry = domainCache.get(host);
     if (entry === undefined) return undefined; // not cached
-    if (entry === null) {
-        // Negative cache — check TTL
-        return null;
-    }
+    // Check TTL for all entries (positive and negative)
     if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
         domainCache.delete(host);
         return undefined; // expired
+    }
+    if (isNegativeCache(entry)) {
+        return null; // negative cache — not a custom domain
     }
     return entry;
 }
@@ -40,7 +47,8 @@ function setCachedDomain(host: string, value: CachedDomain | null) {
             if (key) domainCache.delete(key);
         }
     }
-    domainCache.set(host, value);
+    // Store negative cache as { timestamp } so TTL works
+    domainCache.set(host, value ?? { timestamp: Date.now() });
 }
 
 export async function middleware(request: NextRequest) {

@@ -77,7 +77,6 @@ export async function middleware(request: NextRequest) {
     let isCustomDomain = false;
 
     if (!slug && hostname !== baseDomain && hostname !== 'localhost') {
-        console.log(`[Middleware] Custom domain check: host=${host}, hostname=${hostname}, baseDomain=${baseDomain}, slug=${slug}`);
         // Check cache first
         const cached = getCachedDomain(hostname);
         if (cached !== undefined) {
@@ -101,14 +100,12 @@ export async function middleware(request: NextRequest) {
             // Query custom_domain column — wrapped in try-catch because the column
             // may not exist yet if the migration hasn't been run
             try {
-                const { data: tenant, error: domainError } = await domainLookupClient
+                const { data: tenant } = await domainLookupClient
                     .from('tenants')
                     .select('id, slug')
                     .eq('custom_domain', hostname)
                     .eq('is_active', true)
                     .single();
-
-                console.log(`[Middleware] Custom domain lookup: hostname=${hostname}, found=${!!tenant}, error=${domainError?.message || 'none'}`);
 
                 if (tenant) {
                     slug = tenant.slug;
@@ -124,8 +121,7 @@ export async function middleware(request: NextRequest) {
                     // Negative cache — this hostname is not a custom domain
                     setCachedDomain(hostname, null);
                 }
-            } catch (err) {
-                console.error(`[Middleware] Custom domain query failed for ${hostname}:`, err);
+            } catch {
                 // custom_domain column likely doesn't exist yet — negative cache
                 setCachedDomain(hostname, null);
             }

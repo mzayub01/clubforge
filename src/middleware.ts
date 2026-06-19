@@ -74,6 +74,7 @@ export async function middleware(request: NextRequest) {
     let isCustomDomain = false;
 
     if (!slug && hostname !== baseDomain && hostname !== `www.${baseDomain}` && hostname !== 'localhost') {
+        console.log(`[Middleware] Custom domain check: host=${host}, hostname=${hostname}, baseDomain=${baseDomain}, slug=${slug}`);
         // Check cache first
         const cached = getCachedDomain(hostname);
         if (cached !== undefined) {
@@ -84,27 +85,27 @@ export async function middleware(request: NextRequest) {
                 isCustomDomain = true;
             }
             // If cached === null, it's a negative cache — not a custom domain, treat as platform
-        } else if (supabaseUrl) {
-            // Cache miss — query the database using service role (bypasses RLS)
-            const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-            if (serviceRoleKey) {
-                const domainLookupClient = createServerClient(supabaseUrl, serviceRoleKey, {
-                    cookies: {
-                        get() { return undefined; },
-                        set() { /* no-op */ },
-                        remove() { /* no-op */ },
-                    },
-                });
+        } else if (supabaseUrl && supabaseKey) {
+            // Cache miss — query the database
+            const domainLookupClient = createServerClient(supabaseUrl, supabaseKey, {
+                cookies: {
+                    get() { return undefined; },
+                    set() { /* no-op */ },
+                    remove() { /* no-op */ },
+                },
+            });
 
             // Query custom_domain column — wrapped in try-catch because the column
             // may not exist yet if the migration hasn't been run
             try {
-                const { data: tenant } = await domainLookupClient
+                const { data: tenant, error: domainError } = await domainLookupClient
                     .from('tenants')
                     .select('id, slug')
                     .eq('custom_domain', hostname)
                     .eq('is_active', true)
                     .single();
+
+                console.log(`[Middleware] Custom domain lookup: hostname=${hostname}, found=${!!tenant}, error=${domainError?.message || 'none'}`);
 
                 if (tenant) {
                     slug = tenant.slug;
@@ -120,11 +121,11 @@ export async function middleware(request: NextRequest) {
                     // Negative cache — this hostname is not a custom domain
                     setCachedDomain(hostname, null);
                 }
-            } catch {
+            } catch (err) {
+                console.error(`[Middleware] Custom domain query failed for ${hostname}:`, err);
                 // custom_domain column likely doesn't exist yet — negative cache
                 setCachedDomain(hostname, null);
             }
-            } // end if (serviceRoleKey)
         }
     }
 

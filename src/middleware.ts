@@ -84,20 +84,22 @@ export async function middleware(request: NextRequest) {
                 isCustomDomain = true;
             }
             // If cached === null, it's a negative cache — not a custom domain, treat as platform
-        } else if (supabaseUrl && supabaseKey) {
-            // Cache miss — query the database
-            const adminSupabase = createServerClient(supabaseUrl, supabaseKey, {
-                cookies: {
-                    get() { return undefined; },
-                    set() { /* no-op */ },
-                    remove() { /* no-op */ },
-                },
-            });
+        } else if (supabaseUrl) {
+            // Cache miss — query the database using service role (bypasses RLS)
+            const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+            if (serviceRoleKey) {
+                const domainLookupClient = createServerClient(supabaseUrl, serviceRoleKey, {
+                    cookies: {
+                        get() { return undefined; },
+                        set() { /* no-op */ },
+                        remove() { /* no-op */ },
+                    },
+                });
 
             // Query custom_domain column — wrapped in try-catch because the column
             // may not exist yet if the migration hasn't been run
             try {
-                const { data: tenant } = await adminSupabase
+                const { data: tenant } = await domainLookupClient
                     .from('tenants')
                     .select('id, slug')
                     .eq('custom_domain', hostname)
@@ -122,6 +124,7 @@ export async function middleware(request: NextRequest) {
                 // custom_domain column likely doesn't exist yet — negative cache
                 setCachedDomain(hostname, null);
             }
+            } // end if (serviceRoleKey)
         }
     }
 

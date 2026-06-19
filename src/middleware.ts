@@ -69,11 +69,14 @@ export async function middleware(request: NextRequest) {
     // is completely untouched above.
     // -----------------------------------------------
     const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'clubforgehq.com';
-    const hostname = host.split(':')[0]; // strip port
+    const rawHostname = host.split(':')[0]; // strip port
+    // Strip www. prefix for custom domain matching (DB stores apex domain)
+    const hostname = rawHostname.startsWith('www.') ? rawHostname.slice(4) : rawHostname;
+    const isWww = rawHostname.startsWith('www.');
     let customDomainTenantId: string | null = null;
     let isCustomDomain = false;
 
-    if (!slug && hostname !== baseDomain && hostname !== `www.${baseDomain}` && hostname !== 'localhost') {
+    if (!slug && hostname !== baseDomain && hostname !== 'localhost') {
         console.log(`[Middleware] Custom domain check: host=${host}, hostname=${hostname}, baseDomain=${baseDomain}, slug=${slug}`);
         // Check cache first
         const cached = getCachedDomain(hostname);
@@ -127,6 +130,15 @@ export async function middleware(request: NextRequest) {
                 setCachedDomain(hostname, null);
             }
         }
+    }
+
+    // Redirect www → apex for custom domains (e.g., www.hameem.uk → hameem.uk)
+    if (isCustomDomain && isWww) {
+        const url = request.nextUrl.clone();
+        url.host = hostname; // apex domain without www
+        url.port = '';
+        url.protocol = 'https';
+        return NextResponse.redirect(url, 301);
     }
 
     // -----------------------------------------------

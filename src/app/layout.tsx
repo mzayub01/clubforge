@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'ClubForge', url: 'https://clubforgehq.com' }],
   creator: 'ClubForge',
   publisher: 'ClubForge',
-  manifest: '/manifest.json',
+  manifest: '/api/manifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

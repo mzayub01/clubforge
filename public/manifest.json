@@ -1,7 +1,7 @@
 {
-    "name": "Sport of Kings",
-    "short_name": "SOK",
-    "description": "BJJ & Martial Arts Training - Seerat Un Nabi",
+    "name": "ClubForge",
+    "short_name": "ClubForge",
+    "description": "Club Management Platform",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#FFFFFF",

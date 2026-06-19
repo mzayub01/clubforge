@@ -63,7 +63,7 @@ export default async function AnnouncementsPage() {
             <div className="dashboard-header">
                 <h1 className="dashboard-title">Announcements</h1>
                 <p className="dashboard-subtitle">
-                    Stay updated with the latest news from ClubForge
+                    Stay updated with the latest news and announcements
                 </p>
             </div>
 

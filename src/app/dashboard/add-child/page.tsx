@@ -391,7 +391,7 @@ export default function AddChildPage() {
                 </button>
                 <h1 className="dashboard-title">Add a Child</h1>
                 <p className="dashboard-subtitle">
-                    Register your child for classes at ClubForge
+                    Register your child for classes
                 </p>
             </div>
 

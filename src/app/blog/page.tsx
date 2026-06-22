@@ -28,11 +28,11 @@ export const blogPosts: BlogPost[] = [
     },
     {
         slug: 'martial-arts-software-uk-guide',
-        title: 'Martial Arts Software UK: The Complete Guide for Club Owners',
-        description: 'Everything UK martial arts club owners need to know about choosing, comparing, and switching to the right management software in 2026.',
+        title: 'Martial Arts Software UK: The Complete Guide for Club Owners (2026)',
+        description: 'The definitive comparison of martial arts club management software in the UK. Compare ClubForge, GymDesk, Zen Planner, Glofox, Mindbody & Kicksite — features, pricing, GDPR compliance, and belt tracking.',
         category: 'Guides',
-        readTime: '12 min read',
-        publishedAt: '2026-05-04',
+        readTime: '18 min read',
+        publishedAt: '2026-06-22',
         featured: true,
     },
     {
@@ -42,6 +42,32 @@ export const blogPosts: BlogPost[] = [
         category: 'Guides',
         readTime: '10 min read',
         publishedAt: '2026-05-04',
+    },
+    {
+        slug: 'karate-club-software-guide',
+        title: 'Best Software for Karate Clubs & Dojos in 2026',
+        description: 'Compare the best karate club software for managing kyu/dan belt progression, class scheduling, student management, and automated billing. A complete guide for UK dojo owners.',
+        category: 'Guides',
+        readTime: '11 min read',
+        publishedAt: '2026-06-22',
+        featured: true,
+    },
+    {
+        slug: 'martial-arts-gym-management-guide',
+        title: 'Complete Guide to Martial Arts Gym Management in 2026',
+        description: 'Everything you need to know about managing a martial arts gym — from membership systems and belt progression to attendance tracking, billing automation, and growth strategies.',
+        category: 'Guides',
+        readTime: '14 min read',
+        publishedAt: '2026-06-22',
+        featured: true,
+    },
+    {
+        slug: 'boxing-gym-software-guide',
+        title: 'Best Boxing Gym Software: Complete Guide for UK Clubs',
+        description: 'Find the best boxing gym software for UK clubs. Compare platforms for session scheduling, membership tiers, payment automation, and attendance tracking.',
+        category: 'Guides',
+        readTime: '12 min read',
+        publishedAt: '2026-06-22',
     },
 ];
 

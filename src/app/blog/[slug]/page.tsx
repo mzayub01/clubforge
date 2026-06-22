@@ -11,6 +11,9 @@ import { notFound } from 'next/navigation';
 import { beltTrackingArticle } from './articles/best-app-to-track-belt-promotions';
 import { martialArtsSoftwareUKArticle } from './articles/martial-arts-software-uk-guide';
 import { gymSoftwareCostArticle } from './articles/how-much-does-gym-management-software-cost';
+import { karateClubSoftwareArticle } from './articles/karate-club-software-guide';
+import { martialArtsGymManagementArticle } from './articles/martial-arts-gym-management-guide';
+import { boxingGymSoftwareArticle } from './articles/boxing-gym-software-guide';
 
 interface ArticleData {
     content: React.ReactNode;
@@ -21,6 +24,9 @@ const articleRegistry: Record<string, ArticleData> = {
     'best-app-to-track-belt-promotions': beltTrackingArticle,
     'martial-arts-software-uk-guide': martialArtsSoftwareUKArticle,
     'how-much-does-gym-management-software-cost': gymSoftwareCostArticle,
+    'karate-club-software-guide': karateClubSoftwareArticle,
+    'martial-arts-gym-management-guide': martialArtsGymManagementArticle,
+    'boxing-gym-software-guide': boxingGymSoftwareArticle,
 };
 
 export async function generateStaticParams() {

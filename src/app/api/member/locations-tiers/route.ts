@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
             .or('is_multisite.is.null,is_multisite.eq.false');
 
         return NextResponse.json({
+            tenantId,
             locations: locations || [],
             tiers: tiers || [],
         });

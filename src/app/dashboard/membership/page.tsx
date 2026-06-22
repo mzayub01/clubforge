@@ -48,10 +48,10 @@ function CompletePaymentFlow({ profile, userId }: { profile: Profile | null; use
     const [locations, setLocations] = useState<LocationWithTiers[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string>('');
     const [selectedTier, setSelectedTier] = useState<string>('');
+    const [tenantId, setTenantId] = useState<string>('');
     const [loading, setLoading] = useState(true);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [error, setError] = useState('');
-    const supabase = getSupabaseClient();
 
     useEffect(() => {
         fetchLocationsAndTiers();
@@ -64,7 +64,9 @@ function CompletePaymentFlow({ profile, userId }: { profile: Profile | null; use
             if (!response.ok) {
                 throw new Error('Failed to fetch locations');
             }
-            const { locations: locationsData, tiers: tiersData } = await response.json();
+            const { tenantId: tid, locations: locationsData, tiers: tiersData } = await response.json();
+
+            if (tid) setTenantId(tid);
 
             if (locationsData && tiersData) {
                 // Group tiers by location
@@ -93,32 +95,38 @@ function CompletePaymentFlow({ profile, userId }: { profile: Profile | null; use
             return;
         }
 
+        if (!tenantId) {
+            setError('Unable to determine your club. Please refresh and try again.');
+            return;
+        }
+
         setCheckoutLoading(true);
         setError('');
 
         try {
-            const selectedTierData = locations
-                .find(l => l.id === selectedLocation)?.tiers
-                .find(t => t.id === selectedTier);
+            const selectedLocationData = locations.find(l => l.id === selectedLocation);
+            const selectedTierData = selectedLocationData?.tiers.find(t => t.id === selectedTier);
 
-            if (!selectedTierData?.stripe_price_id) {
-                setError('This membership tier is not configured for online payment. Please contact support.');
+            if (!selectedTierData) {
+                setError('Selected membership tier not found. Please try again.');
                 setCheckoutLoading(false);
                 return;
             }
 
-            // Call checkout API
-            const response = await fetch('/api/stripe/checkout', {
+            // Use connected checkout (tenant's Stripe account) instead of platform checkout
+            const response = await fetch('/api/stripe/checkout-connected', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    tenantId,
                     locationId: selectedLocation,
+                    locationName: selectedLocationData?.name || '',
                     membershipTypeId: selectedTier,
-                    priceId: selectedTierData.stripe_price_id,
                     userId: userId,
                     userEmail: profile?.email,
                     membershipTypeName: selectedTierData.name,
                     price: selectedTierData.price,
+                    cancelPath: '/dashboard/membership',
                 }),
             });
 

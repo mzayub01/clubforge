@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
             userEmail,
             tenantId,
             membershipTypeId,
+            cancelPath,
         } = body;
 
         // Trim membership type name — some tenants have names with trailing whitespace
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
                 },
             },
             success_url: successUrl,
-            cancel_url: `${tenantBaseUrl}/register?payment=cancelled`,
+            cancel_url: `${tenantBaseUrl}${cancelPath || '/register?payment=cancelled'}`,
             metadata: {
                 user_id: userId,
                 location_id: locationId,

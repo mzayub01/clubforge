@@ -1,10 +1,15 @@
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import DashboardSidebar from '@/components/dashboard/Sidebar';
 import BottomNav from '@/components/dashboard/BottomNav';
 import { DashboardProvider } from '@/components/dashboard/DashboardProvider';
 import { getTenantId } from '@/lib/tenant';
 import { ThemeProvider } from '@/lib/theme-provider';
+
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
 
 export default async function DashboardLayout({
     children,

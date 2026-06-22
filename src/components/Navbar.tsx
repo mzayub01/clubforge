@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
-import PromoBanner from './PromoBanner';
 
 interface NavbarProps {
     user?: {
@@ -62,7 +61,6 @@ export default function Navbar({ user }: NavbarProps) {
 
     return (
         <div style={{ position: 'sticky', top: 0, zIndex: 100 }}>
-        {!user && <PromoBanner />}
         <nav
             className="navbar"
             style={{

@@ -138,19 +138,13 @@ export default function AddChildPage() {
 
             setParentMembership(membership);
 
-            // Get locations
-            const { data: locs } = await supabase
-                .from('locations')
-                .select('id, name')
-                .eq('is_active', true);
-            setLocations(locs || []);
-
-            // Get membership types for kids
-            const { data: types } = await supabase
-                .from('membership_types')
-                .select('id, name, price, location_id')
-                .eq('is_active', true);
-            setMembershipTypes(types || []);
+            // Get locations and membership types via server-side API (bypasses RLS)
+            const locTiersRes = await fetch('/api/member/locations-tiers');
+            if (locTiersRes.ok) {
+                const { locations: locs, tiers: types } = await locTiersRes.json();
+                setLocations(locs || []);
+                setMembershipTypes(types || []);
+            }
 
             // Determine source of guardian details to pre-fill
             if (userProfile?.is_child === false) {

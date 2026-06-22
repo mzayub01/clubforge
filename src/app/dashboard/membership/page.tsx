@@ -59,19 +59,12 @@ function CompletePaymentFlow({ profile, userId }: { profile: Profile | null; use
 
     const fetchLocationsAndTiers = async () => {
         try {
-            // Fetch active locations
-            const { data: locationsData } = await supabase
-                .from('locations')
-                .select('id, name')
-                .eq('is_active', true)
-                .order('name');
-
-            // Fetch membership types (non-multisite tiers)
-            const { data: tiersData } = await supabase
-                .from('membership_types')
-                .select('id, name, price, description, stripe_price_id, location_id')
-                .eq('is_active', true)
-                .or('is_multisite.is.null,is_multisite.eq.false');
+            // Use server-side API to bypass RLS (client queries can't resolve tenant context)
+            const response = await fetch('/api/member/locations-tiers');
+            if (!response.ok) {
+                throw new Error('Failed to fetch locations');
+            }
+            const { locations: locationsData, tiers: tiersData } = await response.json();
 
             if (locationsData && tiersData) {
                 // Group tiers by location

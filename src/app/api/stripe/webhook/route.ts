@@ -202,7 +202,14 @@ export async function POST(request: NextRequest) {
                         subject = `Booking Confirmed: ${eventData.title}`;
                     }
 
-                    await sendEmail({ to: userEmail, subject, html });
+                    const fromName = branding?.name || 'ClubForge';
+                    await sendEmail({
+                        to: userEmail,
+                        subject,
+                        html,
+                        from: `${fromName} <noreply@clubforgehq.com>`,
+                        replyTo: branding?.contactEmail,
+                    });
                     console.log('Event confirmation email sent to:', userEmail);
                 }
             } catch (emailErr) {
@@ -446,7 +453,14 @@ export async function POST(request: NextRequest) {
                             subject = `Your ${branding?.name || 'ClubForge'} Membership is Now Active!`;
                         }
 
-                        await sendEmail({ to: profileData.email, subject, html });
+                        const fromName = branding?.name || 'ClubForge';
+                        await sendEmail({
+                            to: profileData.email,
+                            subject,
+                            html,
+                            from: `${fromName} <noreply@clubforgehq.com>`,
+                            replyTo: branding?.contactEmail,
+                        });
                         console.log('Membership activation email sent to:', profileData.email);
                     }
                 } catch (emailErr) {
@@ -553,7 +567,14 @@ export async function POST(request: NextRequest) {
                         subject = `Action Required: Payment Failed for Your Membership`;
                     }
 
-                    await sendEmail({ to: customerEmail, subject, html });
+                    const fromName = branding?.name || 'ClubForge';
+                    await sendEmail({
+                        to: customerEmail,
+                        subject,
+                        html,
+                        from: `${fromName} <noreply@clubforgehq.com>`,
+                        replyTo: branding?.contactEmail,
+                    });
                     console.log('Payment failed email sent to:', customerEmail);
                 } catch (emailErr) {
                     console.error('Failed to send payment failed email:', emailErr);

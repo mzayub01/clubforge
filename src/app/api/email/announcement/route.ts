@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
-import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
@@ -30,6 +30,9 @@ export async function POST(request: NextRequest) {
         // Use admin client to fetch all members
         const supabaseAdmin = createAdminClient();
 
+        // Get tenant branding for email personalisation
+        const branding = auth.tenantId ? await getTenantBranding(auth.tenantId) : null;
+        const fromName = branding?.name || 'ClubForge';
 
         // Build query to get members
         // Start with active memberships
@@ -111,7 +114,7 @@ export async function POST(request: NextRequest) {
                     announcementMessage: safeMessage.replace(/\n/g, '<br>'),
                 };
 
-                const emailContent = await renderEmailFromDatabase('announcement_notification', templateData);
+                const emailContent = await renderEmailFromDatabase('announcement_notification', templateData, auth.tenantId || undefined, branding || undefined);
 
                 if (!emailContent) {
                     // Fallback if template not in database
@@ -121,12 +124,14 @@ export async function POST(request: NextRequest) {
         <p>We have an important announcement:</p>
             <h2>${safeTitle}</h2>
                 <p>${safeMessage.replace(/\n/g, '<br>')}</p>
-                    <p>Best regards,<br>The ClubForge Team</p>
+                    <p>Best regards,<br>${fromName}</p>
                         `;
                     const result = await sendEmail({
                         to: recipient.email,
                         subject: fallbackSubject,
                         html: fallbackHtml,
+                        from: `${fromName} <noreply@clubforgehq.com>`,
+                        replyTo: branding?.contactEmail,
                     });
 
                     if (result.success) {
@@ -140,6 +145,8 @@ export async function POST(request: NextRequest) {
                         to: recipient.email,
                         subject: emailContent.subject,
                         html: emailContent.html,
+                        from: `${fromName} <noreply@clubforgehq.com>`,
+                        replyTo: branding?.contactEmail,
                     });
 
                     if (result.success) {

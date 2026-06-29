@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { renderWelcomeEmail } from '@/lib/email-templates';
-import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { checkRateLimit, escapeHtml, safeErrorResponse } from '@/lib/auth-guard';
 import { createClient } from '@/lib/supabase/server';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -39,18 +40,22 @@ export async function POST(request: NextRequest) {
         const safeLocation = escapeHtml(locationName || 'ClubForge');
         const safeMembership = escapeHtml(membershipType || 'Member');
 
-        // Try to get template from database first
+        // Get tenant context for branding
+        const tenantId = await getTenantId();
+        const branding = tenantId ? await getTenantBranding(tenantId) : null;
+
+        // Try to get template from database first (with tenant context)
         const dbTemplate = await renderEmailFromDatabase('welcome', {
             firstName: safeName,
             locationName: safeLocation,
             membershipType: safeMembership,
-        });
+        }, tenantId || undefined, branding || undefined);
 
         let html: string;
         let subject: string;
 
         if (dbTemplate) {
-            // Use database template
+            // Use database template (tenant-branded)
             html = dbTemplate.html;
             subject = dbTemplate.subject;
         } else {
@@ -60,14 +65,19 @@ export async function POST(request: NextRequest) {
                 locationName: safeLocation,
                 membershipType: safeMembership,
             });
-            subject = `Welcome to ClubForge, ${safeName}!`;
+            subject = `Welcome to ${branding?.name || 'ClubForge'}, ${safeName}!`;
         }
+
+        // Use tenant name in the from address
+        const fromName = branding?.name || 'ClubForge';
 
         // Send the email
         const result = await sendEmail({
             to: email,
             subject,
             html,
+            from: `${fromName} <noreply@clubforgehq.com>`,
+            replyTo: branding?.contactEmail,
         });
 
         if (!result.success) {

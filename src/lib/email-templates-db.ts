@@ -20,6 +20,7 @@ export interface TenantBranding {
     logoUrl?: string;
     primaryColor?: string;
     websiteUrl?: string;
+    contactEmail?: string;
 }
 
 /**
@@ -239,7 +240,7 @@ export async function getTenantBranding(tenantId: string): Promise<TenantBrandin
 
     const { data: tenant } = await supabase
         .from('tenants')
-        .select('name, logo_url, primary_color, slug')
+        .select('name, logo_url, primary_color, slug, contact_email')
         .eq('id', tenantId)
         .single();
 
@@ -250,5 +251,6 @@ export async function getTenantBranding(tenantId: string): Promise<TenantBrandin
         logoUrl: tenant.logo_url || undefined,
         primaryColor: tenant.primary_color || undefined,
         websiteUrl: tenant.slug ? `https://${tenant.slug}.clubforgehq.com` : undefined,
+        contactEmail: tenant.contact_email || undefined,
     };
 }

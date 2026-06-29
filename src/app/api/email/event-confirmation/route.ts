@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import { renderEventConfirmationEmail } from '@/lib/email-templates';
-import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
+import { getTenantId } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -40,7 +41,12 @@ export async function POST(request: NextRequest) {
             // Keep original if parsing fails
         }
 
-        // Try to get template from database first
+        // Get tenant context for branding
+        const tenantId = await getTenantId();
+        const branding = tenantId ? await getTenantBranding(tenantId) : null;
+        const fromName = branding?.name || 'ClubForge';
+
+        // Try to get template from database first (with tenant context)
         const dbTemplate = await renderEmailFromDatabase('event_confirmation', {
             firstName: firstName || 'Guest',
             eventTitle,
@@ -49,13 +55,13 @@ export async function POST(request: NextRequest) {
             eventLocation: eventLocation || 'TBC',
             ticketType: 'General Admission',
             amountPaid: amountPaid || 'Free',
-        });
+        }, tenantId || undefined, branding || undefined);
 
         let html: string;
         let subject: string;
 
         if (dbTemplate) {
-            // Use database template
+            // Use database template (tenant-branded)
             html = dbTemplate.html;
             subject = dbTemplate.subject;
         } else {
@@ -71,11 +77,13 @@ export async function POST(request: NextRequest) {
             subject = `Booking Confirmed: ${eventTitle}`;
         }
 
-        // Send the email
+        // Send the email with tenant-branded from address
         const result = await sendEmail({
             to: email,
             subject,
             html,
+            from: `${fromName} <noreply@clubforgehq.com>`,
+            replyTo: branding?.contactEmail,
         });
 
         if (!result.success) {

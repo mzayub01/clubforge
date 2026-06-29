@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripeClient } from '@/lib/stripe';
+import { sendEmail } from '@/lib/email';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { calculateTrialEndDate } from '@/lib/trial';
 import { getStripePriceId, TRIAL_DURATION_DAYS } from '@/lib/stripe-plans';
 import { rateLimit } from '@/lib/rate-limit';
@@ -464,7 +466,60 @@ export async function POST(request: NextRequest) {
             }
 
             // -----------------------------------------------
-            // 8. Return success
+            // 8. Send welcome email to new club owner
+            // -----------------------------------------------
+            try {
+                const branding = await getTenantBranding(tenant.id);
+                const fromName = branding?.name || 'ClubForge';
+
+                const dbTemplate = await renderEmailFromDatabase('owner_welcome', {
+                    firstName: body.firstName,
+                    clubName: body.clubName,
+                    plan: body.plan.charAt(0).toUpperCase() + body.plan.slice(1),
+                }, tenant.id, branding || undefined);
+
+                let html: string;
+                let subject: string;
+
+                if (dbTemplate) {
+                    html = dbTemplate.html;
+                    subject = dbTemplate.subject;
+                } else {
+                    subject = `Welcome to ClubForge, ${body.firstName}! Your club is ready 🎉`;
+                    html = `
+                        <div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                            <h1 style="color: #1a1a1a; font-size: 24px;">Welcome to ClubForge! 🎉</h1>
+                            <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">Hi ${body.firstName},</p>
+                            <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">Your club <strong>${body.clubName}</strong> is now set up and ready to go on the <strong>${body.plan.charAt(0).toUpperCase() + body.plan.slice(1)}</strong> plan.</p>
+                            <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">Here's what to do next:</p>
+                            <ol style="color: #4a4a4a; font-size: 16px; line-height: 2;">
+                                <li>Log in to your admin dashboard</li>
+                                <li>Set up your locations and class schedule</li>
+                                <li>Add your membership tiers and pricing</li>
+                                <li>Connect Stripe to start accepting payments</li>
+                                <li>Share your registration link with members</li>
+                            </ol>
+                            <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">If you need any help, just reply to this email.</p>
+                            <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The ClubForge Team</strong></p>
+                        </div>
+                    `;
+                }
+
+                await sendEmail({
+                    to: body.email,
+                    subject,
+                    html,
+                    from: `ClubForge <noreply@clubforgehq.com>`,
+                    replyTo: body.clubEmail || undefined,
+                });
+                console.log('[Onboard] Welcome email sent to:', body.email);
+            } catch (emailErr) {
+                // Non-fatal — don't fail onboarding if email fails
+                console.error('[Onboard] Welcome email error (non-fatal):', emailErr);
+            }
+
+            // -----------------------------------------------
+            // 9. Return success
             // -----------------------------------------------
             return NextResponse.json({
                 success: true,

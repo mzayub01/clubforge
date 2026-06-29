@@ -9,6 +9,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getStripeClient } from '@/lib/stripe';
+import { sendEmail } from '@/lib/email';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
+import { renderWelcomeEmail } from '@/lib/email-templates';
 
 export async function GET(request: NextRequest) {
     const sessionId = request.nextUrl.searchParams.get('session_id');
@@ -156,6 +159,69 @@ export async function GET(request: NextRequest) {
                 .from('profiles')
                 .update({ stripe_customer_id: session.customer as string })
                 .eq('user_id', userId);
+        }
+
+        // 5. Send welcome email (fire-and-forget — don't block redirect)
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('first_name, email')
+                .eq('user_id', userId)
+                .single();
+
+            if (profile?.email) {
+                const branding = sessionTenantId ? await getTenantBranding(sessionTenantId) : null;
+                const fromName = branding?.name || 'ClubForge';
+                const firstName = profile.first_name || 'Member';
+
+                // Look up location and membership type names
+                const { data: locationData } = await supabase
+                    .from('locations')
+                    .select('name')
+                    .eq('id', locationId)
+                    .single();
+
+                const { data: membershipTypeData } = membershipTypeId
+                    ? await supabase
+                        .from('membership_types')
+                        .select('name')
+                        .eq('id', membershipTypeId)
+                        .single()
+                    : { data: null };
+
+                const locationName = locationData?.name || 'the club';
+                const membershipName = membershipTypeData?.name || 'Member';
+
+                // Try DB template first, fallback to static
+                const dbTemplate = await renderEmailFromDatabase('welcome', {
+                    firstName,
+                    locationName,
+                    membershipType: membershipName,
+                }, sessionTenantId, branding || undefined);
+
+                let html: string;
+                let subject: string;
+
+                if (dbTemplate) {
+                    html = dbTemplate.html;
+                    subject = dbTemplate.subject;
+                } else {
+                    html = renderWelcomeEmail({ firstName, locationName, membershipType: membershipName });
+                    subject = `Welcome to ${fromName}, ${firstName}!`;
+                }
+
+                await sendEmail({
+                    to: profile.email,
+                    subject,
+                    html,
+                    from: `${fromName} <noreply@clubforgehq.com>`,
+                    replyTo: branding?.contactEmail,
+                });
+                console.log('[Checkout-Success] Welcome email sent to:', profile.email);
+            }
+        } catch (emailErr) {
+            // Non-fatal — don't block redirect if email fails
+            console.error('[Checkout-Success] Welcome email error (non-fatal):', emailErr);
         }
 
         console.log('[Checkout-Success] All DB updates complete. Redirecting to dashboard.');

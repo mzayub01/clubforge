@@ -49,6 +49,14 @@ export async function POST(request: NextRequest) {
         let profileImageUrl = existingImageUrl || null;
         if (imageFile) {
             const supabaseAdmin = createAdminClient();
+
+            // Ensure the avatars bucket exists (auto-create if missing)
+            const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+            if (!buckets?.find(b => b.id === 'avatars')) {
+                await supabaseAdmin.storage.createBucket('avatars', { public: true });
+                console.log('[add-child] Created missing "avatars" storage bucket');
+            }
+
             const fileExt = imageFile.name.split('.').pop() || 'jpg';
             const fileName = `child_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
             const filePath = `profile-images/${fileName}`;

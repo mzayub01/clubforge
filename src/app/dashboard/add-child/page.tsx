@@ -149,13 +149,12 @@ export default function AddChildPage() {
             // Determine source of guardian details to pre-fill
             if (userProfile?.is_child === false) {
                 // Case 1: Active user is a Guardian -> Check for existing children to inherit from
-                const { data: existingChild } = await supabase
-                    .from('profiles')
-                    .select('phone, address, city, postcode, emergency_contact_name, emergency_contact_phone')
-                    .eq('parent_guardian_id', userProfile.id)
-                    .eq('is_child', true)
-                    .limit(1)
-                    .single();
+                const childrenRes = await fetch('/api/member/children');
+                let existingChild: any = null;
+                if (childrenRes.ok) {
+                    const childrenJson = await childrenRes.json();
+                    existingChild = childrenJson.children && childrenJson.children.length > 0 ? childrenJson.children[0] : null;
+                }
 
                 if (existingChild) {
                     setFormData(prev => ({

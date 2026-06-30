@@ -96,11 +96,13 @@ export default function DashboardContent() {
             }
 
             // Fetch attendance count for selected user
-            const { count } = await supabase
-                .from('attendance')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', selectedProfileId);
-            setAttendanceCount(count || 0);
+            const attendanceRes = await fetch(`/api/member/attendance-count?userId=${selectedProfileId}`);
+            if (attendanceRes.ok) {
+                const attendanceJson = await attendanceRes.json();
+                setAttendanceCount(attendanceJson.count || 0);
+            } else {
+                setAttendanceCount(0);
+            }
 
             // Fetch membership via API (handles parent→child RLS bypass)
             const membershipRes = await fetch(`/api/member/memberships?userId=${selectedProfileId}`);

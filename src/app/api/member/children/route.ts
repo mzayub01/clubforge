@@ -33,7 +33,7 @@ export async function GET() {
         // Fetch children linked to this parent
         const { data: children } = await supabaseAdmin
             .from('profiles')
-            .select('id, user_id, first_name, last_name, profile_image_url')
+            .select('id, user_id, first_name, last_name, profile_image_url, phone, address, city, postcode, emergency_contact_name, emergency_contact_phone')
             .eq('parent_guardian_id', parentProfile.id)
             .eq('is_child', true);
 

@@ -64,9 +64,34 @@ export async function POST(request: NextRequest) {
         }
 
         // Security: the authenticated user must match the userId in the body
+        // OR be the parent/guardian of the target user (parent paying for child)
         if (user.id !== userId) {
-            console.error('[Checkout-Connected] User mismatch:', { authUserId: user.id, bodyUserId: userId });
-            return NextResponse.json({ error: 'Forbidden: User mismatch' }, { status: 403 });
+            const parentCheckClient = await createAdminClient();
+
+            // Check if the authenticated user is the parent of the target user
+            const { data: parentProfile } = await parentCheckClient
+                .from('profiles')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_child', false)
+                .single();
+
+            const { data: childProfile } = parentProfile
+                ? await parentCheckClient
+                    .from('profiles')
+                    .select('id')
+                    .eq('user_id', userId)
+                    .eq('parent_guardian_id', parentProfile.id)
+                    .eq('is_child', true)
+                    .single()
+                : { data: null };
+
+            if (!childProfile) {
+                console.error('[Checkout-Connected] User mismatch and not parent-child:', { authUserId: user.id, bodyUserId: userId });
+                return NextResponse.json({ error: 'Forbidden: User mismatch' }, { status: 403 });
+            }
+
+            console.log('[Checkout-Connected] Parent paying for child:', { parentId: user.id, childUserId: userId });
         }
 
         // Get tenant's connected Stripe account

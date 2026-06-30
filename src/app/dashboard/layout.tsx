@@ -86,7 +86,12 @@ export default async function DashboardLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
     const profileImageUrl = profile?.profile_image_url || undefined;
-    const hasParentMembership = hasAnyActiveMembership;
+    // hasParentMembership = parent's OWN membership (false for guardians)
+    // This controls the default profile in DashboardProvider:
+    // - true → default to parent's profile
+    // - false → default to first child's profile
+    const hasParentMembership = !!parentMembership;
+    const isGuardianOnly = !parentMembership && (childProfiles?.length || 0) > 0;
 
     return (
         <ThemeProvider
@@ -105,6 +110,7 @@ export default async function DashboardLayout({
                 }}
                 initialChildren={childProfiles || []}
                 initialHasParentMembership={hasParentMembership}
+                isGuardianOnly={isGuardianOnly}
                 beltProgressEnabled={beltProgressEnabled}
             >
                 <div className="dashboard-layout">

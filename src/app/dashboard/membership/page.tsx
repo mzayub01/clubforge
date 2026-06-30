@@ -296,7 +296,7 @@ export default function MembershipPage() {
     const [memberships, setMemberships] = useState<Membership[]>([]);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
-    const { selectedProfileId } = useDashboard();
+    const { selectedProfileId, isGuardianOnly, children, parentProfile, setSelectedProfileId } = useDashboard();
 
     useEffect(() => {
         if (selectedProfileId) {
@@ -393,6 +393,9 @@ export default function MembershipPage() {
         return <span className="badge badge-gray">{status}</span>;
     };
 
+    // Check if viewing guardian's own profile (no membership expected)
+    const isViewingOwnGuardianProfile = isGuardianOnly && parentProfile && selectedProfileId === parentProfile.user_id;
+
     if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
@@ -408,7 +411,29 @@ export default function MembershipPage() {
                 <p className="dashboard-subtitle">View and manage your membership subscriptions</p>
             </div>
 
-            {memberships.length === 0 ? (
+            {isViewingOwnGuardianProfile ? (
+                <div className="card" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                    <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>👨‍👧‍👦</div>
+                    <h3 style={{ margin: '0 0 var(--space-2) 0' }}>Guardian Account</h3>
+                    <p style={{ color: 'var(--text-secondary)', margin: '0 0 var(--space-4) 0' }}>
+                        This is your guardian profile. To view membership details, switch to a child&apos;s profile using the profile switcher above.
+                    </p>
+                    {children.length > 0 && (
+                        <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            {children.map(child => (
+                                <button
+                                    key={child.user_id}
+                                    className="btn btn-primary"
+                                    onClick={() => setSelectedProfileId(child.user_id)}
+                                    style={{ fontSize: 'var(--text-sm)' }}
+                                >
+                                    View {child.first_name}&apos;s Membership
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : memberships.length === 0 ? (
                 <CompletePaymentFlow profile={profile} userId={selectedProfileId} />
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>

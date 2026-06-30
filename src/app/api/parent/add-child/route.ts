@@ -216,26 +216,8 @@ export async function POST(request: NextRequest) {
                     await supabaseAdmin.from('attendance_records').update({ student_id: newChildProfile.id }).eq('student_id', currentChildProfile.id);
                     await supabaseAdmin.from('class_bookings').update({ student_id: newChildProfile.id }).eq('student_id', currentChildProfile.id);
 
-                    // Clone membership for migrated child (DON'T move — parent keeps theirs)
-                    const { data: parentMemberships } = await supabaseAdmin
-                        .from('memberships')
-                        .select('*')
-                        .eq('user_id', user.id);
-
-                    if (parentMemberships && parentMemberships.length > 0) {
-                        for (const mem of parentMemberships) {
-                            await supabaseAdmin.from('memberships').insert({
-                                user_id: childAuth.user.id,
-                                location_id: mem.location_id,
-                                membership_type_id: mem.membership_type_id,
-                                status: mem.status,
-                                start_date: mem.start_date,
-                                end_date: mem.end_date,
-                                stripe_subscription_id: mem.stripe_subscription_id,
-                                tenant_id: mem.tenant_id,
-                            });
-                        }
-                    }
+                    // Move membership to child (parent is a guardian, not a training member)
+                    await supabaseAdmin.from('memberships').update({ user_id: childAuth.user.id }).eq('user_id', user.id);
 
                     // Create tenant_members record for the migrated child
                     if (tenantId) {

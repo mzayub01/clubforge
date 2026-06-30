@@ -296,7 +296,6 @@ export default function MembershipPage() {
     const [memberships, setMemberships] = useState<Membership[]>([]);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
-    const supabase = getSupabaseClient();
     const { selectedProfileId } = useDashboard();
 
     useEffect(() => {
@@ -310,35 +309,33 @@ export default function MembershipPage() {
 
         setLoading(true);
 
-        // selectedProfileId is actually the user_id from DashboardProvider
         // Fetch profile for selected user
-        const { data: profileData } = await supabase
-            .from('profiles')
-            .select('id, first_name, last_name, email, stripe_customer_id')
-            .eq('user_id', selectedProfileId)
-            .single();
+        // Use API for child profiles (RLS blocks parent from seeing child profiles)
+        const supabase = getSupabaseClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const isViewingChild = user && selectedProfileId !== user.id;
 
-        if (profileData) {
-            setProfile(profileData);
+        if (isViewingChild) {
+            // Fetch child profile via admin-backed query
+            const profileRes = await fetch(`/api/member/profile?userId=${selectedProfileId}`);
+            if (profileRes.ok) {
+                const profileJson = await profileRes.json();
+                setProfile(profileJson.profile || null);
+            }
+        } else {
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, email, stripe_customer_id')
+                .eq('user_id', selectedProfileId)
+                .single();
+            if (profileData) setProfile(profileData);
         }
 
-        // Fetch memberships - memberships are linked directly to user_id
-        const { data: membershipData } = await supabase
-            .from('memberships')
-            .select(`
-                id,
-                status,
-                start_date,
-                stripe_subscription_id,
-                created_at,
-                location:locations(id, name),
-                membership_type:membership_types(id, name, price, description)
-            `)
-            .eq('user_id', selectedProfileId)
-            .order('created_at', { ascending: false });
-
-        if (membershipData) {
-            setMemberships(membershipData as Membership[]);
+        // Fetch memberships via API (handles parent→child RLS bypass)
+        const membershipRes = await fetch(`/api/member/memberships?userId=${selectedProfileId}`);
+        if (membershipRes.ok) {
+            const membershipJson = await membershipRes.json();
+            setMemberships(membershipJson.memberships || []);
         } else {
             setMemberships([]);
         }

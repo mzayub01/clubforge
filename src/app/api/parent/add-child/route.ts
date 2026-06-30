@@ -212,10 +212,40 @@ export async function POST(request: NextRequest) {
                         throw new Error('Failed to create migrated child profile: ' + profileError.message);
                     }
 
-                    // 3. Move Linked Data
+                    // 3. Move Linked Data (attendance/bookings belong to the child)
                     await supabaseAdmin.from('attendance_records').update({ student_id: newChildProfile.id }).eq('student_id', currentChildProfile.id);
                     await supabaseAdmin.from('class_bookings').update({ student_id: newChildProfile.id }).eq('student_id', currentChildProfile.id);
-                    await supabaseAdmin.from('memberships').update({ user_id: childAuth.user.id }).eq('user_id', user.id);
+
+                    // Clone membership for migrated child (DON'T move — parent keeps theirs)
+                    const { data: parentMemberships } = await supabaseAdmin
+                        .from('memberships')
+                        .select('*')
+                        .eq('user_id', user.id);
+
+                    if (parentMemberships && parentMemberships.length > 0) {
+                        for (const mem of parentMemberships) {
+                            await supabaseAdmin.from('memberships').insert({
+                                user_id: childAuth.user.id,
+                                location_id: mem.location_id,
+                                membership_type_id: mem.membership_type_id,
+                                status: mem.status,
+                                start_date: mem.start_date,
+                                end_date: mem.end_date,
+                                stripe_subscription_id: mem.stripe_subscription_id,
+                                tenant_id: mem.tenant_id,
+                            });
+                        }
+                    }
+
+                    // Create tenant_members record for the migrated child
+                    if (tenantId) {
+                        await supabaseAdmin.from('tenant_members').insert({
+                            tenant_id: tenantId,
+                            user_id: childAuth.user.id,
+                            role: 'member',
+                            is_active: true,
+                        });
+                    }
 
                     // 4. Convert Original Profile to Guardian
                     // Restore Guardian Details from Auth Metadata (saved during registration)
@@ -358,6 +388,16 @@ export async function POST(request: NextRequest) {
                 { error: 'Failed to create membership', details: membershipError.message },
                 { status: 500 }
             );
+        }
+
+        // Create tenant_members record for the child (required for RLS)
+        if (tenantId) {
+            await supabaseAdmin.from('tenant_members').insert({
+                tenant_id: tenantId,
+                user_id: childAuth.user.id,
+                role: 'member',
+                is_active: true,
+            });
         }
 
         return NextResponse.json({

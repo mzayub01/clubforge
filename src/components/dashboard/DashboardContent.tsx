@@ -240,7 +240,7 @@ export default function DashboardContent() {
                     </div>
                 </div>
 
-                {membership && (
+                {membership && membership.status === 'active' && (
                     <div className="stat-card glass-card">
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>

@@ -41,7 +41,8 @@ export default async function DashboardLayout({
         .select('id, user_id, first_name, last_name, profile_image_url')
         .eq('parent_guardian_id', profile?.id || '');
 
-    // Check if parent has an active membership
+    // Parent's OWN active membership — controls the default profile and the
+    // membership stat card (i.e. a member who has actually paid).
     const { data: parentMembership } = await supabase
         .from('memberships')
         .select('id')
@@ -49,19 +50,16 @@ export default async function DashboardLayout({
         .eq('status', 'active')
         .single();
 
-    // If parent has no membership, check if any child has one (guardian scenario)
-    let hasAnyActiveMembership = !!parentMembership;
-    if (!hasAnyActiveMembership && childProfiles && childProfiles.length > 0) {
-        const childUserIds = childProfiles.map(c => c.user_id);
-        const { data: childMembership } = await supabaseAdmin
-            .from('memberships')
-            .select('id')
-            .in('user_id', childUserIds)
-            .eq('status', 'active')
-            .limit(1)
-            .single();
-        hasAnyActiveMembership = !!childMembership;
-    }
+    // Does the parent have ANY membership row of their own, regardless of status?
+    // This distinguishes a *pure guardian* (no membership at all) from a member
+    // whose own payment is still pending. A pending member must keep their
+    // "complete payment" banner, so they must NOT be treated as guardian-only.
+    const { data: parentAnyMembership } = await supabase
+        .from('memberships')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .single();
 
     // Get tenant info for sidebar + theming
     const tenantId = await getTenantId();
@@ -86,12 +84,15 @@ export default async function DashboardLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
     const profileImageUrl = profile?.profile_image_url || undefined;
-    // hasParentMembership = parent's OWN membership (false for guardians)
+    // hasParentMembership = parent's OWN active membership (false for guardians)
     // This controls the default profile in DashboardProvider:
     // - true → default to parent's profile
     // - false → default to first child's profile
     const hasParentMembership = !!parentMembership;
-    const isGuardianOnly = !parentMembership && (childProfiles?.length || 0) > 0;
+    // isGuardianOnly = parent has NO membership row of their own AND has children.
+    // Keyed off "any membership" (not active-only) so a parent with a *pending*
+    // membership is still treated as a member and keeps their own payment banner.
+    const isGuardianOnly = !parentAnyMembership && (childProfiles?.length || 0) > 0;
 
     return (
         <ThemeProvider

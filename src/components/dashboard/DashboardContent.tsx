@@ -40,7 +40,7 @@ interface MembershipData {
 }
 
 export default function DashboardContent() {
-    const { selectedProfileId, parentProfile, children, hasParentMembership, beltProgressEnabled } = useDashboard();
+    const { selectedProfileId, parentProfile, children, hasParentMembership, isGuardianOnly, beltProgressEnabled } = useDashboard();
     const supabase = getSupabaseClient();
     const { getSchemaForMember } = useRankSchemas();
 
@@ -76,13 +76,24 @@ export default function DashboardContent() {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            // Fetch profile for selected user
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('first_name, last_name, belt_rank, stripes, profile_image_url, created_at')
-                .eq('user_id', selectedProfileId)
-                .single();
-            setProfile(profileData);
+            // Fetch profile — use API for child profiles (RLS bypass)
+            const { data: { user } } = await supabase.auth.getUser();
+            const isViewingChild = user && selectedProfileId !== user.id;
+
+            if (isViewingChild) {
+                const profileRes = await fetch(`/api/member/profile?userId=${selectedProfileId}`);
+                if (profileRes.ok) {
+                    const profileJson = await profileRes.json();
+                    setProfile(profileJson.profile || null);
+                }
+            } else {
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name, belt_rank, stripes, profile_image_url, created_at')
+                    .eq('user_id', selectedProfileId)
+                    .single();
+                setProfile(profileData);
+            }
 
             // Fetch attendance count for selected user
             const { count } = await supabase
@@ -91,16 +102,19 @@ export default function DashboardContent() {
                 .eq('user_id', selectedProfileId);
             setAttendanceCount(count || 0);
 
-            // Fetch membership for selected user (active or pending)
-            const { data: membershipData } = await supabase
-                .from('memberships')
-                .select('status, membership_type:membership_types(id, name, price), location:locations(id, name)')
-                .eq('user_id', selectedProfileId)
-                .in('status', ['active', 'pending'])
-                .order('status', { ascending: true }) // 'active' comes before 'pending'
-                .limit(1)
-                .single();
-            setMembership(membershipData as MembershipData | null);
+            // Fetch membership via API (handles parent→child RLS bypass)
+            const membershipRes = await fetch(`/api/member/memberships?userId=${selectedProfileId}`);
+            if (membershipRes.ok) {
+                const membershipJson = await membershipRes.json();
+                const memberships = membershipJson.memberships || [];
+                // Get the best membership (active first, then pending)
+                const activeMembership = memberships.find((m: MembershipData) => m.status === 'active')
+                    || memberships.find((m: MembershipData) => m.status === 'pending')
+                    || null;
+                setMembership(activeMembership);
+            } else {
+                setMembership(null);
+            }
 
             // Fetch announcements (same for all)
             const { data: announcementsData } = await supabase
@@ -146,8 +160,8 @@ export default function DashboardContent() {
                 </p>
             </div>
 
-            {/* Payment Incomplete Banner */}
-            {!membership && (
+            {/* Payment Incomplete Banner — hide for guardians viewing own profile */}
+            {!membership && !(isGuardianOnly && isViewingParent) && (
                 <div className="card" style={{
                     marginBottom: 'var(--space-6)',
                     background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(212, 175, 55, 0.1))',

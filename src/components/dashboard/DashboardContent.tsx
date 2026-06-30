@@ -163,7 +163,7 @@ export default function DashboardContent() {
             </div>
 
             {/* Payment Incomplete Banner — hide for guardians viewing own profile */}
-            {!membership && !(isGuardianOnly && isViewingParent) && (
+            {(!membership || membership.status === 'pending') && !(isGuardianOnly && isViewingParent) && (
                 <div className="card" style={{
                     marginBottom: 'var(--space-6)',
                     background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(212, 175, 55, 0.1))',

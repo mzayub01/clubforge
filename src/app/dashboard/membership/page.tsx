@@ -433,7 +433,7 @@ export default function MembershipPage() {
                         </div>
                     )}
                 </div>
-            ) : memberships.length === 0 ? (
+            ) : !memberships.some(m => m.status === 'active') ? (
                 <CompletePaymentFlow profile={profile} userId={selectedProfileId} />
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>

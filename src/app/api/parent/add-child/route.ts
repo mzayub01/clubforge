@@ -13,7 +13,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await request.json();
+        // Parse request body - supports both FormData (with image) and JSON
+        let body: Record<string, any>;
+        let imageFile: File | null = null;
+
+        const contentType = request.headers.get('content-type') || '';
+        if (contentType.includes('multipart/form-data')) {
+            const formData = await request.formData();
+            body = JSON.parse(formData.get('data') as string);
+            imageFile = formData.get('image') as File | null;
+        } else {
+            body = await request.json();
+        }
+
         const {
             firstName,
             lastName,
@@ -30,8 +42,41 @@ export async function POST(request: NextRequest) {
             membershipTypeId,
             beltRank,
             stripes,
-            profileImageUrl,
+            profileImageUrl: existingImageUrl,
         } = body;
+
+        // Upload image server-side using admin client (bypasses storage RLS)
+        let profileImageUrl = existingImageUrl || null;
+        if (imageFile) {
+            const supabaseAdmin = createAdminClient();
+            const fileExt = imageFile.name.split('.').pop() || 'jpg';
+            const fileName = `child_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+            const filePath = `profile-images/${fileName}`;
+
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const { error: uploadError } = await supabaseAdmin.storage
+                .from('avatars')
+                .upload(filePath, buffer, {
+                    contentType: imageFile.type,
+                    upsert: false,
+                });
+
+            if (uploadError) {
+                console.error('[add-child] Image upload error:', uploadError);
+                return NextResponse.json(
+                    { error: 'Failed to upload profile picture', details: uploadError.message },
+                    { status: 500 }
+                );
+            }
+
+            const { data: urlData } = supabaseAdmin.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            profileImageUrl = urlData.publicUrl;
+        }
 
         // Validate required fields
         if (!firstName || !lastName || !dateOfBirth || !locationId || !membershipTypeId) {

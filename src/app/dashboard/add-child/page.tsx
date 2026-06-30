@@ -233,36 +233,15 @@ export default function AddChildPage() {
         }
 
         try {
-            // Upload profile image first
+            // Send form data + image to server-side API (handles upload via admin client)
             setUploadingImage(true);
-            const fileExt = profileImageFile.name.split('.').pop();
-            const fileName = `child_${Date.now()}.${fileExt}`;
-            const filePath = `profile-images/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(filePath, profileImageFile);
-
-            if (uploadError) {
-                console.error('Image upload error:', uploadError);
-                throw new Error('Failed to upload profile picture. Please try again.');
-            }
-
-            // Get public URL
-            const { data: urlData } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath);
-
-            const profileImageUrl = urlData.publicUrl;
-            setUploadingImage(false);
+            const payload = new FormData();
+            payload.append('image', profileImageFile);
+            payload.append('data', JSON.stringify(formData));
 
             const response = await fetch('/api/parent/add-child', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    profileImageUrl,
-                }),
+                body: payload,
             });
 
             const data = await response.json();

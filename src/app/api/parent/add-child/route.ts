@@ -393,6 +393,7 @@ export async function POST(request: NextRequest) {
             // Include info for client to handle payment
             requiresPayment: !isFree && !isCheadleMasjid,
             isCheadleMasjid,
+            tenantId,
             membershipType: {
                 id: membershipTypeId,
                 name: membershipType?.name || 'Membership',

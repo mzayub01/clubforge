@@ -254,8 +254,8 @@ export default function AddChildPage() {
 
             // Check if payment is required
             if (data.requiresPayment) {
-                // Redirect to Stripe checkout for paid memberships
-                const stripeResponse = await fetch('/api/stripe/checkout', {
+                // Redirect to tenant's connected Stripe checkout (parent paying for child)
+                const stripeResponse = await fetch('/api/stripe/checkout-connected', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -265,7 +265,9 @@ export default function AddChildPage() {
                         userId: data.child.user_id,
                         locationId: data.location.id,
                         locationName: data.location.name,
+                        tenantId: data.tenantId,
                         userEmail: '', // Will be handled by Stripe
+                        cancelPath: '/dashboard/add-child',
                     }),
                 });
 

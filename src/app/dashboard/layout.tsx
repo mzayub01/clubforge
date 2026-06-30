@@ -31,8 +31,12 @@ export default async function DashboardLayout({
         .single();
 
     // Get linked children (profiles where parent_guardian_id = profile.id)
-    // parent_guardian_id is a FK to profiles.id, not profiles.user_id
-    const { data: childProfiles } = await supabase
+    // Uses admin client because RLS blocks parent from seeing child profiles
+    // (child profiles have different user_ids - phantom auth accounts)
+    const { createAdminClient } = await import('@/lib/supabase/admin');
+    const supabaseAdmin = createAdminClient();
+
+    const { data: childProfiles } = await supabaseAdmin
         .from('profiles')
         .select('id, user_id, first_name, last_name, profile_image_url')
         .eq('parent_guardian_id', profile?.id || '');
@@ -44,6 +48,20 @@ export default async function DashboardLayout({
         .eq('user_id', user.id)
         .eq('status', 'active')
         .single();
+
+    // If parent has no membership, check if any child has one (guardian scenario)
+    let hasAnyActiveMembership = !!parentMembership;
+    if (!hasAnyActiveMembership && childProfiles && childProfiles.length > 0) {
+        const childUserIds = childProfiles.map(c => c.user_id);
+        const { data: childMembership } = await supabaseAdmin
+            .from('memberships')
+            .select('id')
+            .in('user_id', childUserIds)
+            .eq('status', 'active')
+            .limit(1)
+            .single();
+        hasAnyActiveMembership = !!childMembership;
+    }
 
     // Get tenant info for sidebar + theming
     const tenantId = await getTenantId();
@@ -68,7 +86,7 @@ export default async function DashboardLayout({
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
     const profileImageUrl = profile?.profile_image_url || undefined;
-    const hasParentMembership = !!parentMembership;
+    const hasParentMembership = hasAnyActiveMembership;
 
     return (
         <ThemeProvider

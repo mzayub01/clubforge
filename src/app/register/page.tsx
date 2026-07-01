@@ -397,7 +397,31 @@ function RegisterPageContent() {
         const isChildMembership = formData.membershipType === 'child';
 
         try {
-            // 1. Create user account
+            // 1. Upload profile image first (server-side via admin client) so a
+            //    mandatory photo that fails to upload aborts BEFORE we create the
+            //    account — no orphaned auth user, and a required photo is guaranteed
+            //    to be stored whenever registration succeeds.
+            let profileImageUrl = null;
+            if (profileImageFile) {
+                const imgForm = new FormData();
+                imgForm.append('image', profileImageFile);
+                const uploadRes = await fetch('/api/upload-profile-image', {
+                    method: 'POST',
+                    body: imgForm,
+                });
+                if (uploadRes.ok) {
+                    const uploadJson = await uploadRes.json();
+                    profileImageUrl = uploadJson.url;
+                } else if (tenant?.settings?.require_profile_photo) {
+                    // Photo is mandatory for this club — do not proceed without it
+                    const errJson = await uploadRes.json().catch(() => ({}));
+                    throw new Error(errJson.error || "We couldn't upload your profile photo, which is required. Please try again.");
+                } else {
+                    console.error('Optional profile image upload failed; continuing without it');
+                }
+            }
+
+            // 2. Create user account
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: isChildMembership ? formData.parentEmail : formData.email,
                 password: formData.password,
@@ -412,27 +436,6 @@ function RegisterPageContent() {
 
             if (authError) throw authError;
             if (!authData.user) throw new Error('Account creation failed');
-
-            // 2. Upload profile image if provided
-            let profileImageUrl = null;
-            if (profileImageFile) {
-                try {
-                    const fileExt = profileImageFile.name.split('.').pop();
-                    const fileName = `${authData.user.id}/${Date.now()}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('profile-images')
-                        .upload(fileName, profileImageFile, { upsert: true });
-
-                    if (!uploadError) {
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('profile-images')
-                            .getPublicUrl(fileName);
-                        profileImageUrl = publicUrl;
-                    }
-                } catch (imgErr) {
-                    console.error('Profile image upload failed:', imgErr);
-                }
-            }
 
             // 3. Update profile
             await supabase

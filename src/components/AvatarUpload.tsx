@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { Camera, Loader2, X, Upload } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 import Avatar from './Avatar';
 
 interface AvatarUploadProps {
@@ -26,7 +25,6 @@ export default function AvatarUpload({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [error, setError] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = getSupabaseClient();
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -51,23 +49,24 @@ export default function AvatarUpload({
             const preview = URL.createObjectURL(file);
             setPreviewUrl(preview);
 
-            // Generate unique filename
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${userId}/${Date.now()}.${fileExt}`;
+            // Upload server-side via admin client (bypasses Storage RLS) — the same
+            // reliable path used at registration. The old client-side upload to the
+            // `profile-images` bucket could fail silently.
+            const imgForm = new FormData();
+            imgForm.append('image', file);
+            imgForm.append('userId', userId);
+            const uploadRes = await fetch('/api/upload-profile-image', {
+                method: 'POST',
+                body: imgForm,
+            });
 
-            // Upload to Supabase Storage
-            const { error: uploadError } = await supabase.storage
-                .from('profile-images')
-                .upload(fileName, file, { upsert: true });
+            if (!uploadRes.ok) {
+                const errJson = await uploadRes.json().catch(() => ({}));
+                throw new Error(errJson.error || 'Failed to upload image');
+            }
 
-            if (uploadError) throw uploadError;
-
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('profile-images')
-                .getPublicUrl(fileName);
-
-            onUploadComplete(publicUrl);
+            const { url } = await uploadRes.json();
+            onUploadComplete(url);
         } catch (err) {
             console.error('Upload error:', err);
             setError('Failed to upload image');

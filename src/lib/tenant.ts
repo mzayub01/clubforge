@@ -147,12 +147,13 @@ export async function resolveTenantForUser(userId: string): Promise<{
   tenantId: string;
   role: 'member' | 'instructor' | 'professor' | 'admin';
 } | null> {
+  const admin = createAdminClient();
+
   // Try header-based resolution first (fast path)
   const headerTenantId = await getTenantId();
 
   if (headerTenantId) {
     // We have the tenant from headers; look up the user's role in that tenant
-    const admin = createAdminClient();
     const { data: membership } = await admin
       .from('tenant_members')
       .select('role')
@@ -161,13 +162,27 @@ export async function resolveTenantForUser(userId: string): Promise<{
       .eq('is_active', true)
       .single();
 
-    return membership
-      ? { tenantId: headerTenantId, role: membership.role }
+    if (membership) {
+      return { tenantId: headerTenantId, role: membership.role };
+    }
+
+    // No tenant_members row in the header tenant. Guardians (and any member whose
+    // tenant_members row was never created — it's only written by the Stripe
+    // success handlers) still carry tenant_id on their profile. Trust the header
+    // tenant only if the user's profile actually belongs to it.
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('tenant_id', headerTenantId)
+      .single();
+
+    return profile
+      ? { tenantId: headerTenantId, role: (profile.role as 'member' | 'instructor' | 'professor' | 'admin') || 'member' }
       : null;
   }
 
-  // Fallback: look up tenant_members directly (works for admin-domain routes)
-  const admin = createAdminClient();
+  // Fallback (no header, e.g. admin-domain routes): earliest active membership
   const { data: membership } = await admin
     .from('tenant_members')
     .select('tenant_id, role')
@@ -177,7 +192,21 @@ export async function resolveTenantForUser(userId: string): Promise<{
     .limit(1)
     .single();
 
-  return membership
-    ? { tenantId: membership.tenant_id, role: membership.role }
+  if (membership) {
+    return { tenantId: membership.tenant_id, role: membership.role };
+  }
+
+  // Last resort: resolve tenant from the user's profile (guardians without a
+  // tenant_members row of their own).
+  const { data: profile } = await admin
+    .from('profiles')
+    .select('tenant_id, role')
+    .eq('user_id', userId)
+    .not('tenant_id', 'is', null)
+    .limit(1)
+    .single();
+
+  return profile?.tenant_id
+    ? { tenantId: profile.tenant_id, role: (profile.role as 'member' | 'instructor' | 'professor' | 'admin') || 'member' }
     : null;
 }

@@ -1,6 +1,6 @@
 # ClubForge — Decision Log & Design Principles
 
-> **Last updated:** 2026-02-07 (Phase 3 complete)
+> **Last updated:** 2026-07-01 (Phase 4 in progress)
 
 ---
 
@@ -57,6 +57,17 @@ The UI must feel premium. Glassmorphism, gold accent, subtle animations. No gene
 | Club owner signup flow | 5-step wizard | Single long form | Reduces cognitive load, clear progress indicator |
 | Member signup | Keep existing `/register` | Build new | 1700-line page works, will be adapted for per-tenant use in Phase 4 |
 | Slug input | Auto-generate from club name, editable | Manual only | Reduces friction, most owners accept the auto-generated slug |
+
+### Guardian / Child Accounts & Profile Media
+| Decision | Chosen | Rationale |
+|----------|--------|-----------|
+| Child accounts | Phantom Supabase auth users linked via `profiles.parent_guardian_id`, `is_child = true` | Each child gets its own profile + membership while a guardian manages them |
+| Guardian access to child data | Admin-backed `/api/member/*` (and `/api/parent/*`) endpoints that validate the parent-child link | `profiles`/`memberships` RLS has **no guardian policy** (only `auth.uid() = user_id` or admin), so the browser client can't touch a child's rows |
+| Parent→child payments | `checkout-connected` validates the relationship instead of a strict `user.id === userId` check | A strict match returned 403 for every parent-paying-for-child checkout |
+| Profile photo upload | Server-side via `POST /api/upload-profile-image` (admin client → public `avatars` bucket) | Client-side upload to `profile-images` was subject to Storage RLS / signup session and failed **silently**, saving null URLs |
+| Mandatory photo | Validated in the register wizard AND upload runs before signup, hard-failing registration if a required photo can't be saved | "Mandatory" must guarantee the photo is stored, not merely selected |
+| `isGuardianOnly` | Derived from "parent has **no membership row at all**" (any status) | Active-only misclassified a parent with a *pending* membership as guardian-only and hid their own payment banner |
+| Pending membership on dashboard | Treated as "needs payment": shows Complete-Membership banner, hides the membership stat card | A pending row is not a real membership |
 
 ### Pages Removed
 | Page | Reason |
@@ -149,6 +160,9 @@ Usage limits enforced per tier:
 3. **Register page size:** 1700 lines — needs refactoring into sub-components when adapted for per-tenant use.
 4. **Professor vs Coach:** Role enum still uses `professor` — planned rename to `coach` in future migration.
 5. **Tenant type duplication:** `Tenant` interface defined in both `types.ts` and `tenant.ts` — should be consolidated.
+6. **Legacy null avatars:** members who registered before the server-side upload fix have `profile_image_url = null` and must re-upload (a dashboard reminder now prompts this). All new uploads land in the public `avatars` bucket via `/api/upload-profile-image`.
+7. **Self-editable rank:** the member profile page lets a member (or a guardian for a child) change belt rank/stripes directly. Pre-existing behaviour, preserved — revisit if self-promotion should be blocked.
+8. **`avatars` bucket auto-create:** several routes lazily `createBucket('avatars')` at runtime instead of a migration provisioning it. Consider a storage migration + explicit RLS policies.
 
 ---
 

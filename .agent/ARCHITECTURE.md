@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-02-07 (Phase 3 complete)
+> **Last updated:** 2026-07-01 (Phase 4 in progress — guardian/child flow, member payments, profile media)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -211,6 +211,55 @@ src/
 | **Member** | Own data | View schedule, check-in, view belt progress, RSVP to events |
 
 > **Note:** Current DB enum is `member | instructor | professor | admin`. Future plans include adding `owner`, `coach`, and `staff` roles.
+
+---
+
+## Guardian / Child Accounts
+
+A guardian (parent) can register and manage one or more children. Each child is a
+**separate Supabase auth user** ("phantom" account) with its own `profiles` row,
+linked to the guardian via `profiles.parent_guardian_id` (→ guardian's `profiles.id`)
+and flagged `is_child = true`. Children may have their own `memberships`.
+
+**RLS caveat (important):** `profiles`/`memberships` RLS only grants access when
+`auth.uid() = user_id` (or admin/instructor). There is **no guardian policy**, so a
+guardian's *browser* client cannot read or write a child's rows. All
+guardian-on-behalf-of-child access therefore goes through **admin-backed API routes**
+that re-validate the parent-child relationship server-side:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/member/profile?userId=` | Read own or a child's full profile |
+| `PATCH /api/member/profile` | Update own or a child's profile (whitelisted fields, admin client) |
+| `GET /api/member/memberships?userId=` | Read own or a child's memberships |
+| `GET /api/member/attendance-count?userId=` | Attendance count for own or a child |
+| `GET /api/member/children` | List a guardian's children |
+| `POST /api/parent/add-child` | Create a child (profile + membership + optional photo) |
+| `POST /api/upload-profile-image` | Server-side avatar upload (admin → `avatars` bucket) |
+
+The member dashboard uses a profile switcher (`DashboardProvider` + `ChildSwitcher`)
+to select which profile (`selectedProfileId`) is viewed. Two derived flags drive
+guardian UI, computed in `dashboard/layout.tsx`:
+- `hasParentMembership` — parent has an **active** membership → controls the default
+  selected profile (own vs first child).
+- `isGuardianOnly` — parent has **no membership row at all** (any status) → suppresses
+  the payment banner on the guardian's own profile. (Deliberately *not* active-only,
+  so a parent with a pending membership still sees their own payment banner.)
+
+Payments for a child are made by the guardian; `POST /api/stripe/checkout-connected`
+allows a parent→child payment after validating the relationship.
+
+### Profile Images / Storage
+- Uploads go **server-side** through `POST /api/upload-profile-image` using the admin
+  client into the public **`avatars`** bucket (auto-created if missing), path
+  `profile-images/...`. This replaced client-side uploads to a `profile-images`
+  bucket, which were subject to Storage RLS / signup-session state and failed
+  *silently* (saving `null`).
+- Rendered via `next/image`; `next.config.ts` allowlists
+  `*.supabase.co/storage/v1/object/public/**`.
+- Club setting `require_profile_photo` makes the photo mandatory at registration; the
+  register flow uploads **before** account creation and hard-fails registration if a
+  required photo can't be saved (no orphaned auth user, no silent null).
 
 ---
 

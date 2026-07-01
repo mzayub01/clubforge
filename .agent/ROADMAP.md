@@ -1,7 +1,7 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-02-07
-> **Current Phase:** Phase 3 complete → Phase 4 next
+> **Last updated:** 2026-07-01
+> **Current Phase:** Phase 4 in progress (Member Experience)
 
 ---
 
@@ -13,7 +13,7 @@
 | 1 | Multi-Tenancy Foundation | ✅ Done | tenant_id on all tables, RLS, middleware, context |
 | 2 | Public Platform (SaaS Marketing) | ✅ Done | Landing page, pricing, demo, about, FAQ, privacy, terms |
 | 3 | Onboarding & Provisioning | ✅ Done | Onboarding wizard, provisioning API, feature gate, Stripe plans, trial |
-| **4** | **Member Experience** | ⬜ Next | Per-tenant registration, theming, tenant settings, Stripe Connect |
+| **4** | **Member Experience** | 🔶 In progress | Per-tenant registration, theming, tenant settings, Stripe Connect, guardian/child flow, profile media |
 | 5 | Platform Operations | ⬜ Planned | Super-admin dashboard, usage metering, tenant management |
 | 6 | Scale & Differentiation | ⬜ Planned | Terminology engine, automation, custom domains, white-label |
 
@@ -85,6 +85,32 @@
 | Tenant settings page | `/admin/settings` — branding, contact info, terminology config | Medium |
 | Stripe Connect onboarding | Club owner links their Stripe account at `/admin/settings/payments` | High |
 | Member payment flow | Members pay club's connected Stripe account, ClubForge takes 2.5% | High |
+
+---
+
+## Phase 4 Progress — Member Experience 🔶
+
+**Done so far (2026-06 → 2026-07):**
+- Per-tenant member registration live at `/register` (adult + child), tenant-themed.
+- Stripe Connect member payments — members pay the club's connected account, 2.5%
+  platform fee (`/api/stripe/checkout-connected`, `checkout-success`).
+- Tenant settings page (`/admin/settings`), including `require_profile_photo`.
+- **Guardian / child flow** (see ARCHITECTURE → Guardian/Child Accounts):
+  - Parent→child Stripe checkout (relationship-validated, was 403 for everyone).
+  - Admin-backed `/api/member/*` endpoints (profile GET/PATCH, memberships,
+    attendance-count, children) so guardians can view **and edit** children despite
+    no guardian RLS policy.
+  - Dashboard fixes: correct default profile, pending-membership banner, membership
+    card gated to `active`, `isGuardianOnly` derived from "any membership row".
+- **Profile pictures:** reliable server-side upload (`/api/upload-profile-image` →
+  public `avatars` bucket); mandatory-photo enforced + hard-fails registration when
+  it can't be saved; `AvatarUpload` uses the same path; dashboard reminder prompts
+  members/guardians to add a missing photo.
+
+**Still open in Phase 4:**
+- Per-tenant registration page refactor (still ~1700 lines).
+- Dynamic theming coverage audit across all member-facing pages.
+- Backfill/prompt existing members with `profile_image_url = null`.
 
 ---
 

@@ -40,8 +40,12 @@ export default function ProfilePage() {
     const [formData, setFormData] = useState<Partial<Profile>>({});
 
     const supabase = getSupabaseClient();
-    const { selectedProfileId } = useDashboard();
+    const { selectedProfileId, parentProfile } = useDashboard();
     const { getSchemaForMember } = useRankSchemas();
+
+    // Are we viewing our own profile, or a child's? Guardians edit children
+    // through admin-backed APIs since profiles RLS has no guardian policy.
+    const isOwnProfile = selectedProfileId === parentProfile?.user_id;
 
     useEffect(() => {
         fetchProfile();
@@ -51,17 +55,26 @@ export default function ProfilePage() {
         setLoading(true);
         setError('');
         try {
-            // Fetch profile based on selectedProfileId (user_id)
-            const { data, error: fetchError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('user_id', selectedProfileId)
-                .single();
+            if (isOwnProfile) {
+                // Own profile — direct read (RLS allows)
+                const { data, error: fetchError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_id', selectedProfileId)
+                    .single();
 
-            if (fetchError) throw fetchError;
+                if (fetchError) throw fetchError;
 
-            setProfile(data);
-            setFormData(data);
+                setProfile(data);
+                setFormData(data);
+            } else {
+                // Child profile — via admin-backed API (RLS blocks direct read)
+                const res = await fetch(`/api/member/profile?userId=${selectedProfileId}`);
+                if (!res.ok) throw new Error('Failed to load profile');
+                const { profile: childData } = await res.json();
+                setProfile(childData);
+                setFormData(childData);
+            }
         } catch (err) {
             console.error('Error fetching profile:', err);
             setError('Failed to load profile');
@@ -77,25 +90,36 @@ export default function ProfilePage() {
         setError('');
         setSuccess('');
 
-        try {
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({
-                    first_name: formData.first_name,
-                    last_name: formData.last_name,
-                    phone: formData.phone,
-                    address: formData.address,
-                    city: formData.city,
-                    postcode: formData.postcode,
-                    emergency_contact_name: formData.emergency_contact_name,
-                    emergency_contact_phone: formData.emergency_contact_phone,
-                    medical_info: formData.medical_info,
-                    belt_rank: formData.belt_rank,
-                    stripes: formData.stripes,
-                })
-                .eq('id', profile.id);
+        const updates = {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            postcode: formData.postcode,
+            emergency_contact_name: formData.emergency_contact_name,
+            emergency_contact_phone: formData.emergency_contact_phone,
+            medical_info: formData.medical_info,
+            belt_rank: formData.belt_rank,
+            stripes: formData.stripes,
+        };
 
-            if (updateError) throw updateError;
+        try {
+            if (isOwnProfile) {
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update(updates)
+                    .eq('id', profile.id);
+                if (updateError) throw updateError;
+            } else {
+                // Child profile — update via admin-backed API
+                const res = await fetch('/api/member/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: profile.user_id, updates }),
+                });
+                if (!res.ok) throw new Error('Failed to update profile');
+            }
 
             setProfile({ ...profile, ...formData } as Profile);
             setSuccess('Profile updated successfully!');
@@ -137,9 +161,9 @@ export default function ProfilePage() {
     return (
         <div style={{ paddingBottom: '120px' }}>
             <div className="dashboard-header">
-                <h1 className="dashboard-title">My Profile</h1>
+                <h1 className="dashboard-title">{isOwnProfile ? 'My Profile' : `${profile.first_name}'s Profile`}</h1>
                 <p className="dashboard-subtitle">
-                    Manage your personal information and settings
+                    {isOwnProfile ? 'Manage your personal information and settings' : "Manage your child's information and settings"}
                 </p>
             </div>
 
@@ -167,11 +191,19 @@ export default function ProfilePage() {
                         firstName={profile.first_name}
                         lastName={profile.last_name}
                         onUploadComplete={async (url) => {
-                            // Update profile with new image URL
-                            await supabase
-                                .from('profiles')
-                                .update({ profile_image_url: url })
-                                .eq('id', profile.id);
+                            // Persist the new image URL (own via RLS, child via admin API)
+                            if (isOwnProfile) {
+                                await supabase
+                                    .from('profiles')
+                                    .update({ profile_image_url: url })
+                                    .eq('id', profile.id);
+                            } else {
+                                await fetch('/api/member/profile', {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ userId: profile.user_id, updates: { profile_image_url: url } }),
+                                });
+                            }
                             setProfile({ ...profile, profile_image_url: url });
                             setSuccess('Profile picture updated!');
                         }}

@@ -12,6 +12,7 @@ import {
     ChevronRight,
     Clock,
     CreditCard,
+    Camera,
     MapPin,
     Loader2,
     X
@@ -196,6 +197,43 @@ export default function DashboardContent() {
                             style={{ flexShrink: 0 }}
                         >
                             Complete Payment
+                        </Link>
+                    </div>
+                </div>
+            )}
+
+            {/* Profile picture reminder — shown for any selected profile (own or a
+                child) that has no photo. The profile page supports editing children
+                via admin-backed APIs, so the link is actionable in both cases. */}
+            {profile && !profile.profile_image_url && (
+                <div className="card" style={{
+                    marginBottom: 'var(--space-6)',
+                    border: '1px solid var(--border-light)',
+                    background: 'var(--bg-secondary)',
+                }}>
+                    <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: 'var(--radius-full)',
+                            background: 'rgba(197, 164, 86, 0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}>
+                            <Camera size={24} color="var(--color-gold)" />
+                        </div>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                            <h3 style={{ margin: '0 0 var(--space-1) 0', fontSize: 'var(--text-base)' }}>
+                                Add a profile picture
+                            </h3>
+                            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
+                                Help your coaches recognise you — upload a photo to complete your profile.
+                            </p>
+                        </div>
+                        <Link href="/dashboard/profile" className="btn btn-outline" style={{ flexShrink: 0 }}>
+                            Update Profile
                         </Link>
                     </div>
                 </div>

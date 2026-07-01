@@ -16,15 +16,31 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Resolve the user's tenant
+        const adminSupabase = await createAdminClient();
+
+        // Resolve the user's tenant. Prefer tenant_members (authoritative), but fall
+        // back to the user's profile.tenant_id. Some members never get a tenant_members
+        // row — e.g. free / no-Stripe registrations (the row is only created by the
+        // Stripe success handlers) and guardians — which would otherwise make the
+        // "Complete Your Membership" flow fail with "No tenant found".
         const membership = await resolveTenantForUser(user.id);
-        const tenantId = membership?.tenantId;
+        let tenantId = membership?.tenantId;
+
+        if (!tenantId) {
+            const { data: prof } = await adminSupabase
+                .from('profiles')
+                .select('tenant_id')
+                .eq('user_id', user.id)
+                .single();
+            tenantId = prof?.tenant_id || undefined;
+            if (tenantId) {
+                console.warn('[member/locations-tiers] tenant resolved via profile fallback for user', user.id);
+            }
+        }
 
         if (!tenantId) {
             return NextResponse.json({ error: 'No tenant found' }, { status: 400 });
         }
-
-        const adminSupabase = await createAdminClient();
 
         // Fetch active locations for this tenant
         const { data: locations } = await adminSupabase

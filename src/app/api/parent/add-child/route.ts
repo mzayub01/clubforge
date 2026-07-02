@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { resolveTenantForUser } from '@/lib/tenant';
+import { getTenantId, resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
     try {
@@ -94,9 +94,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get tenant context from authenticated user
+        // Get tenant context: the guardian's own tenant, falling back to the club
+        // they're browsing (subdomain/custom domain set by middleware) so the child
+        // is always created in the right tenant even when the guardian's
+        // tenant_members row is missing/incomplete.
         const membership = await resolveTenantForUser(user.id);
-        const tenantId = membership?.tenantId;
+        const tenantId = membership?.tenantId || (await getTenantId()) || undefined;
 
         // Validate and sanitize gender - only allow 'male' or 'female'
         const validGender = gender === 'male' || gender === 'female' ? gender : null;

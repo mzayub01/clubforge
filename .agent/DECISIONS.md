@@ -1,6 +1,6 @@
 # ClubForge — Decision Log & Design Principles
 
-> **Last updated:** 2026-07-01 (Phase 4 in progress)
+> **Last updated:** 2026-07-02 (Phase 4 in progress)
 
 ---
 
@@ -68,6 +68,7 @@ The UI must feel premium. Glassmorphism, gold accent, subtle animations. No gene
 | Mandatory photo | Validated in the register wizard AND upload runs before signup, hard-failing registration if a required photo can't be saved | "Mandatory" must guarantee the photo is stored, not merely selected |
 | `isGuardianOnly` | Derived from "parent has **no membership row at all**" (any status) | Active-only misclassified a parent with a *pending* membership as guardian-only and hid their own payment banner |
 | Pending membership on dashboard | Treated as "needs payment": shows Complete-Membership banner, hides the membership stat card | A pending row is not a real membership |
+| Child announcement emails | Routed to the guardian's real email (children have dummy `@child.clubforge.local` addresses), deduped by destination | Children can't receive email; the guardian is the right recipient |
 
 ### Pages Removed
 | Page | Reason |
@@ -144,6 +145,23 @@ Usage limits enforced per tier:
 - Client components: `createClient()` from `@/lib/supabase/client`
 - Admin operations: `createAdminClient()` from `@/lib/supabase/admin`
 - Always `.eq('tenant_id', tenantId)` in queries (RLS is defense-in-depth)
+
+### Tenant & Auth Resolution (IMPORTANT — caused multiple prod bugs)
+Resolve the tenant from the **request context** (subdomain / custom domain →
+`x-tenant-id` / `x-tenant-slug`, via `getTenantId()`), NOT by gating on the
+user's `tenant_members` / `profiles` rows. Guardians, platform admins, and
+multi-tenant users often lack a matching row, so membership-gated resolution
+returns null/wrong and silently breaks flows.
+- `requireAuth` (auth-guard) resolves role **scoped to the request tenant** and
+  falls back to `platform_admins` (acting as admin of the browsed tenant) —
+  mirrors the admin CRUD route. Never use an unscoped `.single()` on
+  `tenant_members` (breaks for users in >1 tenant).
+- Member catalog endpoints (`/api/member/locations-tiers`) and `/api/parent/add-child`
+  resolve via `getTenantId()` first, `resolveTenantForUser` only as fallback.
+  `resolveTenantForUser` itself falls back to `profiles.tenant_id`.
+- Symptoms this class produced: guardian empty location dropdown / "Failed to
+  load membership options" (fix `22e7560`); announcement email "undefined sent,
+  undefined failed" which was really a 403 (fix `4ca81cb`).
 
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured

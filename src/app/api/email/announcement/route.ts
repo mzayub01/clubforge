@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         // Start with active memberships
         let query = supabaseAdmin
             .from('memberships')
-            .select('user_id, profile:profiles!inner(first_name, email, role, is_child)')
+            .select('user_id, profile:profiles!inner(first_name, email, role, is_child, parent_guardian_id)')
             .eq('status', 'active')
             .eq('tenant_id', auth.tenantId); // H2: Tenant isolation
 
@@ -54,38 +54,73 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
         }
 
-        // Filter by target audience and remove duplicates (one member might have multiple memberships)
-        const emailMap = new Map<string, { firstName: string; email: string }>();
-
-        for (const membership of memberships || []) {
-            // Profile can be an object or array depending on the query
-            const profileData = membership.profile as unknown;
-            const profile = (Array.isArray(profileData) ? profileData[0] : profileData) as {
+        // Profile can be an object or array depending on the query shape
+        const parseProfile = (m: { profile: unknown }) => {
+            const p = m.profile;
+            return (Array.isArray(p) ? p[0] : p) as {
                 first_name: string;
                 email: string;
                 role: string;
-                is_child: boolean
+                is_child: boolean;
+                parent_guardian_id: string | null;
             } | null;
+        };
 
+        const isChildEmail = (email: string) => email.includes('@child.clubforge.local');
+
+        // Child accounts use dummy emails, so their announcements must go to the
+        // guardian. Resolve the guardian email for every child member up front.
+        const guardianIds = new Set<string>();
+        for (const membership of memberships || []) {
+            const profile = parseProfile(membership);
+            if (profile && (profile.is_child || isChildEmail(profile.email)) && profile.parent_guardian_id) {
+                guardianIds.add(profile.parent_guardian_id);
+            }
+        }
+
+        const guardianMap = new Map<string, { first_name: string; email: string }>();
+        if (guardianIds.size > 0) {
+            const { data: guardians } = await supabaseAdmin
+                .from('profiles')
+                .select('id, first_name, email')
+                .in('id', Array.from(guardianIds));
+            for (const g of guardians || []) {
+                if (g.email && !isChildEmail(g.email)) {
+                    guardianMap.set(g.id, { first_name: g.first_name, email: g.email });
+                }
+            }
+        }
+
+        // Filter by target audience and deduplicate by destination email
+        const emailMap = new Map<string, { firstName: string; email: string }>();
+
+        for (const membership of memberships || []) {
+            const profile = parseProfile(membership);
             if (!profile) continue;
 
-            // Skip child profiles (they don't have real emails)
-            if (profile.is_child) continue;
-
-            // Skip if email looks like a child placeholder
-            if (profile.email.includes('@child.clubforge.local')) continue;
-
-            // Filter by target audience
+            // Filter by target audience (based on the member's own role)
             if (targetAudience === 'members' && profile.role !== 'member') continue;
             if (targetAudience === 'instructors' && profile.role !== 'instructor') continue;
             // 'all' includes everyone
 
-            // Use Map to deduplicate by email
-            if (!emailMap.has(profile.email)) {
-                emailMap.set(profile.email, {
-                    firstName: profile.first_name,
-                    email: profile.email,
-                });
+            // Determine where this member's email should actually go
+            let email = profile.email;
+            let firstName = profile.first_name;
+
+            if (profile.is_child || isChildEmail(profile.email)) {
+                // Route to the guardian's real email (skip if we can't resolve one)
+                const guardian = profile.parent_guardian_id
+                    ? guardianMap.get(profile.parent_guardian_id)
+                    : undefined;
+                if (!guardian) continue;
+                email = guardian.email;
+                firstName = guardian.first_name || profile.first_name;
+            }
+
+            // Use Map to deduplicate by destination email (a guardian with several
+            // children — or who is also a member — gets a single email)
+            if (!emailMap.has(email)) {
+                emailMap.set(email, { firstName, email });
             }
         }
 

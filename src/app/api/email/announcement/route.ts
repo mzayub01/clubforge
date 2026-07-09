@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
             } | null;
         };
 
-        const isChildEmail = (email: string) => email.includes('@child.clubforge.local');
+        const isChildEmail = (email: string | null | undefined) => !!email && email.includes('@child.clubforge.local');
 
         // Child accounts use dummy emails, so their announcements must go to the
         // guardian. Resolve the guardian email for every child member up front.
@@ -116,6 +116,11 @@ export async function POST(request: NextRequest) {
                 email = guardian.email;
                 firstName = guardian.first_name || profile.first_name;
             }
+
+            // Skip anyone without a real, sendable email (null/empty emails and any
+            // residual child dummy addresses) — a null email here previously threw
+            // and crashed the whole send with a 500.
+            if (!email || isChildEmail(email)) continue;
 
             // Use Map to deduplicate by destination email (a guardian with several
             // children — or who is also a member — gets a single email)

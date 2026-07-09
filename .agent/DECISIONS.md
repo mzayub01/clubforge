@@ -160,8 +160,11 @@ returns null/wrong and silently breaks flows.
   resolve via `getTenantId()` first, `resolveTenantForUser` only as fallback.
   `resolveTenantForUser` itself falls back to `profiles.tenant_id`.
 - Symptoms this class produced: guardian empty location dropdown / "Failed to
-  load membership options" (fix `22e7560`); announcement email "undefined sent,
-  undefined failed" which was really a 403 (fix `4ca81cb`).
+  load membership options" (fix `22e7560`). The `requireAuth` hardening
+  (`4ca81cb`) prevents platform admins / multi-tenant users from getting spurious
+  403s on admin endpoints. (NB: the HaMeem announcement-email "undefined sent,
+  undefined failed" was a *separate* 500 — a null member email crashing the send,
+  fix `0b00b21` — not this auth class. Verify with SQL/logs before assuming.)
 
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured

@@ -137,10 +137,12 @@ export default function AdminAnnouncementsPage() {
 
                         if (emailResponse.ok && emailData.sent > 0) {
                             setSuccess(`Announcement created! ${emailData.sent} email(s) sent successfully.`);
-                        } else if (emailData.sent === 0) {
+                        } else if (emailResponse.ok && emailData.sent === 0) {
                             setSuccess('Announcement created! No matching recipients for email.');
-                        } else {
+                        } else if (emailResponse.ok) {
                             setSuccess(`Announcement created! Email sending partially failed: ${emailData.sent} sent, ${emailData.failed} failed.`);
+                        } else {
+                            setSuccess(`Announcement created, but emails could not be sent${emailData.error ? `: ${emailData.error}` : ''}.`);
                         }
                     } catch (emailErr) {
                         console.error('Email sending error:', emailErr);

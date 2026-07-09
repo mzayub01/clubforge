@@ -6,6 +6,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getTenantId } from '@/lib/tenant';
 import { rateLimit } from '@/lib/rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -34,21 +35,69 @@ export async function requireAuth(): Promise<AuthResult> {
             return { error: 'Unauthorized', status: 401, userId: null, tenantId: null, role: null };
         }
 
-        // Look up tenant membership
         const adminSupabase = createAdminClient();
-        const { data: tenantMember } = await adminSupabase
+        const headerTenantId = await getTenantId();
+
+        // 1. Membership scoped to the tenant the request is for (subdomain/custom
+        //    domain). Scoping to one tenant also avoids the old bug where a user
+        //    belonging to multiple tenants broke .single() (multiple rows) and fell
+        //    back to role 'member', causing spurious 403s on admin endpoints.
+        if (headerTenantId) {
+            const { data: tenantMember } = await adminSupabase
+                .from('tenant_members')
+                .select('role')
+                .eq('user_id', user.id)
+                .eq('tenant_id', headerTenantId)
+                .eq('is_active', true)
+                .single();
+
+            if (tenantMember) {
+                return {
+                    error: null,
+                    status: 200,
+                    userId: user.id,
+                    tenantId: headerTenantId,
+                    role: tenantMember.role,
+                };
+            }
+
+            // 2. Platform admins act as admin of the tenant they're browsing
+            //    (mirrors the admin CRUD route). Without this, platform admins who
+            //    aren't tenant_members resolved to 'member' and got 403s.
+            const { data: platformAdmin } = await adminSupabase
+                .from('platform_admins')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+
+            if (platformAdmin) {
+                return {
+                    error: null,
+                    status: 200,
+                    userId: user.id,
+                    tenantId: headerTenantId,
+                    role: 'admin',
+                };
+            }
+        }
+
+        // 3. No tenant context (e.g. non-subdomain route): the user's earliest
+        //    active membership. limit(1) tolerates users in multiple tenants.
+        const { data: anyMember } = await adminSupabase
             .from('tenant_members')
             .select('tenant_id, role')
             .eq('user_id', user.id)
             .eq('is_active', true)
+            .order('created_at', { ascending: true })
+            .limit(1)
             .single();
 
         return {
             error: null,
             status: 200,
             userId: user.id,
-            tenantId: tenantMember?.tenant_id || null,
-            role: tenantMember?.role || 'member',
+            tenantId: anyMember?.tenant_id || null,
+            role: anyMember?.role || 'member',
         };
     } catch {
         return { error: 'Authentication failed', status: 401, userId: null, tenantId: null, role: null };

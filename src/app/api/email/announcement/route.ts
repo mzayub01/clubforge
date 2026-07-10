@@ -34,11 +34,13 @@ export async function POST(request: NextRequest) {
         const branding = auth.tenantId ? await getTenantBranding(auth.tenantId) : null;
         const fromName = branding?.name || 'ClubForge';
 
-        // Build query to get members
-        // Start with active memberships
+        // Get active member user_ids for this tenant. Memberships and profiles are
+        // fetched SEPARATELY (not via a profiles!inner embed) because there is no
+        // foreign key between memberships and profiles, so PostgREST can't resolve
+        // the embed and the query errors — which previously 500'd the whole send.
         let query = supabaseAdmin
             .from('memberships')
-            .select('user_id, profile:profiles!inner(first_name, email, role, is_child, parent_guardian_id)')
+            .select('user_id')
             .eq('status', 'active')
             .eq('tenant_id', auth.tenantId); // H2: Tenant isolation
 
@@ -47,32 +49,41 @@ export async function POST(request: NextRequest) {
             query = query.eq('location_id', locationId);
         }
 
-        const { data: memberships, error: membershipsError } = await query;
+        const { data: memberRows, error: membershipsError } = await query;
 
         if (membershipsError) {
             console.error('Error fetching memberships:', membershipsError);
             return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
         }
 
-        // Profile can be an object or array depending on the query shape
-        const parseProfile = (m: { profile: unknown }) => {
-            const p = m.profile;
-            return (Array.isArray(p) ? p[0] : p) as {
-                first_name: string;
-                email: string;
-                role: string;
-                is_child: boolean;
-                parent_guardian_id: string | null;
-            } | null;
-        };
+        const memberUserIds = Array.from(new Set((memberRows || []).map(m => m.user_id).filter(Boolean)));
+
+        if (memberUserIds.length === 0) {
+            return NextResponse.json({
+                success: true,
+                sent: 0,
+                failed: 0,
+                message: 'No matching recipients found',
+            });
+        }
+
+        // Fetch the profiles for those members
+        const { data: profiles, error: profilesError } = await supabaseAdmin
+            .from('profiles')
+            .select('user_id, first_name, email, role, is_child, parent_guardian_id')
+            .in('user_id', memberUserIds);
+
+        if (profilesError) {
+            console.error('Error fetching member profiles:', profilesError);
+            return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
+        }
 
         const isChildEmail = (email: string | null | undefined) => !!email && email.includes('@child.clubforge.local');
 
         // Child accounts use dummy emails, so their announcements must go to the
         // guardian. Resolve the guardian email for every child member up front.
         const guardianIds = new Set<string>();
-        for (const membership of memberships || []) {
-            const profile = parseProfile(membership);
+        for (const profile of profiles || []) {
             if (profile && (profile.is_child || isChildEmail(profile.email)) && profile.parent_guardian_id) {
                 guardianIds.add(profile.parent_guardian_id);
             }
@@ -94,8 +105,7 @@ export async function POST(request: NextRequest) {
         // Filter by target audience and deduplicate by destination email
         const emailMap = new Map<string, { firstName: string; email: string }>();
 
-        for (const membership of memberships || []) {
-            const profile = parseProfile(membership);
+        for (const profile of profiles || []) {
             if (!profile) continue;
 
             // Filter by target audience (based on the member's own role)

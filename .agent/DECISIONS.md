@@ -163,8 +163,12 @@ returns null/wrong and silently breaks flows.
   load membership options" (fix `22e7560`). The `requireAuth` hardening
   (`4ca81cb`) prevents platform admins / multi-tenant users from getting spurious
   403s on admin endpoints. (NB: the HaMeem announcement-email "undefined sent,
-  undefined failed" was a *separate* 500 — a null member email crashing the send,
-  fix `0b00b21` — not this auth class. Verify with SQL/logs before assuming.)
+  undefined failed" was a *separate* 500 — the recipient query embedded
+  `profile:profiles!inner(...)` on `memberships`, but there is **no FK between
+  memberships and profiles** (both only FK `auth.users`), so PostgREST couldn't
+  resolve the embed; fix `e0b5216` fetches profiles separately. Not this auth
+  class, and not the null-email guess (`0b00b21` was defensive hardening only).
+  Verify with SQL/schema/logs before assuming.)
 
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured

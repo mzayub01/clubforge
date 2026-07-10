@@ -1,6 +1,6 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-07-01
+> **Last updated:** 2026-07-02
 > **Current Phase:** Phase 4 in progress (Member Experience)
 
 ---
@@ -106,6 +106,15 @@
   public `avatars` bucket); mandatory-photo enforced + hard-fails registration when
   it can't be saved; `AvatarUpload` uses the same path; dashboard reminder prompts
   members/guardians to add a missing photo.
+- **Tenant/auth resolution hardening (2026-07):** member catalog endpoints and
+  admin auth (`requireAuth`) now resolve the tenant from the request context
+  (subdomain/custom domain), not the user's `tenant_members` rows. Fixed the
+  guardian **empty location dropdown / "Failed to load membership options"**
+  (reporter-confirmed) and platform-admin/multi-tenant 403s on admin endpoints.
+- **Announcement emails (2026-07):** fixed a 500 that broke *all* announcement
+  sends — the recipient query used an invalid `profiles!inner` embed on
+  `memberships` (no FK). Now fetches profiles separately; child accounts route to
+  the guardian's real email (deduped).
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

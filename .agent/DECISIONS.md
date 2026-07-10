@@ -145,6 +145,11 @@ Usage limits enforced per tier:
 - Client components: `createClient()` from `@/lib/supabase/client`
 - Admin operations: `createAdminClient()` from `@/lib/supabase/admin`
 - Always `.eq('tenant_id', tenantId)` in queries (RLS is defense-in-depth)
+- **No FK between `memberships` and `profiles`** (both only FK `auth.users`). Do
+  NOT embed `profile:profiles!inner(...)` on `memberships` — PostgREST can't
+  resolve the relationship and the whole query errors. Fetch member `user_id`s,
+  then their profiles via `.in('user_id', …)`, and join in JS (see
+  `/api/email/announcement`, and the admin members page).
 
 ### Tenant & Auth Resolution (IMPORTANT — caused multiple prod bugs)
 Resolve the tenant from the **request context** (subdomain / custom domain →

@@ -1,8 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isStripeConfigured, getStripeClient } from '@/lib/stripe';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getTenantId } from '@/lib/tenant';
+import { requireAdmin, checkRateLimit } from '@/lib/auth-guard';
+
+/**
+ * Resolves who may manage coupons and on which Stripe account.
+ *
+ * - On a tenant domain: caller must be that tenant's admin (or a platform
+ *   admin); coupons act on the tenant's CONNECTED account, resolved
+ *   server-side from the tenants table. The client never supplies the
+ *   account id — previously this endpoint was unauthenticated and acted on
+ *   whatever stripeAccountId the request named.
+ * - On the platform domain (no tenant context): platform admins only;
+ *   coupons act on the platform account.
+ */
+async function resolveCouponContext(): Promise<
+    | { error: string; status: number; stripeAccount?: undefined }
+    | { stripeAccount: string | undefined; error?: undefined }
+> {
+    const headerTenantId = await getTenantId();
+
+    if (headerTenantId) {
+        const auth = await requireAdmin();
+        if (auth.error) return { error: auth.error, status: auth.status };
+
+        const adminSupabase = createAdminClient();
+        const { data: tenant } = await adminSupabase
+            .from('tenants')
+            .select('stripe_account_id, stripe_connect_enabled')
+            .eq('id', auth.tenantId)
+            .single();
+
+        if (!tenant?.stripe_account_id || !tenant.stripe_connect_enabled) {
+            return { error: 'Club has not completed Stripe setup', status: 400 };
+        }
+        return { stripeAccount: tenant.stripe_account_id };
+    }
+
+    // Platform domain — platform admins manage platform-account coupons
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Unauthorized', status: 401 };
+
+    const adminSupabase = createAdminClient();
+    const { data: platformAdmin } = await adminSupabase
+        .from('platform_admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+    if (!platformAdmin) return { error: 'Forbidden', status: 403 };
+    return { stripeAccount: undefined };
+}
 
 // GET - List all coupons
-// Optional query param: ?stripeAccountId=acct_xxx (for connected accounts)
 export async function GET(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured', coupons: [] }, { status: 400 });
@@ -13,10 +66,16 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Stripe client not available', coupons: [] }, { status: 400 });
     }
 
-    try {
-        const stripeAccountId = request.nextUrl.searchParams.get('stripeAccountId');
-        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
+    const rateLimited = checkRateLimit(request, 'coupons-get', 30);
+    if (rateLimited) return rateLimited;
 
+    const ctx = await resolveCouponContext();
+    if (ctx.error) {
+        return NextResponse.json({ error: ctx.error, coupons: [] }, { status: ctx.status });
+    }
+    const opts = ctx.stripeAccount ? { stripeAccount: ctx.stripeAccount } : undefined;
+
+    try {
         const coupons = await stripe.coupons.list({ limit: 50 }, opts);
 
         const formattedCoupons = coupons.data.map((coupon) => ({
@@ -40,8 +99,7 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// POST - Create a new coupon
-// Optional body field: stripeAccountId (for connected accounts)
+// POST - Create a new coupon (+ matching promotion code)
 export async function POST(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured' }, { status: 400 });
@@ -52,9 +110,17 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Stripe client not available' }, { status: 400 });
     }
 
+    const rateLimited = checkRateLimit(request, 'coupons-write', 10);
+    if (rateLimited) return rateLimited;
+
+    const ctx = await resolveCouponContext();
+    if (ctx.error) {
+        return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+    }
+    const opts = ctx.stripeAccount ? { stripeAccount: ctx.stripeAccount } : undefined;
+
     try {
-        const { id, name, percent_off, amount_off, duration, duration_in_months, max_redemptions, stripeAccountId } = await request.json();
-        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
+        const { id, name, percent_off, amount_off, duration, duration_in_months, max_redemptions } = await request.json();
 
         if (!id) {
             return NextResponse.json({ error: 'Coupon code (id) is required' }, { status: 400 });
@@ -83,7 +149,7 @@ export async function POST(request: NextRequest) {
             couponParams.max_redemptions = parseInt(max_redemptions);
         }
 
-        console.log('Creating coupon with params:', JSON.stringify(couponParams), stripeAccountId ? `on connected account ${stripeAccountId}` : 'on platform account');
+        console.log('Creating coupon with params:', JSON.stringify(couponParams), ctx.stripeAccount ? `on connected account ${ctx.stripeAccount}` : 'on platform account');
         let coupon;
         try {
             coupon = await stripe.coupons.create(couponParams, opts);
@@ -136,7 +202,6 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE - Delete a coupon
-// Optional body field: stripeAccountId (for connected accounts)
 export async function DELETE(request: NextRequest) {
     if (!isStripeConfigured()) {
         return NextResponse.json({ error: 'Stripe is not configured' }, { status: 400 });
@@ -147,9 +212,17 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({ error: 'Stripe client not available' }, { status: 400 });
     }
 
+    const rateLimited = checkRateLimit(request, 'coupons-write', 10);
+    if (rateLimited) return rateLimited;
+
+    const ctx = await resolveCouponContext();
+    if (ctx.error) {
+        return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+    }
+    const opts = ctx.stripeAccount ? { stripeAccount: ctx.stripeAccount } : undefined;
+
     try {
-        const { couponId, stripeAccountId } = await request.json();
-        const opts = stripeAccountId ? { stripeAccount: stripeAccountId } : undefined;
+        const { couponId } = await request.json();
 
         if (!couponId) {
             return NextResponse.json({ error: 'Coupon ID is required' }, { status: 400 });

@@ -33,7 +33,6 @@ export default function AdminPromoCodesPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [stripeAccountId, setStripeAccountId] = useState<string | null>(null);
     const [stripeEnabled, setStripeEnabled] = useState(false);
     const [formData, setFormData] = useState({
         id: '',
@@ -63,15 +62,12 @@ export default function AdminPromoCodesPage() {
             const result = await res.json();
             const tenant = result.tenant;
 
-            console.log('[PromoCodesPage] tenant from API:', {
-                stripe_account_id: tenant?.stripe_account_id,
-                stripe_connect_enabled: tenant?.stripe_connect_enabled,
-            });
-
-            if (tenant?.stripe_account_id && tenant?.stripe_connect_enabled) {
-                setStripeAccountId(tenant.stripe_account_id);
+            // The settings API strips the raw stripe_account_id (sensitive) and
+            // exposes has_stripe_account instead; the coupons API resolves the
+            // connected account server-side, so the client never needs the id.
+            if (tenant?.has_stripe_account && tenant?.stripe_connect_enabled) {
                 setStripeEnabled(true);
-                await fetchCoupons(tenant.stripe_account_id);
+                await fetchCoupons();
             } else {
                 setStripeEnabled(false);
                 setLoading(false);
@@ -83,13 +79,10 @@ export default function AdminPromoCodesPage() {
         }
     };
 
-    const fetchCoupons = async (accountId?: string) => {
-        const acctId = accountId || stripeAccountId;
-        if (!acctId) return;
-
+    const fetchCoupons = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/stripe/coupons?stripeAccountId=${encodeURIComponent(acctId)}`);
+            const response = await fetch('/api/stripe/coupons');
             const data = await response.json();
             if (data.error) {
                 setError(data.error);
@@ -120,7 +113,6 @@ export default function AdminPromoCodesPage() {
                     duration: formData.duration,
                     duration_in_months: formData.duration === 'repeating' ? formData.duration_in_months : undefined,
                     max_redemptions: formData.max_redemptions || undefined,
-                    stripeAccountId, // Connected account
                 }),
             });
 
@@ -155,7 +147,7 @@ export default function AdminPromoCodesPage() {
             const response = await fetch('/api/stripe/coupons', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ couponId, stripeAccountId }),
+                body: JSON.stringify({ couponId }),
             });
 
             const data = await response.json();

@@ -11,6 +11,10 @@ function stripSensitive(tenant: any) {
     for (const field of SENSITIVE_FIELDS) {
         delete cleaned[field];
     }
+    // Safe boolean so pages can gate on Stripe readiness without the raw
+    // account id (the promo-codes page previously gated on stripe_account_id,
+    // which this function strips — so the gate always failed).
+    cleaned.has_stripe_account = !!tenant.stripe_account_id;
     return cleaned;
 }
 

@@ -117,6 +117,10 @@
   the guardian's real email (deduped); legacy unlinked children fall back to
   their own real email. Modal shows a recipient-count preview (countOnly dry run
   of the same endpoint) before sending.
+- **Admin members page stats (2026-07):** membership-status stat cards with
+  descriptors (Total Profiles / Active / Pending Payment / No Membership —
+  mutually exclusive buckets), clickable as toggling filters; matching status
+  dropdown options.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

@@ -114,7 +114,9 @@
 - **Announcement emails (2026-07):** fixed a 500 that broke *all* announcement
   sends — the recipient query used an invalid `profiles!inner` embed on
   `memberships` (no FK). Now fetches profiles separately; child accounts route to
-  the guardian's real email (deduped).
+  the guardian's real email (deduped); legacy unlinked children fall back to
+  their own real email. Modal shows a recipient-count preview (countOnly dry run
+  of the same endpoint) before sending.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

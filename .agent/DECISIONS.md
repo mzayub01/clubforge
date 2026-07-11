@@ -133,6 +133,16 @@ Usage limits enforced per tier:
 - Components: `src/components/{ComponentName}.tsx` (PascalCase)
 - Lib files: `src/lib/{name}.ts` (kebab-case)
 
+### CSS Gotcha — animations vs position:fixed (caused broken modals app-wide)
+Entrance animations with `fill-mode: forwards|both` must END at `transform: none`,
+never `translate(0)`/identity — the persisted transform makes the element a
+**containing block for `position:fixed` descendants**, so modals anchor to it
+instead of the viewport (cut off, backdrop not covering the screen). This bit us
+via `.page-transition` (`template.tsx` wraps every dashboard page). Also:
+`.modal-overlay` centers `.modal` via `margin:auto` + scrollable overlay (flex
+`align-items:center` clips the top of an overflowing child), and `ModalPortal`
+(portal to body) is available for modals that must escape ancestor CSS entirely.
+
 ### Component Patterns
 - Server components by default (no `'use client'` unless needed)
 - Client components marked with `'use client'` directive

@@ -68,7 +68,7 @@ The UI must feel premium. Glassmorphism, gold accent, subtle animations. No gene
 | Mandatory photo | Validated in the register wizard AND upload runs before signup, hard-failing registration if a required photo can't be saved | "Mandatory" must guarantee the photo is stored, not merely selected |
 | `isGuardianOnly` | Derived from "parent has **no membership row at all**" (any status) | Active-only misclassified a parent with a *pending* membership as guardian-only and hid their own payment banner |
 | Pending membership on dashboard | Treated as "needs payment": shows Complete-Membership banner, hides the membership stat card | A pending row is not a real membership |
-| Child announcement emails | Routed to the guardian's real email (children have dummy `@child.clubforge.local` addresses), deduped by destination | Children can't receive email; the guardian is the right recipient |
+| Child announcement emails | Routed to the guardian's real email (children have dummy `@child.clubforge.local` addresses), deduped by destination. Unlinked legacy children (no `parent_guardian_id`, real email on profile from the /register child flow) fall back to their own email (`0401aa7`) | Children can't receive email; the guardian is the right recipient. HaMeem verified: 43 active members → 38 destinations (12 adults + 9 linked children deduped to guardians + 22 legacy unlinked children) |
 
 ### Pages Removed
 | Page | Reason |

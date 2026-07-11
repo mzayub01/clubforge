@@ -878,6 +878,13 @@ select.form-input {
 }
 
 /* ===== Page Transitions ===== */
+/* IMPORTANT: the final keyframe must be `transform: none`, NOT translateY(0).
+   With fill-mode both/forwards the final transform persists forever, and ANY
+   transform (even identity) turns the element into the containing block for
+   position:fixed descendants — .page-transition wraps every dashboard page
+   (template.tsx), so modals were anchoring to the page div instead of the
+   viewport (cut off / backdrop not covering the screen). `none` is visually
+   identical but leaves no containing block once the entrance finishes. */
 @keyframes pageEnter {
   from {
     opacity: 0;
@@ -886,7 +893,7 @@ select.form-input {
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -1199,6 +1206,9 @@ select.form-input {
   }
 }
 
+/* Final keyframes use `transform: none` (not translate(0)) — see the
+   pageEnter note: a persisted identity transform breaks position:fixed
+   descendants (modals) via the containing-block rule. */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -1207,7 +1217,7 @@ select.form-input {
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -1219,7 +1229,7 @@ select.form-input {
 
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: none;
   }
 }
 

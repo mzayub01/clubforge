@@ -7,7 +7,7 @@ import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/l
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { announcementTitle, announcementMessage, locationId, targetAudience, countOnly } = body;
+        const { announcementTitle, announcementMessage, locationId, targetAudience, countOnly, includePending } = body;
 
         // Rate limit. countOnly previews get their own, more generous bucket so
         // toggling audience/location in the modal can't exhaust the 10/min send
@@ -43,10 +43,12 @@ export async function POST(request: NextRequest) {
         // fetched SEPARATELY (not via a profiles!inner embed) because there is no
         // foreign key between memberships and profiles, so PostgREST can't resolve
         // the embed and the query errors — which previously 500'd the whole send.
+        // Target active members; optionally also members whose payment is still
+        // pending (admin opt-in via the "include pending" checkbox).
         let query = supabaseAdmin
             .from('memberships')
             .select('user_id')
-            .eq('status', 'active')
+            .in('status', includePending ? ['active', 'pending'] : ['active'])
             .eq('tenant_id', auth.tenantId); // H2: Tenant isolation
 
         // Filter by location if specified

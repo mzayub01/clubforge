@@ -34,6 +34,7 @@ export default function AdminAnnouncementsPage() {
     const [sendingEmail, setSendingEmail] = useState(false);
     const [recipientCount, setRecipientCount] = useState<number | null>(null);
     const [countLoading, setCountLoading] = useState(false);
+    const [includePendingMembers, setIncludePendingMembers] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -68,6 +69,7 @@ export default function AdminAnnouncementsPage() {
                 countOnly: true,
                 locationId: formData.location_id || null,
                 targetAudience: formData.target_audience,
+                includePending: includePendingMembers,
             }),
         })
             .then(res => (res.ok ? res.json() : null))
@@ -84,7 +86,7 @@ export default function AdminAnnouncementsPage() {
             });
 
         return () => { cancelled = true; };
-    }, [showModal, editingAnnouncement, formData.sendEmailNotifications, formData.location_id, formData.target_audience]);
+    }, [showModal, editingAnnouncement, formData.sendEmailNotifications, formData.location_id, formData.target_audience, includePendingMembers]);
 
     const fetchData = async () => {
         try {
@@ -130,6 +132,7 @@ export default function AdminAnnouncementsPage() {
                 sendEmailNotifications: false,
             });
         }
+        setIncludePendingMembers(false);
         setShowModal(true);
         setError('');
     };
@@ -169,6 +172,7 @@ export default function AdminAnnouncementsPage() {
                                 announcementMessage: formData.message,
                                 locationId: formData.location_id || null,
                                 targetAudience: formData.target_audience,
+                                includePending: includePendingMembers,
                             }),
                         });
 
@@ -457,6 +461,17 @@ export default function AdminAnnouncementsPage() {
                                         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: 'var(--space-2)', marginLeft: '42px' }}>
                                             Send an email notification to all members matching the target audience and location.
                                         </p>
+                                        {formData.sendEmailNotifications && (
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)', marginLeft: '42px', cursor: 'pointer', fontSize: 'var(--text-sm)' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={includePendingMembers}
+                                                    onChange={(e) => setIncludePendingMembers(e.target.checked)}
+                                                    style={{ width: '16px', height: '16px', accentColor: 'var(--color-gold)' }}
+                                                />
+                                                <span>Also include members awaiting payment (pending memberships)</span>
+                                            </label>
+                                        )}
                                         {formData.sendEmailNotifications && (
                                             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gold)', fontWeight: 500, marginTop: 'var(--space-2)', marginLeft: '42px', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                                                 {countLoading ? (

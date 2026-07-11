@@ -1037,34 +1037,47 @@ export default function AdminMembersPage() {
                                     </select>
                                 </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">Stripes (0-{getSchemaForMember(editingMember.is_child).max_stripes})</label>
-                                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                        {Array.from({ length: getSchemaForMember(editingMember.is_child).max_stripes + 1 }, (_, i) => i).map((s) => (
-                                            <button
-                                                key={s}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, stripes: s })}
-                                                style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    borderRadius: 'var(--radius-md)',
-                                                    border: formData.stripes === s ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
-                                                    background: formData.stripes === s ? 'var(--bg-secondary)' : 'transparent',
-                                                    cursor: 'pointer',
-                                                    fontWeight: formData.stripes === s ? '600' : '400',
-                                                }}
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    {(formData.belt_rank !== editingMember.belt_rank || formData.stripes !== editingMember.stripes) && (
-                                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gold)', marginTop: 'var(--space-2)' }}>
-                                            🎉 Belt change will be recorded in their progression history!
-                                        </p>
-                                    )}
-                                </div>
+                                {(() => {
+                                    // Stripes are schema-driven: adults and children resolve to
+                                    // their own schema, and schemas without stripes (e.g. karate
+                                    // grades presets have has_stripes=false) hide the selector
+                                    // entirely instead of rendering a lone useless "0" button.
+                                    const memberSchema = getSchemaForMember(editingMember.is_child);
+                                    const maxStripes = memberSchema.has_stripes
+                                        ? (memberSchema.max_stripes || (editingMember.is_child ? 12 : 4))
+                                        : 0;
+                                    if (maxStripes <= 0) return null;
+                                    return (
+                                        <div className="form-group">
+                                            <label className="form-label">Stripes (0-{maxStripes})</label>
+                                            <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                                {Array.from({ length: maxStripes + 1 }, (_, i) => i).map((s) => (
+                                                    <button
+                                                        key={s}
+                                                        type="button"
+                                                        onClick={() => setFormData({ ...formData, stripes: s })}
+                                                        style={{
+                                                            width: '40px',
+                                                            height: '40px',
+                                                            borderRadius: 'var(--radius-md)',
+                                                            border: formData.stripes === s ? '2px solid var(--color-gold)' : '1px solid var(--border-light)',
+                                                            background: formData.stripes === s ? 'var(--bg-secondary)' : 'transparent',
+                                                            cursor: 'pointer',
+                                                            fontWeight: formData.stripes === s ? '600' : '400',
+                                                        }}
+                                                    >
+                                                        {s}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+                                {(formData.belt_rank !== editingMember.belt_rank || formData.stripes !== editingMember.stripes) && (
+                                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gold)', marginTop: 'var(--space-2)' }}>
+                                        🎉 Belt change will be recorded in their progression history!
+                                    </p>
+                                )}
 
                                 {/* Membership Tier */}
                                 {(editingMember.memberships?.length || 0) > 0 && (

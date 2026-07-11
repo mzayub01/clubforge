@@ -365,11 +365,20 @@ export default function ProfilePage() {
                                 )}
                             </div>
 
+                            {(() => {
+                                // Schema-driven: hide the stripes control entirely when the
+                                // member's rank schema has no stripes (has_stripes=false)
+                                const memberSchema = getSchemaForMember(profile.is_child);
+                                const maxStripes = memberSchema.has_stripes
+                                    ? (memberSchema.max_stripes || (profile.is_child ? 12 : 4))
+                                    : 0;
+                                if (maxStripes <= 0) return null;
+                                return (
                             <div className="form-group">
-                                <label className="form-label">Stripes (0-{getSchemaForMember(profile.is_child).max_stripes})</label>
+                                <label className="form-label">Stripes (0-{maxStripes})</label>
                                 {isEditing ? (
                                     <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                                        {Array.from({ length: getSchemaForMember(profile.is_child).max_stripes + 1 }, (_, i) => i).map((s) => (
+                                        {Array.from({ length: maxStripes + 1 }, (_, i) => i).map((s) => (
                                             <button
                                                 key={s}
                                                 type="button"
@@ -394,6 +403,8 @@ export default function ProfilePage() {
                                     </p>
                                 )}
                             </div>
+                                );
+                            })()}
                         </div>
                     </div>
                 </div>

@@ -122,6 +122,12 @@
   descriptors (Total Profiles / Active / Pending Payment / No Membership —
   mutually exclusive buckets), clickable as toggling filters; matching status
   dropdown options.
+- **Promo codes (2026-07):** page always showed "Stripe Not Activated" because it
+  gated on `stripe_account_id`, which `/api/admin/settings` strips as sensitive —
+  now gates on a safe `has_stripe_account` boolean. `/api/stripe/coupons` was
+  unauthenticated and trusted a client-supplied account id; now requires tenant
+  admin (connected account resolved server-side) or platform admin (platform
+  account), rate-limited.
 - **Admin member editing (2026-07):** Edit Member modal now edits personal
   details (name, email incl. login email via auth admin API, phone, DOB) and
   membership tier (records only — not Stripe billing) via

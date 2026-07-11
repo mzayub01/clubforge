@@ -117,6 +117,11 @@ Usage limits enforced per tier:
 3. **Stripe handles PCI** — no card data stored in our DB
 4. **Auto-cleanup on failure** — provisioning API deletes auth user if later steps fail
 5. **Reserved slugs** — system names (www, api, admin, etc.) blocked from tenant use
+6. **Never trust client-supplied Stripe account ids** — routes acting on a
+   connected account must resolve `stripe_account_id` server-side from the
+   caller's tenant (see `/api/stripe/coupons`). The raw id is also stripped from
+   API responses (`/api/admin/settings` exposes `has_stripe_account` instead) —
+   don't gate UI on fields that API deliberately removes.
 
 ---
 

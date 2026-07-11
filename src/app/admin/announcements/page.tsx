@@ -32,6 +32,8 @@ export default function AdminAnnouncementsPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [sendingEmail, setSendingEmail] = useState(false);
+    const [recipientCount, setRecipientCount] = useState<number | null>(null);
+    const [countLoading, setCountLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -46,6 +48,43 @@ export default function AdminAnnouncementsPage() {
     useEffect(() => {
         fetchData();
     }, []);
+
+    // Preview how many recipients the email notification would reach, using the
+    // same endpoint as the real send (countOnly dry run). Purely informational —
+    // a failed preview never blocks creating/sending the announcement.
+    useEffect(() => {
+        if (!showModal || editingAnnouncement || !formData.sendEmailNotifications) {
+            setRecipientCount(null);
+            return;
+        }
+
+        let cancelled = false;
+        setCountLoading(true);
+
+        fetch('/api/email/announcement', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                countOnly: true,
+                locationId: formData.location_id || null,
+                targetAudience: formData.target_audience,
+            }),
+        })
+            .then(res => (res.ok ? res.json() : null))
+            .then(data => {
+                if (!cancelled) {
+                    setRecipientCount(typeof data?.recipients === 'number' ? data.recipients : null);
+                }
+            })
+            .catch(() => {
+                if (!cancelled) setRecipientCount(null);
+            })
+            .finally(() => {
+                if (!cancelled) setCountLoading(false);
+            });
+
+        return () => { cancelled = true; };
+    }, [showModal, editingAnnouncement, formData.sendEmailNotifications, formData.location_id, formData.target_audience]);
 
     const fetchData = async () => {
         try {
@@ -418,6 +457,21 @@ export default function AdminAnnouncementsPage() {
                                         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: 'var(--space-2)', marginLeft: '42px' }}>
                                             Send an email notification to all members matching the target audience and location.
                                         </p>
+                                        {formData.sendEmailNotifications && (
+                                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gold)', fontWeight: 500, marginTop: 'var(--space-2)', marginLeft: '42px', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                                {countLoading ? (
+                                                    <>
+                                                        <Loader2 size={14} className="animate-spin" />
+                                                        Counting recipients…
+                                                    </>
+                                                ) : recipientCount !== null ? (
+                                                    <>
+                                                        <Users size={14} />
+                                                        Will be emailed to {recipientCount} recipient{recipientCount === 1 ? '' : 's'} (one per household).
+                                                    </>
+                                                ) : null}
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </div>

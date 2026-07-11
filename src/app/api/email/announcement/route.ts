@@ -6,8 +6,15 @@ import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/l
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limit: 10 requests per minute
-        const rateLimited = checkRateLimit(request, 'email-announce', 10);
+        const body = await request.json();
+        const { announcementTitle, announcementMessage, locationId, targetAudience, countOnly } = body;
+
+        // Rate limit. countOnly previews get their own, more generous bucket so
+        // toggling audience/location in the modal can't exhaust the 10/min send
+        // budget and block the real send.
+        const rateLimited = countOnly
+            ? checkRateLimit(request, 'email-announce-count', 30)
+            : checkRateLimit(request, 'email-announce', 10);
         if (rateLimited) return rateLimited;
 
         // Require admin authentication
@@ -16,10 +23,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
-        const body = await request.json();
-        const { announcementTitle, announcementMessage, locationId, targetAudience } = body;
-
-        if (!announcementTitle || !announcementMessage) {
+        // Title/message only needed when actually sending
+        if (!countOnly && (!announcementTitle || !announcementMessage)) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
@@ -150,6 +155,13 @@ export async function POST(request: NextRequest) {
         }
 
         const recipients = Array.from(emailMap.values());
+
+        // Dry run: report how many would receive the email, without sending.
+        // Runs the exact same selection pipeline as a real send, so the preview
+        // can never drift from actual behaviour.
+        if (countOnly) {
+            return NextResponse.json({ success: true, recipients: recipients.length });
+        }
 
         if (recipients.length === 0) {
             return NextResponse.json({

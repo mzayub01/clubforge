@@ -136,6 +136,14 @@
   could land them at the bottom of long pages. Stripe selectors (edit member +
   member profile) are schema-driven: hidden for no-stripe schemas
   (has_stripes=false presets), 0..max_stripes otherwise with 4/12 fallback.
+- **Modal system overhaul (2026-07):** root cause of mis-anchored/clipped modals
+  found — `.page-transition` (template.tsx) entrance animation persisted an
+  identity transform (fill-mode both), making page divs the containing block for
+  position:fixed; keyframes now end at `transform: none`. Overlay is scrollable
+  with `.modal` centred via margin:auto + 90dvh (tall modals no longer clip the
+  top). Since the CSS fix alone didn't resolve it in the field, ALL 23 modals
+  across 17 files now render via `ModalPortal` (portal to document.body + scroll
+  lock) — this is the convention for any new modal (see DECISIONS → CSS Gotcha).
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

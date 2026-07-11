@@ -140,8 +140,10 @@ never `translate(0)`/identity — the persisted transform makes the element a
 instead of the viewport (cut off, backdrop not covering the screen). This bit us
 via `.page-transition` (`template.tsx` wraps every dashboard page). Also:
 `.modal-overlay` centers `.modal` via `margin:auto` + scrollable overlay (flex
-`align-items:center` clips the top of an overflowing child), and `ModalPortal`
-(portal to body) is available for modals that must escape ancestor CSS entirely.
+`align-items:center` clips the top of an overflowing child). **Convention: ALL
+modals render through `ModalPortal`** (portal to document.body + scroll lock) —
+the keyframe fix alone did not resolve it in the field, so any new modal must be
+wrapped in `<ModalPortal>` to be immune to ancestor CSS.
 
 ### Component Patterns
 - Server components by default (no `'use client'` unless needed)

@@ -118,13 +118,23 @@ export async function POST(request: NextRequest) {
             let firstName = profile.first_name;
 
             if (profile.is_child || isChildEmail(profile.email)) {
-                // Route to the guardian's real email (skip if we can't resolve one)
+                // Route to the guardian's real email when the child is linked
                 const guardian = profile.parent_guardian_id
                     ? guardianMap.get(profile.parent_guardian_id)
                     : undefined;
-                if (!guardian) continue;
-                email = guardian.email;
-                firstName = guardian.first_name || profile.first_name;
+                if (guardian) {
+                    email = guardian.email;
+                    firstName = guardian.first_name || profile.first_name;
+                } else if (profile.email && !isChildEmail(profile.email)) {
+                    // Legacy child-only registration: no parent_guardian_id link, but
+                    // the profile carries the guardian's real email (the /register
+                    // child flow signs up with the parent's address). Use it rather
+                    // than silently dropping a reachable member.
+                    email = profile.email;
+                } else {
+                    // No guardian link and only a dummy address — genuinely unreachable
+                    continue;
+                }
             }
 
             // Skip anyone without a real, sendable email (null/empty emails and any

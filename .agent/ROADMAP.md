@@ -116,7 +116,8 @@
   `memberships` (no FK). Now fetches profiles separately; child accounts route to
   the guardian's real email (deduped); legacy unlinked children fall back to
   their own real email. Modal shows a recipient-count preview (countOnly dry run
-  of the same endpoint) before sending.
+  of the same endpoint) before sending, and an opt-in checkbox to also include
+  pending-payment members (default off).
 - **Admin members page stats (2026-07):** membership-status stat cards with
   descriptors (Total Profiles / Active / Pending Payment / No Membership —
   mutually exclusive buckets), clickable as toggling filters; matching status

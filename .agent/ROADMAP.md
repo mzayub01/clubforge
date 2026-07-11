@@ -133,7 +133,9 @@
   membership tier (records only — not Stripe billing) via
   `POST /api/admin/update-member`. Members-page modals render via `ModalPortal`
   (portal to body) so dialogs are always viewport-centred — inline rendering
-  could land them at the bottom of long pages.
+  could land them at the bottom of long pages. Stripe selectors (edit member +
+  member profile) are schema-driven: hidden for no-stripe schemas
+  (has_stripes=false presets), 0..max_stripes otherwise with 4/12 fallback.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

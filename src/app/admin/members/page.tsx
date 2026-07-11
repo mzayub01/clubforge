@@ -44,6 +44,9 @@ const ROLES = ['member', 'instructor', 'professor', 'admin'];
 export default function AdminMembersPage() {
     const [members, setMembers] = useState<Member[]>([]);
     const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
+    // Members after all filters EXCEPT the membership-status filter — used for the
+    // stat cards so their counts stay stable while the status cards act as filters
+    const [preStatusMembers, setPreStatusMembers] = useState<Member[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [membershipTypes, setMembershipTypes] = useState<MembershipType[]>([]);
     const [loading, setLoading] = useState(true);
@@ -202,6 +205,9 @@ export default function AdminMembersPage() {
             );
         }
 
+        // Snapshot before the status filter — feeds the stat cards
+        setPreStatusMembers(filtered);
+
         // Membership Status filter
         if (membershipStatusFilter === 'no-active') {
             filtered = filtered.filter(m =>
@@ -210,6 +216,15 @@ export default function AdminMembersPage() {
         } else if (membershipStatusFilter === 'has-active') {
             filtered = filtered.filter(m =>
                 m.memberships?.some((mem: any) => mem.status === 'active')
+            );
+        } else if (membershipStatusFilter === 'pending-payment') {
+            filtered = filtered.filter(m =>
+                !m.memberships?.some((mem: any) => mem.status === 'active') &&
+                m.memberships?.some((mem: any) => mem.status === 'pending')
+            );
+        } else if (membershipStatusFilter === 'no-membership') {
+            filtered = filtered.filter(m =>
+                !m.memberships?.some((mem: any) => mem.status === 'active' || mem.status === 'pending')
             );
         } else if (membershipStatusFilter === 'waitlist-only') {
             filtered = filtered.filter(m =>
@@ -367,6 +382,26 @@ export default function AdminMembersPage() {
         return member.memberships?.some((m: any) => m.status === 'active');
     };
 
+    // Membership-status buckets for the stat cards (mutually exclusive, so they
+    // always sum to the total). Computed over preStatusMembers so the counts stay
+    // stable while the cards themselves act as status filters.
+    const hasPendingOnly = (member: Member) =>
+        !hasActiveMembership(member) && member.memberships?.some((m: any) => m.status === 'pending');
+    const activeCount = preStatusMembers.filter(hasActiveMembership).length;
+    const pendingCount = preStatusMembers.filter(hasPendingOnly).length;
+    const noMembershipCount = preStatusMembers.length - activeCount - pendingCount;
+
+    // Clicking a stat card applies its status filter; clicking again clears it
+    const toggleStatusFilter = (value: string) =>
+        setMembershipStatusFilter(prev => (prev === value ? 'all' : value));
+
+    const statDescStyle: React.CSSProperties = {
+        fontSize: 'var(--text-xs)',
+        color: 'var(--text-tertiary)',
+        margin: 'var(--space-1) 0 0',
+        lineHeight: 1.4,
+    };
+
     const downloadCSV = () => {
         const headers = [
             'First Name',
@@ -465,7 +500,7 @@ export default function AdminMembersPage() {
                 <div>
                     <h1 className="dashboard-title">Members</h1>
                     <p className="dashboard-subtitle">
-                        Manage all {members.length} registered members
+                        {members.length} registered profiles · {members.filter(hasActiveMembership).length} with an active membership
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
@@ -591,6 +626,8 @@ export default function AdminMembersPage() {
                         >
                             <option value="all">All Members</option>
                             <option value="has-active">Has Active Membership</option>
+                            <option value="pending-payment">Pending Payment (No Active)</option>
+                            <option value="no-membership">No Membership (Guardians/Cancelled)</option>
                             <option value="no-active">No Active Membership</option>
                             <option value="waitlist-only">Waitlist Only (No Active)</option>
                         </select>
@@ -598,11 +635,55 @@ export default function AdminMembersPage() {
                 </div>
             </div>
 
-            {/* Stats Row */}
+            {/* Stats Row — membership status (click a card to filter the list) */}
+            <div className="stats-grid" style={{ marginBottom: 'var(--space-4)' }}>
+                <div
+                    className="stat-card glass-card"
+                    onClick={() => setMembershipStatusFilter('all')}
+                    style={{ cursor: 'pointer', border: membershipStatusFilter === 'all' ? '2px solid var(--color-gold)' : '2px solid transparent' }}
+                    title="Show everyone"
+                >
+                    <p className="stat-label">Total Profiles</p>
+                    <p className="stat-value">{preStatusMembers.length} <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', fontWeight: 'normal' }}>/ {members.length}</span></p>
+                    <p style={statDescStyle}>Everyone registered: members, children, guardians &amp; staff</p>
+                </div>
+                <div
+                    className="stat-card glass-card"
+                    onClick={() => toggleStatusFilter('has-active')}
+                    style={{ cursor: 'pointer', border: membershipStatusFilter === 'has-active' ? '2px solid var(--color-gold)' : '2px solid transparent' }}
+                    title="Click to show only active members"
+                >
+                    <p className="stat-label">Active Members</p>
+                    <p className="stat-value" style={{ color: 'var(--color-green)' }}>{activeCount}</p>
+                    <p style={statDescStyle}>Hold at least one active (paid or free) membership</p>
+                </div>
+                <div
+                    className="stat-card glass-card"
+                    onClick={() => toggleStatusFilter('pending-payment')}
+                    style={{ cursor: 'pointer', border: membershipStatusFilter === 'pending-payment' ? '2px solid var(--color-gold)' : '2px solid transparent' }}
+                    title="Click to show members awaiting payment"
+                >
+                    <p className="stat-label">Pending Payment</p>
+                    <p className="stat-value" style={{ color: '#F59E0B' }}>{pendingCount}</p>
+                    <p style={statDescStyle}>Registered but haven&apos;t completed payment — can be sent a reminder</p>
+                </div>
+                <div
+                    className="stat-card glass-card"
+                    onClick={() => toggleStatusFilter('no-membership')}
+                    style={{ cursor: 'pointer', border: membershipStatusFilter === 'no-membership' ? '2px solid var(--color-gold)' : '2px solid transparent' }}
+                    title="Click to show profiles without any membership"
+                >
+                    <p className="stat-label">No Membership</p>
+                    <p className="stat-value" style={{ color: 'var(--text-tertiary)' }}>{noMembershipCount}</p>
+                    <p style={statDescStyle}>Guardians, staff-only accounts, or cancelled — nothing active or pending</p>
+                </div>
+            </div>
+
+            {/* Secondary stats */}
             <div className="stats-grid" style={{ marginBottom: 'var(--space-6)' }}>
                 <div className="stat-card glass-card">
-                    <p className="stat-label">Total Members</p>
-                    <p className="stat-value">{filteredMembers.length} <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)', fontWeight: 'normal' }}>/ {members.length}</span></p>
+                    <p className="stat-label">Child Members</p>
+                    <p className="stat-value">{filteredMembers.filter(m => m.is_child).length}</p>
                 </div>
                 <div className="stat-card glass-card">
                     <p className="stat-label">Admins</p>
@@ -611,10 +692,6 @@ export default function AdminMembersPage() {
                 <div className="stat-card glass-card">
                     <p className="stat-label">Instructors</p>
                     <p className="stat-value">{filteredMembers.filter(m => m.role === 'instructor').length}</p>
-                </div>
-                <div className="stat-card glass-card">
-                    <p className="stat-label">Child Members</p>
-                    <p className="stat-value">{filteredMembers.filter(m => m.is_child).length}</p>
                 </div>
             </div>
 

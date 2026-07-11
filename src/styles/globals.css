@@ -769,10 +769,13 @@ select.form-input {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-4);
   z-index: 200;
+  /* Overlay scrolls if the modal is taller than the viewport. Centering is
+     done via margin:auto on .modal (not align-items:center) — flex centering
+     clips the TOP of an overflowing child above the viewport where it can't
+     be scrolled to. */
+  overflow-y: auto;
 }
 
 .modal {
@@ -782,7 +785,13 @@ select.form-input {
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
+  /* dvh accounts for mobile browser chrome (90vh can exceed the visible
+     viewport and clip the modal top on phones) */
+  max-height: 90dvh;
   overflow-y: auto;
+  /* Centers when smaller than the viewport; collapses to 0 when taller so the
+     top stays visible and the overlay scrolls */
+  margin: auto;
 }
 
 .modal-header {

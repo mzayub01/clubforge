@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, Plus, CheckCircle, AlertCircle, Edit, Calendar } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Naseeha {
     id: string;
@@ -210,6 +211,7 @@ export default function InstructorNaseehaPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <div className="modal-header">
@@ -280,6 +282,7 @@ export default function InstructorNaseehaPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

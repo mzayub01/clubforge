@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, MapPin, Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import type { Location } from '@/lib/types';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 export default function AdminLocationsPage() {
     const [locations, setLocations] = useState<Location[]>([]);
@@ -243,6 +244,7 @@ export default function AdminLocationsPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
                         <div className="modal-header">
@@ -367,6 +369,7 @@ export default function AdminLocationsPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

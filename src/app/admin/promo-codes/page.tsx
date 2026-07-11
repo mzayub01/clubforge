@@ -11,6 +11,7 @@ import { Tag, Plus, Trash2, Percent, PoundSterling, CheckCircle, AlertCircle, Cr
 import Link from 'next/link';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import UpgradePrompt from '@/components/admin/UpgradePrompt';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Coupon {
     id: string;
@@ -393,6 +394,7 @@ export default function AdminPromoCodesPage() {
 
             {/* Create Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -543,6 +545,7 @@ export default function AdminPromoCodesPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

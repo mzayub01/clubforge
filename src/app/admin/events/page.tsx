@@ -6,6 +6,7 @@ import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib
 import type { Event, Location } from '@/lib/types';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import UpgradePrompt from '@/components/admin/UpgradePrompt';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 const EVENT_TYPES = [
     { value: 'class', label: 'Class' },
@@ -346,6 +347,7 @@ export default function AdminEventsPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div className="modal-header">
@@ -405,10 +407,12 @@ export default function AdminEventsPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Attendees Modal */}
             {showAttendeesModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowAttendeesModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div className="modal-header">
@@ -497,6 +501,7 @@ export default function AdminEventsPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

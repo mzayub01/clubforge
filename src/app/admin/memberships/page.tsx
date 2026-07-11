@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw } from 'lucide-react';
 import { adminFetch, adminFetchOne, adminInsert, adminUpdateById } from '@/lib/admin-api';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Membership {
     id: string;
@@ -485,6 +486,7 @@ export default function AdminMembershipsPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -556,6 +558,7 @@ export default function AdminMembershipsPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

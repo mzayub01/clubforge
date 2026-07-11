@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, CheckCircle, Clock, TrendingUp, Award, MapPin } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface AttendanceRecord {
     id: string;
@@ -121,6 +122,7 @@ export default function MemberAttendanceModal({ isOpen, onClose, member }: Membe
     if (!isOpen || !member) return null;
 
     return (
+        <ModalPortal>
         <div className="modal-overlay" onClick={onClose}>
             <div
                 className="modal"
@@ -278,5 +280,6 @@ export default function MemberAttendanceModal({ isOpen, onClose, member }: Membe
                 </div>
             </div>
         </div>
+        </ModalPortal>
     );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, User, Award, Edit, CheckCircle, AlertCircle, Mail, Calendar, BookOpen } from 'lucide-react';
 import { adminFetch, adminInsert, adminUpdateById, adminUpdate } from '@/lib/admin-api';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Member {
     id: string;
@@ -350,6 +351,7 @@ export default function AdminInstructorsPage() {
 
             {/* Edit Modal */}
             {showModal && editingInstructor && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -403,10 +405,12 @@ export default function AdminInstructorsPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Promote Modal */}
             {showPromoteModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowPromoteModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -457,6 +461,7 @@ export default function AdminInstructorsPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

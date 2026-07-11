@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, MessageSquare, Loader2, CheckCircle, Send } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface MemberForFeedback {
     user_id: string;
@@ -64,6 +65,7 @@ export default function FeedbackModal({ member, onClose, onSuccess }: FeedbackMo
     };
 
     return (
+        <ModalPortal>
         <div className="modal-overlay" onClick={onClose}>
             <div
                 className="modal-content"
@@ -219,5 +221,6 @@ export default function FeedbackModal({ member, onClose, onSuccess }: FeedbackMo
                 }
             `}</style>
         </div>
+        </ModalPortal>
     );
 }

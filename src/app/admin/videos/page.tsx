@@ -6,6 +6,7 @@ import EmptyState from '@/components/admin/EmptyState';
 import { getSupabaseClient } from '@/lib/supabase/client'; // Kept for Storage only
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface VideoItem {
     id: string;
@@ -463,6 +464,7 @@ export default function AdminVideosPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -658,6 +660,7 @@ export default function AdminVideosPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

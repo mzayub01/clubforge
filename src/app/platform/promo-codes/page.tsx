@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Tag, Plus, Trash2, Percent, PoundSterling, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Coupon {
     id: string;
@@ -310,6 +311,7 @@ export default function PlatformPromoCodesPage() {
 
             {/* Create Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -463,6 +465,7 @@ export default function PlatformPromoCodesPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

@@ -6,6 +6,7 @@ import EmptyState from '@/components/admin/EmptyState';
 import { adminFetch, adminInsert, adminUpdateById, adminDelete } from '@/lib/admin-api';
 import { getClassTypes, getClassTypeLabel } from '@/lib/class-type-utils';
 import type { Class, Location, Instructor } from '@/lib/types';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -316,6 +317,7 @@ export default function AdminClassesPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
                         <div className="modal-header">
@@ -458,6 +460,7 @@ export default function AdminClassesPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

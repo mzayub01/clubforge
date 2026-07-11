@@ -5,6 +5,7 @@ import { Mail, Edit, Eye, Save, X, CheckCircle, AlertCircle, RefreshCw } from 'l
 import { adminFetch, adminUpdateById } from '@/lib/admin-api';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import UpgradePrompt from '@/components/admin/UpgradePrompt';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface EmailTemplate {
     id: string;
@@ -371,6 +372,7 @@ export default function AdminEmailTemplatesPage() {
 
             {/* Preview Modal */}
             {previewTemplate && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setPreviewTemplate(null)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '90vh' }}>
                         <div className="modal-header">
@@ -398,10 +400,12 @@ export default function AdminEmailTemplatesPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Edit Modal */}
             {editingTemplate && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setEditingTemplate(null)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px', maxHeight: '90vh' }}>
                         <div className="modal-header">
@@ -549,6 +553,7 @@ export default function AdminEmailTemplatesPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

@@ -6,6 +6,7 @@ import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib
 import type { Naseeha } from '@/lib/types';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import UpgradePrompt from '@/components/admin/UpgradePrompt';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 export default function AdminNaseehaPage() {
     const { can } = useFeatureGate();
@@ -224,6 +225,7 @@ export default function AdminNaseehaPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <div className="modal-header">
@@ -307,6 +309,7 @@ export default function AdminNaseehaPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

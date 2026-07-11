@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Star, Award, Loader2, CheckCircle, MessageSquare } from 'lucide-react';
 import BJJBelt from '@/components/BJJBelt';
 import { useRankSchemas } from '@/hooks/useRankSchemas';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface MemberForGrading {
     user_id: string;
@@ -95,6 +96,7 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
     };
 
     return (
+        <ModalPortal>
         <div className="modal-overlay" onClick={onClose}>
             <div
                 className="modal-content"
@@ -337,5 +339,6 @@ export default function GradingModal({ member, classId, onClose, onSuccess }: Gr
                 }
             `}</style>
         </div >
+        </ModalPortal>
     );
 }

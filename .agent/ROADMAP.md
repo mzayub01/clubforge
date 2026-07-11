@@ -122,6 +122,12 @@
   descriptors (Total Profiles / Active / Pending Payment / No Membership —
   mutually exclusive buckets), clickable as toggling filters; matching status
   dropdown options.
+- **Admin member editing (2026-07):** Edit Member modal now edits personal
+  details (name, email incl. login email via auth admin API, phone, DOB) and
+  membership tier (records only — not Stripe billing) via
+  `POST /api/admin/update-member`. Members-page modals render via `ModalPortal`
+  (portal to body) so dialogs are always viewport-centred — inline rendering
+  could land them at the bottom of long pages.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

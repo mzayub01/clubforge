@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Bell, Edit, Trash2, Calendar, MapPin, Users, AlertCircle, CheckCircle, Mail, Loader2 } from 'lucide-react';
 import { adminFetch, adminInsert, adminUpdateById, adminDeleteById } from '@/lib/admin-api';
+import ModalPortal from '@/components/admin/ModalPortal';
 
 interface Location {
     id: string;
@@ -364,6 +365,7 @@ export default function AdminAnnouncementsPage() {
 
             {/* Modal */}
             {showModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -509,6 +511,7 @@ export default function AdminAnnouncementsPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Download, Edit, Trash2, AlertCircle, CheckCircle, User, Phone, Mail, Award, Shield, ChevronDown, ChevronUp, CreditCard, MoreHorizontal, Send, X, Eye, Clock, Users, MapPin, Filter, Calendar, Loader2, Info, EyeOff, XCircle, ClipboardList } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
-import { adminFetch, adminFetchOne, adminInsert, adminUpdate, adminUpdateById } from '@/lib/admin-api';
+import { adminFetch, adminFetchOne, adminInsert, adminUpdate } from '@/lib/admin-api';
 import type { Location, MembershipType } from '@/lib/types';
 import MemberAttendanceModal from '@/components/admin/MemberAttendanceModal';
+import ModalPortal from '@/components/admin/ModalPortal';
 import Avatar from '@/components/Avatar';
 import { useRankSchemas } from '@/hooks/useRankSchemas';
 
@@ -70,9 +71,15 @@ export default function AdminMembersPage() {
     const [success, setSuccess] = useState('');
 
     const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        dateOfBirth: '',
         role: 'member',
         belt_rank: 'white',
         stripes: 0,
+        membershipTiers: {} as Record<string, string>, // membership id -> membership_type_id
     });
 
     // Create user state
@@ -239,9 +246,17 @@ export default function AdminMembersPage() {
     const openEditModal = (member: Member) => {
         setEditingMember(member);
         setFormData({
+            firstName: member.first_name || '',
+            lastName: member.last_name || '',
+            email: member.email || '',
+            phone: member.phone || '',
+            dateOfBirth: member.date_of_birth ? member.date_of_birth.slice(0, 10) : '',
             role: member.role || 'member',
             belt_rank: member.belt_rank || 'white',
             stripes: member.stripes || 0,
+            membershipTiers: Object.fromEntries(
+                (member.memberships || []).map((m: any) => [m.id, m.membership_type_id || ''])
+            ),
         });
         setShowModal(true);
         setError('');
@@ -255,13 +270,35 @@ export default function AdminMembersPage() {
         setSuccess('');
 
         try {
-            const { error } = await adminUpdateById('profiles', editingMember.id, {
-                role: formData.role,
-                belt_rank: formData.belt_rank,
-                stripes: formData.stripes,
+            // Only send tier changes (not every membership row)
+            const membershipUpdates = Object.entries(formData.membershipTiers)
+                .filter(([id, typeId]) => {
+                    const original = editingMember.memberships?.find((m: any) => m.id === id)?.membership_type_id || '';
+                    return typeId && typeId !== original;
+                })
+                .map(([id, membership_type_id]) => ({ id, membership_type_id }));
+
+            const response = await fetch('/api/admin/update-member', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: editingMember.user_id,
+                    profile: {
+                        first_name: formData.firstName.trim(),
+                        last_name: formData.lastName.trim(),
+                        email: formData.email.trim(),
+                        phone: formData.phone.trim(),
+                        ...(formData.dateOfBirth ? { date_of_birth: formData.dateOfBirth } : {}),
+                        role: formData.role,
+                        belt_rank: formData.belt_rank,
+                        stripes: formData.stripes,
+                    },
+                    membershipUpdates,
+                }),
             });
 
-            if (error) throw new Error(error);
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Failed to update member');
 
             // Handle instructor record creation/management
             if (formData.role === 'instructor' && editingMember.role !== 'instructor') {
@@ -844,6 +881,7 @@ export default function AdminMembersPage() {
 
             {/* Edit Modal */}
             {showModal && editingMember && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
@@ -882,6 +920,76 @@ export default function AdminMembersPage() {
                                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
                                             Joined {new Date(editingMember.created_at).toLocaleDateString('en-GB')}
                                         </p>
+                                    </div>
+                                </div>
+
+                                {/* Personal Details */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">First Name</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.firstName}
+                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Last Name</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.lastName}
+                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">
+                                        <Mail size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                        Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="form-input"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        required
+                                    />
+                                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-1)' }}>
+                                        {editingMember.is_child
+                                            ? 'Child account — updates the contact email on the profile only (their login is unaffected).'
+                                            : 'Changing this also updates the email they log in with.'}
+                                    </p>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <Phone size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                            Phone
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            className="form-input"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <Calendar size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                            Date of Birth
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="form-input"
+                                            value={formData.dateOfBirth}
+                                            onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                                        />
                                     </div>
                                 </div>
 
@@ -957,6 +1065,53 @@ export default function AdminMembersPage() {
                                         </p>
                                     )}
                                 </div>
+
+                                {/* Membership Tier */}
+                                {(editingMember.memberships?.length || 0) > 0 && (
+                                    <div className="form-group" style={{ marginTop: 'var(--space-2)' }}>
+                                        <label className="form-label">
+                                            <CreditCard size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                            Membership Tier
+                                        </label>
+                                        {editingMember.memberships!.map((m: any) => {
+                                            const tierOptions = membershipTypes.filter(
+                                                (mt: any) => !mt.location_id || mt.location_id === m.location_id
+                                            );
+                                            const currentId = formData.membershipTiers[m.id] || '';
+                                            const hasCurrent = tierOptions.some((t: any) => t.id === currentId);
+                                            return (
+                                                <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)', flexWrap: 'wrap' }}>
+                                                    <span style={{ fontSize: 'var(--text-sm)', minWidth: '140px', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                                        {m.location?.name || 'Membership'}
+                                                        <span className={`badge ${m.status === 'active' ? 'badge-green' : 'badge-gray'}`}>{m.status}</span>
+                                                    </span>
+                                                    <select
+                                                        className="form-input"
+                                                        style={{ flex: 1, minWidth: '180px' }}
+                                                        value={currentId}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            membershipTiers: { ...formData.membershipTiers, [m.id]: e.target.value },
+                                                        })}
+                                                    >
+                                                        {!hasCurrent && currentId && (
+                                                            <option value={currentId}>{m.membership_type?.name || 'Current tier'}</option>
+                                                        )}
+                                                        {!currentId && <option value="">No tier set</option>}
+                                                        {tierOptions.map((t: any) => (
+                                                            <option key={t.id} value={t.id}>
+                                                                {t.name}{typeof t.price === 'number' ? (t.price > 0 ? ` — £${t.price}/mo` : ' (Free)') : ''}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            );
+                                        })}
+                                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-1)' }}>
+                                            ⚠️ Tier changes update club records only — they do <strong>not</strong> change the amount of an existing Stripe subscription.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="modal-footer">
@@ -970,6 +1125,7 @@ export default function AdminMembersPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Attendance Modal */}
@@ -984,8 +1140,9 @@ export default function AdminMembersPage() {
 
             {/* Create User Modal */}
             {showCreateModal && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
                         <div className="modal-header">
                             <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                                 <Plus size={20} />
@@ -1096,10 +1253,12 @@ export default function AdminMembersPage() {
                         </form>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Delete Confirmation Modal */}
             {showDeleteModal && deletingMember && (
+                <ModalPortal>
                 <div className="modal-overlay">
                     <div className="modal" style={{ maxWidth: '450px' }}>
                         <div className="modal-header">
@@ -1153,10 +1312,12 @@ export default function AdminMembersPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
 
             {/* Member Details Modal */}
             {showDetailsModal && viewingMember && (
+                <ModalPortal>
                 <div className="modal-overlay" onClick={() => { setShowDetailsModal(false); setViewingMember(null); }}>
                     <div className="modal" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
@@ -1320,6 +1481,7 @@ export default function AdminMembersPage() {
                         </div>
                     </div>
                 </div>
+                </ModalPortal>
             )}
         </div>
     );

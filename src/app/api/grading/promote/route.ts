@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { resolveTenantForUser } from '@/lib/tenant';
 
 export async function POST(request: NextRequest) {
@@ -30,9 +31,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
         }
 
+        // Role is validated above, so DB operations use the admin client. The
+        // user-scoped client silently failed here: profiles RLS only lets tenant
+        // ADMINS update other members, so a PROFESSOR's promotion updated 0 rows
+        // (belt never changed) while the route still reported success.
+        const adminSupabase = createAdminClient();
+
         // For professors (not admin), verify access to the class
         if (membership.role === 'professor') {
-            const { data: access } = await supabase
+            const { data: access } = await adminSupabase
                 .from('professor_class_access')
                 .select('id')
                 .eq('professor_user_id', user.id)
@@ -45,7 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Create promotion record (write both legacy + new FK columns)
-        const { error: promotionError } = await supabase
+        const { error: promotionError } = await adminSupabase
             .from('promotions')
             .insert({
                 user_id: userId,
@@ -77,7 +84,7 @@ export async function POST(request: NextRequest) {
             updatePayload.rank_level_id = rankLevelId;
         }
 
-        const { error: updateError } = await supabase
+        const { error: updateError } = await adminSupabase
             .from('profiles')
             .update(updatePayload)
             .eq('user_id', userId);

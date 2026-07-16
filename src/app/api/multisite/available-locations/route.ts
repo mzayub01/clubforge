@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getTenantId, resolveTenantForUser } from '@/lib/tenant';
 
 interface MultisiteTier {
     id: string;
@@ -36,6 +38,11 @@ function getAge(dateOfBirth: string): number {
 
 export async function GET(request: NextRequest) {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -45,8 +52,47 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+        // Reads use the admin client: profiles/memberships RLS has no guardian
+        // policy, so guardians browsing for their child got "Profile not found".
+        // Authorisation (self / guardian-of-child / staff) is checked explicitly,
+        // and queries are tenant-scoped since the admin client bypasses RLS.
+        const admin = createAdminClient();
+
+        if (userId !== user.id) {
+            const { data: parentProfile } = await admin
+                .from('profiles')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_child', false)
+                .single();
+
+            const { data: childProfile } = parentProfile
+                ? await admin
+                    .from('profiles')
+                    .select('id')
+                    .eq('user_id', userId)
+                    .eq('parent_guardian_id', parentProfile.id)
+                    .eq('is_child', true)
+                    .single()
+                : { data: null };
+
+            if (!childProfile) {
+                const callerMembership = await resolveTenantForUser(user.id);
+                const isStaff = ['admin', 'instructor', 'professor'].includes(callerMembership?.role || '');
+                if (!isStaff) {
+                    return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+                }
+            }
+        }
+
+        // Tenant scope: request context first, caller's membership as fallback
+        const tenantId = (await getTenantId()) || (await resolveTenantForUser(user.id))?.tenantId;
+        if (!tenantId) {
+            return NextResponse.json({ error: 'No tenant found' }, { status: 400 });
+        }
+
         // Get user profile to determine age
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await admin
             .from('profiles')
             .select('date_of_birth, is_child')
             .eq('user_id', userId)
@@ -59,10 +105,11 @@ export async function GET(request: NextRequest) {
         const memberAge = getAge(profile.date_of_birth);
 
         // Get current active memberships for this user with location names
-        const { data: currentMemberships, error: membershipError } = await supabase
+        const { data: currentMemberships, error: membershipError } = await admin
             .from('memberships')
             .select('id, location_id, status, location:locations(id, name)')
             .eq('user_id', userId)
+            .eq('tenant_id', tenantId)
             .eq('status', 'active');
 
         if (membershipError) {
@@ -77,9 +124,10 @@ export async function GET(request: NextRequest) {
         }));
 
         // Get available locations (multisite enabled, not already a member)
-        const { data: locations, error: locationsError } = await supabase
+        const { data: locations, error: locationsError } = await admin
             .from('locations')
             .select('id, name, city, max_capacity, current_members')
+            .eq('tenant_id', tenantId)
             .eq('is_active', true)
             .eq('allow_multisite', true);
 
@@ -102,9 +150,10 @@ export async function GET(request: NextRequest) {
         }
 
         // Fetch multisite tiers for available locations
-        const { data: multisiteTiers, error: tiersError } = await supabase
+        const { data: multisiteTiers, error: tiersError } = await admin
             .from('membership_types')
             .select('id, location_id, name, description, price, age_min, age_max, stripe_price_id')
+            .eq('tenant_id', tenantId)
             .eq('is_multisite', true)
             .eq('is_active', true)
             .in('location_id', availableLocationIds);

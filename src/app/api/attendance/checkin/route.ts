@@ -43,21 +43,27 @@ export async function POST(request: NextRequest) {
             }
 
             if (!isStaff) {
-                // Not staff — check parent-child relationship
-                const { data: parentProfile } = await supabase
+                // Not staff — check parent-child relationship.
+                // MUST use the admin client here: profiles RLS has no guardian
+                // policy, so a guardian cannot read their child's row with the
+                // user-scoped client — the child lookup always returned null and
+                // every guardian check-in got a spurious 403.
+                const { data: parentProfile } = await adminSupabaseAuth
                     .from('profiles')
                     .select('id')
                     .eq('user_id', user.id)
+                    .eq('is_child', false)
                     .single();
 
                 if (!parentProfile) {
                     return NextResponse.json({ error: 'Not authorized to check in for this profile' }, { status: 403 });
                 }
 
-                const { data: childProfile } = await supabase
+                const { data: childProfile } = await adminSupabaseAuth
                     .from('profiles')
                     .select('id, parent_guardian_id')
                     .eq('user_id', profileId)
+                    .eq('is_child', true)
                     .single();
 
                 if (!childProfile || childProfile.parent_guardian_id !== parentProfile.id) {

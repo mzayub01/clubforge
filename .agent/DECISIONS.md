@@ -181,6 +181,14 @@ returns null/wrong and silently breaks flows.
 - Member catalog endpoints (`/api/member/locations-tiers`) and `/api/parent/add-child`
   resolve via `getTenantId()` first, `resolveTenantForUser` only as fallback.
   `resolveTenantForUser` itself falls back to `profiles.tenant_id`.
+- **Inside a route, use the ADMIN client for any query touching another user's
+  rows** — validate authorization explicitly first, then query with admin. The
+  user-scoped client silently fails under RLS (guardian reading a child → null →
+  spurious 403/404; professor updating a member's belt → 0 rows updated but no
+  error). Three prod bugs from this: guardian check-in 403 (`c75519d`),
+  professor promotions not persisting + guardian multisite 404 (`315e5ab`).
+  When using the admin client, add explicit `.eq('tenant_id', …)` scoping —
+  RLS's tenant isolation no longer applies.
 - Symptoms this class produced: guardian empty location dropdown / "Failed to
   load membership options" (fix `22e7560`). The `requireAuth` hardening
   (`4ca81cb`) prevents platform admins / multi-tenant users from getting spurious

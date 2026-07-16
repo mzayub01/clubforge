@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-07-01 (Phase 4 in progress — guardian/child flow, member payments, profile media)
+> **Last updated:** 2026-07-02 (Phase 4 in progress — guardian/child flow, member payments, profile media, modal system)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -236,6 +236,8 @@ that re-validate the parent-child relationship server-side:
 | `GET /api/member/children` | List a guardian's children |
 | `POST /api/parent/add-child` | Create a child (profile + membership + optional photo) |
 | `POST /api/upload-profile-image` | Server-side avatar upload (admin → `avatars` bucket) |
+| `POST /api/attendance/checkin` | Check in self or a child (guardian validated via admin client) |
+| `GET /api/multisite/available-locations` | Multisite options for self or a child (auth: self/guardian/staff) |
 
 The member dashboard uses a profile switcher (`DashboardProvider` + `ChildSwitcher`)
 to select which profile (`selectedProfileId`) is viewed. Two derived flags drive

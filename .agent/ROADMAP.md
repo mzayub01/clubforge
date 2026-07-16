@@ -136,6 +136,15 @@
   could land them at the bottom of long pages. Stripe selectors (edit member +
   member profile) are schema-driven: hidden for no-stripe schemas
   (has_stripes=false presets), 0..max_stripes otherwise with 4/12 fallback.
+- **Guardian child check-in (2026-07):** every guardian check-in 403'd — the
+  endpoint validated the parent-child link by reading the child's profile with
+  the user-scoped client (profiles RLS has no guardian policy). Lookups now use
+  the admin client (fix `c75519d`); covers TodayClassCard, classes page and
+  instructor attendance, which share `/api/attendance/checkin`. Sweeping the
+  same pattern found two more (fix `315e5ab`): professor promotions silently
+  updated 0 rows (grading/promote belt write ran as the caller; only admins
+  pass RLS), and multisite available-locations 404'd for guardians (now has
+  explicit auth + admin-client, tenant-scoped reads).
 - **Modal system overhaul (2026-07):** root cause of mis-anchored/clipped modals
   found — `.page-transition` (template.tsx) entrance animation persisted an
   identity transform (fill-mode both), making page divs the containing block for

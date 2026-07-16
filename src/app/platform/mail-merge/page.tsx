@@ -56,7 +56,7 @@ export default function MailMergePage() {
     // Flow
     const [step, setStep] = useState<Step>('recipients');
     const [sending, setSending] = useState(false);
-    const [result, setResult] = useState<{ sent: number; failed: number; errors?: string[] } | null>(null);
+    const [result, setResult] = useState<{ sent: number; failed: number; errors?: string[]; note?: string } | null>(null);
     const [error, setError] = useState('');
     const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -185,7 +185,7 @@ export default function MailMergePage() {
                 return;
             }
 
-            setResult({ sent: data.sent, failed: data.failed, errors: data.errors });
+            setResult({ sent: data.sent, failed: data.failed, errors: data.errors, note: data.note });
         } catch {
             setError('Network error. Please try again.');
         } finally {
@@ -519,7 +519,10 @@ export default function MailMergePage() {
                                     />
                                 </div>
                             </div>
-                            <span className="hint" style={{ marginBottom: '16px', marginTop: '-8px' }}>Emails will be sent from this identity. Replies go to this address.</span>
+                            <span className="hint" style={{ marginBottom: '16px', marginTop: '-8px' }}>
+                                Replies always go to this address. The from-address must be on a verified domain (@clubforgehq.com) —
+                                personal addresses (Gmail etc.) are sent as &quot;Your Name &lt;noreply@clubforgehq.com&gt;&quot; automatically.
+                            </span>
 
                             <div className="form-group">
                                 <label>
@@ -731,6 +734,12 @@ export default function MailMergePage() {
                                         <span className="stat-label">Failed</span>
                                     </div>
                                 </div>
+
+                                {result.note && (
+                                    <p className="hint" style={{ maxWidth: '420px', margin: '8px auto 0' }}>
+                                        {result.note}
+                                    </p>
+                                )}
 
                                 {result.errors && result.errors.length > 0 && (
                                     <div className="error-list">

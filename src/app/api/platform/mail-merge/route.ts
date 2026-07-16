@@ -138,13 +138,29 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Build from address: "Display Name <email>" or fall back to default
-        const fromAddress = fromName && fromEmail
-            ? `${fromName} <${fromEmail}>`
-            : undefined;
+        // Resend only permits sending from VERIFIED domains — a personal address
+        // (gmail.com etc.) as the from-address makes Resend reject the whole send
+        // ("This API key is not authorized to send emails from gmail.com"). Keep
+        // the display name, send from the platform address, and route replies to
+        // the requested email instead.
+        const VERIFIED_SENDING_DOMAINS = (process.env.RESEND_VERIFIED_DOMAINS || 'clubforgehq.com')
+            .split(',')
+            .map(d => d.trim().toLowerCase())
+            .filter(Boolean);
 
-        // Reply-to: use explicit replyTo, or fall back to fromEmail so replies go to their inbox
-        const effectiveReplyTo = replyTo?.trim() || fromEmail?.trim() || undefined;
+        const requestedEmail = fromEmail?.trim() || '';
+        const requestedDomain = requestedEmail.toLowerCase().split('@')[1] || '';
+        const canSendAsRequested = !!requestedDomain && VERIFIED_SENDING_DOMAINS.includes(requestedDomain);
+
+        const effectiveFromEmail = canSendAsRequested ? requestedEmail : 'noreply@clubforgehq.com';
+        const fromAddress = (fromName?.trim() || requestedEmail)
+            ? `${fromName?.trim() || 'ClubForge'} <${effectiveFromEmail}>`
+            : undefined;
+        const fromRewritten = !!requestedEmail && !canSendAsRequested;
+
+        // Reply-to: explicit replyTo, else the requested from email — so replies
+        // reach the sender's real inbox even when the from-address was rewritten
+        const effectiveReplyTo = replyTo?.trim() || requestedEmail || undefined;
 
         let sent = 0;
         let failed = 0;
@@ -193,6 +209,9 @@ export async function POST(request: NextRequest) {
             failed,
             total: recipients.length,
             errors: errors.length > 0 ? errors.slice(0, 10) : undefined,
+            note: fromRewritten
+                ? `Sent from "${fromName?.trim() || 'ClubForge'} <${effectiveFromEmail}>" because ${requestedDomain} is not a verified sending domain. Replies go to ${requestedEmail}.`
+                : undefined,
         });
 
     } catch (error) {

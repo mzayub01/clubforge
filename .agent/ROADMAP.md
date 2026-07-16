@@ -145,6 +145,10 @@
   updated 0 rows (grading/promote belt write ran as the caller; only admins
   pass RLS), and multisite available-locations 404'd for guardians (now has
   explicit auth + admin-client, tenant-scoped reads).
+- **Platform mail merge (2026-07):** personal from-addresses (gmail etc.) made
+  Resend reject the whole send. Unverified from-domains are now rewritten to
+  `Name <noreply@clubforgehq.com>` with the requested address as Reply-To
+  (verified domains configurable via `RESEND_VERIFIED_DOMAINS`).
 - **Modal system overhaul (2026-07):** root cause of mis-anchored/clipped modals
   found — `.page-transition` (template.tsx) entrance animation persisted an
   identity transform (fill-mode both), making page divs the containing block for

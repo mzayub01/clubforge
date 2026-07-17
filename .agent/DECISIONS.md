@@ -200,6 +200,16 @@ returns null/wrong and silently breaks flows.
   class, and not the null-email guess (`0b00b21` was defensive hardening only).
   Verify with SQL/schema/logs before assuming.)
 
+### Email Patterns (Resend)
+- **From-addresses must be on a verified domain** (`RESEND_VERIFIED_DOMAINS`,
+  default clubforgehq.com). Never pass a user-supplied address straight to
+  `from:` — Resend rejects the send, and personal-provider domains (gmail etc.)
+  can never verify (DMARC would junk the mail regardless). Pattern: keep the
+  display name, send as `Name <noreply@clubforgehq.com>`, put the user's real
+  address in `replyTo` (see `/api/platform/mail-merge`, `/api/email/announcement`).
+- Child accounts have dummy `@child.clubforge.local` emails — route to the
+  guardian; never use a dummy address as a send target.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

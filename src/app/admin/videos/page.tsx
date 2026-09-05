@@ -48,6 +48,17 @@ export default function AdminVideosPage() {
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+    // Tenant id for tenant-scoped storage paths (videos/<tenantId>/<file>).
+    // Storage policies (migration 014) only let a club's admins write inside
+    // its own folder, so uploads must carry the tenant in the path.
+    const [tenantId, setTenantId] = useState<string | null>(null);
+    useEffect(() => {
+        fetch('/api/admin/settings')
+            .then(r => (r.ok ? r.json() : null))
+            .then(j => setTenantId(j?.tenant?.id || j?.id || null))
+            .catch(() => setTenantId(null));
+    }, []);
+
 
 
     useEffect(() => {
@@ -135,7 +146,10 @@ export default function AdminVideosPage() {
         const supabase = getSupabaseClient(); // Storage only
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `videos/${fileName}`;
+        if (!tenantId) {
+            throw new Error('Could not determine your club. Please refresh the page and try again.');
+        }
+        const filePath = `videos/${tenantId}/${fileName}`;
 
         setUploading(true);
         setUploadProgress(0);
@@ -250,9 +264,15 @@ export default function AdminVideosPage() {
             // If it's a storage URL, delete from storage too
             if (video?.url.includes('supabase')) {
                 const supabase = getSupabaseClient(); // Storage only
-                const path = video.url.split('/').pop();
-                if (path) {
-                    await supabase.storage.from('videos').remove([`videos/${path}`]);
+                // Object path is everything after the bucket segment — handles both
+                // the legacy flat layout videos/<file> and videos/<tenantId>/<file>.
+                const marker = '/object/public/videos/';
+                const idx = video.url.indexOf(marker);
+                const objectPath = idx >= 0
+                    ? decodeURIComponent(video.url.slice(idx + marker.length).split('?')[0])
+                    : null;
+                if (objectPath) {
+                    await supabase.storage.from('videos').remove([objectPath]);
                 }
             }
 

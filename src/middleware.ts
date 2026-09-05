@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { extractSlugFromHost, TENANT_ID_HEADER, TENANT_SLUG_HEADER } from '@/lib/tenant';
 
 // -----------------------------------------------
@@ -51,6 +52,44 @@ function setCachedDomain(host: string, value: CachedDomain | null) {
     domainCache.set(host, value ?? { timestamp: Date.now() });
 }
 
+// -----------------------------------------------
+// Public tenant lookup with the anon key.
+// Reads the `tenants_public` view (migration 014), which exposes only
+// marketing-safe columns — the base `tenants` table is no longer readable by
+// anon. Falls back to the base table only while the view doesn't exist yet
+// (deploy-before-migrate window).
+// -----------------------------------------------
+type PublicTenantRow = { id: string; slug: string; custom_domain: string | null };
+
+async function lookupPublicTenant(
+    client: SupabaseClient,
+    column: 'slug' | 'custom_domain',
+    value: string,
+): Promise<PublicTenantRow | null> {
+    const columns = 'id, slug, custom_domain';
+    const { data, error } = await client
+        .from('tenants_public')
+        .select(columns)
+        .eq(column, value)
+        .eq('is_active', true)
+        .maybeSingle();
+    if (!error) return (data as PublicTenantRow | null) ?? null;
+
+    const viewMissing =
+        error.code === '42P01' ||
+        error.code === 'PGRST205' ||
+        /schema cache|does not exist/i.test(error.message || '');
+    if (!viewMissing) return null;
+
+    const { data: legacy } = await client
+        .from('tenants')
+        .select(columns)
+        .eq(column, value)
+        .eq('is_active', true)
+        .maybeSingle();
+    return (legacy as PublicTenantRow | null) ?? null;
+}
+
 export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -100,12 +139,7 @@ export async function middleware(request: NextRequest) {
             // Query custom_domain column — wrapped in try-catch because the column
             // may not exist yet if the migration hasn't been run
             try {
-                const { data: tenant } = await domainLookupClient
-                    .from('tenants')
-                    .select('id, slug')
-                    .eq('custom_domain', hostname)
-                    .eq('is_active', true)
-                    .single();
+                const tenant = await lookupPublicTenant(domainLookupClient, 'custom_domain', hostname);
 
                 if (tenant) {
                     slug = tenant.slug;
@@ -218,12 +252,7 @@ export async function middleware(request: NextRequest) {
                     rewriteResponse.headers.set(TENANT_ID_HEADER, customDomainTenantId);
                     requestHeaders.set(TENANT_ID_HEADER, customDomainTenantId);
                 } else {
-                    const { data: tenant } = await supabase
-                        .from('tenants')
-                        .select('id, custom_domain')
-                        .eq('slug', slug)
-                        .eq('is_active', true)
-                        .single();
+                    const tenant = await lookupPublicTenant(supabase, 'slug', slug);
 
                     if (tenant) {
                         rewriteResponse.headers.set(TENANT_ID_HEADER, tenant.id);
@@ -306,12 +335,7 @@ export async function middleware(request: NextRequest) {
             });
             response.headers.set(TENANT_ID_HEADER, customDomainTenantId);
         } else {
-            const { data: tenant } = await supabase
-                .from('tenants')
-                .select('id, custom_domain')
-                .eq('slug', slug)
-                .eq('is_active', true)
-                .single();
+            const tenant = await lookupPublicTenant(supabase, 'slug', slug);
 
             if (tenant) {
                 // SEO redirect: if tenant has custom_domain and user is on subdomain, redirect

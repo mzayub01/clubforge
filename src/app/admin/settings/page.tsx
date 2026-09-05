@@ -13,7 +13,6 @@ import {
     Shield, Zap, MapPin, ImageIcon
 } from 'lucide-react';
 import { getUsageLimits, SubscriptionTier } from '@/lib/feature-gate';
-import { getSupabaseClient } from '@/lib/supabase/client';
 
 type Tab = 'general' | 'branding' | 'payments' | 'subscription';
 
@@ -76,7 +75,6 @@ export default function AdminSettingsPage() {
     const [membershipLocationMode, setMembershipLocationMode] = useState<'per_location' | 'all_locations'>('per_location');
     const logoInputRef = useRef<HTMLInputElement>(null);
 
-    const supabase = getSupabaseClient();
 
     // Check for Stripe Connect return status
     const connectStatus = searchParams.get('connect');
@@ -196,18 +194,14 @@ export default function AdminSettingsPage() {
 
         setSaving(true);
         try {
-            const ext = file.name.split('.').pop();
-            const path = `tenants/${tenant.id}/logo.${ext}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('tenant-assets')
-                .upload(path, file, { upsert: true });
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('tenant-assets')
-                .getPublicUrl(path);
+            // Upload server-side (service role): tenant-assets no longer accepts
+            // browser writes outside the caller's own tenant folder (migration 014).
+            const body = new FormData();
+            body.append('logo', file);
+            const uploadRes = await fetch('/api/admin/upload-logo', { method: 'POST', body });
+            const uploadJson = await uploadRes.json();
+            if (!uploadRes.ok) throw new Error(uploadJson.error || 'Failed to upload logo');
+            const publicUrl: string = uploadJson.url;
 
             // Update tenant record via API (bypasses RLS)
             const res = await fetch('/api/admin/settings', {

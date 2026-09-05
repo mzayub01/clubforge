@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { TENANT_SLUG_HEADER } from '@/lib/tenant';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // Serve a dynamic manifest.json that uses the tenant name when on a tenant domain
 export async function GET(request: NextRequest) {
@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
 
     if (slug) {
         try {
-            const supabase = await createClient();
+            // Service role: `tenants` is not readable with the anon/user key any
+            // more (migration 014). Only marketing-safe columns are selected.
+            const supabase = createAdminClient();
             const { data: tenant } = await supabase
                 .from('tenants')
                 .select('name, primary_color')

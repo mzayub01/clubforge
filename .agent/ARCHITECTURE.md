@@ -52,7 +52,7 @@ ClubForge is a **multi-tenant SaaS platform** for managing clubs (martial arts g
 Browser → {slug}.clubforgehq.com
   → middleware.ts
     → extractSlugFromHost(host)
-    → Supabase query: tenants WHERE slug = ? AND is_active = true
+    → Supabase query (anon key): tenants_public WHERE slug = ? AND is_active = true
     → Sets x-tenant-id header
   → Server component / API route
     → getTenantId() reads header
@@ -274,6 +274,33 @@ guardian UI, computed in `dashboard/layout.tsx`:
 
 Payments for a child are made by the guardian; `POST /api/stripe/checkout-connected`
 allows a parent→child payment after validating the relationship.
+
+### Public tenant data & storage authorization (2026-09 hardening)
+
+- `public.tenants` is readable only by the tenant's owner/admins (and the
+  service role). Anonymous and member code paths read **`public.tenants_public`**
+  — a view (owner-executed, not `security_invoker`) exposing `id, name, slug,
+  logo_url, primary_color, tagline, custom_domain, is_active, created_at` plus a
+  whitelisted `settings` object (waiver/etiquette/registration text,
+  `require_profile_photo`, `belt_progress_enabled`, `membership_location_mode`).
+  Middleware resolves subdomains and custom domains through it (falling back to
+  `tenants` only while the view doesn't exist yet). There is no client-side
+  UPDATE on `tenants`: every tenant write goes through server routes.
+- Storage policies are path-scoped: `tenant-assets` → `tenants/<tenantId>/…`,
+  `videos` → `videos/<tenantId>/…` (legacy flat `videos/<file>` stay deletable
+  by any tenant admin), both gated by
+  `is_tenant_admin(storage_path_tenant_id(name, prefix))`. `avatars` has no
+  client policies at all (server-side writes only). Public buckets still serve
+  downloads without RLS; policies only govern list / upload / overwrite /
+  delete / signed URLs.
+- Logo upload: `POST /api/admin/upload-logo` (multipart `logo`, tenant admin
+  only, service role, path derived from the caller's tenant, `?v=` cache-buster).
+- `profiles` trigger `protect_profile_privileged_columns` rejects anon /
+  authenticated changes to `role, tenant_id, user_id, parent_guardian_id,
+  stripe_customer_id` (tenant admins may change them within their tenant;
+  `is_child` stays writable because `/register` sets it client-side).
+- Migration `014_security_hardening_authz.sql`; verify with
+  `scripts/verify-security-posture.mjs` (anon probes, optional signed-in probes).
 
 ### Profile Images / Storage
 - Uploads go **server-side** through `POST /api/upload-profile-image` using the admin

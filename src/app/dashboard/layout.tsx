@@ -69,7 +69,8 @@ export default async function DashboardLayout({
     let tenantTagline: string | undefined;
     let beltProgressEnabled: boolean | undefined;
     if (tenantId) {
-        const { data: tenant } = await supabase
+        // Admin client: members can no longer read `tenants` directly (migration 014).
+        const { data: tenant } = await supabaseAdmin
             .from('tenants')
             .select('logo_url, name, primary_color, tagline, settings')
             .eq('id', tenantId)

@@ -1,6 +1,6 @@
 # ClubForge — Decision Log & Design Principles
 
-> **Last updated:** 2026-07-02 (Phase 4 in progress)
+> **Last updated:** 2026-09-05 (Phase 4 in progress — security hardening)
 
 ---
 
@@ -122,6 +122,28 @@ Usage limits enforced per tier:
    caller's tenant (see `/api/stripe/coupons`). The raw id is also stripped from
    API responses (`/api/admin/settings` exposes `has_stripe_account` instead) —
    don't gate UI on fields that API deliberately removes.
+7. **No anonymous reads of `tenants`** (2026-09 disclosure: the anon key could
+   pull every club's contact details + Stripe ids). Anon/member code paths read
+   the **`tenants_public`** view (id, name, slug, logo_url, primary_color,
+   tagline, custom_domain, is_active, whitelisted `settings` keys); anything
+   else is server-side with the admin client. Client-side UPDATE and INSERT on
+   `tenants` were removed too (an owner could self-upgrade `subscription_tier`;
+   any signed-in user could insert a tenant with any slug/tier — 004's unused
+   "client-side provisioning fallback"). Never add a permissive
+   SELECT/INSERT/UPDATE policy back to `tenants`; provisioning is `/api/onboard`
+   with the service role.
+8. **Storage policies are tenant-scoped by path.** Object paths carry the tenant
+   (`tenants/<tenantId>/…`, `videos/<tenantId>/…`) and policies gate on
+   `is_tenant_admin(storage_path_tenant_id(name, prefix))`. Prefer server-side
+   uploads with the service role (`/api/admin/upload-logo`,
+   `/api/upload-profile-image`). Never `WITH CHECK (bucket_id = '…')` alone —
+   that let any trial account overwrite/delete every club's logo.
+9. **Privileged profile columns are server-only.** `profiles.role`, `tenant_id`,
+   `user_id`, `parent_guardian_id`, `stripe_customer_id` can't be changed with
+   the anon/authenticated role (trigger `protect_profile_privileged_columns`;
+   tenant admins may change them within their tenant). `tenant_members` is the
+   role source of truth — `resolveTenantForUser` still falls back to
+   `profiles.role` for guardians, which is exactly why the column must be locked.
 
 ---
 
@@ -228,6 +250,9 @@ returns null/wrong and silently breaks flows.
 6. **Legacy null avatars:** members who registered before the server-side upload fix have `profile_image_url = null` and must re-upload (a dashboard reminder now prompts this). All new uploads land in the public `avatars` bucket via `/api/upload-profile-image`.
 7. **Self-editable rank:** the member profile page lets a member (or a guardian for a child) change belt rank/stripes directly. Pre-existing behaviour, preserved — revisit if self-promotion should be blocked.
 8. **`avatars` bucket auto-create:** several routes lazily `createBucket('avatars')` at runtime instead of a migration provisioning it. Consider a storage migration + explicit RLS policies.
+9. **Signup hardening (Supabase Auth dashboard):** signups are open with `mailer_autoconfirm` and no CAPTCHA / per-IP limit, so anyone can pre-register ("squat") an email such as a club's advertised contact address. Enable Turnstile/hCaptcha (token must be wired into `/register`, `/get-started`, `/login`) and Auth rate limits.
+10. **Applying SQL:** there is no CLI / psql / DB-password path from the dev machine. Migrations are pasted into the Supabase SQL editor by the owner, then verified with `scripts/verify-security-posture.mjs`. Ship app code that works both before and after a migration (e.g. `tenants_public` with fallback).
+11. **Legacy flat video objects** (`videos/<file>`) predate tenant-scoped paths; any tenant admin can delete them until they are moved under `videos/<tenantId>/`.
 
 ---
 

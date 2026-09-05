@@ -1,6 +1,6 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-07-02
+> **Last updated:** 2026-09-05
 > **Current Phase:** Phase 4 in progress (Member Experience)
 
 ---
@@ -157,6 +157,28 @@
   top). Since the CSS fix alone didn't resolve it in the field, ALL 23 modals
   across 17 files now render via `ModalPortal` (portal to document.body + scroll
   lock) — this is the convention for any new modal (see DECISIONS → CSS Gotcha).
+
+- **Security hardening — responsible disclosure (2026-09-05):** an external
+  researcher reported, and we confirmed live: anon SELECT on `tenants` (13
+  active rows incl. contact + Stripe ids), bucket-wide `tenant-assets`
+  policies (any signed-in user could list/overwrite/delete any club's logo —
+  All Out Warriors' logo was destroyed during their proof), self-editable
+  `profiles.role` (a real escalation via `resolveTenantForUser`'s profile
+  fallback, not just a control-plane gap), and 42P17 recursion on
+  `tenant_members`. Also found in the same pass: owner UPDATE on `tenants`
+  allowed self-service tier/status changes; 004's INSERT policies let any
+  signed-in user create tenants directly (any slug/tier); `avatars` and
+  `videos` had the same policy shape. Fix = `014_security_hardening_authz.sql` + app release
+  (middleware / manifest / check-slug / dashboard layout read `tenants_public`
+  or use the admin client; logos upload via `/api/admin/upload-logo`; videos
+  upload to `videos/<tenantId>/`). Verify with
+  `scripts/verify-security-posture.mjs`; one-off cleanup flags in
+  `scripts/cleanup-disclosure-2026-09.mjs`.
+  **Pending (owner):** run 014 in the SQL editor → re-run the verify script;
+  delete the squatted `info@alloutwarriors.com` auth user; clear All Out
+  Warriors' dead `logo_url` and ask them to re-upload; enable CAPTCHA + Auth
+  rate limits in the Supabase dashboard; keep the researcher's two trial
+  accounts until they have validated, then delete.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

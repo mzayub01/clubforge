@@ -4,7 +4,7 @@
 // ===============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET(request: NextRequest) {
     const slug = request.nextUrl.searchParams.get('slug');
@@ -30,21 +30,20 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ available: false, error: 'This name is reserved' });
     }
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!url || !key) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
         // In development without Supabase, return available
         return NextResponse.json({ available: true });
     }
 
-    const supabase = createClient(url, key);
+    // Service role: `tenants` is not readable with the anon key any more
+    // (migration 014), and availability must also consider inactive tenants.
+    const supabase = createAdminClient();
 
     const { data } = await supabase
         .from('tenants')
         .select('id')
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
     return NextResponse.json({ available: !data });
 }

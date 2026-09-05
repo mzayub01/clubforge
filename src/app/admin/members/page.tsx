@@ -86,10 +86,21 @@ export default function AdminMembersPage() {
         email: '',
         phone: '',
         dateOfBirth: '',
+        gender: '',
+        address: '',
+        city: '',
+        postcode: '',
+        emergencyName: '',
+        emergencyPhone: '',
+        medicalInfo: '',
+        waiverAccepted: false,
+        bestPracticeAccepted: false,
+        guardianProfileId: '', // children only
         role: 'member',
         belt_rank: 'white',
         stripes: 0,
         membershipTiers: {} as Record<string, string>, // membership id -> membership_type_id
+        membershipStatuses: {} as Record<string, string>, // membership id -> status
     });
 
     // Create member modal (full profile flow lives in components/admin/CreateMemberModal)
@@ -263,11 +274,24 @@ export default function AdminMembersPage() {
             email: member.email || '',
             phone: member.phone || '',
             dateOfBirth: member.date_of_birth ? member.date_of_birth.slice(0, 10) : '',
+            gender: member.gender || '',
+            address: member.address || '',
+            city: member.city || '',
+            postcode: member.postcode || '',
+            emergencyName: member.emergency_contact_name || '',
+            emergencyPhone: member.emergency_contact_phone || '',
+            medicalInfo: member.medical_info || '',
+            waiverAccepted: !!member.waiver_accepted,
+            bestPracticeAccepted: !!member.best_practice_accepted,
+            guardianProfileId: member.parent_guardian_id || '',
             role: member.role || 'member',
             belt_rank: member.belt_rank || 'white',
             stripes: member.stripes || 0,
             membershipTiers: Object.fromEntries(
                 (member.memberships || []).map((m: any) => [m.id, m.membership_type_id || ''])
+            ),
+            membershipStatuses: Object.fromEntries(
+                (member.memberships || []).map((m: any) => [m.id, m.status || 'active'])
             ),
         });
         setShowModal(true);
@@ -282,13 +306,19 @@ export default function AdminMembersPage() {
         setSuccess('');
 
         try {
-            // Only send tier changes (not every membership row)
-            const membershipUpdates = Object.entries(formData.membershipTiers)
-                .filter(([id, typeId]) => {
-                    const original = editingMember.memberships?.find((m: any) => m.id === id)?.membership_type_id || '';
-                    return typeId && typeId !== original;
-                })
-                .map(([id, membership_type_id]) => ({ id, membership_type_id }));
+            // Only send memberships whose tier and/or status actually changed
+            const membershipUpdates = (editingMember.memberships || []).flatMap((m: any) => {
+                const typeId = formData.membershipTiers[m.id] || '';
+                const status = formData.membershipStatuses[m.id] || '';
+                const tierChanged = !!typeId && typeId !== (m.membership_type_id || '');
+                const statusChanged = !!status && status !== m.status;
+                if (!tierChanged && !statusChanged) return [];
+                return [{
+                    id: m.id,
+                    ...(tierChanged ? { membership_type_id: typeId } : {}),
+                    ...(statusChanged ? { status } : {}),
+                }];
+            });
 
             const response = await fetch('/api/admin/update-member', {
                 method: 'POST',
@@ -301,6 +331,16 @@ export default function AdminMembersPage() {
                         email: formData.email.trim(),
                         phone: formData.phone.trim(),
                         ...(formData.dateOfBirth ? { date_of_birth: formData.dateOfBirth } : {}),
+                        gender: formData.gender || null,
+                        address: formData.address.trim(),
+                        city: formData.city.trim(),
+                        postcode: formData.postcode.trim(),
+                        emergency_contact_name: formData.emergencyName.trim(),
+                        emergency_contact_phone: formData.emergencyPhone.trim(),
+                        medical_info: formData.medicalInfo.trim() || null,
+                        waiver_accepted: formData.waiverAccepted,
+                        best_practice_accepted: formData.bestPracticeAccepted,
+                        ...(editingMember.is_child ? { parent_guardian_id: formData.guardianProfileId || null } : {}),
                         role: formData.role,
                         belt_rank: formData.belt_rank,
                         stripes: formData.stripes,
@@ -1007,6 +1047,132 @@ export default function AdminMembersPage() {
                                     </div>
                                 </div>
 
+                                {/* Address & gender */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Gender</label>
+                                        <select
+                                            className="form-input"
+                                            value={formData.gender}
+                                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                        >
+                                            <option value="">Not specified</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <MapPin size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                            Address
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.address}
+                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">City</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.city}
+                                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Postcode</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.postcode}
+                                            onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Guardian (children only) */}
+                                {editingMember.is_child && (
+                                    <div className="form-group">
+                                        <label className="form-label">
+                                            <Users size={16} style={{ marginRight: 'var(--space-1)' }} />
+                                            Guardian
+                                        </label>
+                                        <select
+                                            className="form-input"
+                                            value={formData.guardianProfileId}
+                                            onChange={(e) => setFormData({ ...formData, guardianProfileId: e.target.value })}
+                                        >
+                                            <option value="">— No guardian linked —</option>
+                                            {members
+                                                .filter(m => !m.is_child && !isChildDummyEmail(m.email) && m.id !== editingMember.id)
+                                                .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
+                                                .map(m => (
+                                                    <option key={m.id} value={m.id}>
+                                                        {m.first_name} {m.last_name} ({m.email})
+                                                    </option>
+                                                ))}
+                                        </select>
+                                        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-1)' }}>
+                                            The guardian manages this child from their dashboard and receives the child&apos;s club emails.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Emergency contact & medical */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Emergency contact name</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.emergencyName}
+                                            onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Emergency contact phone</label>
+                                        <input
+                                            type="tel"
+                                            className="form-input"
+                                            value={formData.emergencyPhone}
+                                            onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Medical information</label>
+                                    <textarea
+                                        className="form-input"
+                                        rows={2}
+                                        value={formData.medicalInfo}
+                                        onChange={(e) => setFormData({ ...formData, medicalInfo: e.target.value })}
+                                        placeholder="Allergies, conditions, injuries…"
+                                    />
+                                </div>
+
+                                {/* Agreements */}
+                                <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+                                    <label className="form-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.waiverAccepted}
+                                            onChange={(e) => setFormData({ ...formData, waiverAccepted: e.target.checked })}
+                                        />
+                                        <span>Waiver accepted</span>
+                                    </label>
+                                    <label className="form-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.bestPracticeAccepted}
+                                            onChange={(e) => setFormData({ ...formData, bestPracticeAccepted: e.target.checked })}
+                                        />
+                                        <span>Etiquette / best practice accepted</span>
+                                    </label>
+                                </div>
+
                                 <div className="form-group">
                                     <label className="form-label">
                                         <Shield size={16} style={{ marginRight: 'var(--space-1)' }} />
@@ -1130,6 +1296,21 @@ export default function AdminMembersPage() {
                                                                 {t.name}{typeof t.price === 'number' ? (t.price > 0 ? ` — £${t.price}/mo` : ' (Free)') : ''}
                                                             </option>
                                                         ))}
+                                                    </select>
+                                                    <select
+                                                        className="form-input"
+                                                        style={{ width: '160px' }}
+                                                        title="Membership status (records only)"
+                                                        value={formData.membershipStatuses[m.id] || m.status || 'active'}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            membershipStatuses: { ...formData.membershipStatuses, [m.id]: e.target.value },
+                                                        })}
+                                                    >
+                                                        <option value="active">Active</option>
+                                                        <option value="pending">Pending payment</option>
+                                                        <option value="inactive">Inactive</option>
+                                                        <option value="cancelled">Cancelled</option>
                                                     </select>
                                                 </div>
                                             );

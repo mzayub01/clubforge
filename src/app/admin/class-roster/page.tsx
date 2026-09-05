@@ -19,6 +19,7 @@ import {
 import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import Avatar from '@/components/Avatar';
+import PhotoLightbox from '@/components/PhotoLightbox';
 
 interface ClassInfo {
     id: string;
@@ -51,6 +52,7 @@ export default function ClassRosterPage() {
     const [selectedClass, setSelectedClass] = useState<string>('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [roster, setRoster] = useState<MemberStatus[]>([]);
+    const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
     const [loading, setLoading] = useState(true);
     const [rosterLoading, setRosterLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -475,28 +477,38 @@ export default function ClassRosterPage() {
                                             background: member.checked_in ? 'rgba(45, 125, 70, 0.05)' : 'transparent',
                                         }}
                                     >
-                                        {/* Avatar */}
-                                        {member.checked_in ? (
-                                            <div style={{
-                                                width: '44px',
-                                                height: '44px',
-                                                borderRadius: 'var(--radius-full)',
-                                                background: 'var(--color-green)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                flexShrink: 0,
-                                            }}>
-                                                <UserCheck size={20} color="white" />
-                                            </div>
-                                        ) : (
+                                        {/* Avatar — click to view full size; checked-in members keep a green tick badge */}
+                                        <div style={{ position: 'relative', flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                                             <Avatar
                                                 src={member.profile_image_url}
                                                 firstName={member.first_name}
                                                 lastName={member.last_name}
                                                 size="md"
+                                                onClick={member.profile_image_url
+                                                    ? () => setLightbox({ src: member.profile_image_url!, alt: `${member.first_name} ${member.last_name}` })
+                                                    : undefined}
                                             />
-                                        )}
+                                            {member.checked_in && (
+                                                <span
+                                                    title="Checked in"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        right: -4,
+                                                        bottom: -4,
+                                                        width: 20,
+                                                        height: 20,
+                                                        borderRadius: '50%',
+                                                        background: 'var(--color-green)',
+                                                        border: '2px solid var(--bg-primary)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    <UserCheck size={11} color="white" />
+                                                </span>
+                                            )}
+                                        </div>
 
                                         {/* Info */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -564,6 +576,9 @@ export default function ClassRosterPage() {
                 </div>
             )
             }
+
+            {/* Full-size photo viewer */}
+            {lightbox && <PhotoLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
         </div >
     );
 }

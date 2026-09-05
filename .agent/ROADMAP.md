@@ -239,6 +239,18 @@
   recovery link → `/reset-password`). Blank password ⇒ generated and shown
   once in the success panel with copy. Full cleanup on any failure.
 
+- **Fuller Edit Member + roster zoom (2026-09-05):** the admin Edit Member
+  modal now covers gender, address/city/postcode, emergency contact,
+  medical info, waiver + etiquette flags (timestamps set server-side only
+  when a flag changes), a guardian selector for child accounts, and per
+  membership a **status** select (active / pending / inactive / cancelled;
+  cancelled/inactive set `end_date`) alongside the tier select.
+  `POST /api/admin/update-member` whitelists the new fields, validates
+  gender + guardian (adult member of the tenant), and accepts
+  `membershipUpdates[{ id, membership_type_id?, status? }]`. Class roster
+  avatars open the `PhotoLightbox`; checked-in members show their photo
+  with a green tick badge instead of a photo-less green circle.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

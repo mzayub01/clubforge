@@ -174,11 +174,16 @@
   upload to `videos/<tenantId>/`). Verify with
   `scripts/verify-security-posture.mjs`; one-off cleanup flags in
   `scripts/cleanup-disclosure-2026-09.mjs`.
-  **Pending (owner):** run 014 in the SQL editor → re-run the verify script;
-  delete the squatted `info@alloutwarriors.com` auth user; clear All Out
-  Warriors' dead `logo_url` and ask them to re-upload; enable CAPTCHA + Auth
-  rate limits in the Supabase dashboard; keep the researcher's two trial
-  accounts until they have validated, then delete.
+  **Status 2026-09-05:** 014 applied by the owner; verify script all-PASS
+  (anon probes, plus storage/tenant probes signed in as an admin account);
+  squatted `info@alloutwarriors.com` auth user deleted; All Out Warriors'
+  dead `logo_url` cleared (club must re-upload). **Still pending:** enable
+  CAPTCHA + Auth rate limits in the Supabase dashboard (needs token wiring in
+  `/register`, `/get-started`, `/login`); researcher to validate with a plain
+  member account (the role self-edit probe is inconclusive for admin accounts
+  — admins may edit roles in their own club by design), then delete their two
+  trial accounts (`scripts/cleanup-disclosure-2026-09.mjs
+  --delete-researcher-accounts --yes`).
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

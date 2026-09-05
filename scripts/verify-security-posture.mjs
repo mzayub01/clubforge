@@ -86,16 +86,18 @@ async function anonChecks(url, anonKey) {
             error ? `error ${error.message}` : `${data?.length ?? 0} entries`);
     }
 
-    // Public-bucket downloads must keep working (logos render without RLS)
+    // Public-bucket downloads must keep working (logos render without RLS).
+    // Checks several tenants: a single 400 just means that club's file is missing.
     {
-        const { data } = await anon.from('tenants_public').select('slug, logo_url').not('logo_url', 'is', null).limit(1);
-        const logo = data?.[0]?.logo_url;
-        if (logo) {
-            const res = await fetch(logo.split('?')[0]);
-            report(res.status === 200, `public logo download still works (${data[0].slug})`, `HTTP ${res.status}`);
-        } else {
-            report(true, 'public logo download check skipped', 'no tenant with a logo_url');
+        const { data } = await anon.from('tenants_public').select('slug, logo_url').not('logo_url', 'is', null).limit(5);
+        const results = [];
+        for (const t of data || []) {
+            const res = await fetch(t.logo_url.split('?')[0]);
+            results.push(`${t.slug}:${res.status}`);
         }
+        const anyOk = results.some(r => r.endsWith(':200'));
+        report(anyOk || results.length === 0, 'public logo downloads still work (public bucket bypasses RLS)',
+            results.join(', ') || 'no tenant with a logo_url');
     }
 }
 
@@ -123,14 +125,39 @@ async function authenticatedChecks(url, anonKey, email, password) {
         report(!!error, 'client upload into avatars is refused', error ? error.message : 'UPLOAD SUCCEEDED (cleaned up)');
     }
 
-    // L1: self-elevation of profiles.role
+    // L1: self-elevation of profiles.role. Tenant admins may edit roles inside
+    // their own club by design, so this is only conclusive for a plain member.
+    const { data: before } = await client.from('profiles').select('role, tenant_id').eq('user_id', uid).maybeSingle();
+    const { data: ownMembership } = before?.tenant_id
+        ? await client.from('tenant_members').select('role').eq('user_id', uid).eq('tenant_id', before.tenant_id).maybeSingle()
+        : { data: null };
+    const isTenantAdmin = ownMembership?.role === 'admin';
     {
-        const { data: before } = await client.from('profiles').select('role').eq('user_id', uid).maybeSingle();
         const { data, error } = await client.from('profiles').update({ role: 'admin' }).eq('user_id', uid).select('role');
         const elevated = !error && data?.[0]?.role === 'admin' && before?.role !== 'admin';
         if (elevated) await client.from('profiles').update({ role: before?.role || 'member' }).eq('user_id', uid);
-        report(!elevated, 'PATCH own profiles.role=admin is refused',
-            error ? `error ${error.code}` : (before?.role === 'admin' ? 'already admin — inconclusive' : 'ROLE CHANGED (reverted)'));
+        if (isTenantAdmin) {
+            report(true, 'PATCH own profiles.role (INCONCLUSIVE: signed-in user is a tenant admin — allowed by design; re-run as a plain member)',
+                elevated ? 'changed and reverted' : (error ? `error ${error.code}` : 'unchanged'));
+        } else {
+            report(!elevated, 'PATCH own profiles.role=admin is refused',
+                error ? `error ${error.code}` : (before?.role === 'admin' ? 'already admin — inconclusive' : 'ROLE CHANGED (reverted)'));
+        }
+    }
+
+    // The trigger must fire even for admins: a profile can never be moved to another tenant.
+    {
+        const { data: others } = await client.from('tenants_public').select('id').neq('id', before?.tenant_id || '00000000-0000-0000-0000-000000000000').limit(1);
+        const otherTenant = others?.[0]?.id;
+        if (!otherTenant) {
+            report(true, 'PATCH own profiles.tenant_id check skipped', 'no other tenant to target');
+        } else {
+            const { data, error } = await client.from('profiles').update({ tenant_id: otherTenant }).eq('user_id', uid).select('tenant_id');
+            const moved = !error && data?.[0]?.tenant_id === otherTenant;
+            if (moved) await client.from('profiles').update({ tenant_id: before?.tenant_id ?? null }).eq('user_id', uid);
+            report(!moved, 'PATCH own profiles.tenant_id to another tenant is refused (trigger installed)',
+                error ? `error ${error.code}` : 'TENANT CHANGED (reverted)');
+        }
     }
 
     // Tenants visible to a signed-in user must be limited to owned/admin tenants

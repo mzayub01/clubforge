@@ -131,7 +131,7 @@ export default function AdminMembersPage() {
                     order: [{ column: 'created_at', ascending: false }],
                 }),
                 adminFetch('memberships', {
-                    select: '*, location:locations(name), membership_type:membership_types(name)',
+                    select: '*, location:locations(name), membership_type:membership_types(name, price)',
                 }),
                 adminFetch<Location>('locations', {
                     filters: [{ column: 'is_active', value: true }],
@@ -481,6 +481,74 @@ export default function AdminMembersPage() {
     const pendingCount = preStatusMembers.filter(hasPendingOnly).length;
     const noMembershipCount = preStatusMembers.length - activeCount - pendingCount;
 
+    // What "Active" and "No membership" actually mean, in numbers
+    const stripeActiveCount = preStatusMembers.filter(m =>
+        m.memberships?.some((x: any) => x.status === 'active' && x.stripe_subscription_id)
+    ).length;
+    const noMembershipMembers = preStatusMembers.filter(m => !hasActiveMembership(m) && !hasPendingOnly(m));
+    const cancelledOnlyCount = noMembershipMembers.filter(m => (m.memberships?.length || 0) > 0).length;
+    const guardianOnlyCount = noMembershipMembers.filter(m => !(m.memberships?.length) && (m.children?.length || 0) > 0).length;
+    const staffOnlyCount = noMembershipMembers.filter(m => !(m.memberships?.length) && !(m.children?.length) && m.role !== 'member').length;
+    const neverChoseCount = noMembershipMembers.length - cancelledOnlyCount - guardianOnlyCount - staffOnlyCount;
+
+    // One-line membership status per row: makes "who is actually a live (and
+    // paying) member" obvious and spells out why someone has no membership.
+    type MembershipSummary = {
+        state: 'active' | 'pending' | 'ended' | 'none';
+        heading: string;
+        label: string;
+        detail: string;
+        tone: string;
+        stripe: boolean;
+    };
+    const membershipSummary = (member: Member): MembershipSummary => {
+        const ms: any[] = member.memberships || [];
+        const describe = (m: any) => {
+            const name = m.membership_type?.name || 'no plan set';
+            const price = m.membership_type?.price;
+            const priceText = typeof price === 'number' ? (price > 0 ? ` £${price}/mo` : ' (free)') : '';
+            const loc = ms.length > 1 && m.location?.name ? ` @ ${m.location.name}` : '';
+            return `${name}${priceText}${loc}`;
+        };
+        const active = ms.filter(m => m.status === 'active');
+        if (active.length) {
+            const stripe = active.some(m => m.stripe_subscription_id);
+            return {
+                state: 'active', heading: 'Active', tone: 'var(--color-green)', stripe,
+                label: active.map(describe).join(' · '),
+                detail: stripe
+                    ? 'Live membership — paid via an active Stripe subscription'
+                    : 'Live membership — free plan or activated manually (no Stripe subscription)',
+            };
+        }
+        const pending = ms.filter(m => m.status === 'pending');
+        if (pending.length) {
+            return {
+                state: 'pending', heading: 'Pending payment', tone: '#F59E0B', stripe: false,
+                label: pending.map(describe).join(' · '),
+                detail: 'Chose this plan but never completed the payment — not a live member until they pay',
+            };
+        }
+        if (ms.length) {
+            const last = ms[0];
+            return {
+                state: 'ended', heading: last.status === 'inactive' ? 'Inactive' : 'Cancelled', tone: 'var(--text-tertiary)', stripe: false,
+                label: describe(last),
+                detail: 'Membership ended — nothing live or pending',
+            };
+        }
+        const reason = (member.children?.length || 0) > 0
+            ? 'guardian only — manages children, no membership of their own'
+            : member.role !== 'member'
+                ? `${member.role} account — no membership of their own`
+                : 'never chose a plan';
+        return {
+            state: 'none', heading: 'No membership', tone: 'var(--text-tertiary)', stripe: false,
+            label: reason,
+            detail: 'No membership record exists for this profile',
+        };
+    };
+
     // Clicking a stat card applies its status filter; clicking again clears it
     const toggleStatusFilter = (value: string) =>
         setMembershipStatusFilter(prev => (prev === value ? 'all' : value));
@@ -686,11 +754,11 @@ export default function AdminMembersPage() {
                             onChange={(e) => setMembershipStatusFilter(e.target.value)}
                         >
                             <option value="all">All Members</option>
-                            <option value="has-active">Has Active Membership</option>
-                            <option value="pending-payment">Pending Payment (No Active)</option>
-                            <option value="no-membership">No Membership (Guardians/Cancelled)</option>
-                            <option value="no-active">No Active Membership</option>
-                            <option value="waitlist-only">Waitlist Only (No Active)</option>
+                            <option value="has-active">Active — live membership (paid or free)</option>
+                            <option value="pending-payment">Pending payment — plan chosen, not paid</option>
+                            <option value="no-membership">No membership — guardians, staff, cancelled, never chose a plan</option>
+                            <option value="no-active">Anyone without a live membership</option>
+                            <option value="waitlist-only">Waitlist only (no live membership)</option>
                         </select>
                     </div>
                 </div>
@@ -716,7 +784,9 @@ export default function AdminMembersPage() {
                 >
                     <p className="stat-label">Active Members</p>
                     <p className="stat-value" style={{ color: 'var(--color-green)' }}>{activeCount}</p>
-                    <p style={statDescStyle}>Hold at least one active (paid or free) membership</p>
+                    <p style={statDescStyle}>
+                        Live membership — {stripeActiveCount} paying via a Stripe subscription, {Math.max(0, activeCount - stripeActiveCount)} on a free or manually activated plan
+                    </p>
                 </div>
                 <div
                     className="stat-card glass-card"
@@ -726,7 +796,9 @@ export default function AdminMembersPage() {
                 >
                     <p className="stat-label">Pending Payment</p>
                     <p className="stat-value" style={{ color: '#F59E0B' }}>{pendingCount}</p>
-                    <p style={statDescStyle}>Registered but haven&apos;t completed payment — can be sent a reminder</p>
+                    <p style={statDescStyle}>
+                        Chose a plan but never completed the payment, so the membership isn&apos;t live — use the reminder button to chase
+                    </p>
                 </div>
                 <div
                     className="stat-card glass-card"
@@ -736,7 +808,9 @@ export default function AdminMembersPage() {
                 >
                     <p className="stat-label">No Membership</p>
                     <p className="stat-value" style={{ color: 'var(--text-tertiary)' }}>{noMembershipCount}</p>
-                    <p style={statDescStyle}>Guardians, staff-only accounts, or cancelled — nothing active or pending</p>
+                    <p style={statDescStyle}>
+                        No membership record at all, or only ended ones — {guardianOnlyCount} guardian-only · {staffOnlyCount} staff · {cancelledOnlyCount} cancelled · {neverChoseCount} never chose a plan
+                    </p>
                 </div>
             </div>
 
@@ -829,6 +903,26 @@ export default function AdminMembersPage() {
                                                 </span>
                                             ))}
                                         </div>
+                                        {/* Membership status — the thing admins actually need to see at a glance */}
+                                        {(() => {
+                                            const s = membershipSummary(member);
+                                            const Icon = s.state === 'active' ? CheckCircle : s.state === 'pending' ? Clock : XCircle;
+                                            return (
+                                                <p
+                                                    title={s.detail}
+                                                    style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap', color: s.tone }}
+                                                >
+                                                    <Icon size={12} />
+                                                    <span style={{ fontWeight: 600 }}>{s.heading}</span>
+                                                    <span style={{ color: 'var(--text-secondary)' }}>· {s.label}</span>
+                                                    {s.stripe && (
+                                                        <span style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '999px', background: 'rgba(16,185,129,0.12)', color: 'var(--color-green)', border: '1px solid rgba(16,185,129,0.35)' }}>
+                                                            Stripe subscription
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            );
+                                        })()}
                                         {/* Guardian link for children / children list for guardians */}
                                         {member.is_child && (
                                             <p style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap' }}>

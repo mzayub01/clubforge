@@ -159,7 +159,7 @@ export interface MembershipType {
   location_id: string;
   name: string;
   description?: string;
-  price: number; // in pence/cents
+  price: number; // whole pounds per month (e.g. 30 = £30/mo) — NOT pence
   duration_days: number;
   age_min?: number;
   age_max?: number;

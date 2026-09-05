@@ -251,6 +251,16 @@
   avatars open the `PhotoLightbox`; checked-in members show their photo
   with a green tick badge instead of a photo-less green circle.
 
+- **Members page: membership state at a glance (2026-09-05):** every row
+  now carries a status line — Active (plan name, £/mo, "Stripe subscription"
+  chip when `stripe_subscription_id` is set), Pending payment (plan chosen,
+  checkout never completed), Cancelled/Inactive, or No membership with the
+  reason (guardian-only / staff account / never chose a plan). Stat-card
+  descriptors quantify the buckets (Stripe-paying vs free/manual; guardian ·
+  staff · cancelled · never-chose breakdown) and the status filter labels
+  say the same thing. NB `membership_types.price` is stored in **pounds**
+  (types.ts comment says pence — wrong; the UI renders `£{price}/mo`).
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

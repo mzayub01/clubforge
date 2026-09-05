@@ -543,7 +543,7 @@ export default function CreateMemberModal({
                                             <select className="form-select" value={form.membershipTypeId} onChange={e => set('membershipTypeId', e.target.value)} disabled={form.membershipStatus === 'none'}>
                                                 <option value="">— Not set —</option>
                                                 {typesForLocation.map(t => (
-                                                    <option key={t.id} value={t.id}>{t.name}{typeof t.price === 'number' ? ` · £${(t.price / 100).toFixed(2)}` : ''}</option>
+                                                    <option key={t.id} value={t.id}>{t.name}{typeof t.price === 'number' ? (t.price > 0 ? ` · £${t.price}/mo` : ' · free') : ''}</option>
                                                 ))}
                                             </select>
                                         </div>

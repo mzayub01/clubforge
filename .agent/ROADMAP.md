@@ -196,6 +196,20 @@
 
 **Goal:** ClubForge team can manage all tenants from a central dashboard.
 
+**Started early (2026-09-05) — `/platform/tenants` tenant health view:**
+per-tenant Status (is_active + subscription status), Stripe Connect state
+(connected / pending setup / not connected, from `stripe_connect_enabled` +
+`stripe_account_id`), Trial ends (days left, "ended Xd ago" for lapsed
+trials), and Last used (latest auth sign-in across the tenant's members,
+owner and guardian profiles, or latest attendance check-in — computed in
+`GET /api/platform/tenants` from auth users — RPC `platform_user_activity()`
+if optional migration 015 is applied, else adaptive `listUsers` paging that
+skips the one corrupt auth row — plus `attendance.check_in_time`; cached 2 min). Clickable summary chips filter (active,
+inactive, on trial, trial ended, past due, Stripe connected / not), sort by
+last used / trial ending / newest / members / name. Detail panel adds owner
+email + last sign-in, billing-customer presence, Stripe account id, last
+sign-in vs last check-in.
+
 | Item | Description |
 |------|-------------|
 | Super-admin dashboard | `/platform-admin` — tenant list, revenue, health metrics |

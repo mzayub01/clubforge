@@ -253,6 +253,7 @@ returns null/wrong and silently breaks flows.
 9. **Signup hardening (Supabase Auth dashboard):** signups are open with `mailer_autoconfirm` and no CAPTCHA / per-IP limit, so anyone can pre-register ("squat") an email such as a club's advertised contact address. Enable Turnstile/hCaptcha (token must be wired into `/register`, `/get-started`, `/login`) and Auth rate limits.
 10. **Applying SQL:** there is no CLI / psql / DB-password path from the dev machine. Migrations are pasted into the Supabase SQL editor by the owner, then verified with `scripts/verify-security-posture.mjs`. Ship app code that works both before and after a migration (e.g. `tenants_public` with fallback).
 11. **Legacy flat video objects** (`videos/<file>`) predate tenant-scoped paths; any tenant admin can delete them until they are moved under `videos/<tenantId>/`.
+12. **Corrupt `auth.users` row breaks `auth.admin.listUsers`:** any page that contains it returns "Database error finding users" (page 2 at perPage 100 today; perPage 1000 fails outright). `getUserById` works. Code that needs all users must page adaptively (see `GET /api/platform/tenants`, 100 → 10 → 1) or use the service-role-only RPC `platform_user_activity()` (optional migration 015). Worth finding the bad row in the dashboard (likely a NULL in a text column of a hand-inserted/child user) and fixing it.
 
 ---
 

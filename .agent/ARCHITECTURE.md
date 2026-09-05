@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-07-02 (Phase 4 in progress — guardian/child flow, member payments, profile media, modal system)
+> **Last updated:** 2026-09-05 (Phase 4 in progress — guardian/child flow, member payments, profile media, modal system, platform-admin tooling)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -211,6 +211,30 @@ src/
 | **Member** | Own data | View schedule, check-in, view belt progress, RSVP to events |
 
 > **Note:** Current DB enum is `member | instructor | professor | admin`. Future plans include adding `owner`, `coach`, and `staff` roles.
+
+### Platform Admins (super-admin)
+
+Platform-level access is a **separate** system from `tenant_members.role`: a row in
+`public.platform_admins` (`user_id` → `auth.users`; **no RLS policies**, so service-role
+only — migration `002_platform_admins.sql`). It is checked server-side in
+`platform/layout.tsx`, `/api/auth/role` (login redirect → `/platform`), `requireAuth`
+(a platform admin acts as admin of whichever tenant is being browsed), and the
+`/api/platform/*` routes. `/platform` is **apex-domain only** — middleware redirects it
+away on tenant subdomains — so platform admins sign in at `clubforgehq.com/login`.
+
+**Grant / revoke / list** with `scripts/create-platform-admin.mjs` (reads
+`SUPABASE_SERVICE_ROLE_KEY` from `.env.local`):
+
+```
+node scripts/create-platform-admin.mjs --list
+node scripts/create-platform-admin.mjs --email ops@example.com [--password …] [--first-name …] [--last-name …]
+node scripts/create-platform-admin.mjs --remove --email ops@example.com
+```
+
+Creates a confirmed auth user if one doesn't exist (the `on_auth_user_created` trigger
+adds the `profiles` row from `user_metadata`), generating and printing a one-time
+password when none is supplied, then inserts the `platform_admins` row. Existing auth
+users are reused unchanged. `--remove` only deletes the `platform_admins` row.
 
 ---
 

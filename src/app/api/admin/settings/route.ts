@@ -90,6 +90,7 @@ export async function PUT(request: NextRequest) {
             const mergedSettings = {
                 ...currentSettings,
                 belt_progress_enabled: data.belt_progress_enabled ?? currentSettings.belt_progress_enabled,
+                welcome_email_enabled: data.welcome_email_enabled ?? currentSettings.welcome_email_enabled,
             };
 
             updatePayload = {

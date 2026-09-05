@@ -6,27 +6,34 @@ interface WelcomeEmailProps {
     firstName: string;
     locationName: string;
     membershipType: string;
+    clubName?: string;
     dashboardUrl?: string;
 }
 
+/**
+ * Static fallback welcome email — used only when a club has no active
+ * `welcome` row in email_templates. Wording is deliberately sport-neutral:
+ * this template can't know whether the club is a dojo or a 24/7 gym.
+ */
 export function WelcomeEmail({
     firstName,
     locationName,
     membershipType,
+    clubName = 'ClubForge',
     dashboardUrl = 'https://clubforgehq.com/dashboard',
 }: WelcomeEmailProps) {
     return (
-        <BaseEmailLayout previewText={`Welcome to ClubForge, ${firstName}!`}>
+        <BaseEmailLayout previewText={`Welcome to ${clubName}, ${firstName}!`}>
             <Text style={baseStyles.heading}>
-                Welcome to ClubForge! 🥋
+                Welcome to {clubName}!
             </Text>
 
             <Text style={baseStyles.text}>
-                Welcome {firstName},
+                Hi {firstName},
             </Text>
 
             <Text style={baseStyles.text}>
-                We're thrilled to welcome you to our martial arts family! Your registration at <strong>{locationName}</strong> has been successfully completed.
+                We're thrilled to welcome you to {clubName}! Your registration at <strong>{locationName}</strong> has been successfully completed.
             </Text>
 
             <Hr style={{ borderColor: '#e5e5e5', margin: '24px 0' }} />
@@ -47,12 +54,11 @@ export function WelcomeEmail({
             </div>
 
             <Text style={baseStyles.text}>
-                Before your first class, please remember to:
+                Before your first session, please remember to:
             </Text>
 
             <Text style={{ ...baseStyles.text, paddingLeft: '16px' }}>
-                ✅ Bring a clean Gi (uniform)<br />
-                ✅ Trim your finger and toe nails<br />
+                ✅ Wear comfortable training clothes<br />
                 ✅ Arrive 10 minutes early<br />
                 ✅ Bring water and a positive attitude!
             </Text>
@@ -62,8 +68,8 @@ export function WelcomeEmail({
             </Text>
 
             <Text style={baseStyles.text}>
-                See you on the mats!<br />
-                <strong>The ClubForge Team</strong>
+                See you soon!<br />
+                <strong>The {clubName} Team</strong>
             </Text>
         </BaseEmailLayout>
     );

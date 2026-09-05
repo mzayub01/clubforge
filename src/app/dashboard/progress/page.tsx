@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Award, Star, Trophy, Target, Calendar, Loader2, MessageSquare } from 'lucide-react';
 import BJJBelt from '@/components/BJJBelt';
 import { getSupabaseClient } from '@/lib/supabase/client';
@@ -35,13 +36,19 @@ interface FeedbackRecord {
 
 export default function MemberProgressPage() {
     const supabase = getSupabaseClient();
-    const { selectedProfileId } = useDashboard();
+    const { selectedProfileId, beltProgressEnabled } = useDashboard();
     const { getSchemaForMember, loading: schemasLoading } = useRankSchemas();
+    const router = useRouter();
 
     const [profile, setProfile] = useState<ProfileData | null>(null);
     const [promotions, setPromotions] = useState<PromotionRecord[]>([]);
     const [feedback, setFeedback] = useState<FeedbackRecord[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Belt progression is switched off for this club: nothing to show here.
+    useEffect(() => {
+        if (!beltProgressEnabled) router.replace('/dashboard');
+    }, [beltProgressEnabled, router]);
 
     useEffect(() => {
         fetchData();

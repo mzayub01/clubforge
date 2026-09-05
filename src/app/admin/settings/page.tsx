@@ -71,6 +71,8 @@ export default function AdminSettingsPage() {
     const [waiverText, setWaiverText] = useState('');
     const [etiquetteText, setEtiquetteText] = useState('');
     const [registrationMessage, setRegistrationMessage] = useState('');
+    const [welcomeEmailEnabled, setWelcomeEmailEnabled] = useState(true);
+    const [savingWelcomeEmail, setSavingWelcomeEmail] = useState(false);
     const [requireProfilePhoto, setRequireProfilePhoto] = useState(false);
     const [membershipLocationMode, setMembershipLocationMode] = useState<'per_location' | 'all_locations'>('per_location');
     const logoInputRef = useRef<HTMLInputElement>(null);
@@ -113,6 +115,7 @@ export default function AdminSettingsPage() {
                 setRegistrationMessage((settings.registration_message as string) || '');
                 setRequireProfilePhoto((settings.require_profile_photo as boolean) || false);
                 setMembershipLocationMode((settings.membership_location_mode as 'per_location' | 'all_locations') || 'per_location');
+                setWelcomeEmailEnabled(settings.welcome_email_enabled !== false);
                 setCustomDomain(tenantData.custom_domain || '');
             }
 
@@ -185,6 +188,27 @@ export default function AdminSettingsPage() {
             setError(err instanceof Error ? err.message : 'Failed to save');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const toggleWelcomeEmail = async (enabled: boolean) => {
+        setSavingWelcomeEmail(true);
+        setError('');
+        try {
+            const res = await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ section: 'features', data: { welcome_email_enabled: enabled } }),
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || 'Failed to save');
+            setWelcomeEmailEnabled(enabled);
+            setSuccess(enabled ? 'Welcome email switched on' : 'Welcome email switched off');
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to save');
+        } finally {
+            setSavingWelcomeEmail(false);
         }
     };
 
@@ -443,6 +467,35 @@ export default function AdminSettingsPage() {
                                 Save Changes
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Member emails (General tab) */}
+            {activeTab === 'general' && (
+                <div className="card animate-fade-in" style={{ marginTop: 'var(--space-6)' }}>
+                    <div className="card-header">
+                        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                            <Mail size={20} color="var(--color-gold)" />
+                            Member Emails
+                        </h3>
+                    </div>
+                    <div className="card-body">
+                        <div className="form-group" style={{ marginBottom: 'var(--space-2)' }}>
+                            <label className="form-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={welcomeEmailEnabled}
+                                    disabled={savingWelcomeEmail}
+                                    onChange={e => toggleWelcomeEmail(e.target.checked)}
+                                />
+                                <span>Send an automated welcome email to new members after registration</span>
+                            </label>
+                        </div>
+                        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
+                            Switch this off if you would rather welcome members yourself. The wording of the
+                            email can be customised under <strong>Email Templates</strong> (Pro plan).
+                        </p>
                     </div>
                 </div>
             )}

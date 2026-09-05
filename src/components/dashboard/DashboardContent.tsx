@@ -241,6 +241,8 @@ export default function DashboardContent() {
 
             {/* Stats Grid */}
             <div className="stats-grid">
+                {/* Rank card is hidden entirely when the club has belt progression switched off */}
+                {beltProgressEnabled && (
                 <div className="stat-card glass-card">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div>
@@ -263,6 +265,7 @@ export default function DashboardContent() {
                         />
                     </div>
                 </div>
+                )}
 
                 <div className="stat-card glass-card">
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

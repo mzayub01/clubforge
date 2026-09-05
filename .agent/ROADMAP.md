@@ -185,6 +185,19 @@
   trial accounts (`scripts/cleanup-disclosure-2026-09.mjs
   --delete-researcher-accounts --yes`).
 
+- **Non-martial-arts clubs (2026-09-05, customer request from a 24/7 gym):**
+  the belt-progress toggle (Admin → Grading & Rank Settings) previously only
+  removed the Rank Progress nav/page; it now also hides the Current Rank card
+  on the member dashboard, the belt badge + Rank Progress card on the member
+  profile, and redirects `/dashboard/progress`. Welcome email: default wording
+  is now club-type aware (`src/lib/welcome-email-copy.ts` — Gi/mats copy only
+  for martial-arts club types; the static fallback template is neutral), and
+  Admin → Settings → General has a "Member Emails" switch
+  (`settings.welcome_email_enabled`, honoured by `/api/email/welcome`) so any
+  tier can turn the automated email off. Existing tenants keep their seeded
+  copy — use `scripts/set-welcome-template.mjs --tenant <slug> --yes` to
+  rewrite one. Wording customisation stays Pro-gated (Email Templates).
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

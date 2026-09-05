@@ -5,6 +5,7 @@ import { calculateTrialEndDate } from '@/lib/trial';
 import { getStripePriceId, TRIAL_DURATION_DAYS } from '@/lib/stripe-plans';
 import { rateLimit } from '@/lib/rate-limit';
 import { getRankPreset } from '@/lib/rank-presets';
+import { defaultWelcomeCopy } from '@/lib/welcome-email-copy';
 
 // -----------------------------------------------
 // clubType → rank preset IDs mapping
@@ -291,6 +292,9 @@ export async function POST(request: NextRequest) {
             // -----------------------------------------------
             try {
                 const clubUrl = `https://${body.slug}.clubforgehq.com`;
+                // Wording depends on club type: martial-arts clubs get Gi/mats
+                // copy, gyms/studios get neutral "training session" copy.
+                const welcomeCopy = defaultWelcomeCopy(body.clubName, body.clubType);
                 const defaultTemplates = [
                     {
                         tenant_id: tenant.id,
@@ -299,10 +303,10 @@ export async function POST(request: NextRequest) {
                         description: 'Sent to new members after registration',
                         subject: `Welcome to ${body.clubName}, {{firstName}}!`,
                         greeting: 'Hi {{firstName}},',
-                        body_intro: `We're thrilled to welcome you to our martial arts family! Your registration at **{{locationName}}** has been successfully completed.`,
+                        body_intro: welcomeCopy.body_intro,
                         body_details: '📍 **Location:** {{locationName}}\n🏷️ **Membership:** {{membershipType}}',
-                        body_action: 'Before your first class, please remember to:\n✅ Bring a clean Gi (uniform)\n✅ Trim your finger and toe nails\n✅ Arrive 10 minutes early\n✅ Bring water and a positive attitude!',
-                        body_closing: 'If you have any questions, please don\'t hesitate to reach out to us. See you on the mats!',
+                        body_action: welcomeCopy.body_action,
+                        body_closing: welcomeCopy.body_closing,
                         signature: `The ${body.clubName} Team`,
                         button_text: 'Go to Dashboard',
                         button_url: `${clubUrl}/dashboard`,

@@ -182,7 +182,7 @@ export default function GradingSettingsPage() {
                             }}>
                                 {beltEnabled
                                     ? 'Members can track belt progress. Grading features are visible.'
-                                    : 'Belt progress and grading are hidden from all members and staff.'}
+                                    : 'Rank badges, the Rank Progress page and grading are hidden from all members and staff.'}
                             </p>
                         </div>
                         <button

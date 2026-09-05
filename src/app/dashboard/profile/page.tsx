@@ -40,7 +40,7 @@ export default function ProfilePage() {
     const [formData, setFormData] = useState<Partial<Profile>>({});
 
     const supabase = getSupabaseClient();
-    const { selectedProfileId, parentProfile } = useDashboard();
+    const { selectedProfileId, parentProfile, beltProgressEnabled } = useDashboard();
     const { getSchemaForMember } = useRankSchemas();
 
     // Are we viewing our own profile, or a child's? Guardians edit children
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                         </p>
                         <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                             <span className={`badge badge-belt-${profile.belt_rank || 'white'}`} style={{
-                                display: 'flex',
+                                display: beltProgressEnabled ? 'flex' : 'none',
                                 alignItems: 'center',
                                 gap: 'var(--space-1)',
                             }}>
@@ -324,8 +324,8 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* BJJ Progress */}
-                <div className="card">
+                {/* Rank progress — hidden when the club has belt progression switched off */}
+                <div className="card" style={{ display: beltProgressEnabled ? undefined : 'none' }}>
                     <div className="card-header">
                         <h3 style={{ margin: 0, fontSize: 'var(--text-lg)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                             <Award size={20} color="var(--color-gold)" />

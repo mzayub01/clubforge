@@ -5,6 +5,7 @@ import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-template
 import { checkRateLimit, escapeHtml, safeErrorResponse } from '@/lib/auth-guard';
 import { createClient } from '@/lib/supabase/server';
 import { getTenantId } from '@/lib/tenant';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: NextRequest) {
     try {
@@ -44,6 +45,19 @@ export async function POST(request: NextRequest) {
         const tenantId = await getTenantId();
         const branding = tenantId ? await getTenantBranding(tenantId) : null;
 
+        // Clubs can switch the automated welcome email off (Settings → General).
+        if (tenantId) {
+            const { data: tenantRow } = await createAdminClient()
+                .from('tenants')
+                .select('settings')
+                .eq('id', tenantId)
+                .maybeSingle();
+            const settings = (tenantRow?.settings || {}) as Record<string, unknown>;
+            if (settings.welcome_email_enabled === false) {
+                return NextResponse.json({ success: true, skipped: true, reason: 'welcome_email_disabled' });
+            }
+        }
+
         // Try to get template from database first (with tenant context)
         const dbTemplate = await renderEmailFromDatabase('welcome', {
             firstName: safeName,
@@ -64,6 +78,7 @@ export async function POST(request: NextRequest) {
                 firstName: safeName,
                 locationName: safeLocation,
                 membershipType: safeMembership,
+                clubName: branding?.name || 'ClubForge',
             });
             subject = `Welcome to ${branding?.name || 'ClubForge'}, ${safeName}!`;
         }

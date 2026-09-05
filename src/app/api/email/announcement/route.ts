@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
-import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding, getEmailTemplate } from '@/lib/email-templates-db';
 import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/lib/auth-guard';
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { announcementTitle, announcementMessage, locationId, targetAudience, countOnly, includePending } = body;
+        const { announcementTitle, announcementMessage, locationId, targetAudience, countOnly, includePending, templateKey } = body;
 
         // Rate limit. countOnly previews get their own, more generous bucket so
         // toggling audience/location in the modal can't exhaust the 10/min send
@@ -23,14 +23,29 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: auth.error }, { status: auth.status });
         }
 
-        // Title/message only needed when actually sending
-        if (!countOnly && (!announcementTitle || !announcementMessage)) {
+        // Custom template send (Pro/Elite "Email Templates" page) reuses this exact
+        // recipient pipeline. Only the tenant's own custom_* templates may be sent.
+        const customTemplateKey: string | null =
+            typeof templateKey === 'string' && templateKey.startsWith('custom_') ? templateKey : null;
+        if (templateKey && !customTemplateKey) {
+            return NextResponse.json({ error: 'Only custom templates can be sent directly' }, { status: 400 });
+        }
+        if (customTemplateKey && !countOnly) {
+            const tpl = await getEmailTemplate(customTemplateKey, auth.tenantId || undefined);
+            const tplTenant = (tpl as unknown as { tenant_id?: string | null } | null)?.tenant_id;
+            if (!tpl || !tpl.is_active || tplTenant !== auth.tenantId) {
+                return NextResponse.json({ error: 'Template not found or inactive' }, { status: 404 });
+            }
+        }
+
+        // Title/message only needed when actually sending an announcement
+        if (!countOnly && !customTemplateKey && (!announcementTitle || !announcementMessage)) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         // H5: Sanitise user inputs before HTML interpolation
-        const safeTitle = escapeHtml(announcementTitle);
-        const safeMessage = escapeHtml(announcementMessage);
+        const safeTitle = escapeHtml(announcementTitle || '');
+        const safeMessage = escapeHtml(announcementMessage || '');
 
         // Use admin client to fetch all members
         const supabaseAdmin = createAdminClient();
@@ -188,7 +203,20 @@ export async function POST(request: NextRequest) {
                     announcementMessage: safeMessage.replace(/\n/g, '<br>'),
                 };
 
-                const emailContent = await renderEmailFromDatabase('announcement_notification', templateData, auth.tenantId || undefined, branding || undefined);
+                const emailContent = customTemplateKey
+                    ? await renderEmailFromDatabase(
+                        customTemplateKey,
+                        { firstName: escapeHtml(recipient.firstName), clubName: fromName },
+                        auth.tenantId || undefined,
+                        branding || undefined,
+                    )
+                    : await renderEmailFromDatabase('announcement_notification', templateData, auth.tenantId || undefined, branding || undefined);
+
+                if (customTemplateKey && !emailContent) {
+                    failed++;
+                    errors.push(`${recipient.email}: template ${customTemplateKey} not found`);
+                    continue;
+                }
 
                 if (!emailContent) {
                     // Fallback if template not in database

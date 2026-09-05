@@ -262,6 +262,15 @@ that re-validate the parent-child relationship server-side:
 | `POST /api/upload-profile-image` | Server-side avatar upload (admin → `avatars` bucket) |
 | `POST /api/attendance/checkin` | Check in self or a child (guardian validated via admin client) |
 | `GET /api/multisite/available-locations` | Multisite options for self or a child (auth: self/guardian/staff) |
+| `GET /api/staff/guardian-contacts` | Staff only: child → guardian contact map for the tenant (used by `useGuardianContacts()` so children show the guardian's email everywhere) |
+| `POST /api/staff/member-photo` | Staff only: upload / camera-capture a member's profile photo (service role → `avatars`, updates `profile_image_url`) |
+
+**Child emails:** children's generated `@child.clubforge.local` addresses are never
+shown or mailed. `sendEmail()` (`src/lib/email.ts`) swaps any dummy recipient for the
+linked guardian's address (deduped) so every trigger is covered; staff pages display
+`contactFor(email).label` from `useGuardianContacts()`; the admin members page also
+lists each child's guardian (name, email, phone, "View guardian") and each guardian's
+children.
 
 The member dashboard uses a profile switcher (`DashboardProvider` + `ChildSwitcher`)
 to select which profile (`selectedProfileId`) is viewed. Two derived flags drive

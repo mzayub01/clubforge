@@ -241,8 +241,13 @@ payment-reminder reply-to all pointed at ClubForge.
   can never verify (DMARC would junk the mail regardless). Pattern: keep the
   display name, send as `Name <noreply@clubforgehq.com>`, put the user's real
   address in `replyTo` (see `/api/platform/mail-merge`, `/api/email/announcement`).
-- Child accounts have dummy `@child.clubforge.local` emails — route to the
-  guardian; never use a dummy address as a send target.
+- Child accounts have dummy `@child.clubforge.local` emails — never a send
+  target and never shown to staff. `sendEmail()` resolves dummy recipients to
+  the linked guardian centrally (unlinked children are dropped with a warning),
+  so new call sites need do nothing; for display use
+  `useGuardianContacts().contactFor(email)` (client) or resolve
+  `parent_guardian_id` server-side (see instructor "My Students"). Helpers in
+  `src/lib/member-contact.ts`.
 
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured

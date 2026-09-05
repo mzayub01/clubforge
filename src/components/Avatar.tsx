@@ -8,6 +8,9 @@ interface AvatarProps {
     lastName?: string;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     className?: string;
+    /** When set, the avatar becomes a button (e.g. open a full-size lightbox). */
+    onClick?: () => void;
+    title?: string;
 }
 
 const SIZES = {
@@ -18,20 +21,34 @@ const SIZES = {
     xl: { width: 80, height: 80, fontSize: '24px' },
 };
 
-export default function Avatar({ src, firstName = '', lastName = '', size = 'md', className = '' }: AvatarProps) {
+export default function Avatar({ src, firstName = '', lastName = '', size = 'md', className = '', onClick, title }: AvatarProps) {
     const { width, height, fontSize } = SIZES[size];
     const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+
+    const interactive = onClick
+        ? {
+            role: 'button' as const,
+            tabIndex: 0,
+            onClick,
+            onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } },
+            title: title || 'View photo',
+            'aria-label': title || 'View photo',
+        }
+        : {};
+    const interactiveStyle = onClick ? { cursor: 'zoom-in', boxShadow: '0 0 0 2px transparent', transition: 'box-shadow 0.15s ease' } : {};
 
     if (src) {
         return (
             <div
                 className={className}
+                {...interactive}
                 style={{
                     width,
                     height,
                     borderRadius: '50%',
                     overflow: 'hidden',
                     flexShrink: 0,
+                    ...interactiveStyle,
                 }}
             >
                 <Image
@@ -49,6 +66,7 @@ export default function Avatar({ src, firstName = '', lastName = '', size = 'md'
     return (
         <div
             className={className}
+            {...(onClick ? { title } : {})}
             style={{
                 width,
                 height,

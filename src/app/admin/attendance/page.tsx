@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { CheckCircle, Search, Calendar, Clock, User, UserPlus, AlertCircle } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import type { Class, Profile, Attendance } from '@/lib/types';
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function AdminAttendancePage() {
+    const { contactFor } = useGuardianContacts();
     const [classes, setClasses] = useState<Class[]>([]);
     const [members, setMembers] = useState<Profile[]>([]);
     const [memberMap, setMemberMap] = useState<Record<string, Profile>>({});
@@ -232,7 +234,7 @@ export default function AdminAttendancePage() {
                                                         {member.first_name} {member.last_name}
                                                     </p>
                                                     <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: 0 }}>
-                                                        {member.email}
+                                                        {contactFor(member.email).label}
                                                     </p>
                                                 </div>
                                             </div>

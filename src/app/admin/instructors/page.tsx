@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, User, Award, Edit, CheckCircle, AlertCircle, Mail, Calendar, BookOpen } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminUpdateById, adminUpdate } from '@/lib/admin-api';
 import ModalPortal from '@/components/admin/ModalPortal';
 
@@ -34,6 +35,7 @@ interface Instructor {
 }
 
 export default function AdminInstructorsPage() {
+    const { contactFor } = useGuardianContacts();
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
     const [loading, setLoading] = useState(true);
@@ -303,7 +305,7 @@ export default function AdminInstructorsPage() {
 
                                         <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 'var(--space-2)' }}>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginBottom: 'var(--space-1)' }}>
-                                                <Mail size={14} /> {instructor.profile?.email}
+                                                <Mail size={14} /> {contactFor(instructor.profile?.email).label}
                                             </span>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
                                                 <Award size={14} /> {(instructor.profile?.belt_rank || 'white').charAt(0).toUpperCase() + (instructor.profile?.belt_rank || 'white').slice(1)} Belt
@@ -438,7 +440,7 @@ export default function AdminInstructorsPage() {
                                         <option value="">Choose a member...</option>
                                         {eligibleMembers.map(member => (
                                             <option key={member.id} value={member.id}>
-                                                {member.first_name} {member.last_name} ({member.email})
+                                                {member.first_name} {member.last_name} ({contactFor(member.email).email || 'no email'})
                                             </option>
                                         ))}
                                     </select>

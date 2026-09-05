@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Clock, CheckCircle, XCircle, AlertCircle, UserPlus, Trash2, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import UpgradePrompt from '@/components/admin/UpgradePrompt';
@@ -40,6 +41,7 @@ interface Location {
 }
 
 export default function AdminWaitlistPage() {
+    const { contactFor } = useGuardianContacts();
     const { can } = useFeatureGate();
     const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
@@ -279,7 +281,7 @@ export default function AdminWaitlistPage() {
                                                             {entry.profile?.first_name} {entry.profile?.last_name}
                                                         </p>
                                                         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>
-                                                            {entry.profile?.email}
+                                                            {contactFor(entry.profile?.email).label}
                                                         </p>
                                                         {entry.membership_type && (
                                                             <span className="badge badge-gold" style={{ marginTop: 'var(--space-1)' }}>

@@ -16,6 +16,7 @@ import {
     Loader2,
     Download
 } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 import Avatar from '@/components/Avatar';
 
@@ -45,6 +46,7 @@ interface MemberStatus {
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function ClassRosterPage() {
+    const { contactFor } = useGuardianContacts();
     const [classes, setClasses] = useState<ClassInfo[]>([]);
     const [selectedClass, setSelectedClass] = useState<string>('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -510,7 +512,7 @@ export default function ClassRosterPage() {
                                                 )}
                                             </div>
                                             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-                                                {member.email}
+                                                {contactFor(member.email).label}
                                             </div>
                                         </div>
 

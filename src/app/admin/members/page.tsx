@@ -9,6 +9,9 @@ import MemberAttendanceModal from '@/components/admin/MemberAttendanceModal';
 import ModalPortal from '@/components/admin/ModalPortal';
 import Avatar from '@/components/Avatar';
 import { useRankSchemas } from '@/hooks/useRankSchemas';
+import MemberPhotoEditor from '@/components/MemberPhotoEditor';
+import PhotoLightbox from '@/components/PhotoLightbox';
+import { isChildDummyEmail } from '@/lib/member-contact';
 
 interface Member {
     id: string;
@@ -31,6 +34,11 @@ interface Member {
     is_child: boolean;
     parent_guardian_id?: string;
     guardian_email?: string;
+    guardian_name?: string;
+    guardian_phone?: string;
+    guardian_user_id?: string;
+    /** Profiles that name this member as their guardian */
+    children?: { id: string; user_id: string; first_name: string; last_name: string }[];
     profile_image_url?: string;
     created_at: string;
     best_practice_accepted?: boolean;
@@ -67,6 +75,7 @@ export default function AdminMembersPage() {
     const [attendanceMember, setAttendanceMember] = useState<Member | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [viewingMember, setViewingMember] = useState<Member | null>(null);
+    const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -141,21 +150,32 @@ export default function AdminMembersPage() {
 
             const waitlistUserIds = new Set((waitlistRes.data || []).map((w: any) => w.user_id));
 
-            // Create a map of profile IDs to emails for guardian lookup
-            const profileIdToEmail: Record<string, string> = {};
+            // Guardian lookup: children carry a generated dummy email, so anywhere
+            // a child's contact is shown we use the guardian's details instead.
+            const profileById: Record<string, any> = {};
+            profiles.forEach((p: any) => { profileById[p.id] = p; });
+            const childrenByGuardianId: Record<string, any[]> = {};
             profiles.forEach((p: any) => {
-                profileIdToEmail[p.id] = p.email;
+                if (p.parent_guardian_id) (childrenByGuardianId[p.parent_guardian_id] ||= []).push(p);
             });
 
-            // Attach memberships, guardian email, and waitlist status to profiles
-            const membersWithData = profiles.map((profile: any) => ({
-                ...profile,
-                memberships: memberships.filter((m: any) => m.user_id === profile.user_id),
-                guardian_email: profile.is_child && profile.parent_guardian_id
-                    ? profileIdToEmail[profile.parent_guardian_id]
-                    : undefined,
-                isOnWaitlist: waitlistUserIds.has(profile.user_id),
-            }));
+            // Attach memberships, guardian details, children and waitlist status
+            const membersWithData = profiles.map((profile: any) => {
+                const guardian = profile.parent_guardian_id ? profileById[profile.parent_guardian_id] : undefined;
+                const guardianEmail = guardian?.email && !isChildDummyEmail(guardian.email) ? guardian.email : undefined;
+                return {
+                    ...profile,
+                    memberships: memberships.filter((m: any) => m.user_id === profile.user_id),
+                    guardian_email: guardianEmail,
+                    guardian_name: guardian ? `${guardian.first_name || ''} ${guardian.last_name || ''}`.trim() : undefined,
+                    guardian_phone: guardian?.phone || undefined,
+                    guardian_user_id: guardian?.user_id,
+                    children: (childrenByGuardianId[profile.id] || []).map((c: any) => ({
+                        id: c.id, user_id: c.user_id, first_name: c.first_name, last_name: c.last_name,
+                    })),
+                    isOnWaitlist: waitlistUserIds.has(profile.user_id),
+                };
+            });
 
             setMembers(membersWithData);
             setLocations(locationsRes.data || []);
@@ -394,7 +414,8 @@ export default function AdminMembersPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId: member.user_id,
-                    email: member.email,
+                    // Children can't receive mail — the reminder goes to the guardian
+                    email: member.is_child && member.guardian_email ? member.guardian_email : member.email,
                     firstName: member.first_name,
                     locationName: member.memberships?.[0]?.location?.name || 'your preferred location',
                 }),
@@ -464,7 +485,7 @@ export default function AdminMembersPage() {
         const rows = filteredMembers.map(m => [
             m.first_name || '',
             m.last_name || '',
-            m.email || '',
+            (m.is_child && m.guardian_email) ? m.guardian_email : (m.email || ''),
             m.phone || '',
             m.role || 'member',
             m.belt_rank || 'white',
@@ -763,12 +784,15 @@ export default function AdminMembersPage() {
                                         borderBottom: index < filteredMembers.length - 1 ? '1px solid var(--border-light)' : 'none',
                                     }}
                                 >
-                                    {/* Avatar */}
+                                    {/* Avatar — click to view full size */}
                                     <Avatar
                                         src={member.profile_image_url}
                                         firstName={member.first_name}
                                         lastName={member.last_name}
                                         size="md"
+                                        onClick={member.profile_image_url
+                                            ? () => setLightbox({ src: member.profile_image_url!, alt: `${member.first_name} ${member.last_name}` })
+                                            : undefined}
                                     />
 
                                     {/* Info */}
@@ -802,6 +826,29 @@ export default function AdminMembersPage() {
                                                 </span>
                                             ))}
                                         </div>
+                                        {/* Guardian link for children / children list for guardians */}
+                                        {member.is_child && (
+                                            <p style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
+                                                <Shield size={12} />
+                                                <span>Guardian: <strong style={{ color: 'var(--text-secondary)' }}>{member.guardian_name || 'not linked'}</strong></span>
+                                                {member.guardian_email && <span>· {member.guardian_email}</span>}
+                                                {member.parent_guardian_id && members.some(m => m.id === member.parent_guardian_id) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { const g = members.find(m => m.id === member.parent_guardian_id); if (g) { setViewingMember(g); setShowDetailsModal(true); } }}
+                                                        style={{ background: 'none', border: 'none', color: 'var(--color-gold)', cursor: 'pointer', padding: 0, fontSize: 'inherit' }}
+                                                    >
+                                                        View guardian
+                                                    </button>
+                                                )}
+                                            </p>
+                                        )}
+                                        {!member.is_child && !!member.children?.length && (
+                                            <p style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
+                                                <Users size={12} />
+                                                <span>Guardian of: {member.children.map(c => `${c.first_name} ${c.last_name}`).join(', ')}</span>
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Joined Date */}
@@ -901,22 +948,26 @@ export default function AdminMembersPage() {
                                     background: 'var(--bg-secondary)',
                                     borderRadius: 'var(--radius-lg)',
                                 }}>
-                                    <div style={{
-                                        width: '60px',
-                                        height: '60px',
-                                        borderRadius: 'var(--radius-full)',
-                                        background: 'var(--color-gold-gradient)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: 'var(--text-xl)',
-                                        fontWeight: '600',
-                                        color: 'var(--color-black)',
-                                    }}>
-                                        {editingMember.first_name?.[0]}{editingMember.last_name?.[0]}
-                                    </div>
-                                    <div>
-                                        <p style={{ fontWeight: '600', margin: 0 }}>{editingMember.email}</p>
+                                    {/* Photo: view full size, upload, or take one now */}
+                                    <MemberPhotoEditor
+                                        userId={editingMember.user_id}
+                                        currentUrl={editingMember.profile_image_url}
+                                        firstName={editingMember.first_name}
+                                        lastName={editingMember.last_name}
+                                        size="lg"
+                                        onUpdated={(url) => {
+                                            setEditingMember({ ...editingMember, profile_image_url: url });
+                                            setMembers(prev => prev.map(m => (m.id === editingMember.id ? { ...m, profile_image_url: url } : m)));
+                                        }}
+                                    />
+                                    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                                        <p style={{ fontWeight: '600', margin: 0 }}>
+                                            {isChildDummyEmail(editingMember.email)
+                                                ? (editingMember.guardian_email
+                                                    ? <>{editingMember.guardian_email} <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>(guardian)</span></>
+                                                    : <span style={{ color: 'var(--text-tertiary)' }}>No guardian email on file</span>)
+                                                : editingMember.email}
+                                        </p>
                                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
                                             Joined {new Date(editingMember.created_at).toLocaleDateString('en-GB')}
                                         </p>
@@ -1339,7 +1390,10 @@ export default function AdminMembersPage() {
                                     src={viewingMember.profile_image_url}
                                     firstName={viewingMember.first_name}
                                     lastName={viewingMember.last_name}
-                                    size="md"
+                                    size="lg"
+                                    onClick={viewingMember.profile_image_url
+                                        ? () => setLightbox({ src: viewingMember.profile_image_url!, alt: `${viewingMember.first_name} ${viewingMember.last_name}` })
+                                        : undefined}
                                 />
                                 <div>
                                     <span>{viewingMember.first_name} {viewingMember.last_name}</span>
@@ -1387,6 +1441,51 @@ export default function AdminMembersPage() {
                                     </p>
                                 </div>
                             </div>
+
+                            {/* Guardian (children) / Children (guardians) */}
+                            {viewingMember.is_child && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--space-6)' }}>
+                                    <Shield size={18} color="var(--color-gold)" />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Guardian</p>
+                                        <p style={{ margin: 0, fontWeight: '600' }}>{viewingMember.guardian_name || 'Not linked to a guardian account'}</p>
+                                        {(viewingMember.guardian_email || viewingMember.guardian_phone) && (
+                                            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                                                {viewingMember.guardian_email}{viewingMember.guardian_email && viewingMember.guardian_phone ? ' · ' : ''}{viewingMember.guardian_phone}
+                                            </p>
+                                        )}
+                                    </div>
+                                    {viewingMember.parent_guardian_id && members.some(m => m.id === viewingMember.parent_guardian_id) && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-ghost btn-sm"
+                                            onClick={() => { const g = members.find(m => m.id === viewingMember.parent_guardian_id); if (g) setViewingMember(g); }}
+                                        >
+                                            View guardian
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {!!viewingMember.children?.length && (
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', marginBottom: 'var(--space-6)' }}>
+                                    <Users size={18} color="var(--color-gold)" style={{ marginTop: 2 }} />
+                                    <div style={{ flex: 1 }}>
+                                        <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>Guardian of</p>
+                                        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: '4px' }}>
+                                            {viewingMember.children.map(c => (
+                                                <button
+                                                    key={c.id}
+                                                    type="button"
+                                                    className="btn btn-ghost btn-sm"
+                                                    onClick={() => { const child = members.find(m => m.id === c.id); if (child) setViewingMember(child); }}
+                                                >
+                                                    {c.first_name} {c.last_name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Personal Information */}
                             <h3 style={{ fontSize: 'var(--text-base)', fontWeight: '600', marginBottom: 'var(--space-3)', color: 'var(--text-primary)' }}>
@@ -1496,6 +1595,9 @@ export default function AdminMembersPage() {
                 </div>
                 </ModalPortal>
             )}
+
+            {/* Full-size photo viewer */}
+            {lightbox && <PhotoLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
         </div>
     );
 }

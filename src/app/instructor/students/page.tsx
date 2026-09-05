@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { Users, Award, CheckCircle, TrendingUp, Calendar } from 'lucide-react';
 import { getBeltColors } from '@/hooks/useRankSchemas';
+import StudentPhoto from '@/components/StudentPhoto';
+import { isChildDummyEmail } from '@/lib/member-contact';
 
 export const metadata = {
     title: 'My Students | Instructor - ClubForge',
@@ -10,7 +12,15 @@ export const metadata = {
 interface StudentAttendanceRecord {
     user_id: string;
     class_date: string;
-    profiles?: { first_name: string; last_name: string; email: string; belt_rank: string };
+    profiles?: {
+        first_name: string;
+        last_name: string;
+        email: string;
+        belt_rank: string;
+        profile_image_url?: string | null;
+        is_child?: boolean;
+        parent_guardian_id?: string | null;
+    };
 }
 
 
@@ -42,7 +52,7 @@ export default async function InstructorStudentsPage() {
     // Get unique students who attended these classes
     const { data: attendanceRecords } = await supabase
         .from('attendance')
-        .select('user_id, class_date, profiles(first_name, last_name, email, belt_rank)')
+        .select('user_id, class_date, profiles(first_name, last_name, email, belt_rank, profile_image_url, is_child, parent_guardian_id)')
         .in('class_id', classIds)
         .order('class_date', { ascending: false }) as { data: StudentAttendanceRecord[] | null };
 
@@ -53,6 +63,9 @@ export default async function InstructorStudentsPage() {
         last_name: string;
         email: string;
         belt_rank: string;
+        profile_image_url: string | null;
+        is_child: boolean;
+        parent_guardian_id: string | null;
         attendance_count: number;
         last_attendance: string;
     }>();
@@ -74,6 +87,9 @@ export default async function InstructorStudentsPage() {
                 last_name: profile.last_name,
                 email: profile.email,
                 belt_rank: profile.belt_rank || 'white',
+                profile_image_url: profile.profile_image_url || null,
+                is_child: !!profile.is_child,
+                parent_guardian_id: profile.parent_guardian_id || null,
                 attendance_count: 1,
                 last_attendance: record.class_date,
             });
@@ -83,6 +99,27 @@ export default async function InstructorStudentsPage() {
     const students = Array.from(studentMap.values()).sort((a, b) =>
         b.attendance_count - a.attendance_count
     );
+
+    // Children have generated dummy emails — show the guardian's real contact instead
+    const guardianIds = Array.from(new Set(
+        students.map(s => s.parent_guardian_id).filter((id): id is string => !!id)
+    ));
+    const guardianById = new Map<string, { email: string | null; first_name: string; last_name: string }>();
+    if (guardianIds.length > 0) {
+        const { data: guardians } = await supabase
+            .from('profiles')
+            .select('id, email, first_name, last_name')
+            .in('id', guardianIds);
+        guardians?.forEach((g: { id: string; email: string | null; first_name: string; last_name: string }) => guardianById.set(g.id, g));
+    }
+    const contactLine = (s: { email: string; is_child: boolean; parent_guardian_id: string | null }) => {
+        const guardian = s.parent_guardian_id ? guardianById.get(s.parent_guardian_id) : undefined;
+        if (guardian?.email && !isChildDummyEmail(guardian.email)) {
+            return `${guardian.email} (guardian: ${guardian.first_name} ${guardian.last_name})`;
+        }
+        if (isChildDummyEmail(s.email) || s.is_child) return 'No guardian email on file';
+        return s.email;
+    };
 
     // Stats
     const totalStudents = students.length;
@@ -149,22 +186,19 @@ export default async function InstructorStudentsPage() {
                                     <tr key={student.user_id} style={{ borderBottom: index < students.length - 1 ? '1px solid var(--border-light)' : 'none' }}>
                                         <td style={{ padding: 'var(--space-3) var(--space-4)' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                                                <div style={{
-                                                    width: '36px',
-                                                    height: '36px',
-                                                    borderRadius: 'var(--radius-full)',
-                                                    background: 'var(--bg-tertiary)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: 'var(--text-sm)',
-                                                    fontWeight: '600',
-                                                }}>
-                                                    {student.first_name[0]}{student.last_name[0]}
-                                                </div>
+                                                {/* Click to zoom; camera button to replace / take a photo */}
+                                                <StudentPhoto
+                                                    userId={student.user_id}
+                                                    src={student.profile_image_url}
+                                                    firstName={student.first_name}
+                                                    lastName={student.last_name}
+                                                />
                                                 <div>
-                                                    <p style={{ fontWeight: '600', margin: 0 }}>{student.first_name} {student.last_name}</p>
-                                                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>{student.email}</p>
+                                                    <p style={{ fontWeight: '600', margin: 0 }}>
+                                                        {student.first_name} {student.last_name}
+                                                        {student.is_child && <span className="badge badge-gold" style={{ marginLeft: 'var(--space-2)' }}>Child</span>}
+                                                    </p>
+                                                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0 }}>{contactLine(student)}</p>
                                                 </div>
                                             </div>
                                         </td>

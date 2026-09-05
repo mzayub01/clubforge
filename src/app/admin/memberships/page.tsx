@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminFetchOne, adminInsert, adminUpdateById } from '@/lib/admin-api';
 import ModalPortal from '@/components/admin/ModalPortal';
 
@@ -49,6 +50,7 @@ interface Member {
 const STATUS_OPTIONS = ['active', 'inactive', 'pending', 'cancelled'];
 
 export default function AdminMembershipsPage() {
+    const { contactFor } = useGuardianContacts();
     const [memberships, setMemberships] = useState<Membership[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
@@ -509,7 +511,7 @@ export default function AdminMembershipsPage() {
                                             <option value="">Select member...</option>
                                             {members.map(member => (
                                                 <option key={member.id} value={member.user_id}>
-                                                    {member.first_name} {member.last_name} ({member.email})
+                                                    {member.first_name} {member.last_name} ({contactFor(member.email).email || 'no email'})
                                                 </option>
                                             ))}
                                         </select>

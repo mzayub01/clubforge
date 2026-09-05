@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Award, Users, Plus, Trash2, Loader2, MapPin, CheckCircle, Search } from 'lucide-react';
+import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
 
 interface Professor {
@@ -25,6 +26,7 @@ interface ClassAccess {
 }
 
 export default function ProfessorAccessPage() {
+    const { contactFor } = useGuardianContacts();
     const [professors, setProfessors] = useState<Professor[]>([]);
     const [classes, setClasses] = useState<ClassOption[]>([]);
     const [selectedProfessor, setSelectedProfessor] = useState<string>('');
@@ -225,7 +227,7 @@ export default function ProfessorAccessPage() {
                                     </div>
                                     <div>
                                         <div style={{ fontWeight: '600' }}>{prof.first_name} {prof.last_name}</div>
-                                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>{prof.email}</div>
+                                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>{contactFor(prof.email).label}</div>
                                     </div>
                                 </button>
                             ))}

@@ -208,6 +208,25 @@
   add-child now redirects with `?paymentInfo=true` (legacy `?cheadle=true`
   still accepted). See DECISIONS → Member-facing contact points.
 
+- **Children, photos, custom templates (2026-09-05):**
+  - *Guardian everywhere:* `sendEmail()` swaps child dummy addresses for the
+    guardian's (covers welcome, payment, event, webhook mails in one place);
+    staff pages show the guardian's email via `useGuardianContacts()`
+    (`GET /api/staff/guardian-contacts`); admin members list/details show
+    "Guardian: name · email · View guardian" on children and "Guardian of: …"
+    on guardians; payment reminders and CSV export use the guardian address.
+  - *Staff photo editing:* `MemberPhotoEditor` (upload, or **take a photo** with
+    live camera preview, square crop, device-camera fallback) in the admin Edit
+    Member modal and on instructor "My Students" (`StudentPhoto`), via
+    `POST /api/staff/member-photo` (admin + instructor, tenant-checked).
+  - *Zoom:* `PhotoLightbox` — click any avatar on the members list/details or
+    students table to view full size (`Avatar` gained `onClick`).
+  - *Custom email templates (Pro/Elite):* Email Templates page now has "New
+    Template" (`custom_*` keys, name/description editable, delete) and a
+    **Send** flow reusing `/api/email/announcement` (`templateKey`) with the
+    same location/audience/include-pending options and live recipient count.
+    Placeholders `{{firstName}}`, `{{clubName}}`.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

@@ -68,11 +68,12 @@ export default async function DashboardLayout({
     let tenantPrimaryColor: string | undefined;
     let tenantTagline: string | undefined;
     let beltProgressEnabled: boolean | undefined;
+    let tenantContactEmail: string | undefined;
     if (tenantId) {
         // Admin client: members can no longer read `tenants` directly (migration 014).
         const { data: tenant } = await supabaseAdmin
             .from('tenants')
-            .select('logo_url, name, primary_color, tagline, settings')
+            .select('logo_url, name, primary_color, tagline, settings, contact_email, owner_user_id')
             .eq('id', tenantId)
             .single();
         tenantLogoUrl = tenant?.logo_url || undefined;
@@ -81,6 +82,15 @@ export default async function DashboardLayout({
         tenantTagline = tenant?.tagline || undefined;
         const settings = (tenant?.settings || {}) as Record<string, unknown>;
         beltProgressEnabled = settings.belt_progress_enabled !== false; // default true
+
+        // Member-facing "contact your club" links (membership help, payment notices)
+        // must reach the CLUB, never ClubForge support: club contact email, else the
+        // owner's login email.
+        tenantContactEmail = tenant?.contact_email || undefined;
+        if (!tenantContactEmail && tenant?.owner_user_id) {
+            const { data: owner } = await supabaseAdmin.auth.admin.getUserById(tenant.owner_user_id);
+            tenantContactEmail = owner?.user?.email || undefined;
+        }
     }
 
     const userName = profile ? `${profile.first_name} ${profile.last_name}` : 'Member';
@@ -114,6 +124,8 @@ export default async function DashboardLayout({
                 initialHasParentMembership={hasParentMembership}
                 isGuardianOnly={isGuardianOnly}
                 beltProgressEnabled={beltProgressEnabled}
+                tenantName={tenantName ?? null}
+                tenantContactEmail={tenantContactEmail ?? null}
             >
                 <div className="dashboard-layout">
                     <DashboardSidebar

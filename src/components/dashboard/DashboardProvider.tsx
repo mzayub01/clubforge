@@ -27,6 +27,9 @@ interface DashboardContextType {
     hasParentMembership: boolean;
     isGuardianOnly: boolean;
     beltProgressEnabled: boolean;
+    // Member-facing "contact your club" details (club contact email, else owner's login email)
+    tenantName: string | null;
+    tenantContactEmail: string | null;
     isLoading: boolean;
     refreshChildren: () => Promise<void>;
 }
@@ -45,6 +48,8 @@ export function useDashboard() {
             hasParentMembership: true, // Default to true for non-member contexts
             isGuardianOnly: false,
             beltProgressEnabled: true, // Default to true for non-member contexts
+            tenantName: null,
+            tenantContactEmail: null,
             isLoading: false,
             refreshChildren: async () => { },
         };
@@ -59,6 +64,8 @@ interface DashboardProviderProps {
     initialHasParentMembership: boolean;
     isGuardianOnly?: boolean;
     beltProgressEnabled?: boolean;
+    tenantName?: string | null;
+    tenantContactEmail?: string | null;
 }
 
 export function DashboardProvider({
@@ -68,6 +75,8 @@ export function DashboardProvider({
     initialHasParentMembership,
     isGuardianOnly: isGuardianOnlyProp = false,
     beltProgressEnabled = true,
+    tenantName = null,
+    tenantContactEmail = null,
 }: DashboardProviderProps) {
     const supabase = getSupabaseClient();
     const [parentProfile] = useState(initialParentProfile);
@@ -127,6 +136,8 @@ export function DashboardProvider({
                 hasParentMembership,
                 isGuardianOnly: isGuardianOnlyProp,
                 beltProgressEnabled,
+                tenantName,
+                tenantContactEmail,
                 isLoading,
                 refreshChildren,
             }}

@@ -198,6 +198,16 @@
   copy — use `scripts/set-welcome-template.mjs --tenant <slug> --yes` to
   rewrite one. Wording customisation stays Pro-gated (Email Templates).
 
+- **Member contact routing (2026-09-05):** members were emailing ClubForge
+  support to cancel club memberships. Root cause: member-facing help links
+  were hard-coded to `support@clubforgehq.com` — Membership page "Contact
+  Support" button (next to "cancellations" copy), the dashboard payment-info
+  modal (also hard-coded to "Cheadle Masjid"), the checkout-cancel page, and
+  the payment-reminder reply-to. All now resolve to the club's contact email
+  (fallback: owner login email) via `useDashboard().tenantContactEmail`;
+  add-child now redirects with `?paymentInfo=true` (legacy `?cheadle=true`
+  still accepted). See DECISIONS → Member-facing contact points.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

@@ -41,7 +41,7 @@ interface MembershipData {
 }
 
 export default function DashboardContent() {
-    const { selectedProfileId, parentProfile, children, hasParentMembership, isGuardianOnly, beltProgressEnabled } = useDashboard();
+    const { selectedProfileId, parentProfile, children, hasParentMembership, isGuardianOnly, beltProgressEnabled, tenantName, tenantContactEmail } = useDashboard();
     const supabase = getSupabaseClient();
     const { getSchemaForMember } = useRankSchemas();
 
@@ -56,7 +56,9 @@ export default function DashboardContent() {
     const router = useRouter();
 
     useEffect(() => {
-        if (searchParams.get('cheadle') === 'true') {
+        // `paymentInfo=true` is set by the add-child flow when the location collects
+        // payment through the club's Stripe (legacy name `cheadle` still accepted).
+        if (searchParams.get('paymentInfo') === 'true' || searchParams.get('cheadle') === 'true') {
             setShowCheadleModal(true);
             // Clean up URL
             router.replace('/dashboard');
@@ -386,7 +388,7 @@ export default function DashboardContent() {
                 </div>
             )}
 
-            {/* Cheadle Masjid Payment Modal */}
+            {/* Payment information modal (club-branded; shown after add-child at pay-via-club locations) */}
             {showCheadleModal && (
                 <div style={{
                     position: 'fixed',
@@ -443,13 +445,13 @@ export default function DashboardContent() {
                             borderLeft: '4px solid var(--color-gold)',
                         }}>
                             <p style={{ marginBottom: 'var(--space-4)' }}>
-                                Your payments will be collected directly through <strong>Cheadle Masjid&apos;s</strong> Stripe payment system.
+                                Your payments will be collected directly through <strong>{tenantName || 'your club'}&apos;s</strong> Stripe payment system.
                             </p>
                             <p style={{ marginBottom: 'var(--space-4)' }}>
                                 If there are any issues with your payment set up then please note your membership may become inactive until the payments are set up.
                             </p>
                             <p style={{ marginBottom: 'var(--space-4)' }}>
-                                <strong>For existing members:</strong> Your payments should already be set up. If they have not, please email <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>support@clubforgehq.com</a> stating your payments have not yet been set up.
+                                <strong>For existing members:</strong> Your payments should already be set up. If they have not, please email <a href={`mailto:${tenantContactEmail || 'support@clubforgehq.com'}`} style={{ color: 'var(--color-gold)' }}>{tenantContactEmail || 'support@clubforgehq.com'}</a> stating your payments have not yet been set up.
                             </p>
                             <p style={{ marginBottom: 0 }}>
                                 <strong>New members:</strong> You will receive separate email instructions on setting up payment for the first time.

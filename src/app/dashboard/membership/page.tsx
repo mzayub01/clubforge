@@ -296,7 +296,7 @@ export default function MembershipPage() {
     const [memberships, setMemberships] = useState<Membership[]>([]);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
-    const { selectedProfileId, isGuardianOnly, children, parentProfile, setSelectedProfileId } = useDashboard();
+    const { selectedProfileId, isGuardianOnly, children, parentProfile, setSelectedProfileId, tenantName, tenantContactEmail } = useDashboard();
 
     useEffect(() => {
         if (selectedProfileId) {
@@ -625,11 +625,16 @@ export default function MembershipPage() {
                     <div style={{ flex: 1 }}>
                         <p style={{ fontWeight: '500', margin: 0 }}>Need help with your membership?</p>
                         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
-                            Contact us if you have any questions about payments, cancellations, or upgrades.
+                            Payments, cancellations and upgrades are handled by {tenantName || 'your club'} directly
+                            {tenantContactEmail ? <> at <strong>{tenantContactEmail}</strong></> : null}.
                         </p>
                     </div>
-                    <a href="mailto:support@clubforgehq.com" className="btn btn-ghost">
-                        Contact Support
+                    {/* Always the club's address — membership questions must never land in ClubForge support */}
+                    <a
+                        href={`mailto:${tenantContactEmail || 'support@clubforgehq.com'}?subject=${encodeURIComponent(`Membership query — ${parentProfile?.first_name || ''} ${parentProfile?.last_name || ''}`.trim())}`}
+                        className="btn btn-ghost"
+                    >
+                        Contact {tenantName || 'your club'}
                     </a>
                 </div>
             </div>

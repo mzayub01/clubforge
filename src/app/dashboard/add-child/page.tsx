@@ -293,7 +293,7 @@ export default function AddChildPage() {
             setTimeout(async () => {
                 await refreshChildren();
                 if (data.isCheadleMasjid) {
-                    router.push('/dashboard?cheadle=true');
+                    router.push('/dashboard?paymentInfo=true');
                 } else {
                     router.push('/dashboard');
                 }

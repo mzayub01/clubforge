@@ -222,6 +222,18 @@ returns null/wrong and silently breaks flows.
   class, and not the null-email guess (`0b00b21` was defensive hardening only).
   Verify with SQL/schema/logs before assuming.)
 
+### Member-facing contact points (IMPORTANT — caused support-mailbox leakage)
+Anything a **member** can click or reply to must reach **their club**, never
+`support@clubforgehq.com`: contact = `tenants.contact_email`, else the owner's
+login email (resolved in `dashboard/layout.tsx` and exposed via
+`useDashboard().tenantContactEmail` / `tenantName`), else — and only as a last
+resort — the platform address. Outbound member emails set `replyTo` to the club
+contact. The platform address is for club *owners*. 2026-09: members were
+emailing ClubForge support to cancel memberships because the member Membership
+page's "Contact Support" button, the dashboard payment-info modal (which was
+also hard-coded to "Cheadle Masjid"), the checkout-cancel page and the
+payment-reminder reply-to all pointed at ClubForge.
+
 ### Email Patterns (Resend)
 - **From-addresses must be on a verified domain** (`RESEND_VERIFIED_DOMAINS`,
   default clubforgehq.com). Never pass a user-supplied address straight to

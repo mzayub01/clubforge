@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { resolveTenantForUser } from '@/lib/tenant';
 import { sendEmail } from '@/lib/email';
-import { renderEmailFromDatabase } from '@/lib/email-templates-db';
+import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 
 export async function POST(request: NextRequest) {
     try {
@@ -40,7 +40,9 @@ export async function POST(request: NextRequest) {
             paymentLink: paymentLink,
         };
 
-        const rendered = await renderEmailFromDatabase('payment_incomplete', emailData);
+        // Club-branded template; replies go to the club, never ClubForge support.
+        const branding = await getTenantBranding(membership.tenantId);
+        const rendered = await renderEmailFromDatabase('payment_incomplete', emailData, membership.tenantId, branding || undefined);
 
         if (!rendered) {
             return NextResponse.json({
@@ -53,7 +55,8 @@ export async function POST(request: NextRequest) {
             to: email,
             subject: rendered.subject,
             html: rendered.html,
-            replyTo: 'support@clubforgehq.com',
+            from: `${branding?.name || 'ClubForge'} <noreply@clubforgehq.com>`,
+            replyTo: branding?.contactEmail || undefined,
         });
 
         if (!result.success) {

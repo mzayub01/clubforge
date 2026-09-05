@@ -177,13 +177,33 @@ export default function AdminMembershipsPage() {
 
         try {
             if (editingMembership) {
-                const { error } = await adminUpdateById('memberships', editingMembership.id, {
-                    location_id: formData.location_id,
-                    status: formData.status,
-                });
+                // Location is a plain record change; status must go through the
+                // Stripe-aware endpoint so a cancellation also cancels the subscription.
+                if (formData.location_id !== editingMembership.location_id) {
+                    const { error } = await adminUpdateById('memberships', editingMembership.id, {
+                        location_id: formData.location_id,
+                    });
+                    if (error) throw new Error(error);
+                }
 
-                if (error) throw new Error(error);
-                setSuccess('Membership updated successfully!');
+                let note = '';
+                if (formData.status !== editingMembership.status) {
+                    if ((formData.status === 'cancelled' || formData.status === 'inactive') && editingMembership.stripe_subscription_id) {
+                        if (!confirm('This will also cancel the member\'s Stripe subscription immediately, so they are not charged again. Continue?')) {
+                            return;
+                        }
+                    }
+                    const res = await fetch('/api/admin/membership-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ membershipId: editingMembership.id, status: formData.status }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to update membership status');
+                    note = data.message ? ` ${data.message}` : '';
+                }
+
+                setSuccess(`Membership updated successfully!${note}`);
             } else {
                 // Check if membership already exists
                 const { data: existing } = await adminFetchOne('memberships', {
@@ -217,22 +237,50 @@ export default function AdminMembershipsPage() {
         }
     };
 
-    const updateStatus = async (membershipId: string, newStatus: string) => {
+    // Status changes go through the Stripe-aware endpoint so cancelling here also
+    // cancels the member's subscription on the club's connected Stripe account.
+    const updateStatus = async (membership: Membership, newStatus: string) => {
+        if (newStatus === membership.status) return;
+        const name = `${membership.profile?.first_name || ''} ${membership.profile?.last_name || ''}`.trim() || 'this member';
+        if ((newStatus === 'cancelled' || newStatus === 'inactive') && membership.stripe_subscription_id) {
+            if (!confirm(`This will also cancel ${name}'s Stripe subscription immediately, so they are not charged again. Continue?`)) {
+                fetchData();
+                return;
+            }
+        }
+        setError('');
+        setSuccess('');
         try {
-            await adminUpdateById('memberships', membershipId, { status: newStatus });
-            fetchData();
+            const response = await fetch('/api/admin/membership-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ membershipId: membership.id, status: newStatus }),
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                setError(data.error || 'Failed to update status');
+            } else if (data.message) {
+                setSuccess(data.message);
+            }
         } catch (err) {
             console.error('Error updating status:', err);
+            setError('Failed to update status');
+        } finally {
+            fetchData();
         }
     };
 
-    const cancelSubscription = async (membership: Membership) => {
+    const cancelSubscription = async (membership: Membership, mode: 'immediately' | 'period_end' = 'immediately') => {
         if (!membership.stripe_subscription_id) {
             setError('This membership does not have a Stripe subscription.');
             return;
         }
 
-        if (!confirm(`Are you sure you want to cancel the subscription for ${membership.profile?.first_name} ${membership.profile?.last_name}? This will stop their recurring payments.`)) {
+        const name = `${membership.profile?.first_name || ''} ${membership.profile?.last_name || ''}`.trim();
+        const prompt = mode === 'period_end'
+            ? `Stop ${name}'s subscription renewing? They keep access until the end of the period they have paid for, then the membership ends automatically.`
+            : `Cancel ${name}'s subscription now? Their Stripe subscription is cancelled immediately and the membership is marked cancelled today.`;
+        if (!confirm(prompt)) {
             return;
         }
 
@@ -240,19 +288,19 @@ export default function AdminMembershipsPage() {
             setSuccess('');
             setError('');
 
-            const response = await fetch('/api/stripe/cancel', {
+            const response = await fetch('/api/admin/membership-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    subscriptionId: membership.stripe_subscription_id,
                     membershipId: membership.id,
+                    status: mode === 'period_end' ? 'cancel_at_period_end' : 'cancelled',
                 }),
             });
 
             const data = await response.json();
 
-            if (data.success) {
-                setSuccess('Subscription cancelled successfully!');
+            if (response.ok && data.success) {
+                setSuccess(data.message || 'Subscription cancelled successfully!');
                 fetchData();
             } else {
                 setError(data.error || 'Failed to cancel subscription');
@@ -418,7 +466,7 @@ export default function AdminMembershipsPage() {
                                         <select
                                             className="form-input"
                                             value={membership.status}
-                                            onChange={(e) => updateStatus(membership.id, e.target.value)}
+                                            onChange={(e) => updateStatus(membership, e.target.value)}
                                             style={{
                                                 width: 'auto',
                                                 padding: 'var(--space-1) var(--space-2)',
@@ -459,15 +507,31 @@ export default function AdminMembershipsPage() {
                                                     Payments
                                                 </a>
                                             )}
+                                            {membership.stripe_subscription_id && membership.status === 'active' && !membership.end_date && (
+                                                <button
+                                                    onClick={() => cancelSubscription(membership, 'period_end')}
+                                                    className="btn btn-ghost btn-sm"
+                                                    style={{ color: '#F59E0B' }}
+                                                    title="Stop renewal — access continues until the paid period ends"
+                                                >
+                                                    <Calendar size={14} />
+                                                    End at period end
+                                                </button>
+                                            )}
+                                            {membership.stripe_subscription_id && membership.status === 'active' && membership.end_date && (
+                                                <span style={{ fontSize: 'var(--text-xs)', color: '#F59E0B', alignSelf: 'center' }} title="Renewal stopped">
+                                                    Ends {new Date(membership.end_date).toLocaleDateString('en-GB')}
+                                                </span>
+                                            )}
                                             {membership.stripe_subscription_id && membership.status === 'active' && (
                                                 <button
-                                                    onClick={() => cancelSubscription(membership)}
+                                                    onClick={() => cancelSubscription(membership, 'immediately')}
                                                     className="btn btn-ghost btn-sm"
                                                     style={{ color: 'var(--color-red)' }}
-                                                    title="Cancel Stripe subscription"
+                                                    title="Cancel the Stripe subscription immediately"
                                                 >
                                                     <Ban size={14} />
-                                                    Cancel
+                                                    Cancel now
                                                 </button>
                                             )}
                                         </div>

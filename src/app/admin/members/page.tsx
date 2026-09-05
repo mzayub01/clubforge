@@ -351,6 +351,8 @@ export default function AdminMembersPage() {
 
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Failed to update member');
+            // Stripe outcomes for any status change (e.g. "subscription cancelled")
+            const stripeNotes: string[] = Array.isArray(result.notes) ? result.notes : [];
 
             // Handle instructor record creation/management
             if (formData.role === 'instructor' && editingMember.role !== 'instructor') {
@@ -390,7 +392,7 @@ export default function AdminMembersPage() {
                 });
             }
 
-            setSuccess(`${editingMember.first_name}'s profile updated successfully!`);
+            setSuccess(`${editingMember.first_name}'s profile updated successfully!${stripeNotes.length ? ' ' + stripeNotes.join(' ') : ''}`);
             setShowModal(false);
             fetchData();
         } catch (err: any) {
@@ -1403,14 +1405,25 @@ export default function AdminMembersPage() {
                                                     >
                                                         <option value="active">Active</option>
                                                         <option value="pending">Pending payment</option>
+                                                        {m.stripe_subscription_id && (
+                                                            <option value="cancel_at_period_end">Cancel at end of billing period</option>
+                                                        )}
+                                                        <option value="cancelled">Cancelled (now)</option>
                                                         <option value="inactive">Inactive</option>
-                                                        <option value="cancelled">Cancelled</option>
                                                     </select>
+                                                    {m.stripe_subscription_id && m.status === 'active' && m.end_date && (
+                                                        <span style={{ fontSize: 'var(--text-xs)', color: '#F59E0B', width: '100%' }}>
+                                                            Renewal stopped — access until {new Date(m.end_date).toLocaleDateString('en-GB')}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             );
                                         })}
                                         <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-1)' }}>
                                             ⚠️ Tier changes update club records only — they do <strong>not</strong> change the amount of an existing Stripe subscription.
+                                            Status changes <strong>do</strong> sync with Stripe: <strong>Cancelled (now)</strong> cancels the member&apos;s subscription immediately,
+                                            <strong> Cancel at end of billing period</strong> stops renewal but keeps access until the paid period ends, and setting a
+                                            scheduled cancellation back to <strong>Active</strong> resumes billing.
                                         </p>
                                     </div>
                                 )}

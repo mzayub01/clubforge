@@ -261,6 +261,16 @@
   say the same thing. NB `membership_types.price` is stored in **pounds**
   (types.ts comment says pence — wrong; the UI renders `£{price}/mo`).
 
+- **Admin cancellations sync to Stripe (2026-09-06):** `membership-billing.ts`
+  + `POST /api/admin/membership-status`. Edit Member status select and the
+  Memberships page (dropdown, "Cancel now", new "End at period end") all
+  cancel / schedule / resume the member's subscription on the club's
+  connected Stripe account and stamp `end_date`; `/api/stripe/cancel`
+  rewritten to the same helper (it previously hit the platform account, so
+  admin cancels of connected-account subscriptions silently failed). Connect
+  webhook now also records `end_date` when renewal is stopped/resumed in the
+  Stripe dashboard. See DECISIONS → Membership status ↔ Stripe.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

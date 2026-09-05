@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin, checkRateLimit, safeErrorResponse } from '@/lib/auth-guard';
+import { applyMembershipStatusChange, MEMBERSHIP_STATUS_TARGETS, type MembershipStatusTarget } from '@/lib/membership-billing';
 
 // Profile fields an admin may edit from the members page
 const EDITABLE_PROFILE_FIELDS = [
@@ -13,7 +14,6 @@ const EDITABLE_PROFILE_FIELDS = [
 ] as const;
 
 const GENDERS = ['male', 'female'];
-const MEMBERSHIP_STATUSES = ['active', 'pending', 'inactive', 'cancelled'];
 
 /**
  * POST /api/admin/update-member
@@ -155,11 +155,15 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // ---- Membership tier / status changes (records only — never touches Stripe) ----
+        // ---- Membership tier / status changes ----
+        // Tier changes are records only. Status changes go through
+        // applyMembershipStatusChange so the member's Stripe subscription (on the
+        // club's connected account) is cancelled / scheduled / resumed in step.
+        const notes: string[] = [];
         if (Array.isArray(membershipUpdates) && membershipUpdates.length > 0) {
             for (const update of membershipUpdates) {
                 if (!update?.id || (!update.membership_type_id && !update.status)) continue;
-                if (update.status && !MEMBERSHIP_STATUSES.includes(update.status)) {
+                if (update.status && !MEMBERSHIP_STATUS_TARGETS.includes(update.status as MembershipStatusTarget)) {
                     return NextResponse.json({ error: 'Invalid membership status' }, { status: 400 });
                 }
 
@@ -191,28 +195,33 @@ export async function POST(request: NextRequest) {
                     }
                     membershipPatch.membership_type_id = update.membership_type_id;
                 }
-                if (update.status) {
-                    membershipPatch.status = update.status;
-                    if (update.status === 'cancelled' || update.status === 'inactive') {
-                        membershipPatch.end_date = new Date().toISOString().split('T')[0];
-                    } else {
-                        membershipPatch.end_date = null;
+                if (Object.keys(membershipPatch).length > 0) {
+                    const { error: membershipError } = await supabaseAdmin
+                        .from('memberships')
+                        .update(membershipPatch)
+                        .eq('id', update.id);
+
+                    if (membershipError) {
+                        console.error('[update-member] Membership update failed:', membershipError);
+                        return NextResponse.json({ error: 'Failed to update membership tier' }, { status: 500 });
                     }
                 }
 
-                const { error: membershipError } = await supabaseAdmin
-                    .from('memberships')
-                    .update(membershipPatch)
-                    .eq('id', update.id);
-
-                if (membershipError) {
-                    console.error('[update-member] Membership update failed:', membershipError);
-                    return NextResponse.json({ error: 'Failed to update membership tier' }, { status: 500 });
+                if (update.status) {
+                    const result = await applyMembershipStatusChange(supabaseAdmin, {
+                        membershipId: update.id,
+                        tenantId: auth.tenantId!,
+                        target: update.status as MembershipStatusTarget,
+                    });
+                    if (!result.ok) {
+                        return NextResponse.json({ error: result.error || 'Failed to update membership status' }, { status: 400 });
+                    }
+                    if (result.note) notes.push(result.note);
                 }
             }
         }
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true, notes });
 
     } catch (error) {
         console.error('[update-member] Error:', error);

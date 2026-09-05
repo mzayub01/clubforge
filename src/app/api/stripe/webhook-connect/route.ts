@@ -132,10 +132,34 @@ export async function POST(request: NextRequest) {
 
         await supabase
             .from('memberships')
-            .update({ status: 'cancelled' })
+            .update({ status: 'cancelled', end_date: new Date().toISOString().slice(0, 10) })
             .eq('stripe_subscription_id', subscription.id);
 
         console.log('[Connect Webhook] Subscription cancelled:', subscription.id);
+    }
+
+    // Keep end_date in step when a cancellation is scheduled / unscheduled
+    // (from our admin UI or directly in the club's Stripe dashboard)
+    if (event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object as Stripe.Subscription;
+        const previous = (event.data.previous_attributes || {}) as Partial<Stripe.Subscription>;
+
+        if ('cancel_at_period_end' in previous && subscription.status === 'active') {
+            const supabase = await createAdminClient();
+            // Period end moved from the subscription to its items in newer Stripe API versions
+            const periodEnd = (subscription as unknown as { current_period_end?: number }).current_period_end
+                ?? (subscription.items?.data?.[0] as unknown as { current_period_end?: number } | undefined)?.current_period_end
+                ?? null;
+            const endDate = subscription.cancel_at_period_end && periodEnd
+                ? new Date(periodEnd * 1000).toISOString().slice(0, 10)
+                : null;
+            await supabase
+                .from('memberships')
+                .update({ end_date: endDate })
+                .eq('stripe_subscription_id', subscription.id)
+                .eq('status', 'active');
+            console.log('[Connect Webhook] Subscription renewal', subscription.cancel_at_period_end ? 'stopped' : 'resumed', subscription.id);
+        }
     }
 
     // Handle subscription past_due on connected account

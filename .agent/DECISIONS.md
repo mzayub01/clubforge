@@ -249,6 +249,20 @@ payment-reminder reply-to all pointed at ClubForge.
   `parent_guardian_id` server-side (see instructor "My Students"). Helpers in
   `src/lib/member-contact.ts`.
 
+### Membership status ↔ Stripe (IMPORTANT)
+Member subscriptions live on the **club's connected account**, so every Stripe
+call about them needs `{ stripeAccount: tenant.stripe_account_id }` — the old
+`/api/stripe/cancel` called the platform account and could never find them.
+**Never write `memberships.status` directly from admin code.** Go through
+`applyMembershipStatusChange()` (`src/lib/membership-billing.ts`): `cancelled` /
+`inactive` cancel the Stripe subscription immediately and stamp `end_date`;
+`cancel_at_period_end` sets Stripe `cancel_at_period_end`, keeps the membership
+active with `end_date = period end` (the connect webhook flips it to cancelled
+when Stripe ends it); `active` clears a scheduled cancellation. If Stripe rejects
+the change the record is left untouched, so the club never believes billing has
+stopped when it hasn't. Entry points: `POST /api/admin/membership-status`,
+`POST /api/admin/update-member` (`membershipUpdates[].status`), `/api/stripe/cancel`.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

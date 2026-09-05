@@ -1,6 +1,6 @@
 # ClubForge — Decision Log & Design Principles
 
-> **Last updated:** 2026-09-05 (Phase 4 in progress — security hardening)
+> **Last updated:** 2026-09-06 (Phase 4 in progress — security hardening, member-contact routing, membership↔Stripe sync)
 
 ---
 

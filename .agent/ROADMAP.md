@@ -1,7 +1,44 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-09-05
-> **Current Phase:** Phase 4 in progress (Member Experience)
+> **Last updated:** 2026-09-06
+> **Current Phase:** Phase 4 in progress (Member Experience) · Phase 5 started early (platform tenant health view)
+
+---
+
+## Next session — pick up here (as of 2026-09-06)
+
+**Owner actions still pending**
+- [ ] Supabase Auth dashboard: enable CAPTCHA (Turnstile/hCaptcha) + Auth rate
+      limits, then wire the token into `/register`, `/get-started`, `/login`
+      (owner parked this on 2026-09-05).
+- [ ] Security researcher (greysurface-security, two trial accounts) to validate
+      the fix with a plain member account; afterwards
+      `node scripts/cleanup-disclosure-2026-09.mjs --delete-researcher-accounts --yes`.
+- [ ] Optional: paste `supabase/migrations/015_platform_user_activity.sql` in the
+      SQL editor — makes `/platform/tenants` "last used" a single query instead
+      of adaptive `listUsers` paging.
+- [ ] **Production test of Stripe-synced cancellation**: on a Stripe-backed
+      membership click "End at period end", confirm "cancels on …" in the club's
+      Stripe dashboard, then set back to Active (reversible). Could NOT be
+      verified locally — `.env.local` holds the TEST key and all connected
+      accounts are live-mode.
+- [ ] All Out Warriors is a test tenant (owner confirmed) — no logo restore
+      needed. Tenant health view shows many stale/inactive test tenants worth
+      deactivating.
+
+**Shipped 2026-09-05 → 06** (details in the Phase 4 progress bullets below):
+platform-admin tooling · security disclosure remediation (migration 014
+applied + verified) · platform tenant health view · belt toggle hides all
+rank UI + club-type welcome email + off switch · member contact routing to
+the club · guardian email everywhere for children · staff photo
+capture/upload + zoom · custom email templates (Pro/Elite) · full Add Member
+· fuller Edit Member · membership state per member row · Stripe-synced
+cancellations.
+
+**Ideas queued (not started)**
+- Migrate legacy flat video objects to `videos/<tenantId>/…`.
+- Find/fix the corrupt `auth.users` row that breaks `listUsers` paging (DECISIONS debt #12).
+- Per-tenant registration page refactor, theming audit, null-avatar backfill (see "Still open").
 
 ---
 

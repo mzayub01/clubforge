@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-09-05 (Phase 4 in progress — guardian/child flow, member payments, profile media, modal system, platform-admin tooling)
+> **Last updated:** 2026-09-06 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -325,6 +325,26 @@ allows a parent→child payment after validating the relationship.
   required photo can't be saved (no orphaned auth user, no silent null).
 
 ---
+
+## Recent additions (2026-09)
+
+| Area | Where to look |
+|------|---------------|
+| Platform admin tooling | `scripts/create-platform-admin.mjs` (grant/revoke/list); `/platform/tenants` health view fed by `GET /api/platform/tenants` (status, Stripe Connect state, trial end, last used) |
+| Security hardening | `supabase/migrations/014_security_hardening_authz.sql` (**applied**): `tenants_public` view, owner/admin-only `tenants` SELECT, tenant-scoped storage policies, `protect_profile_privileged_columns` trigger; `scripts/verify-security-posture.mjs`; `scripts/cleanup-disclosure-2026-09.mjs` |
+| Member contact routing | `useDashboard().tenantName / tenantContactEmail` (dashboard layout resolves club contact → owner login email); membership help card, payment modal, checkout-cancel page, payment reminders |
+| Children / guardians | `src/lib/member-contact.ts`; `sendEmail()` swaps child dummies for guardian; `useGuardianContacts()` + `GET /api/staff/guardian-contacts`; members page guardian/children links |
+| Photos | `components/MemberPhotoEditor.tsx` (exports `CameraCapture`), `PhotoLightbox.tsx`, `StudentPhoto.tsx`, `Avatar` `onClick`; `POST /api/staff/member-photo`; `POST /api/admin/upload-logo` |
+| Members admin | `components/admin/CreateMemberModal.tsx` + rewritten `POST /api/admin/create-user`; fuller `POST /api/admin/update-member`; per-row `membershipSummary()` on `/admin/members` |
+| Billing sync | `src/lib/membership-billing.ts` (`applyMembershipStatusChange`), `POST /api/admin/membership-status`, `/api/stripe/cancel` (rewritten); connect webhook `end_date` sync |
+| Email | `src/lib/welcome-email-copy.ts` (club-type aware defaults), `settings.welcome_email_enabled` (Admin → Settings → General), custom templates (`custom_*` keys) created on `/admin/email-templates` and sent via `/api/email/announcement` `templateKey`; `scripts/set-welcome-template.mjs` |
+| Belt toggle | `settings.belt_progress_enabled=false` now hides the dashboard rank card, profile badge/section and redirects `/dashboard/progress` |
+
+Facts worth remembering: `membership_types.price` is whole **pounds**; member
+Stripe subscriptions live on each club's **connected account** (always pass
+`stripeAccount`); `.env.local` carries the **test** Stripe key so Stripe
+behaviour must be verified in production; the working copy uses CRLF line
+endings (scripted edits must be EOL-aware).
 
 ## Design System
 

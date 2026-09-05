@@ -227,6 +227,18 @@
     same location/audience/include-pending options and live recipient count.
     Placeholders `{{firstName}}`, `{{clubName}}`.
 
+- **Admin "Add Member" (2026-09-05):** the old Create User (name/email/
+  password/role, placeholder DOB) is replaced by `CreateMemberModal` +
+  rewritten `POST /api/admin/create-user` (requireAdmin, tenant-scoped):
+  adult or child (child = generated dummy login + `parent_guardian_id` to a
+  chosen adult member), full personal/address/emergency/medical details,
+  gender, role (+ `instructors` row for staff roles), schema-driven rank &
+  stripes, membership (location + type + active/pending/none), photo
+  (upload or take one via `CameraCapture`), waiver/etiquette flags, and for
+  adults an optional welcome email and a set-password email (Supabase
+  recovery link → `/reset-password`). Blank password ⇒ generated and shown
+  once in the success panel with copy. Full cleanup on any failure.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

@@ -134,7 +134,7 @@ export default function MemberPhotoEditor({
 // Live camera capture (getUserMedia). Falls back to the device camera app via
 // <input capture> where the browser refuses or has no camera.
 // -----------------------------------------------
-function CameraCapture({
+export function CameraCapture({
     onCapture,
     onClose,
     subjectName,

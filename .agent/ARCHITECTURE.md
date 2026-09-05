@@ -264,6 +264,7 @@ that re-validate the parent-child relationship server-side:
 | `GET /api/multisite/available-locations` | Multisite options for self or a child (auth: self/guardian/staff) |
 | `GET /api/staff/guardian-contacts` | Staff only: child → guardian contact map for the tenant (used by `useGuardianContacts()` so children show the guardian's email everywhere) |
 | `POST /api/staff/member-photo` | Staff only: upload / camera-capture a member's profile photo (service role → `avatars`, updates `profile_image_url`) |
+| `POST /api/admin/create-user` | Admin only: create a complete adult or child member (auth user, profile, tenant_members, optional membership, photo, welcome + set-password emails). Children get a dummy login and `parent_guardian_id` |
 
 **Child emails:** children's generated `@child.clubforge.local` addresses are never
 shown or mailed. `sendEmail()` (`src/lib/email.ts`) swaps any dummy recipient for the

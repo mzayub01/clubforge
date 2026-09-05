@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, Download, Edit, Trash2, AlertCircle, CheckCircle, User, Phone, Mail, Award, Shield, ChevronDown, ChevronUp, CreditCard, MoreHorizontal, Send, X, Eye, Clock, Users, MapPin, Filter, Calendar, Loader2, Info, EyeOff, XCircle, ClipboardList } from 'lucide-react';
+import { Plus, Search, Download, Edit, Trash2, AlertCircle, CheckCircle, User, Phone, Mail, Award, Shield, ChevronDown, ChevronUp, CreditCard, MoreHorizontal, Send, X, Clock, Users, MapPin, Filter, Calendar, Loader2, Info, XCircle, ClipboardList } from 'lucide-react';
 import EmptyState from '@/components/admin/EmptyState';
 import { adminFetch, adminFetchOne, adminInsert, adminUpdate } from '@/lib/admin-api';
 import type { Location, MembershipType } from '@/lib/types';
@@ -11,6 +11,7 @@ import Avatar from '@/components/Avatar';
 import { useRankSchemas } from '@/hooks/useRankSchemas';
 import MemberPhotoEditor from '@/components/MemberPhotoEditor';
 import PhotoLightbox from '@/components/PhotoLightbox';
+import CreateMemberModal from '@/components/admin/CreateMemberModal';
 import { isChildDummyEmail } from '@/lib/member-contact';
 
 interface Member {
@@ -91,17 +92,8 @@ export default function AdminMembersPage() {
         membershipTiers: {} as Record<string, string>, // membership id -> membership_type_id
     });
 
-    // Create user state
+    // Create member modal (full profile flow lives in components/admin/CreateMemberModal)
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [createLoading, setCreateLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [createFormData, setCreateFormData] = useState({
-        email: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        role: 'member',
-    });
 
     // Delete member state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -515,35 +507,6 @@ export default function AdminMembersPage() {
         link.click();
     };
 
-    const handleCreateUser = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setCreateLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch('/api/admin/create-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(createFormData),
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                setSuccess(`User ${createFormData.email} created successfully!`);
-                setShowCreateModal(false);
-                setCreateFormData({ email: '', password: '', firstName: '', lastName: '', role: 'member' });
-                fetchData();
-            } else {
-                setError(data.error || 'Failed to create user');
-            }
-        } catch {
-            setError('Failed to create user');
-        } finally {
-            setCreateLoading(false);
-        }
-    };
-
     if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
@@ -577,7 +540,7 @@ export default function AdminMembersPage() {
                         style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
                     >
                         <Plus size={18} />
-                        Create User
+                        Add Member
                     </button>
                 </div>
             </div>
@@ -1202,123 +1165,18 @@ export default function AdminMembersPage() {
                 member={attendanceMember}
             />
 
-            {/* Create User Modal */}
-            {showCreateModal && (
-                <ModalPortal>
-                <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px' }}>
-                        <div className="modal-header">
-                            <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                                <Plus size={20} />
-                                Create User
-                            </h2>
-                            <button onClick={() => setShowCreateModal(false)} className="btn btn-ghost btn-sm">
-                                <X size={18} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleCreateUser}>
-                            <div className="modal-body">
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">First Name *</label>
-                                        <input
-                                            type="text"
-                                            className="form-input"
-                                            required
-                                            value={createFormData.firstName}
-                                            onChange={(e) => setCreateFormData({ ...createFormData, firstName: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Last Name *</label>
-                                        <input
-                                            type="text"
-                                            className="form-input"
-                                            required
-                                            value={createFormData.lastName}
-                                            onChange={(e) => setCreateFormData({ ...createFormData, lastName: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Email *</label>
-                                    <input
-                                        type="email"
-                                        className="form-input"
-                                        required
-                                        value={createFormData.email}
-                                        onChange={(e) => setCreateFormData({ ...createFormData, email: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Password *</label>
-                                    <div style={{ position: 'relative' }}>
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            className="form-input"
-                                            required
-                                            minLength={6}
-                                            value={createFormData.password}
-                                            onChange={(e) => setCreateFormData({ ...createFormData, password: e.target.value })}
-                                            style={{ paddingRight: '40px' }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            style={{
-                                                position: 'absolute',
-                                                right: '8px',
-                                                top: '50%',
-                                                transform: 'translateY(-50%)',
-                                                background: 'none',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                color: 'var(--text-tertiary)',
-                                            }}
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Role</label>
-                                    <select
-                                        className="form-select"
-                                        value={createFormData.role}
-                                        onChange={(e) => setCreateFormData({ ...createFormData, role: e.target.value })}
-                                    >
-                                        {ROLES.map((role) => (
-                                            <option key={role} value={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" onClick={() => setShowCreateModal(false)} className="btn btn-ghost">
-                                    Cancel
-                                </button>
-                                <button type="submit" disabled={createLoading} className="btn btn-primary">
-                                    {createLoading ? (
-                                        <>
-                                            <Loader2 size={16} className="spinner" />
-                                            Creating...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Plus size={16} />
-                                            Create User
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                </ModalPortal>
-            )}
+            {/* Add Member — full profile, login/guardian, role & rank, membership, photo */}
+            <CreateMemberModal
+                open={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onCreated={(message) => { setSuccess(message); fetchData(); }}
+                locations={locations}
+                membershipTypes={membershipTypes}
+                guardianOptions={members
+                    .filter(m => !m.is_child && !isChildDummyEmail(m.email))
+                    .map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}`.trim(), email: m.email }))}
+                getSchemaForMember={getSchemaForMember}
+            />
 
             {/* Delete Confirmation Modal */}
             {showDeleteModal && deletingMember && (

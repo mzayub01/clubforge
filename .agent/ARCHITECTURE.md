@@ -345,6 +345,7 @@ allows a parent→child payment after validating the relationship.
 | Billing sync | `src/lib/membership-billing.ts` (`applyMembershipStatusChange`), `POST /api/admin/membership-status`, `/api/stripe/cancel` (rewritten); connect webhook `end_date` sync |
 | Email | `src/lib/welcome-email-copy.ts` (club-type aware defaults), `settings.welcome_email_enabled` (Admin → Settings → General), custom templates (`custom_*` keys) created on `/admin/email-templates` and sent via `/api/email/announcement` `templateKey`; `scripts/set-welcome-template.mjs` |
 | Belt toggle | `settings.belt_progress_enabled=false` now hides the dashboard rank card, profile badge/section and redirects `/dashboard/progress` |
+| Review batch 1 (2026-09-06) | `/instructor/class-roster` (re-export), `POST /api/staff/attendance-remove`, `GET /api/staff/member-details` + `components/instructor/StudentDetailsButton.tsx`, `POST /api/stripe/member-portal` + `components/dashboard/ManagePaymentButton.tsx`, location `settings.payment_offline` (Admin → Locations), `/api/auth/role` request-tenant resolution, announcements audience/location filter, 30-min late check-in (`TodayClassCard`, `dashboard/classes`) |
 
 Facts worth remembering: `membership_types.price` is whole **pounds**; member
 Stripe subscriptions live on each club's **connected account** (always pass

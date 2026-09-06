@@ -22,9 +22,35 @@
       Stripe dashboard, then set back to Active (reversible). Could NOT be
       verified locally — `.env.local` holds the TEST key and all connected
       accounts are live-mode.
+- [ ] **Production test of the member payment portal** (added 2026-09-06): as a
+      member with a Stripe subscription, Membership → "Manage payment details";
+      confirm the portal opens on the club's account and shows NO cancel option
+      (first use creates the restricted configuration). Same local-key caveat.
+- [ ] **Instructor smoke test** (added 2026-09-06): an instructor opens
+      Class Roster from the sidebar / mobile Check-in tab, checks a member in
+      and out, and opens a student's Details on My Students.
 - [ ] All Out Warriors is a test tenant (owner confirmed) — no logo restore
       needed. Tenant health view shows many stale/inactive test tenants worth
       deactivating.
+
+**Product review findings not yet picked (2026-09-06)** — numbering matches
+the review the owner chose batch 1 from; batch 1 (1,2,3,5,7,8,10,13,17,19,23,25)
+is shipped. Remaining, roughly by value:
+- #22 Members can change their own belt/stripes on the profile page (undermines the progression moat; DECISIONS debt #7).
+- #24 Structured "request cancellation" button for members (emails the club with details) instead of "email us".
+- #11 Replace 12× native `confirm()` / 2× `alert()` in admin with the shared modal pattern.
+- #12 Consolidate scattered feature toggles (belt, welcome email, child accounts…) into a Settings → Features tab.
+- #4 Admin/instructor/professor layouts resolve tenant from the user's first membership (unscoped `.single()`), not the request — same class as the July bugs.
+- #20 Bulk attendance (select-all / booked list / undo) for instructors.
+- #21 Grading page: default location/class when there is only one.
+- #26 "Check in all my children" for guardians on the Today card.
+- #27 In-app "join waitlist" for existing members.
+- #14 Invite-by-email with prefilled details + invited-but-not-registered view.
+- #15 Per-club toggle for child/family accounts (hide "Add Child" for gyms).
+- #16 Rename / opt-in "Weekly Wisdom" (Naseeha) for non-Islamic clubs.
+- #18 Sidebar labels every admin "Club Owner".
+- #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
+- #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
 
 **Shipped 2026-09-05 → 06** (details in the Phase 4 progress bullets below):
 platform-admin tooling · security disclosure remediation (migration 014
@@ -33,7 +59,11 @@ rank UI + club-type welcome email + off switch · member contact routing to
 the club · guardian email everywhere for children · staff photo
 capture/upload + zoom · custom email templates (Pro/Elite) · full Add Member
 · fuller Edit Member · membership state per member row · Stripe-synced
-cancellations.
+cancellations · UX/bug review batch 1 (instructor roster, announcement
+audience, multisite Today card, tenant-aware login redirect, legacy wording,
+in-person-payment location setting, error boundaries, people-based overview
+stats, aria-labels, instructor student details, member payment portal,
+30-min late check-in).
 
 **Ideas queued (not started)**
 - Migrate legacy flat video objects to `videos/<tenantId>/…`.

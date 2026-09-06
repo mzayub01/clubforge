@@ -263,6 +263,15 @@ the change the record is left untouched, so the club never believes billing has
 stopped when it hasn't. Entry points: `POST /api/admin/membership-status`,
 `POST /api/admin/update-member` (`membershipUpdates[].status`), `/api/stripe/cancel`.
 
+### Staff routes & roles
+Anything an **instructor** must reach lives under `/instructor/*` (the `/admin`
+layout admits admins and platform admins only; instructors were being bounced
+from the roster). Shared screens are re-exported (`instructor/class-roster/page.tsx`
+re-exports the admin roster) and their writes use staff endpoints
+(`requireStaff`) rather than the admin-only CRUD route, which only permits
+`select` for non-admins. Member-facing check-in stays open 30 minutes after a
+class ends; staff can back-date via `classDate` on `/api/attendance/checkin`.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

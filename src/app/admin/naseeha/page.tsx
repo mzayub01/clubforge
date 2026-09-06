@@ -209,10 +209,10 @@ export default function AdminNaseehaPage() {
                                         </p>
                                     </div>
                                     <div style={{ display: 'flex', gap: 'var(--space-2)', marginLeft: 'var(--space-4)' }}>
-                                        <button className="btn btn-ghost btn-icon" onClick={() => openModal(naseeha)}>
+                                        <button className="btn btn-ghost btn-icon" onClick={() => openModal(naseeha)} aria-label="Edit entry" title="Edit">
                                             <Edit size={18} />
                                         </button>
-                                        <button className="btn btn-ghost btn-icon" onClick={() => deleteNaseeha(naseeha.id)}>
+                                        <button className="btn btn-ghost btn-icon" onClick={() => deleteNaseeha(naseeha.id)} aria-label="Delete entry" title="Delete">
                                             <Trash2 size={18} />
                                         </button>
                                     </div>
@@ -232,7 +232,7 @@ export default function AdminNaseehaPage() {
                             <h2 className="modal-title">
                                 {editNaseeha ? 'Edit Entry' : 'Add New Entry'}
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">

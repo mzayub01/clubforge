@@ -23,6 +23,7 @@ export default function AdminLocationsPage() {
         contact_email: '',
         contact_phone: '',
         allow_multisite: true,
+        payment_offline: false,
     });
 
     useEffect(() => {
@@ -60,6 +61,7 @@ export default function AdminLocationsPage() {
                 contact_email: location.contact_email || '',
                 contact_phone: location.contact_phone || '',
                 allow_multisite: location.allow_multisite !== false,
+                payment_offline: location.settings?.payment_offline === true,
             });
         } else {
             setEditLocation(null);
@@ -72,6 +74,7 @@ export default function AdminLocationsPage() {
                 contact_email: '',
                 contact_phone: '',
                 allow_multisite: true,
+                payment_offline: false,
             });
         }
         setShowModal(true);
@@ -212,12 +215,14 @@ export default function AdminLocationsPage() {
                                         )}
                                     </div>
                                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                                        <button className="btn btn-ghost btn-icon" onClick={() => openModal(location)}>
+                                        <button className="btn btn-ghost btn-icon" onClick={() => openModal(location)} aria-label={`Edit ${location.name}`} title="Edit location">
                                             <Edit size={18} />
                                         </button>
                                         <button
                                             className="btn btn-ghost btn-icon"
                                             onClick={() => toggleLocationStatus(location)}
+                                            aria-label={location.is_active ? `Deactivate ${location.name}` : `Reactivate ${location.name}`}
+                                            title={location.is_active ? 'Deactivate location' : 'Reactivate location'}
                                         >
                                             {location.is_active ? <Trash2 size={18} /> : <CheckCircle size={18} />}
                                         </button>
@@ -251,7 +256,7 @@ export default function AdminLocationsPage() {
                             <h2 className="modal-title">
                                 {editLocation ? 'Edit Location' : 'Add New Location'}
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">
@@ -339,6 +344,23 @@ export default function AdminLocationsPage() {
                                             onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
                                         />
                                     </div>
+                                </div>
+
+                                {/* In-person payments (skips online checkout for this location) */}
+                                <div className="form-group" style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)' }}>
+                                    <label className="form-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.payment_offline}
+                                            onChange={(e) => setFormData({ ...formData, payment_offline: e.target.checked })}
+                                        />
+                                        <div>
+                                            <span style={{ fontWeight: '500' }}>Payments collected in person at this location</span>
+                                            <p style={{ margin: '4px 0 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                                                Members and children added here are activated straight away without online checkout — you take payment yourself.
+                                            </p>
+                                        </div>
+                                    </label>
                                 </div>
 
                                 {/* Multisite Toggle */}

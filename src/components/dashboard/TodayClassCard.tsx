@@ -48,48 +48,50 @@ export default function TodayClassCard({ selectedUserId }: TodayClassCardProps) 
             // Use selectedUserId if provided, otherwise fall back to logged-in user
             const targetUserId = selectedUserId || user.id;
 
-            // Get user's membership
-            const { data: membership } = await supabase
+            // All active memberships (multisite members have more than one)
+            const { data: memberships } = await supabase
                 .from('memberships')
                 .select('location_id, membership_type_id')
                 .eq('user_id', targetUserId)
-                .eq('status', 'active')
-                .single();
+                .eq('status', 'active');
 
-            if (!membership) {
+            if (!memberships || memberships.length === 0) {
+                setTodayClass(null);
                 setLoading(false);
                 return;
             }
+            const locationIds = Array.from(new Set(memberships.map(m => m.location_id).filter(Boolean)));
 
             const today = new Date();
             const currentDayOfWeek = today.getDay();
             const currentTime = today.toTimeString().slice(0, 5);
             const todayDate = today.toISOString().split('T')[0];
 
-            // Fetch today's classes for this location, including tier associations
+            // Fetch today's classes at every location the member belongs to
             const { data: classes } = await supabase
                 .from('classes')
-                .select('id, name, start_time, end_time, location:locations(name), class_membership_types(membership_type_id)')
-                .eq('location_id', membership.location_id)
+                .select('id, name, start_time, end_time, location_id, location:locations(name), class_membership_types(membership_type_id)')
+                .in('location_id', locationIds)
                 .eq('day_of_week', currentDayOfWeek)
                 .eq('is_active', true)
                 .order('start_time');
 
             if (!classes || classes.length === 0) {
+                setTodayClass(null);
                 setLoading(false);
                 return;
             }
 
-            // Filter by membership type using junction table
-            // If class has no tier associations, it's available to all members
-            // If class has tier associations, member's tier must be in the list
+            // A class is accessible when the member holds a membership at that
+            // location whose tier is allowed (classes with no tier restriction are
+            // open to everyone at the location).
             const accessibleClasses = classes.filter((c: any) => {
-                const classTiers = c.class_membership_types || [];
-                // No tier restrictions = available to all members at this location
-                if (classTiers.length === 0) return true;
-                // Has tier restrictions - check if member's tier is in the list
-                return classTiers.some((t: { membership_type_id: string }) =>
-                    t.membership_type_id === membership.membership_type_id
+                const classTiers: { membership_type_id: string }[] = c.class_membership_types || [];
+                return memberships.some(m =>
+                    m.location_id === c.location_id && (
+                        classTiers.length === 0 ||
+                        classTiers.some(t => t.membership_type_id === m.membership_type_id)
+                    )
                 );
             });
 
@@ -109,17 +111,29 @@ export default function TodayClassCard({ selectedUserId }: TodayClassCardProps) 
             const [nowH, nowM] = currentTime.split(':').map(Number);
             const nowMins = nowH * 60 + nowM;
 
+            const GRACE_MINS = 30; // check-in stays open this long after a class ends
+
             for (const cls of accessibleClasses) {
                 const startTime = cls.start_time.slice(0, 5);
                 const endTime = cls.end_time.slice(0, 5);
                 const [startH, startM] = startTime.split(':').map(Number);
+                const [endH, endM] = endTime.split(':').map(Number);
                 const startMins = startH * 60 + startM;
+                const endMins = endH * 60 + endM;
 
-                if (currentTime >= startTime && currentTime <= endTime) {
+                if (nowMins >= startMins && nowMins <= endMins) {
                     // Class is happening now!
                     selectedClass = cls;
                     isHappeningNow = true;
                     canCheckIn = true;
+                    break;
+                } else if (nowMins > endMins && nowMins <= endMins + GRACE_MINS) {
+                    // Just finished — late check-in still allowed
+                    selectedClass = cls;
+                    isHappeningNow = false;
+                    isUpcoming = false;
+                    canCheckIn = true;
+                    startsIn = `Finished — check-in closes in ${endMins + GRACE_MINS - nowMins} min`;
                     break;
                 } else if (currentTime < startTime) {
                     // Class is upcoming

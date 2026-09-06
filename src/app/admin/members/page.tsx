@@ -70,6 +70,14 @@ export default function AdminMembersPage() {
     const [membershipTypeFilter, setMembershipTypeFilter] = useState('all');
     const [membershipStatusFilter, setMembershipStatusFilter] = useState('all');
 
+    // Deep links from the overview stat cards: /admin/members?status=has-active
+    useEffect(() => {
+        const wanted = new URLSearchParams(window.location.search).get('status');
+        if (wanted && ['all', 'has-active', 'pending-payment', 'no-membership', 'no-active', 'waitlist-only'].includes(wanted)) {
+            setMembershipStatusFilter(wanted);
+        }
+    }, []);
+
     const [showModal, setShowModal] = useState(false);
     const [editingMember, setEditingMember] = useState<Member | null>(null);
     const [showAttendanceModal, setShowAttendanceModal] = useState(false);

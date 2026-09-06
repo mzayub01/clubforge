@@ -339,18 +339,24 @@ export async function POST(request: NextRequest) {
 
         const isFree = !membershipType || membershipType.price === 0;
 
-        // Fetch location to check for Cheadle Masjid exception
+        // Some locations collect payment in person rather than through online
+        // checkout (location setting `payment_offline`). The old hard-coded
+        // "Cheadle Masjid" name check is kept as a legacy fallback.
         const { data: locationData } = await supabaseAdmin
             .from('locations')
-            .select('name')
+            .select('name, settings')
             .eq('id', locationId)
             .single();
 
-        const isCheadleMasjid = locationData?.name?.toLowerCase().includes('cheadle masjid') ||
-            locationData?.name?.toLowerCase().includes('cheadle mosque');
+        const locationSettings = (locationData?.settings || {}) as Record<string, unknown>;
+        const locationName = locationData?.name?.toLowerCase() || '';
+        const paysViaClub = locationSettings.payment_offline === true
+            || locationName.includes('cheadle masjid')
+            || locationName.includes('cheadle mosque');
+        const isCheadleMasjid = paysViaClub; // legacy name used by older clients
 
         // Determine membership status based on payment type
-        const membershipStatus = (isFree || isCheadleMasjid) ? 'active' : 'pending';
+        const membershipStatus = (isFree || paysViaClub) ? 'active' : 'pending';
 
         // Create membership for child
         const { error: membershipError } = await supabaseAdmin
@@ -394,8 +400,9 @@ export async function POST(request: NextRequest) {
                 last_name: childProfile.last_name,
             },
             // Include info for client to handle payment
-            requiresPayment: !isFree && !isCheadleMasjid,
-            isCheadleMasjid,
+            requiresPayment: !isFree && !paysViaClub,
+            paysViaClub,
+            isCheadleMasjid, // deprecated alias of paysViaClub
             tenantId,
             membershipType: {
                 id: membershipTypeId,

@@ -58,7 +58,6 @@ export default function AdminAttendancePage() {
     };
 
     const fetchAttendance = async () => {
-        console.log('Fetching attendance for class:', selectedClass, 'date:', selectedDate);
 
         const { data, error } = await adminFetch<Attendance>('attendance', {
             filters: [
@@ -67,7 +66,6 @@ export default function AdminAttendancePage() {
             ],
         });
 
-        console.log('Fetch attendance result:', { data, error });
 
         setAttendance(data || []);
     };
@@ -89,11 +87,9 @@ export default function AdminAttendancePage() {
             checked_in_by: '__CURRENT_USER__',
         };
 
-        console.log('Inserting attendance:', insertData);
 
         const { data, error } = await adminInsert('attendance', insertData);
 
-        console.log('Insert result:', { data, error });
 
         if (error) {
             if (error.includes('23505') || error.includes('unique') || error.includes('duplicate')) {

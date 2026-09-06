@@ -151,6 +151,8 @@ export interface LocationSettings {
   allow_waitlist: boolean;
   contact_email?: string;
   contact_phone?: string;
+  /** Payments are collected by the club in person — skip online checkout for this location */
+  payment_offline?: boolean;
 }
 
 export interface MembershipType {

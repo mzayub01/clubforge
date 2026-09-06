@@ -468,18 +468,6 @@ function RegisterPageContent() {
             const isFree = selectedType?.price === 0;
             const membershipHasCapacity = hasCapacity(formData.selectedMembershipTypeId);
 
-            // Debug: log payment decision variables
-            console.log('[Register] Payment decision:', {
-                selectedTypeId: formData.selectedMembershipTypeId,
-                selectedTypeName: selectedType?.name,
-                price: selectedType?.price,
-                isFree,
-                stripeConnectEnabled: tenant?.stripe_connect_enabled,
-                stripeAccountId: tenant?.stripe_account_id,
-                membershipHasCapacity,
-                path: (isFree || !tenant?.stripe_connect_enabled) ? 'FREE/PENDING' : 'CONNECTED_CHECKOUT',
-            });
-
             if (membershipHasCapacity) {
                 if (isFree || !tenant?.stripe_connect_enabled) {
                     // Free membership OR club hasn't connected Stripe → create via server-side API
@@ -516,7 +504,6 @@ function RegisterPageContent() {
                     router.refresh();
                 } else {
                     // Club has Stripe Connect → redirect to connected checkout
-                    console.log('[Register] Calling checkout-connected API...');
                     const response = await fetch('/api/stripe/checkout-connected', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -533,7 +520,6 @@ function RegisterPageContent() {
                     });
 
                     const data = await response.json();
-                    console.log('[Register] Checkout-connected response:', { status: response.status, hasUrl: !!data.url, error: data.error });
 
                     if (data.url) {
                         window.location.href = data.url;

@@ -329,6 +329,8 @@ export default function EventRegistration({ event, user }: EventRegistrationProp
                                 <button
                                     type="button"
                                     className="btn btn-ghost btn-icon"
+                                    aria-label="Remove attendee"
+                                    title="Remove attendee"
                                     onClick={() => setAdditionalAttendees(additionalAttendees.filter((_, i) => i !== index))}
                                     style={{ color: 'var(--color-red)' }}
                                 >

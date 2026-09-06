@@ -265,6 +265,12 @@ that re-validate the parent-child relationship server-side:
 | `GET /api/staff/guardian-contacts` | Staff only: child → guardian contact map for the tenant (used by `useGuardianContacts()` so children show the guardian's email everywhere) |
 | `POST /api/staff/member-photo` | Staff only: upload / camera-capture a member's profile photo (service role → `avatars`, updates `profile_image_url`) |
 | `POST /api/admin/create-user` | Admin only: create a complete adult or child member (auth user, profile, tenant_members, optional membership, photo, welcome + set-password emails). Children get a dummy login and `parent_guardian_id` |
+| `GET /api/staff/member-details?userId=` | Staff only: emergency contact, medical, guardian contact, memberships, recent attendance (instructor "Details" modal) |
+| `POST /api/staff/attendance-remove` | Staff only: undo a check-in by attendance id (roster works for instructors) |
+| `POST /api/stripe/member-portal` | Member/guardian: Stripe customer portal session on the club's connected account with a restricted configuration (update card, invoices; no cancel/pause/plan change) |
+
+Staff routes live under `/instructor/*` for instructors (e.g. `/instructor/class-roster`
+re-exports the admin roster page) — the `/admin` layout admits admins only.
 
 **Child emails:** children's generated `@child.clubforge.local` addresses are never
 shown or mailed. `sendEmail()` (`src/lib/email.ts`) swaps any dummy recipient for the

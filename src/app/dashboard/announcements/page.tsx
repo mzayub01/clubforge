@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getTenantId } from '@/lib/tenant';
 import { Bell, Calendar, MapPin, Info } from 'lucide-react';
 
 export const metadata = {
-    title: 'Announcements | ClubForge',
-    description: 'View announcements and updates from ClubForge',
+    title: 'Announcements',
+    description: 'Announcements and updates from your club',
 };
 
 interface Announcement {
@@ -34,7 +36,38 @@ export default async function AnnouncementsPage() {
         .or('expires_at.is.null,expires_at.gt.now()')
         .order('created_at', { ascending: false });
 
-    const announcements = (rawAnnouncements || []) as Announcement[];
+    // Only show what was aimed at this person: staff-only announcements go to
+    // staff, and location-specific ones to people with a membership (own or a
+    // child's) at that location.
+    const admin = createAdminClient();
+    const tenantId = await getTenantId();
+    let isStaff = false;
+    const memberLocationIds = new Set<string>();
+    if (user) {
+        const { data: tm } = tenantId
+            ? await admin.from('tenant_members').select('role').eq('user_id', user.id).eq('tenant_id', tenantId).eq('is_active', true).maybeSingle()
+            : { data: null };
+        isStaff = ['admin', 'instructor', 'professor'].includes(tm?.role || '');
+
+        const { data: me } = await admin.from('profiles').select('id').eq('user_id', user.id).maybeSingle();
+        const { data: children } = me
+            ? await admin.from('profiles').select('user_id').eq('parent_guardian_id', me.id)
+            : { data: [] as { user_id: string }[] };
+        const userIds = [user.id, ...(children || []).map(c => c.user_id)];
+        const { data: ms } = await admin
+            .from('memberships')
+            .select('location_id')
+            .in('user_id', userIds)
+            .in('status', ['active', 'pending']);
+        (ms || []).forEach(m => { if (m.location_id) memberLocationIds.add(m.location_id); });
+    }
+
+    const announcements = ((rawAnnouncements || []) as Announcement[]).filter(a => {
+        const audience = a.target_audience || 'all';
+        if (audience === 'instructors' && !isStaff) return false;
+        if (a.location_id && memberLocationIds.size > 0 && !memberLocationIds.has(a.location_id) && !isStaff) return false;
+        return true;
+    });
 
     // Group by date
     const today = new Date().toDateString();

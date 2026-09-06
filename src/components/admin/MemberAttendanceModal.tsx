@@ -138,7 +138,7 @@ export default function MemberAttendanceModal({ isOpen, onClose, member }: Membe
                             Attendance History
                         </p>
                     </div>
-                    <button className="btn btn-ghost btn-icon" onClick={onClose}>
+                    <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close" title="Close">
                         <X size={20} />
                     </button>
                 </div>

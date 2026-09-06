@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { name, address, city, postcode, description, contact_email, contact_phone, allow_multisite } = body;
+        const { name, address, city, postcode, description, contact_email, contact_phone, allow_multisite, payment_offline } = body;
 
         if (!name || !address || !city || !postcode) {
             return NextResponse.json({ error: 'Missing required fields: name, address, city, postcode' }, { status: 400 });
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
                 contact_email: contact_email || null,
                 contact_phone: contact_phone || null,
                 allow_multisite: allow_multisite !== false,
+                settings: { allow_waitlist: true, payment_offline: payment_offline === true },
                 is_active: true,
             })
             .select()
@@ -113,7 +114,7 @@ export async function PUT(request: NextRequest) {
         // Verify the location belongs to this tenant
         const { data: existing } = await adminSupabase
             .from('locations')
-            .select('id')
+            .select('id, settings')
             .eq('id', id)
             .eq('tenant_id', auth.tenantId)
             .single();
@@ -121,6 +122,12 @@ export async function PUT(request: NextRequest) {
         if (!existing) {
             return NextResponse.json({ error: 'Location not found' }, { status: 404 });
         }
+
+        // Merge into the settings JSON so other keys (allow_waitlist…) survive
+        const existingSettings = (existing.settings || {}) as Record<string, unknown>;
+        const settingsPatch = 'payment_offline' in updateData
+            ? { settings: { ...existingSettings, payment_offline: updateData.payment_offline === true } }
+            : {};
 
         const { data, error } = await adminSupabase
             .from('locations')
@@ -134,6 +141,7 @@ export async function PUT(request: NextRequest) {
                 contact_phone: updateData.contact_phone || null,
                 allow_multisite: updateData.allow_multisite,
                 is_active: updateData.is_active,
+                ...settingsPatch,
             })
             .eq('id', id)
             .eq('tenant_id', auth.tenantId)

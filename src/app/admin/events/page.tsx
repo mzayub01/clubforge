@@ -352,7 +352,7 @@ export default function AdminEventsPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">{editEvent ? 'Edit Event' : 'Add New Event'}</h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">
@@ -417,7 +417,7 @@ export default function AdminEventsPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">Attendees: {currentEvent?.title}</h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowAttendeesModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowAttendeesModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <div className="modal-body">
                             {attendeesLoading ? (

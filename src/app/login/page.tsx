@@ -69,7 +69,6 @@ function LoginPageContent() {
             // Get user role via server API (bypasses RLS for reliable lookup)
             const roleRes = await fetch('/api/auth/role');
             const roleData = await roleRes.json();
-            console.log('[Login] Role API response:', roleData);
             const role = roleData.role;
 
             if (role === 'platform_admin') {

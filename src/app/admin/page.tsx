@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
     // Fetch stats in parallel
     const [
         { count: totalMembers },
-        { count: activeMembers },
+        { data: membershipRows },
         { count: totalClasses },
         { count: todayAttendance },
         { count: waitlistCount },
@@ -71,7 +71,8 @@ export default async function AdminDashboard() {
         { data: recentActivity },
     ] = await Promise.all([
         admin.from('profiles').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-        admin.from('memberships').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('status', 'active'),
+        // People, not rows: the same buckets the Members page uses
+        admin.from('memberships').select('user_id, status').eq('tenant_id', tenantId),
         admin.from('classes').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_active', true),
         admin.from('attendance').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
             .gte('class_date', new Date().toISOString().split('T')[0]),
@@ -87,6 +88,19 @@ export default async function AdminDashboard() {
             .order('created_at', { ascending: false })
             .limit(5),
     ]);
+
+    // Membership buckets by PERSON, matching /admin/members:
+    //   Active  = at least one active membership
+    //   Pending = a pending membership and no active one
+    const activeUserIds = new Set<string>();
+    const pendingUserIds = new Set<string>();
+    (membershipRows || []).forEach((m: { user_id: string; status: string }) => {
+        if (m.status === 'active') activeUserIds.add(m.user_id);
+        else if (m.status === 'pending') pendingUserIds.add(m.user_id);
+    });
+    activeUserIds.forEach(id => pendingUserIds.delete(id));
+    const activeMembers = activeUserIds.size;
+    const pendingMembers = pendingUserIds.size;
 
     // Calculate MRR
     const allActiveMemberships = revenueResult?.data || [];
@@ -111,18 +125,28 @@ export default async function AdminDashboard() {
 
     const stats = [
         {
-            label: 'Total Members',
+            label: 'Active Members',
+            value: activeMembers,
+            hint: 'people with a live membership',
+            icon: CheckCircle,
+            color: 'var(--color-green)',
+            href: '/admin/members?status=has-active',
+        },
+        {
+            label: 'Pending Payment',
+            value: pendingMembers,
+            hint: 'chose a plan, not yet paid',
+            icon: Users,
+            color: '#F59E0B',
+            href: '/admin/members?status=pending-payment',
+        },
+        {
+            label: 'Total Profiles',
             value: totalMembers || 0,
+            hint: 'members, children, guardians & staff',
             icon: Users,
             color: 'var(--color-gold)',
             href: '/admin/members',
-        },
-        {
-            label: 'Active Memberships',
-            value: activeMembers || 0,
-            icon: CheckCircle,
-            color: 'var(--color-green)',
-            href: '/admin/memberships',
         },
         {
             label: 'Active Classes',
@@ -224,6 +248,9 @@ export default async function AdminDashboard() {
                             <div>
                                 <p className="stat-label">{stat.label}</p>
                                 <p className="stat-value">{stat.value}</p>
+                                {'hint' in stat && stat.hint && (
+                                    <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>{stat.hint}</p>
+                                )}
                             </div>
                             <div style={{
                                 width: '48px',

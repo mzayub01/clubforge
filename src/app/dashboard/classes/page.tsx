@@ -290,9 +290,12 @@ export default function MemberClassesPage() {
         const startMins = startH * 60 + startM;
         const endMins = endH * 60 + endM;
 
-        // Class is happening now
+        // Class is happening now, or finished within the last 30 minutes
         if (nowMins >= startMins && nowMins <= endMins) {
             return { allowed: true };
+        }
+        if (nowMins > endMins && nowMins <= endMins + 30) {
+            return { allowed: true, message: `Late check-in closes in ${endMins + 30 - nowMins} min` };
         }
 
         // Class is upcoming - check if within 1 hour

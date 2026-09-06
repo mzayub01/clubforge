@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { classId, profileId } = await request.json();
+        const { classId, profileId, classDate } = await request.json();
 
         if (!classId) {
             return NextResponse.json({ error: 'Class ID required' }, { status: 400 });
@@ -20,6 +20,9 @@ export async function POST(request: NextRequest) {
 
         // Use provided profileId or fall back to authenticated user
         let targetUserId = profileId || user.id;
+        // Staff may record attendance for a past session (roster date picker);
+        // members always check in for today.
+        let callerIsStaff = false;
 
         // If checking in for a different profile, validate authorization
         if (profileId && profileId !== user.id) {
@@ -39,7 +42,8 @@ export async function POST(request: NextRequest) {
                     .eq('is_active', true)
                     .single();
 
-                isStaff = callerRole?.role === 'admin' || callerRole?.role === 'owner' || callerRole?.role === 'instructor';
+                isStaff = ['admin', 'owner', 'instructor', 'professor'].includes(callerRole?.role || '');
+                callerIsStaff = isStaff;
             }
 
             if (!isStaff) {
@@ -85,15 +89,17 @@ export async function POST(request: NextRequest) {
         // (RLS policies require tenant context that client-side calls don't have)
         const adminSupabase = await createAdminClient();
 
-        // Check if already checked in today for this class AND this profile
+        // Check if already checked in for this class, profile and date
         const today = new Date().toISOString().split('T')[0];
+        const requestedDate = typeof classDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(classDate) ? classDate : null;
+        const targetDate = callerIsStaff && requestedDate && requestedDate <= today ? requestedDate : today;
         const { data: existing } = await adminSupabase
             .from('attendance')
             .select('id')
             .eq('class_id', classId)
             .eq('user_id', targetUserId)
-            .eq('class_date', today)
-            .single();
+            .eq('class_date', targetDate)
+            .maybeSingle();
 
         if (existing) {
             return NextResponse.json({
@@ -109,7 +115,7 @@ export async function POST(request: NextRequest) {
             .insert({
                 class_id: classId,
                 user_id: targetUserId,
-                class_date: today,
+                class_date: targetDate,
                 check_in_time: new Date().toISOString(),
                 tenant_id: tenantId,
                 checked_in_by: user.id,

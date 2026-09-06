@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { BookOpen, Calendar } from 'lucide-react';
 
 export const metadata = {
-    title: 'Weekly Wisdom | DojoHub',
+    title: 'Weekly Wisdom',
     description: 'Weekly wisdom and guidance from your coaches',
 };
 

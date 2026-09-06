@@ -553,7 +553,7 @@ export default function AdminEmailTemplatesPage() {
                             <h2 className="modal-title">
                                 {iconFor(previewTemplate)} {previewTemplate.name || 'New template'} Preview
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setPreviewTemplate(null)}>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setPreviewTemplate(null)} aria-label="Close" title="Close">
                                 <X size={20} />
                             </button>
                         </div>
@@ -588,7 +588,7 @@ export default function AdminEmailTemplatesPage() {
                             <h2 className="modal-title">
                                 {editingTemplate.id ? `${iconFor(editingTemplate)} Edit ${editingTemplate.name}` : '✉️ New custom template'}
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setEditingTemplate(null)}>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setEditingTemplate(null)} aria-label="Close" title="Close">
                                 <X size={20} />
                             </button>
                         </div>
@@ -772,7 +772,7 @@ export default function AdminEmailTemplatesPage() {
                             <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                                 <Send size={18} /> Send &ldquo;{sendingTemplate.name}&rdquo;
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setSendingTemplate(null)} disabled={sending}>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setSendingTemplate(null)} disabled={sending} aria-label="Close" title="Close">
                                 <X size={20} />
                             </button>
                         </div>
@@ -866,7 +866,7 @@ export default function AdminEmailTemplatesPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">Delete template?</h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setDeletingTemplate(null)}>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setDeletingTemplate(null)} aria-label="Close" title="Close">
                                 <X size={20} />
                             </button>
                         </div>

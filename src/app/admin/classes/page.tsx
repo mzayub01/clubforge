@@ -322,7 +322,7 @@ export default function AdminClassesPage() {
                     <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
                         <div className="modal-header">
                             <h2 className="modal-title">{editClass ? 'Edit Class' : 'Add New Class'}</h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">

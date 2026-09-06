@@ -471,7 +471,7 @@ export default function AdminMembershipTypesPage() {
                             <h2 className="modal-title">
                                 {editItem ? 'Edit Membership Type' : 'Add Membership Type'}
                             </h2>
-                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>×</button>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)} aria-label="Close" title="Close">×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">

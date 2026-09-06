@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { CreditCard, Calendar, MapPin, CheckCircle, AlertCircle, Clock, ExternalLink, Plus, Loader2 } from 'lucide-react';
+import ManagePaymentButton from '@/components/dashboard/ManagePaymentButton';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useDashboard } from '@/components/dashboard/DashboardProvider';
 
@@ -531,7 +532,8 @@ export default function MembershipPage() {
                                                     Your subscription renews automatically each month
                                                 </span>
                                             </div>
-                                            {/* Future: Add manage subscription button when Stripe Customer Portal is set up */}
+                                            {/* Update card / view invoices — cancellations stay with the club */}
+                                            <ManagePaymentButton userId={selectedProfileId} />
                                         </div>
                                     )}
 

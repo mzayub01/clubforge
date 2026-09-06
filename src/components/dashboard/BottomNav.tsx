@@ -26,13 +26,13 @@ export default function BottomNav({ role = 'member', beltProgressEnabled = true 
         { href: '/admin/members', label: 'Members', icon: User, isCheckIn: false },
         { href: '/admin/class-roster', label: 'Roster', icon: CheckCircle, isCheckIn: true },
         { href: '/admin/classes', label: 'Classes', icon: Calendar, isCheckIn: false },
-        { href: '/professor', label: 'Grading', icon: Award, isCheckIn: false },
+        ...(beltProgressEnabled ? [{ href: '/professor', label: 'Grading', icon: Award, isCheckIn: false }] : []),
     ];
 
     const instructorLinks = [
         { href: '/instructor', label: 'Home', icon: Home, isCheckIn: false },
         { href: '/instructor/classes', label: 'Classes', icon: Calendar, isCheckIn: false },
-        { href: '/admin/class-roster', label: 'Check-in', icon: CheckCircle, isCheckIn: true },
+        { href: '/instructor/class-roster', label: 'Check-in', icon: CheckCircle, isCheckIn: true },
         { href: '/instructor/students', label: 'Students', icon: User, isCheckIn: false },
         { href: '/instructor/naseeha', label: 'Wisdom', icon: Award, isCheckIn: false },
     ];

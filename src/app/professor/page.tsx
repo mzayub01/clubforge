@@ -155,13 +155,6 @@ export default function ProfessorGradingPage() {
 
             const { data: memberships, error: membershipsError } = await query;
 
-            console.log('Memberships query result:', {
-                memberships,
-                membershipsError,
-                location_id: classInfo.location_id,
-                tier_ids: tierIds
-            });
-
             if (memberships && memberships.length > 0) {
                 const userIds = memberships.map(m => m.user_id);
 

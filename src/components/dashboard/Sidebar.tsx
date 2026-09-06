@@ -351,7 +351,7 @@ export default function DashboardSidebar({ role, userRole, userName = 'Member', 
     const instructorLinks = [
         { href: '/instructor', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/instructor/classes', label: 'My Classes', icon: Calendar },
-        { href: '/admin/class-roster', label: 'Class Roster', icon: ClipboardList },
+        { href: '/instructor/class-roster', label: 'Class Roster', icon: ClipboardList },
         { href: '/instructor/attendance', label: 'Attendance', icon: CheckCircle },
         { href: '/instructor/students', label: 'Students', icon: User },
         { href: '/instructor/naseeha', label: 'Weekly Wisdom', icon: BookOpen },

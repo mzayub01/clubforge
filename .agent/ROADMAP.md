@@ -308,6 +308,34 @@ cancellations.
   webhook now also records `end_date` when renewal is stopped/resumed in the
   Stripe dashboard. See DECISIONS → Membership status ↔ Stripe.
 
+- **UX/bug review batch 1 (2026-09-06)** — from the product review, items
+  1,2,3,5,7,8,10,13,17,19,23,25:
+  - Instructors get their own roster at `/instructor/class-roster` (re-exports
+    the admin page; writes go through staff endpoints `/api/attendance/checkin`
+    with `classDate` for staff back-dating and new `/api/staff/attendance-remove`).
+    Sidebar/bottom-nav links fixed; admin bottom nav hides Grading when belts are off.
+  - Member announcements filtered by audience (staff-only hidden from members)
+    and by the member's/children's membership locations.
+  - Today's Class card handles multiple active memberships (multisite).
+  - `/api/auth/role` resolves the role for the club the request is on.
+  - Debug `console.log`s removed from register/login/professor/progress/attendance
+    (register was logging the club's Stripe account id).
+  - Legacy wording: naseeha/announcement titles, neutral etiquette + waiver
+    defaults; Cheadle rule generalised to a location setting
+    `settings.payment_offline` ("Payments collected in person") on
+    Admin → Locations; add-child returns `paysViaClub` (`isCheadleMasjid` kept as alias).
+  - Error boundaries + loading for instructor/professor sections.
+  - Admin overview stats now count PEOPLE (Active Members / Pending Payment /
+    Total Profiles) and deep-link to `/admin/members?status=…` (page reads it).
+  - aria-labels/titles on all icon-only buttons.
+  - Instructor My Students "Details" modal (`/api/staff/member-details`):
+    emergency contact, medical, guardian contact, memberships, recent attendance.
+  - Members: "Manage payment details" opens a restricted Stripe customer portal on
+    the club's connected account (`/api/stripe/member-portal`; config created once
+    per club, cached in `settings.stripe_portal_config_id`; cancel/pause/plan
+    changes disabled).
+  - Check-in stays open 30 minutes after a class ends (Today card + Classes page).
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

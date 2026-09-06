@@ -103,8 +103,6 @@ export default function MemberProgressPage() {
                 .eq('user_id', selectedProfileId)
                 .order('created_at', { ascending: false });
 
-            console.log('Feedback query result:', { feedbackData, feedbackError, selectedProfileId });
-
             // Fetch professor names for feedback
             if (feedbackData && feedbackData.length > 0) {
                 const professorIds = [...new Set(feedbackData.map(f => f.professor_id))];

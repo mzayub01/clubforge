@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Users, Award, CheckCircle, TrendingUp, Calendar } from 'lucide-react';
 import { getBeltColors } from '@/hooks/useRankSchemas';
 import StudentPhoto from '@/components/StudentPhoto';
+import StudentDetailsButton from '@/components/instructor/StudentDetailsButton';
 import { isChildDummyEmail } from '@/lib/member-contact';
 
 export const metadata = {
@@ -179,6 +180,7 @@ export default async function InstructorStudentsPage() {
                                     <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'left', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Belt</th>
                                     <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Attendance</th>
                                     <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'right', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Last Seen</th>
+                                    <th style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'right', fontWeight: '600', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -231,6 +233,10 @@ export default async function InstructorStudentsPage() {
                                                     month: 'short',
                                                 })}
                                             </div>
+                                        </td>
+                                        <td style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'right' }}>
+                                            {/* Emergency contact, medical notes, guardian, memberships */}
+                                            <StudentDetailsButton userId={student.user_id} name={`${student.first_name} ${student.last_name}`} />
                                         </td>
                                     </tr>
                                 ))}

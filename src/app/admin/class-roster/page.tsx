@@ -17,7 +17,7 @@ import {
     Download
 } from 'lucide-react';
 import { useGuardianContacts } from '@/hooks/useGuardianContacts';
-import { adminFetch, adminInsert, adminDeleteById } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import Avatar from '@/components/Avatar';
 import PhotoLightbox from '@/components/PhotoLightbox';
 
@@ -203,32 +203,41 @@ export default function ClassRosterPage() {
         setError('');
         setSuccess('');
 
+        // Staff endpoints (admin + instructor) rather than the admin-only CRUD route,
+        // so the roster works for instructors too.
         if (member.checked_in && member.attendance_id) {
             // Remove check-in
-            const { error } = await adminDeleteById('attendance', member.attendance_id);
+            const res = await fetch('/api/staff/attendance-remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ attendanceId: member.attendance_id }),
+            });
+            const data = await res.json().catch(() => ({}));
 
-            if (error) {
-                setError('Failed to remove check-in');
+            if (!res.ok) {
+                setError(data.error || 'Failed to remove check-in');
             } else {
                 setSuccess(`${member.first_name} checked out`);
                 fetchRoster();
             }
         } else {
-            // Add check-in
-            const { error } = await adminInsert('attendance', {
-                class_id: selectedClass,
-                user_id: member.user_id,
-                class_date: selectedDate,
-                check_in_time: new Date().toISOString(),
-                checked_in_by: '__CURRENT_USER__',
+            // Add check-in (classDate lets staff record a past session)
+            const res = await fetch('/api/attendance/checkin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    classId: selectedClass,
+                    profileId: member.user_id,
+                    classDate: selectedDate,
+                }),
             });
+            const data = await res.json().catch(() => ({}));
 
-            if (error) {
-                if (error.includes('23505') || error.includes('unique') || error.includes('duplicate')) {
-                    setError('Already checked in');
-                } else {
-                    setError(error);
-                }
+            if (!res.ok) {
+                setError(data.error || 'Failed to check in');
+            } else if (data.alreadyCheckedIn) {
+                setError('Already checked in');
+                fetchRoster();
             } else {
                 setSuccess(`${member.first_name} checked in!`);
                 fetchRoster();

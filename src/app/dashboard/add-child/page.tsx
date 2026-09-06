@@ -18,9 +18,9 @@ Respect for Instructors and Coaches: Listen attentively to their guidance and fo
 
 Proper Attire: Wear the required uniform or attire for your class. This shows respect for the tradition and ensures safety during training.
 
-No Eating or Drinking on the Mats: To maintain cleanliness and hygiene, refrain from eating or drinking on the training area.
+No Eating or Drinking in the Training Area: To maintain cleanliness and hygiene, refrain from eating or drinking in the training area.
 
-No Shoes on Mats: Remove your shoes before stepping onto the training area to keep mats clean and safe for everyone.
+Footwear: Follow the club's footwear rules for the training area so it stays clean and safe for everyone.
 
 Personal Hygiene: Being in close contact with others during training requires proper personal hygiene. Ensure that your clothes and body are clean.
 
@@ -30,7 +30,7 @@ No Dangerous Behaviour: Any form of reckless or aggressive behaviour during trai
 
 Parental Involvement: Parents are kindly requested to refrain from entering the training area during children's classes. Avoid coaching from the sidelines to maintain a focused learning environment.
 
-Good Manners: Always exhibit respect, humility, and kindness towards fellow participants on and off the mats. Show appreciation for your training partners' efforts.
+Good Manners: Always exhibit respect, humility, and kindness towards fellow participants in and out of sessions. Show appreciation for your training partners' efforts.
 
 By following these guidelines, we can create a respectful and inclusive atmosphere that promotes growth and community.`;
 
@@ -39,7 +39,7 @@ const WAIVER_TEXT = `Disclaimer and Waiver of Liability
 
 As the participant or legal guardian of the participant(s), I hereby acknowledge and agree to the following terms and conditions for participation in classes:
 
-Risk Acknowledgement: I understand that martial arts and physical fitness activities are contact activities that involve physical exertion and carry an inherent risk of injury. I acknowledge these risks, which may include, but are not limited to, bruises, strains, sprains, fractures, concussions, and other physical or mental harm.
+Risk Acknowledgement: I understand that physical training activities can be contact activities that involve physical exertion and carry an inherent risk of injury. I acknowledge these risks, which may include, but are not limited to, bruises, strains, sprains, fractures, concussions, and other physical or mental harm.
 
 Fitness and Health: I confirm that the participant(s) is/are physically fit, in good health, and do not have any condition or ailment that could be adversely affected by participation in these classes.
 
@@ -288,11 +288,11 @@ export default function AddChildPage() {
                 }
             }
 
-            // Free membership or Cheadle Masjid - show success
+            // Free membership, or a location that collects payment in person — show success
             setSuccess(true);
             setTimeout(async () => {
                 await refreshChildren();
-                if (data.isCheadleMasjid) {
+                if (data.paysViaClub || data.isCheadleMasjid) {
                     router.push('/dashboard?paymentInfo=true');
                 } else {
                     router.push('/dashboard');

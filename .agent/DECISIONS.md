@@ -287,6 +287,20 @@ re-exports the admin roster) and their writes use staff endpoints
 `select` for non-admins. Member-facing check-in stays open 30 minutes after a
 class ends; staff can back-date via `classDate` on `/api/attendance/checkin`.
 
+### Marketing / SEO pages (2026-09-17)
+- The SEO/AEO backlog is `.agent/SEO_PLAN.md` (fourth source-of-truth doc,
+  alongside ARCHITECTURE/DECISIONS/ROADMAP). Tick items there; re-audit with
+  its section 5 commands after each batch.
+- Marketing pages (home, pricing, features, faq, about, blog, `/for/*`, city
+  pages) must be **statically prerendered**: never call `createClient()` /
+  `auth.getUser()` / `cookies()` in those server components — logged-in state
+  for the Navbar belongs in a client component. (Today they all do, which is
+  why they serve `private, no-cache, no-store`; Batch A removes it.)
+- Page-level `metadata.title` must NOT include "| ClubForge" — the root layout
+  template `%s | ClubForge` adds it (doubling was live on 2026-09-17).
+- Structured data lives in `components/structured-data.tsx`; add schema there,
+  not inline, and only link `sameAs` profiles that actually exist.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-09-06 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
+> **Last updated:** 2026-09-17 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -346,6 +346,10 @@ allows a parent→child payment after validating the relationship.
 | Email | `src/lib/welcome-email-copy.ts` (club-type aware defaults), `settings.welcome_email_enabled` (Admin → Settings → General), custom templates (`custom_*` keys) created on `/admin/email-templates` and sent via `/api/email/announcement` `templateKey`; `scripts/set-welcome-template.mjs` |
 | Belt toggle | `settings.belt_progress_enabled=false` now hides the dashboard rank card, profile badge/section and redirects `/dashboard/progress` |
 | Review batch 1 (2026-09-06) | `/instructor/class-roster` (re-export), `POST /api/staff/attendance-remove`, `GET /api/staff/member-details` + `components/instructor/StudentDetailsButton.tsx`, `POST /api/stripe/member-portal` + `components/dashboard/ManagePaymentButton.tsx`, location `settings.payment_offline` (Admin → Locations), `/api/auth/role` request-tenant resolution, announcements audience/location filter, 30-min late check-in (`TodayClassCard`, `dashboard/classes`) |
+| Admin CRUD select validation (2026-09-17) | `src/lib/select-sanitiser.ts` — structural validator for `/api/admin/crud` `select` strings (allowed tables only, `tenants`/`platform_admins` never embeddable, nesting ≤ 3); replaced the exact-string allowlist that silently fell back to `*` and lost class tier links |
+| Payment reminder (2026-09-17) | `POST /api/admin/send-payment-reminder` (`requireAdmin`, club-domain payment link) → club `payment_incomplete` DB template else `email-templates/payment-reminder.tsx`; onboarding seeds the template; `scripts/seed-email-template.mjs --key <key> --all|--tenant <slug>` for existing clubs |
+| Undeliverable addresses (2026-09-17) | `isPlaceholderEmail()` / `undeliverableReason()` in `src/lib/member-contact.ts`; `sendEmail()` returns a plain explanation for `@example.com`-style demo addresses instead of Resend's "Invalid `to` field" |
+| SEO / AEO (2026-09-17) | Audit + plan in `.agent/SEO_PLAN.md`. Surface: `src/app/sitemap.ts`, `robots.ts`, `llms.txt/route.ts`, `opengraph-image.tsx`, `components/structured-data.tsx` (Organization, WebSite, SoftwareApplication, FAQPage, Breadcrumb, City), blog articles in `src/app/blog/[slug]/articles/`, `/for/*` discipline pages, ~30 city pages. Marketing pages are currently dynamic because they call `getUser()` server-side for the navbar (Batch A fixes this) |
 
 Facts worth remembering: `membership_types.price` is whole **pounds**; member
 Stripe subscriptions live on each club's **connected account** (always pass

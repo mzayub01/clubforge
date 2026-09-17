@@ -5,7 +5,7 @@
 
 ---
 
-## Next session — pick up here (as of 2026-09-06)
+## Next session — pick up here (as of 2026-09-17)
 
 **Owner actions still pending**
 - [ ] Supabase Auth dashboard: enable CAPTCHA (Turnstile/hCaptcha) + Auth rate
@@ -51,6 +51,11 @@ is shipped. Remaining, roughly by value:
 - #18 Sidebar labels every admin "Club Owner".
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
+
+**Shipped 2026-09-17**: class membership tiers persisting (structural select
+sanitiser) · payment reminder built-in template + seeding for all clubs ·
+placeholder-address explanation instead of Resend errors · SEO/AEO audit and
+plan (`.agent/SEO_PLAN.md`, no code yet).
 
 **Shipped 2026-09-05 → 06** (details in the Phase 4 progress bullets below):
 platform-admin tooling · security disclosure remediation (migration 014
@@ -395,6 +400,17 @@ Owner: grant GSC access per SEO_PLAN section 4; decide X/Twitter profile.
   template. Onboarding now seeds `payment_incomplete`; existing clubs seeded
   with `scripts/seed-email-template.mjs --key payment_incomplete --all --yes`
   so Pro/Elite can edit it under Email Templates.
+
+- **Placeholder addresses (2026-09-17, demo tenant):** sending to `@example.com`
+  members failed with Resend's cryptic "Invalid `to` field". `sendEmail()` and
+  the payment-reminder route now check `undeliverableReason()`
+  (`src/lib/member-contact.ts`) after guardian resolution and return a plain
+  explanation; demo-tenant members can never receive mail by design.
+
+- **SEO / AEO audit (2026-09-17):** full findings and a four-batch plan in
+  `.agent/SEO_PLAN.md`. Nothing shipped yet; Batch A (static marketing pages,
+  title template, www redirect, sameAs, metadata gaps, sitemap dates, perf)
+  is the next coding session. Owner to grant GSC access (plan section 4).
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

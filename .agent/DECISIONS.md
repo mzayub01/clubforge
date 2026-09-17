@@ -241,6 +241,11 @@ payment-reminder reply-to all pointed at ClubForge.
   can never verify (DMARC would junk the mail regardless). Pattern: keep the
   display name, send as `Name <noreply@clubforgehq.com>`, put the user's real
   address in `replyTo` (see `/api/platform/mail-merge`, `/api/email/announcement`).
+- Placeholder addresses (`@example.com/.org/.net`, `.test`, `.invalid`, `.local`)
+  are rejected by Resend with a cryptic "Invalid `to` field". `sendEmail()`
+  refuses them first with a plain reason (`undeliverableReason()` in
+  `member-contact.ts`); the demo tenant's members all use `@example.com`, so
+  emails there can never send — that's expected, not a bug.
 - Child accounts have dummy `@child.clubforge.local` emails — never a send
   target and never shown to staff. `sendEmail()` resolves dummy recipients to
   the linked guardian centrally (unlinked children are dropped with a warning),

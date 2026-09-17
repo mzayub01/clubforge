@@ -65,6 +65,11 @@ in-person-payment location setting, error boundaries, people-based overview
 stats, aria-labels, instructor student details, member payment portal,
 30-min late check-in).
 
+**SEO / AEO growth (2026-09-17)** — full audit + prioritised plan in
+`.agent/SEO_PLAN.md`. Start with Batch A (static marketing pages, title
+template, www redirect, sameAs, metadata gaps, sitemap dates, perf).
+Owner: grant GSC access per SEO_PLAN section 4; decide X/Twitter profile.
+
 **Ideas queued (not started)**
 - Migrate legacy flat video objects to `videos/<tenantId>/…`.
 - Find/fix the corrupt `auth.users` row that breaks `listUsers` paging (DECISIONS debt #12).

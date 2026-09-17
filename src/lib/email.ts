@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { isChildDummyEmail } from './member-contact';
+import { isChildDummyEmail, undeliverableReason } from './member-contact';
 
 // Initialize Resend client
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -106,6 +106,13 @@ export async function sendEmail(options: SendEmailOptions): Promise<EmailResult>
     const to = await resolveRecipients(options.to);
     if (to.length === 0) {
         return { success: false, error: 'No reachable recipient (child account without a linked guardian)', to };
+    }
+
+    // Placeholder domains (example.com etc.) are rejected by Resend with a
+    // cryptic "Invalid `to` field" — say what's actually wrong instead.
+    const undeliverable = to.map(undeliverableReason).find(Boolean);
+    if (undeliverable) {
+        return { success: false, error: undeliverable, to };
     }
 
     try {

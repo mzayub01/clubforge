@@ -15,7 +15,7 @@ import { requireAdmin, checkRateLimit, escapeHtml, safeErrorResponse } from '@/l
 import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { renderPaymentReminderEmail } from '@/lib/email-templates';
-import { isChildDummyEmail } from '@/lib/member-contact';
+import { isChildDummyEmail, undeliverableReason } from '@/lib/member-contact';
 
 export async function POST(request: NextRequest) {
     try {
@@ -50,6 +50,12 @@ export async function POST(request: NextRequest) {
         // A child's dummy address can't receive mail — sendEmail() swaps it for the
         // guardian, but prefer the address the page resolved for us.
         const recipient = isChildDummyEmail(email) ? (isChildDummyEmail(target.email) ? email : target.email) : email;
+
+        // Fail early with a plain explanation rather than the provider's error
+        const reason = isChildDummyEmail(recipient) ? null : undeliverableReason(recipient);
+        if (reason) {
+            return NextResponse.json({ error: `Can't send: ${reason}` }, { status: 400 });
+        }
 
         // Payment link on the club's own domain (subdomain or custom domain)
         const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'clubforgehq.com';

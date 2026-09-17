@@ -459,7 +459,10 @@ export default function AdminMembersPage() {
                     // Children can't receive mail — the reminder goes to the guardian
                     email: member.is_child && member.guardian_email ? member.guardian_email : member.email,
                     firstName: member.first_name,
-                    locationName: member.memberships?.[0]?.location?.name || 'your preferred location',
+                    locationName: member.memberships?.[0]?.location?.name || 'your club',
+                    membershipType: member.memberships?.find((m: any) => m.status === 'pending')?.membership_type?.name
+                        || member.memberships?.[0]?.membership_type?.name
+                        || undefined,
                 }),
             });
 

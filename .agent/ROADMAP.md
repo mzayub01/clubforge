@@ -380,6 +380,17 @@ stats, aria-labels, instructor student details, member payment portal,
   link errors instead of showing success regardless. Any club whose tiers were
   wiped by an earlier re-save must re-tick them once.
 
+- **Payment reminder "Email template not found" (2026-09-17, HaMeem + demo):**
+  the `payment_incomplete` template was never seeded for any club (onboarding
+  and migration 012 skip it; the old global migration was never run and had
+  Sport of Kings wording). Fix: `/api/admin/send-payment-reminder` now uses
+  `requireAdmin`, checks the member belongs to the club, builds the payment
+  link on the club's own domain, and falls back to a built-in club-branded
+  template (`email-templates/payment-reminder.tsx`) when the club has no DB
+  template. Onboarding now seeds `payment_incomplete`; existing clubs seeded
+  with `scripts/seed-email-template.mjs --key payment_incomplete --all --yes`
+  so Pro/Elite can edit it under Email Templates.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

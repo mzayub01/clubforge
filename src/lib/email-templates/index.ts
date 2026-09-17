@@ -5,6 +5,7 @@ export { WelcomeEmail, renderWelcomeEmail } from './welcome';
 export { EventConfirmationEmail, renderEventConfirmationEmail } from './event-confirmation';
 export { MembershipActivatedEmail, renderMembershipActivatedEmail } from './membership-activated';
 export { PaymentFailedEmail, renderPaymentFailedEmail } from './payment-failed';
+export { PaymentReminderEmail, renderPaymentReminderEmail } from './payment-reminder';
 export { SubscriptionActivatedEmail, renderSubscriptionActivatedEmail } from './subscription-activated';
 export { PlanUpgradeEmail, renderPlanUpgradeEmail } from './plan-upgrade';
 export { TrialEndingEmail, renderTrialEndingEmail } from './trial-ending';

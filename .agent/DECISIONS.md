@@ -263,6 +263,16 @@ the change the record is left untouched, so the club never believes billing has
 stopped when it hasn't. Entry points: `POST /api/admin/membership-status`,
 `POST /api/admin/update-member` (`membershipUpdates[].status`), `/api/stripe/cancel`.
 
+### Admin CRUD select strings (IMPORTANT — silent data loss class)
+`/api/admin/crud` validates `select` with `src/lib/select-sanitiser.ts`
+(structural: embeds only on allowlisted tables, `tenants`/`platform_admins`
+blocked, ≤3 levels, plain columns). **Never reintroduce an exact-string
+allowlist** — the previous one fell back to `*` for unrecognised embeds and
+pages silently lost joined data; the Classes page then wiped tier links on
+re-save. Two rules for pages: (1) never "delete all + reinsert" a junction from
+form state — diff against what the row already has; (2) never call
+`setSuccess` before every write has been checked for an error.
+
 ### Staff routes & roles
 Anything an **instructor** must reach lives under `/instructor/*` (the `/admin`
 layout admits admins and platform admins only; instructors were being bounced

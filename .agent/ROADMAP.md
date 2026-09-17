@@ -366,6 +366,20 @@ stats, aria-labels, instructor student details, member payment portal,
     changes disabled).
   - Check-in stays open 30 minutes after a class ends (Today card + Classes page).
 
+- **Class membership tiers didn't persist (2026-09-17, HaMeem + demo):** root
+  cause was `sanitiseSelect` in `/api/admin/crud` — an exact-string allowlist
+  of four embeds that silently fell back to `*` for anything else, so the
+  Classes page never received `class_membership_types(...)` (or its
+  location/instructor embeds), the edit form opened with tiers unticked, and
+  saving did delete-all + reinsert-ticked, wiping the links that WERE in the DB.
+  Members page (`membership_types(name, price)` — a space broke the match),
+  data-export, reports, memberships and professor-access were degraded the same
+  way. Fix: structural validator `src/lib/select-sanitiser.ts` (allowed tables
+  only, `tenants`/`platform_admins` blocked, nesting ≤ 3, plain columns), unit
+  cases in the scratch test; Classes page now applies a tier DIFF and surfaces
+  link errors instead of showing success regardless. Any club whose tiers were
+  wiped by an earlier re-save must re-tick them once.
+
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).
 - Dynamic theming coverage audit across all member-facing pages.

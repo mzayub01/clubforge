@@ -163,30 +163,41 @@ export default function AdminClassesPage() {
                 const { error } = await adminUpdateById('classes', editClass.id, payload);
                 if (error) throw new Error(error);
                 classId = editClass.id;
-                setSuccess('Class updated successfully');
             } else {
                 const { data, error } = await adminInsert<{ id: string }>('classes', payload);
                 if (error) throw new Error(error);
                 classId = data!.id;
-                setSuccess('Class created successfully');
             }
 
-            // Update membership type associations in junction table
-            // First, delete existing associations for this class
-            await adminDelete('class_membership_types', [
-                { column: 'class_id', value: classId },
-            ]);
+            // Membership tier links: apply the DIFF against what the class already
+            // has (never delete-all-then-reinsert — if the form had failed to load
+            // the existing links, that wiped them), and surface any failure
+            // instead of reporting success regardless.
+            const existingIds: string[] = editClass
+                ? ((editClass as any).class_membership_types || []).map((cmt: { membership_type_id: string }) => cmt.membership_type_id)
+                : [];
+            const wantedIds = formData.membership_type_ids;
+            const toRemove = existingIds.filter(id => !wantedIds.includes(id));
+            const toAdd = wantedIds.filter(id => !existingIds.includes(id));
 
-            // Then, insert new associations
-            if (formData.membership_type_ids.length > 0) {
-                for (const typeId of formData.membership_type_ids) {
-                    await adminInsert('class_membership_types', {
-                        class_id: classId,
-                        membership_type_id: typeId,
-                    });
-                }
+            for (const typeId of toRemove) {
+                const { error } = await adminDelete('class_membership_types', [
+                    { column: 'class_id', value: classId },
+                    { column: 'membership_type_id', value: typeId },
+                ]);
+                if (error) throw new Error(`Class saved, but removing a membership tier failed: ${error}`);
+            }
+            for (const typeId of toAdd) {
+                const { error } = await adminInsert('class_membership_types', {
+                    class_id: classId,
+                    membership_type_id: typeId,
+                });
+                if (error) throw new Error(`Class saved, but linking a membership tier failed: ${error}`);
             }
 
+            setSuccess(editClass
+                ? `Class updated successfully${toAdd.length || toRemove.length ? ` (${wantedIds.length} membership tier${wantedIds.length === 1 ? '' : 's'} linked)` : ''}`
+                : 'Class created successfully');
             setShowModal(false);
             fetchData();
         } catch (err: unknown) {

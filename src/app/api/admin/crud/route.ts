@@ -9,6 +9,7 @@ import { createClient as createServerClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { safeErrorResponse } from '@/lib/auth-guard';
+import { sanitiseSelect as sanitiseSelectStructural } from '@/lib/select-sanitiser';
 
 // Whitelist of tables admins can access
 const ALLOWED_TABLES = [
@@ -69,24 +70,11 @@ const TENANTS_SENSITIVE_COLUMNS = [
 ];
 
 // Validate and sanitise the select parameter to prevent join traversal
+// Structural select validation (see src/lib/select-sanitiser.ts). The old
+// exact-string allowlist silently dropped any embed it didn't recognise, which
+// is how the Classes page lost its tier links and re-saves wiped them.
 function sanitiseSelect(select: string | undefined): string {
-    if (!select) return '*';
-    // Block Supabase relationship traversal syntax (parentheses)
-    // e.g. "*, tenants(*)" or "id, other_table!inner(secret)"
-    if (/[()]/.test(select)) {
-        // Allow known safe join patterns used by the app
-        const safePatterns = [
-            'membership_type:membership_types(name)',
-            'membership_type:membership_types(name,price)',
-            'profile:profiles!inner(first_name,email,role,is_child)',
-            'profiles!inner(first_name, email, role, is_child)',
-        ];
-        const isSafe = safePatterns.some(p => select.includes(p));
-        if (!isSafe) {
-            return '*'; // Fall back to wildcard if unsanctioned join detected
-        }
-    }
-    return select;
+    return sanitiseSelectStructural(select, ALLOWED_TABLES);
 }
 
 // Strip sensitive columns from tenants table results

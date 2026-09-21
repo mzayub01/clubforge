@@ -278,6 +278,14 @@ re-save. Two rules for pages: (1) never "delete all + reinsert" a junction from
 form state — diff against what the row already has; (2) never call
 `setSuccess` before every write has been checked for an error.
 
+- Because valid-looking selects now reach PostgREST unchanged, a column or
+  relationship that is missing in production fails the page at runtime instead
+  of silently degrading (2026-09-21: the roster asked for
+  `classes.membership_type_id`, which only exists in an unapplied legacy
+  migration). After changing any select run `node scripts/verify-crud-selects.mjs`
+  — it probes every select string in `src/` against the live DB. Class tiers
+  live ONLY in `class_membership_types`; never read a tier off `classes`.
+
 ### Staff routes & roles
 Anything an **instructor** must reach lives under `/instructor/*` (the `/admin`
 layout admits admins and platform admins only; instructors were being bounced

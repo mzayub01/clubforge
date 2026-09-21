@@ -28,7 +28,6 @@ interface ClassInfo {
     start_time: string;
     end_time: string;
     location?: { id: string; name: string };
-    membership_type_id?: string;
 }
 
 interface MemberStatus {
@@ -73,7 +72,7 @@ export default function ClassRosterPage() {
 
     const fetchClasses = async () => {
         const { data, error } = await adminFetch<ClassInfo>('classes', {
-            select: 'id, name, day_of_week, start_time, end_time, location:locations(id, name), membership_type_id',
+            select: 'id, name, day_of_week, start_time, end_time, location:locations(id, name)',
             filters: [{ column: 'is_active', value: true }],
             order: [{ column: 'day_of_week' }],
         });
@@ -118,11 +117,11 @@ export default function ClassRosterPage() {
             { column: 'status', value: 'active' },
         ];
 
-        // If class has specific membership types in the junction table, filter by those
+        // Tiers live only in the class_membership_types junction table (classes has no
+        // membership_type_id column in production). No rows = open to every active
+        // membership at the location.
         if (allowedMembershipTypeIds.length > 0) {
             membershipFilters.push({ column: 'membership_type_id', operator: 'in', value: allowedMembershipTypeIds });
-        } else if (classInfo.membership_type_id) {
-            membershipFilters.push({ column: 'membership_type_id', value: classInfo.membership_type_id });
         }
 
         // Don't join profiles — no direct FK from memberships to profiles

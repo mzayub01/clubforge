@@ -52,6 +52,9 @@ is shipped. Remaining, roughly by value:
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
 
+**Shipped 2026-09-21**: class roster loads again (removed non-existent
+`classes.membership_type_id` from its select) + `scripts/verify-crud-selects.mjs`.
+
 **Shipped 2026-09-17**: class membership tiers persisting (structural select
 sanitiser) · payment reminder built-in template + seeding for all clubs ·
 placeholder-address explanation instead of Resend errors · SEO/AEO audit and
@@ -411,6 +414,16 @@ Owner: grant GSC access per SEO_PLAN section 4; decide X/Twitter profile.
   `.agent/SEO_PLAN.md`. Nothing shipped yet; Batch A (static marketing pages,
   title template, www redirect, sameAs, metadata gaps, sitemap dates, perf)
   is the next coding session. Owner to grant GSC access (plan section 4).
+
+- **Class roster "Failed to load classes" (2026-09-21, HaMeem):** fallout from
+  the 2026-09-17 sanitiser fix. The roster selected `classes.membership_type_id`,
+  a column that exists only in an unapplied legacy migration; the old sanitiser
+  had silently replaced that select with `*`, the new one passes it through and
+  PostgREST rejected it. Removed the column from the roster select/type and the
+  legacy single-tier fallback (tiers live only in `class_membership_types`).
+  Added `scripts/verify-crud-selects.mjs`, which extracts every CRUD select
+  string in `src/` and runs each against the live DB (28 checked, 0 failing) —
+  run it whenever an admin page select changes.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-09-17 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
+> **Last updated:** 2026-09-21 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 

@@ -5,9 +5,12 @@
 
 ---
 
-## Next session — pick up here (as of 2026-09-17)
+## Next session — pick up here (as of 2026-09-22)
 
 **Owner actions still pending**
+- [ ] HaMeem to confirm the class roster loads after bf3125d (deployed
+      2026-09-21); if any other admin page shows "Failed to load …", run
+      `node scripts/verify-crud-selects.mjs` first.
 - [ ] Supabase Auth dashboard: enable CAPTCHA (Turnstile/hCaptcha) + Auth rate
       limits, then wire the token into `/register`, `/get-started`, `/login`
       (owner parked this on 2026-09-05).

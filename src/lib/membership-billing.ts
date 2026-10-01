@@ -147,6 +147,157 @@ export async function resumeStripeSubscription(
     }
 }
 
+/** Statuses in which Stripe can still take (or retry) a payment. */
+const LIVE_STATUSES: ReadonlySet<string> = new Set(['active', 'trialing', 'past_due', 'unpaid', 'paused', 'incomplete']);
+
+export function isLiveSubscription(sub: Pick<Stripe.Subscription, 'status'>): boolean {
+    return LIVE_STATUSES.has(sub.status);
+}
+
+/**
+ * Every subscription on the club's connected account that can still charge.
+ * Checkout tags each subscription with metadata { user_id, location_id,
+ * tenant_id }, which is how they are matched back to members.
+ */
+export async function listLiveSubscriptions(
+    stripe: Stripe,
+    connectedAccountId: string,
+    options: { expandCustomer?: boolean; max?: number } = {},
+): Promise<Stripe.Subscription[]> {
+    const max = options.max ?? 5000;
+    const params: Stripe.SubscriptionListParams = { limit: 100 };
+    if (options.expandCustomer) params.expand = ['data.customer'];
+
+    const live: Stripe.Subscription[] = [];
+    // Without a status filter Stripe returns every subscription that is not cancelled
+    for await (const sub of stripe.subscriptions.list(params, { stripeAccount: connectedAccountId })) {
+        if (isLiveSubscription(sub)) live.push(sub);
+        if (live.length >= max) break;
+    }
+    return live;
+}
+
+export interface SweepResult {
+    /** false when the account's subscriptions could not be listed */
+    checked: boolean;
+    /** ids cancelled (or set to stop renewing) by the sweep */
+    handled: string[];
+    /** a subscription was found but Stripe refused the change — blocking */
+    error?: string;
+    /** the account could not be searched — not blocking */
+    warning?: string;
+}
+
+/**
+ * A member can hold more than one live subscription while the membership row
+ * only remembers one id: every checkout creates a NEW subscription, so paying
+ * twice, or paying again after a failed payment, leaves the earlier one
+ * running. Cancelling by the stored id alone left those charging (HaMeem,
+ * 2026-10). Every cancellation therefore also sweeps the club's account for
+ * subscriptions tagged with this member (and location, when given).
+ */
+export async function cancelOtherLiveSubscriptions(
+    connectedAccountId: string | null,
+    match: { userId: string; locationId?: string | null },
+    excludeIds: string[],
+    mode: CancelMode,
+): Promise<SweepResult> {
+    const stripe = getStripeClient();
+    if (!stripe || !connectedAccountId) return { checked: false, handled: [] };
+
+    let live: Stripe.Subscription[];
+    try {
+        live = await listLiveSubscriptions(stripe, connectedAccountId);
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Stripe error';
+        console.error('[membership-billing] sweep could not list subscriptions:', message);
+        return { checked: false, handled: [], warning: message };
+    }
+
+    const opts: Stripe.RequestOptions = { stripeAccount: connectedAccountId };
+    const handled: string[] = [];
+    for (const sub of live) {
+        if (excludeIds.includes(sub.id)) continue;
+        if (sub.metadata?.user_id !== match.userId) continue;
+        // A subscription tagged with a different location belongs to another membership
+        if (match.locationId && sub.metadata?.location_id && sub.metadata.location_id !== match.locationId) continue;
+        try {
+            if (mode === 'period_end') {
+                if (sub.cancel_at_period_end) continue;
+                await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true }, opts);
+            } else {
+                await stripe.subscriptions.cancel(sub.id, undefined, opts);
+            }
+            handled.push(sub.id);
+        } catch (err) {
+            if (isMissing(err)) continue;
+            const message = err instanceof Error ? err.message : 'Stripe error';
+            console.error('[membership-billing] sweep cancel failed:', sub.id, message);
+            return { checked: true, handled, error: message };
+        }
+    }
+    if (handled.length > 0) {
+        console.log(`[membership-billing] sweep ${mode === 'period_end' ? 'scheduled' : 'cancelled'} ${handled.length} extra subscription(s) for user ${match.userId}: ${handled.join(', ')}`);
+    }
+    return { checked: true, handled };
+}
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/** Admin-facing summary of an immediate cancellation. */
+function cancellationNote(primary: StripeSyncResult | null, sweep: SweepResult): string | undefined {
+    const parts: string[] = [];
+    const extras = sweep.handled.length;
+    if (primary?.action === 'cancelled') parts.push('Stripe subscription cancelled — no further charges.');
+    else if (primary?.action === 'already_cancelled') parts.push('Stripe subscription was already cancelled.');
+    else if (primary?.action === 'not_found' && extras === 0) parts.push('No matching subscription found in Stripe (nothing was billing).');
+
+    if (extras > 0) {
+        parts.push(primary && primary.action !== 'not_found'
+            ? `Also cancelled ${plural(extras, 'other subscription')} found in Stripe for this member.`
+            : `Cancelled ${plural(extras, 'subscription')} found in Stripe for this member — no further charges.`);
+    }
+    if (sweep.warning) {
+        parts.push(`Could not check Stripe for other subscriptions (${sweep.warning}) — run Billing check on the Memberships page to confirm.`);
+    }
+    return parts.length > 0 ? parts.join(' ') : undefined;
+}
+
+/**
+ * Cancel every Stripe subscription a member holds at this club — used before a
+ * member is deleted, because deleting the records alone leaves Stripe charging.
+ */
+export async function cancelAllSubscriptionsForUser(
+    admin: SupabaseClient,
+    params: { tenantId: string; userId: string },
+): Promise<{ ok: boolean; cancelled: number; error?: string; warning?: string }> {
+    const { tenantId, userId } = params;
+
+    const [{ data: tenant }, { data: rows }] = await Promise.all([
+        admin.from('tenants').select('stripe_account_id').eq('id', tenantId).maybeSingle(),
+        admin.from('memberships').select('stripe_subscription_id').eq('tenant_id', tenantId).eq('user_id', userId),
+    ]);
+    const connectedAccountId: string | null = tenant?.stripe_account_id || null;
+    const ids = Array.from(new Set(
+        (rows || []).map(r => r.stripe_subscription_id as string | null).filter((id): id is string => !!id),
+    ));
+    if (ids.length === 0 && !connectedAccountId) return { ok: true, cancelled: 0 };
+
+    let cancelled = 0;
+    for (const id of ids) {
+        const result = await cancelStripeSubscription(id, connectedAccountId, 'immediately');
+        if (!result.ok && result.action !== 'not_found') {
+            return { ok: false, cancelled, error: result.error || 'Stripe error' };
+        }
+        if (result.action === 'cancelled') cancelled++;
+    }
+
+    const sweep = await cancelOtherLiveSubscriptions(connectedAccountId, { userId }, ids, 'immediately');
+    cancelled += sweep.handled.length;
+    if (sweep.error) return { ok: false, cancelled, error: sweep.error };
+    return { ok: true, cancelled, warning: sweep.warning };
+}
+
 export interface StatusChangeResult {
     ok: boolean;
     error?: string;
@@ -159,7 +310,9 @@ export interface StatusChangeResult {
 
 /**
  * Change a membership's status AND keep its Stripe subscription in step.
- *  - cancelled / inactive  → Stripe subscription cancelled immediately, end_date = today
+ *  - cancelled / inactive  → Stripe subscription cancelled immediately, end_date = today;
+ *                            any OTHER live subscription tagged with this member +
+ *                            location is cancelled too (see cancelOtherLiveSubscriptions)
  *  - cancel_at_period_end  → Stripe stops renewal; membership stays active with
  *                            end_date = period end (webhook marks it cancelled later)
  *  - active                → clears a scheduled cancellation in Stripe if there is one
@@ -175,7 +328,7 @@ export async function applyMembershipStatusChange(
 
     const { data: membership } = await admin
         .from('memberships')
-        .select('id, user_id, tenant_id, status, stripe_subscription_id, end_date')
+        .select('id, user_id, tenant_id, location_id, status, stripe_subscription_id, end_date')
         .eq('id', membershipId)
         .maybeSingle();
     if (!membership || membership.tenant_id !== tenantId) {
@@ -201,14 +354,20 @@ export async function applyMembershipStatusChange(
             if (!stripe.ok && stripe.action !== 'not_found') {
                 return { ok: false, error: `Stripe refused the cancellation: ${stripe.error}`, stripe };
             }
-            note = stripe.action === 'cancelled'
-                ? 'Stripe subscription cancelled — no further charges.'
-                : stripe.action === 'already_cancelled'
-                    ? 'Stripe subscription was already cancelled.'
-                    : 'No matching subscription found in Stripe (nothing was billing).';
         }
+        const sweep = await cancelOtherLiveSubscriptions(
+            connectedAccountId,
+            { userId: membership.user_id, locationId: membership.location_id },
+            subId ? [subId] : [],
+            'immediately',
+        );
+        if (sweep.error) {
+            return { ok: false, error: `Stripe refused to cancel another subscription held by this member: ${sweep.error}`, stripe };
+        }
+        note = cancellationNote(stripe, sweep);
         patch.status = target;
-        patch.end_date = today;
+        // Re-running a cancellation (to re-check Stripe) keeps the original end date
+        patch.end_date = membership.status === target && membership.end_date ? membership.end_date : today;
     } else if (target === 'cancel_at_period_end') {
         if (!subId) {
             return { ok: false, error: 'This membership has no Stripe subscription — use Cancelled instead' };
@@ -227,6 +386,18 @@ export async function applyMembershipStatusChange(
             note = stripe.periodEnd
                 ? `Stripe will not renew — access continues until ${stripe.periodEnd}, then the membership ends automatically.`
                 : 'Stripe will not renew — the membership ends at the close of the current period.';
+            const sweep = await cancelOtherLiveSubscriptions(
+                connectedAccountId,
+                { userId: membership.user_id, locationId: membership.location_id },
+                [subId],
+                'period_end',
+            );
+            if (sweep.error) {
+                return { ok: false, error: `Stripe refused to stop another subscription held by this member: ${sweep.error}`, stripe };
+            }
+            if (sweep.handled.length > 0) {
+                note += ` Also stopped ${plural(sweep.handled.length, 'other subscription')} found in Stripe for this member from renewing.`;
+            }
         }
     } else if (target === 'active') {
         if (subId) {

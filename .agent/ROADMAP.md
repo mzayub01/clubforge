@@ -5,9 +5,15 @@
 
 ---
 
-## Next session — pick up here (as of 2026-09-22)
+## Next session — pick up here (as of 2026-10-01)
 
 **Owner actions still pending**
+- [ ] **HaMeem billing clean-up (2026-10-01):** open hameem.uk → Admin →
+      Memberships → **Billing check** (platform admins can do this too) and press
+      "Stop billing" on anything flagged. Expect at least the three memberships
+      cancelled 24 Aug – 1 Sep (before Stripe sync existed). Refund any charges
+      taken after cancellation from the club's Stripe dashboard — the app does
+      not refund. The panel itself has not been seen against live data yet.
 - [ ] HaMeem to confirm the class roster loads after bf3125d (deployed
       2026-09-21); if any other admin page shows "Failed to load …", run
       `node scripts/verify-crud-selects.mjs` first.
@@ -54,6 +60,10 @@ is shipped. Remaining, roughly by value:
 - #18 Sidebar labels every admin "Club Owner".
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
+
+**Shipped 2026-10-01**: cancelled members still charged — cancellation now
+sweeps every subscription the member holds, member delete cancels Stripe
+first, Billing check on Admin → Memberships finds and stops leftovers.
 
 **Shipped 2026-09-21**: class roster loads again (removed non-existent
 `classes.membership_type_id` from its select) + `scripts/verify-crud-selects.mjs`.
@@ -427,6 +437,25 @@ Owner: grant GSC access per SEO_PLAN section 4; decide X/Twitter profile.
   Added `scripts/verify-crud-selects.mjs`, which extracts every CRUD select
   string in `src/` and runs each against the live DB (28 checked, 0 failing) —
   run it whenever an admin page select changes.
+
+- **Cancelled members still being charged (2026-10-01, HaMeem):** three causes,
+  none of them the stored-id cancel itself (all 84 stored ids are on HaMeem's
+  connected account). (1) Memberships cancelled before 2026-09-05 were
+  record-only — 3 HaMeem rows (24 Aug, 26 Aug, 1 Sep) never reached Stripe and
+  nothing in the UI could retry them. (2) Each checkout creates a new Stripe
+  customer + subscription and the row keeps only the latest id, so a member who
+  paid twice (or again after a failed payment) had an earlier subscription the
+  cancel never touched. (3) Deleting a member removed the rows and left the
+  subscription running. Fix: cancellations sweep the connected account by
+  subscription metadata (`cancelOtherLiveSubscriptions`), member delete calls
+  `cancelAllSubscriptionsForUser` and aborts if Stripe refuses, and a new
+  **Billing check** (Admin → Memberships, `/api/admin/billing-check`) lists
+  subscriptions still charging for cancelled/deleted/duplicate cases with a
+  "Stop billing" action. Verified with `scripts/test-billing-stripe.mjs` against
+  Stripe test mode (19 checks) and `scripts/test-billing-classify.mjs` (20
+  checks); the modal was not viewed in a browser and live data is unchecked
+  until the owner runs it. Not done: preventing a second checkout for a
+  membership that already has a live subscription.
 
 **Still open in Phase 4:**
 - Per-tenant registration page refactor (still ~1700 lines).

@@ -1,6 +1,6 @@
 # ClubForge — Project Architecture & Context
 
-> **Last updated:** 2026-09-21 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
+> **Last updated:** 2026-10-01 (Phase 4 in progress — see "Recent additions (2026-09)" below for the session's new modules/endpoints)
 > **Repository:** `c:\Users\user\dev\dojohub`
 > **Live Domain:** `clubforgehq.com`
 
@@ -347,6 +347,7 @@ allows a parent→child payment after validating the relationship.
 | Belt toggle | `settings.belt_progress_enabled=false` now hides the dashboard rank card, profile badge/section and redirects `/dashboard/progress` |
 | Review batch 1 (2026-09-06) | `/instructor/class-roster` (re-export), `POST /api/staff/attendance-remove`, `GET /api/staff/member-details` + `components/instructor/StudentDetailsButton.tsx`, `POST /api/stripe/member-portal` + `components/dashboard/ManagePaymentButton.tsx`, location `settings.payment_offline` (Admin → Locations), `/api/auth/role` request-tenant resolution, announcements audience/location filter, 30-min late check-in (`TodayClassCard`, `dashboard/classes`) |
 | Admin CRUD select validation (2026-09-17) | `src/lib/select-sanitiser.ts` — structural validator for `/api/admin/crud` `select` strings (allowed tables only, `tenants`/`platform_admins` never embeddable, nesting ≤ 3); replaced the exact-string allowlist that silently fell back to `*` and lost class tier links |
+| Billing check + cancellation sweep (2026-10-01) | `src/lib/membership-billing.ts` gained `listLiveSubscriptions`, `cancelOtherLiveSubscriptions` (sweep by subscription metadata) and `cancelAllSubscriptionsForUser` (member delete); `src/lib/billing-check.ts` + pure `src/lib/billing-classify.ts`; `GET/POST /api/admin/billing-check`; "Billing check" modal on `/admin/memberships`; tests `scripts/test-billing-classify.mjs` (pure) and `scripts/test-billing-stripe.mjs` (Stripe TEST mode, trial subscriptions, self-cleaning) |
 | CRUD select verification (2026-09-21) | `scripts/verify-crud-selects.mjs` — extracts every `adminFetch(table, { select })` string from `src/` and runs each against the live DB; catches columns/relationships that do not exist in production (the class roster's `classes.membership_type_id`). Run after editing any admin page select |
 | Payment reminder (2026-09-17) | `POST /api/admin/send-payment-reminder` (`requireAdmin`, club-domain payment link) → club `payment_incomplete` DB template else `email-templates/payment-reminder.tsx`; onboarding seeds the template; `scripts/seed-email-template.mjs --key <key> --all|--tenant <slug>` for existing clubs |
 | Undeliverable addresses (2026-09-17) | `isPlaceholderEmail()` / `undeliverableReason()` in `src/lib/member-contact.ts`; `sendEmail()` returns a plain explanation for `@example.com`-style demo addresses instead of Resend's "Invalid `to` field" |

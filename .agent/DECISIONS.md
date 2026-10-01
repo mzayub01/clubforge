@@ -268,6 +268,35 @@ the change the record is left untouched, so the club never believes billing has
 stopped when it hasn't. Entry points: `POST /api/admin/membership-status`,
 `POST /api/admin/update-member` (`membershipUpdates[].status`), `/api/stripe/cancel`.
 
+**One membership row can have several live subscriptions** (2026-10-01, HaMeem:
+cancelled members still charged). Every checkout creates a NEW Stripe customer +
+subscription (`customer_email`, not `customer`), and the row only remembers the
+latest id, so paying twice — or paying again after a failed payment — leaves the
+earlier one running. Rules that follow:
+- A cancellation cancels the stored id AND sweeps the connected account for any
+  other live subscription tagged with the member (`metadata.user_id` +
+  `location_id`): `cancelOtherLiveSubscriptions()`. Never cancel by stored id alone.
+- Never delete membership rows without stopping billing first. Member delete
+  (`DELETE /api/admin/members`) calls `cancelAllSubscriptionsForUser()` and
+  refuses to delete if Stripe refuses.
+- "Live" = active, trialing, past_due, unpaid, paused, incomplete — a past-due
+  subscription still retries and can charge later.
+- Keep `subscription_data.metadata { user_id, location_id, tenant_id }` on every
+  checkout; it is the only link from a Stripe subscription back to a member.
+- The club's safety net is **Billing check** (Admin → Memberships):
+  `src/lib/billing-check.ts` + pure classifier `src/lib/billing-classify.ts`
+  list subscriptions still charging for a cancelled membership, a deleted member,
+  or a duplicate, each with a "Stop billing" button. Subscriptions without
+  ClubForge metadata (created by hand in Stripe) are never touched.
+- Memberships cancelled before 2026-09-05 were record-only changes; their
+  subscriptions were never cancelled. Billing check is how they get found.
+- Known gap (not fixed): checkout does not stop a member starting a second
+  subscription for a membership that already has a live one.
+- Verify Stripe code with `node scripts/test-billing-stripe.mjs` (runs the real
+  library against the platform's TEST account using trial subscriptions) and
+  `node scripts/test-billing-classify.mjs` (pure). Cancelling a subscription
+  never refunds past payments — that is done in the club's Stripe dashboard.
+
 ### Admin CRUD select strings (IMPORTANT — silent data loss class)
 `/api/admin/crud` validates `select` with `src/lib/select-sanitiser.ts`
 (structural: embeds only on allowlisted tables, `tenants`/`platform_admins`

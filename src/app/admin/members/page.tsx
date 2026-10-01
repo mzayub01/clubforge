@@ -425,7 +425,12 @@ export default function AdminMembersPage() {
                 throw new Error(data.error || 'Failed to delete member');
             }
 
-            setSuccess(`${deletingMember.first_name} ${deletingMember.last_name} has been deleted.`);
+            const stripeNote = data.stripeCancelled > 0
+                ? ` ${data.stripeCancelled} Stripe subscription${data.stripeCancelled === 1 ? '' : 's'} cancelled — no further charges.`
+                : data.stripeWarning
+                    ? ' Could not check Stripe for subscriptions — run Billing check on the Memberships page.'
+                    : '';
+            setSuccess(`${deletingMember.first_name} ${deletingMember.last_name} has been deleted.${stripeNote}`);
             setShowDeleteModal(false);
             setDeletingMember(null);
             fetchData();

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw } from 'lucide-react';
+import { Users, MapPin, Search, CheckCircle, XCircle, AlertCircle, Filter, Calendar, UserPlus, CreditCard, Ban, Receipt, RefreshCw, ShieldCheck } from 'lucide-react';
+import type { BillingIssue, BillingTotals } from '@/lib/billing-classify';
 import { useGuardianContacts } from '@/hooks/useGuardianContacts';
 import { adminFetch, adminFetchOne, adminInsert, adminUpdateById } from '@/lib/admin-api';
 import ModalPortal from '@/components/admin/ModalPortal';
@@ -69,6 +70,15 @@ export default function AdminMembershipsPage() {
         location_id: '',
         status: 'active',
     });
+
+    // Billing check: Stripe subscriptions still charging that should not be
+    const [showBilling, setShowBilling] = useState(false);
+    const [billing, setBilling] = useState<{ connected: boolean; totals: BillingTotals; issues: BillingIssue[] } | null>(null);
+    const [billingLoading, setBillingLoading] = useState(false);
+    const [billingError, setBillingError] = useState('');
+    const [billingNotice, setBillingNotice] = useState('');
+    const [confirmSub, setConfirmSub] = useState<string | null>(null);
+    const [stoppingSub, setStoppingSub] = useState<string | null>(null);
 
 
 
@@ -310,6 +320,61 @@ export default function AdminMembershipsPage() {
         }
     };
 
+    const runBillingCheck = async () => {
+        setShowBilling(true);
+        setBillingLoading(true);
+        setBillingError('');
+        setBillingNotice('');
+        setConfirmSub(null);
+        try {
+            const res = await fetch('/api/admin/billing-check');
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error || 'Billing check failed');
+            setBilling({ connected: data.connected, totals: data.totals, issues: data.issues });
+        } catch (err: any) {
+            setBilling(null);
+            setBillingError(err.message || 'Billing check failed');
+        } finally {
+            setBillingLoading(false);
+        }
+    };
+
+    const stopBilling = async (issue: BillingIssue) => {
+        setStoppingSub(issue.subscriptionId);
+        setBillingError('');
+        setBillingNotice('');
+        try {
+            const res = await fetch('/api/admin/billing-check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subscriptionId: issue.subscriptionId }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error || 'Failed to cancel subscription');
+            setBillingNotice(data.message || 'Subscription cancelled.');
+            setBilling(prev => prev ? {
+                ...prev,
+                issues: prev.issues.filter(i => i.subscriptionId !== issue.subscriptionId),
+                totals: { ...prev.totals, live: prev.totals.live - 1, issues: prev.totals.issues - 1 },
+            } : prev);
+            fetchData();
+        } catch (err: any) {
+            setBillingError(err.message || 'Failed to cancel subscription');
+        } finally {
+            setStoppingSub(null);
+            setConfirmSub(null);
+        }
+    };
+
+    const formatCharge = (issue: BillingIssue) => {
+        if (issue.amount === null) return 'Amount not available';
+        const money = new Intl.NumberFormat('en-GB', { style: 'currency', currency: (issue.currency || 'gbp').toUpperCase() }).format(issue.amount);
+        return issue.interval ? `${money} / ${issue.interval}` : money;
+    };
+
+    const formatDay = (date: string | null) =>
+        date ? new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+
     if (loading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-12)' }}>
@@ -327,10 +392,20 @@ export default function AdminMembershipsPage() {
                         Manage member enrollments at locations
                     </p>
                 </div>
-                <button onClick={() => openModal()} className="btn btn-primary">
-                    <UserPlus size={18} />
-                    Add Membership
-                </button>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                    <button
+                        onClick={runBillingCheck}
+                        className="btn btn-outline"
+                        title="Find Stripe subscriptions still charging for cancelled or deleted members"
+                    >
+                        <ShieldCheck size={18} />
+                        Billing check
+                    </button>
+                    <button onClick={() => openModal()} className="btn btn-primary">
+                        <UserPlus size={18} />
+                        Add Membership
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -622,6 +697,153 @@ export default function AdminMembershipsPage() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+                </ModalPortal>
+            )}
+
+            {/* Billing check */}
+            {showBilling && (
+                <ModalPortal>
+                <div className="modal-overlay" onClick={() => setShowBilling(false)}>
+                    <div className="modal" style={{ maxWidth: '720px' }} onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">Billing check</h2>
+                        </div>
+
+                        <div className="modal-body">
+                            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>
+                                Compares the subscriptions Stripe is still charging with your membership records, and lists any
+                                that belong to a cancelled membership, a deleted member, or a member who is paying twice.
+                            </p>
+
+                            {billingLoading && (
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-8)' }}>
+                                    <div className="loading-spinner" />
+                                </div>
+                            )}
+
+                            {billingError && (
+                                <div className="alert alert-error" style={{ marginBottom: 'var(--space-4)' }}>
+                                    <AlertCircle size={18} />
+                                    {billingError}
+                                </div>
+                            )}
+
+                            {billingNotice && (
+                                <div className="alert alert-success" style={{ marginBottom: 'var(--space-4)' }}>
+                                    <CheckCircle size={18} />
+                                    {billingNotice}
+                                </div>
+                            )}
+
+                            {!billingLoading && billing && !billing.connected && (
+                                <p style={{ color: 'var(--text-secondary)' }}>
+                                    This club has not connected Stripe, so there are no subscriptions to check.
+                                </p>
+                            )}
+
+                            {!billingLoading && billing && billing.connected && (
+                                <>
+                                    <p style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>
+                                        <strong>{billing.totals.live}</strong> subscription{billing.totals.live === 1 ? '' : 's'} charging in Stripe
+                                        {' · '}<strong>{billing.totals.healthy + billing.totals.unlinked}</strong> match a current membership
+                                        {billing.totals.ending > 0 && <>{' · '}<strong>{billing.totals.ending}</strong> already set to stop</>}
+                                        {billing.totals.unmanaged > 0 && <>{' · '}<strong>{billing.totals.unmanaged}</strong> not created by ClubForge</>}
+                                    </p>
+
+                                    {billing.issues.length === 0 ? (
+                                        <div className="alert alert-success">
+                                            <CheckCircle size={18} />
+                                            Nothing to fix — nobody without a current membership is being charged.
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <p style={{ fontWeight: 600, color: 'var(--color-red)', marginBottom: 'var(--space-3)' }}>
+                                                {billing.issues.length} subscription{billing.issues.length === 1 ? ' is' : 's are'} still charging and should not be
+                                            </p>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                                                {billing.issues.map(issue => (
+                                                    <div
+                                                        key={issue.subscriptionId}
+                                                        style={{
+                                                            border: '1px solid var(--border-light)',
+                                                            borderLeft: '4px solid var(--color-red)',
+                                                            borderRadius: 'var(--radius-lg)',
+                                                            padding: 'var(--space-3) var(--space-4)',
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            gap: 'var(--space-3)',
+                                                            flexWrap: 'wrap',
+                                                        }}
+                                                    >
+                                                        <div style={{ minWidth: 0, flex: '1 1 260px' }}>
+                                                            <p style={{ fontWeight: 600, margin: 0 }}>
+                                                                {issue.memberName}
+                                                                {issue.locationName ? <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}> · {issue.locationName}</span> : null}
+                                                            </p>
+                                                            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+                                                                {issue.reason}
+                                                            </p>
+                                                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', margin: '4px 0 0', overflowWrap: 'anywhere' }}>
+                                                                {formatCharge(issue)}
+                                                                {issue.nextChargeDate ? ` · next charge ${formatDay(issue.nextChargeDate)}` : ''}
+                                                                {issue.stripeStatus !== 'active' ? ` · Stripe status: ${issue.stripeStatus.replace('_', ' ')}` : ''}
+                                                                {issue.customerEmail ? ` · ${contactFor(issue.customerEmail).email || issue.customerEmail}` : ''}
+                                                                {` · ${issue.subscriptionId}`}
+                                                            </p>
+                                                        </div>
+                                                        {confirmSub === issue.subscriptionId ? (
+                                                            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                                                                <button
+                                                                    onClick={() => stopBilling(issue)}
+                                                                    className="btn btn-danger btn-sm"
+                                                                    disabled={stoppingSub === issue.subscriptionId}
+                                                                >
+                                                                    {stoppingSub === issue.subscriptionId ? 'Cancelling…' : 'Yes, cancel in Stripe'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => setConfirmSub(null)}
+                                                                    className="btn btn-ghost btn-sm"
+                                                                    disabled={stoppingSub === issue.subscriptionId}
+                                                                >
+                                                                    Keep
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => setConfirmSub(issue.subscriptionId)}
+                                                                className="btn btn-outline btn-sm"
+                                                                style={{ color: 'var(--color-red)' }}
+                                                                disabled={!!stoppingSub}
+                                                            >
+                                                                <Ban size={14} />
+                                                                Stop billing
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: 'var(--space-3)' }}>
+                                                Stopping billing cancels the subscription in Stripe straight away. It does not refund
+                                                payments already taken — refund those from your Stripe dashboard if needed.
+                                            </p>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        <div className="modal-footer">
+                            <button type="button" onClick={runBillingCheck} className="btn btn-ghost" disabled={billingLoading}>
+                                <RefreshCw size={16} />
+                                Check again
+                            </button>
+                            <button type="button" onClick={() => setShowBilling(false)} className="btn btn-primary">
+                                Done
+                            </button>
+                        </div>
                     </div>
                 </div>
                 </ModalPortal>

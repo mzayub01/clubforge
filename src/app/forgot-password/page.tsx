@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface TenantBranding {
     name: string;
@@ -16,7 +15,6 @@ export default function ForgotPasswordPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const supabase = getSupabaseClient();
 
     // Tenant branding state
     const [tenantInfo, setTenantInfo] = useState<TenantBranding | null>(null);
@@ -51,12 +49,22 @@ export default function ForgotPasswordPage() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
+            // Server route: generates the link and emails it through Resend with
+            // the club's branding. (Supabase's own mailer only delivers to the
+            // project's team members, so it is never used for members.)
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim() }),
             });
+            const data = await res.json().catch(() => ({}));
 
-            if (error) {
-                setError(error.message);
+            if (!res.ok) {
+                setError(
+                    res.status === 429
+                        ? 'Too many attempts. Please wait a little while before trying again.'
+                        : data?.error || "We couldn't send the email right now. Please try again shortly.",
+                );
                 return;
             }
 
@@ -157,9 +165,14 @@ export default function ForgotPasswordPage() {
                         }}>
                             <CheckCircle size={32} color="var(--color-green)" />
                         </div>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                            We&apos;ve sent a password reset link to <strong>{email}</strong>.
-                            Please check your inbox and follow the instructions.
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-3)' }}>
+                            If there&apos;s an account for <strong>{email}</strong>, we&apos;ve sent it a
+                            password reset link{tenantInfo ? <> from <strong>{tenantInfo.name}</strong></> : null}.
+                            Open the email and tap the button to choose a new password.
+                        </p>
+                        <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
+                            Nothing after a couple of minutes? Check your spam or junk folder, and make sure
+                            this is the address your account was registered with.
                         </p>
                         <Link href="/login" className="btn btn-primary" style={{ width: '100%' }}>
                             <ArrowLeft size={18} />

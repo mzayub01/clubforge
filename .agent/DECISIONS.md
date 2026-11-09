@@ -254,6 +254,38 @@ payment-reminder reply-to all pointed at ClubForge.
   `parent_guardian_id` server-side (see instructor "My Students"). Helpers in
   `src/lib/member-contact.ts`.
 
+### Auth emails never go through Supabase's mailer (IMPORTANT — 2026-11-09)
+HaMeem members pressed "Forgot password?", saw "we've sent a link" and got
+nothing. Two causes, both fixed in `src/lib/password-reset.ts`:
+- **Supabase Auth's built-in mailer only delivers to the Supabase project's
+  own team members** unless custom SMTP is configured (and is capped at ~2
+  emails/hour) — see https://supabase.com/docs/guides/auth/auth-smtp. The
+  browser-side `supabase.auth.resetPasswordForEmail()` used that mailer and
+  returns 200 regardless (anti-enumeration), so the page lied. **Rule:** any
+  email a member must receive is generated server-side
+  (`auth.admin.generateLink`) and sent through Resend via `sendEmail()` with the
+  club's branding. Signups are `mailer_autoconfirm`, admin email changes use
+  `email_confirm: true`, so nothing else relies on the Supabase mailer today;
+  keep it that way (no magic links / `inviteUserByEmail` / `signInWithOtp`).
+- **Never hand a user Supabase's `action_link`.** It completes as an
+  implicit-flow redirect (`/reset-password#access_token=…`) and the
+  `@supabase/ssr` browser client hard-codes `flowType: 'pkce'`, so auth-js
+  rejects it ("Not a valid PKCE flow url.") and the member sees "link expired".
+  **Rule:** build links with `buildRecoveryUrl(origin, hashed_token)` →
+  `/auth/confirm?token_hash=…&type=recovery&next=/reset-password`. That route
+  (`src/app/auth/confirm/route.ts`) calls `verifyOtp` server-side and writes
+  the session cookies onto the redirect, so the link works in any browser or
+  device the email is opened in. `/reset-password` reads the cookie session
+  (its `getSession()` path) and shows a clear message on `?error=link_invalid`.
+- `POST /api/auth/forgot-password` answers `{ success: true }` for unknown
+  addresses and child dummies (no enumeration) but returns 503 when Resend or
+  `generateLink` genuinely fails — never a fake success. Limits: 5/IP/15 min,
+  3/address/hour. Verify the mechanism any time with
+  `node scripts/test-password-reset-link.mjs` (throwaway auth user, no email).
+- Known limitation: the one-click GET link can be consumed by an aggressive
+  corporate link scanner before the member clicks. If "link already used"
+  reports appear, land on a page with a button that POSTs the token instead.
+
 ### Membership status ↔ Stripe (IMPORTANT)
 Member subscriptions live on the **club's connected account**, so every Stripe
 call about them needs `{ stripeAccount: tenant.stripe_account_id }` — the old

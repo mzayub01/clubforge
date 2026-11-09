@@ -1,13 +1,24 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-09-06
+> **Last updated:** 2026-11-09
 > **Current Phase:** Phase 4 in progress (Member Experience) · Phase 5 started early (platform tenant health view)
 
 ---
 
-## Next session — pick up here (as of 2026-10-01)
+## Next session — pick up here (as of 2026-11-09)
 
 **Owner actions still pending**
+- [ ] **HaMeem forgot-password (2026-11-09):** tell HaMeem the fix is live and
+      ask one member who was stuck to try "Forgot password?" again (email now
+      comes from "HaMeem <noreply@clubforgehq.com>", via Resend — check spam
+      the first time). Members created from Admin → Add Member whose
+      "Set my password" link showed "link expired" should also just use
+      "Forgot password?" now — there is no separate "re-send" button.
+- [ ] Optional, Supabase dashboard → Authentication → Emails/SMTP: confirm
+      whether custom SMTP is configured. Nothing in the app depends on
+      Supabase's mailer any more, but if it is still the default sender,
+      leave it — don't be surprised that it "doesn't send" to non-team
+      addresses.
 - [ ] **HaMeem billing clean-up (2026-10-01):** open hameem.uk → Admin →
       Memberships → **Billing check** (platform admins can do this too) and press
       "Stop billing" on anything flagged. Expect at least the three memberships
@@ -60,6 +71,13 @@ is shipped. Remaining, roughly by value:
 - #18 Sidebar labels every admin "Club Owner".
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
+
+**Shipped 2026-11-09**: member "Forgot password?" emails never arrived
+(Supabase's built-in mailer only delivers to the project's team members) and
+the admin "Set my password" link was rejected by the PKCE browser client.
+Both now go through Resend with club branding and land on `/auth/confirm`
+(server-side `verifyOtp` → session cookie → `/reset-password`), so links work
+on any device. `scripts/test-password-reset-link.mjs` proves the mechanism.
 
 **Shipped 2026-10-01**: cancelled members still charged — cancellation now
 sweeps every subscription the member holds, member delete cancels Stripe

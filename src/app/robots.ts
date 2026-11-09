@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
                     '/professor/',
                     '/platform/',
                     '/api/',
+                    '/auth/',
                     '/docs/',
                     '/tenant-home',
                     '/login',

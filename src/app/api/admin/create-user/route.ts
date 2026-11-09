@@ -17,6 +17,7 @@ import { sendEmail } from '@/lib/email';
 import { renderEmailFromDatabase, getTenantBranding } from '@/lib/email-templates-db';
 import { renderWelcomeEmail } from '@/lib/email-templates';
 import { CHILD_EMAIL_DOMAIN } from '@/lib/member-contact';
+import { createRecoveryLink, requestOrigin, sendPasswordEmail } from '@/lib/password-reset';
 
 const ROLES = ['member', 'instructor', 'professor', 'admin'] as const;
 type Role = typeof ROLES[number];
@@ -279,8 +280,7 @@ export async function POST(request: NextRequest) {
             const clubName = branding?.name || 'ClubForge';
             const from = `${clubName} <noreply@clubforgehq.com>`;
             const replyTo = branding?.contactEmail || undefined;
-            const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'clubforgehq.com';
-            const origin = `https://${host}`;
+            const { origin, host } = requestOrigin(request);
 
             if (body.sendWelcomeEmail) {
                 try {
@@ -306,29 +306,19 @@ export async function POST(request: NextRequest) {
 
             if (body.sendSetPasswordEmail) {
                 try {
-                    const { data: link, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-                        type: 'recovery',
-                        email,
-                        options: { redirectTo: `${origin}/reset-password` },
-                    });
-                    const actionLink = link?.properties?.action_link;
-                    if (linkError || !actionLink) throw new Error(linkError?.message || 'no link');
-                    const html = `
-                        <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#222">
-                            <h2 style="margin:0 0 12px">Your ${escapeHtml(clubName)} member account</h2>
-                            <p>Hi ${escapeHtml(firstName)},</p>
-                            <p>${escapeHtml(clubName)} has created a member account for you${email ? ` using <strong>${escapeHtml(email)}</strong>` : ''}.
-                               Choose your password to sign in:</p>
-                            <p style="margin:24px 0"><a href="${actionLink}" style="background:#c5a456;color:#000;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:600">Set my password</a></p>
-                            <p style="color:#666;font-size:13px">This link expires after a short time. If it has expired, use “Forgot password?” on the sign-in page at <a href="${origin}/login">${escapeHtml(host)}</a>.</p>
-                            <p>See you soon,<br/>The ${escapeHtml(clubName)} Team</p>
-                        </div>`;
-                    const result = await sendEmail({
+                    // Link goes through our /auth/confirm route (token hash → session
+                    // cookie), not Supabase's action_link, which the PKCE browser
+                    // client rejects. See src/lib/password-reset.ts.
+                    const link = await createRecoveryLink(email, origin);
+                    if (!link.ok) throw new Error(link.message);
+                    const result = await sendPasswordEmail({
                         to: email,
-                        subject: `Set your password for ${clubName}`,
-                        html,
-                        from,
-                        replyTo,
+                        variant: 'set',
+                        url: link.url,
+                        firstName,
+                        tenantId,
+                        origin,
+                        host,
                     });
                     emails.setPassword = result.success;
                 } catch (err) {

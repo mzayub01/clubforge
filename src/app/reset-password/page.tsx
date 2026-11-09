@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
@@ -23,10 +23,22 @@ function ResetPasswordForm() {
     const [checking, setChecking] = useState(true);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
+    // /auth/confirm sends the user here with ?error=link_invalid when the
+    // token hash was rejected (expired, already used, or tampered with).
+    const linkInvalid = searchParams.get('error') === 'link_invalid';
     const supabase = getSupabaseClient();
 
     useEffect(() => {
-        // Listen for the PASSWORD_RECOVERY event from the email link
+        if (linkInvalid) {
+            setChecking(false);
+            return;
+        }
+
+        // Emailed links land on /auth/confirm, which verifies the token server
+        // side and arrives here with the session already in cookies — so the
+        // getSession() check below is the normal path. The PASSWORD_RECOVERY
+        // event still covers links that carry the session in the URL.
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event) => {
                 if (event === 'PASSWORD_RECOVERY') {
@@ -53,7 +65,7 @@ function ResetPasswordForm() {
             subscription.unsubscribe();
             clearTimeout(timer);
         };
-    }, [supabase]);
+    }, [supabase, linkInvalid]);
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -134,10 +146,14 @@ function ResetPasswordForm() {
         return (
             <div style={{ textAlign: 'center' }}>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
-                    This page requires a valid password reset link. Please click the link in your email to continue.
+                    {linkInvalid
+                        ? 'This password link has expired or has already been used.'
+                        : 'This page requires a valid password reset link. Please click the link in your email to continue.'}
                 </p>
                 <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
-                    If your link has expired, you can request a new one.
+                    {linkInvalid
+                        ? 'Each link works once and only for a short time. Request a new one below and use the newest email.'
+                        : 'If your link has expired, you can request a new one.'}
                 </p>
                 <Link href="/forgot-password" className="btn btn-primary" style={{ width: '100%' }}>
                     Request New Reset Link

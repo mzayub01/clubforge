@@ -1,19 +1,49 @@
 # ClubForge — Roadmap & Progress
 
-> **Last updated:** 2026-11-09
+> **Last updated:** 2026-11-22
 > **Current Phase:** Phase 4 in progress (Member Experience) · Phase 5 started early (platform tenant health view)
 
 ---
 
-## Next session — pick up here (as of 2026-11-09)
+## Next session — pick up here (as of 2026-11-22)
+
+**Open bug — start here**
+- [ ] **HaMeem forgot-password STILL not arriving (reported again 2026-11-22,
+      after fix 1da4bc6 of 2026-11-09).** Parked by the owner in favour of the
+      homepage work; not yet investigated. First checks: Vercel logs for
+      `[forgot-password]` lines (the route logs "no account for …", "reset link
+      sent … resend <id>" or the failure reason), then the Resend dashboard for
+      that id (delivered / bounced / spam), then whether the member is typing
+      the same address their auth account uses (the route is silent for unknown
+      addresses) and whether they are a child account (no inbox). Ask HaMeem
+      for one affected member's email and the time they tried.
 
 **Owner actions still pending**
-- [ ] **HaMeem forgot-password (2026-11-09):** tell HaMeem the fix is live and
-      ask one member who was stuck to try "Forgot password?" again (email now
-      comes from "HaMeem <noreply@clubforgehq.com>", via Resend — check spam
-      the first time). Members created from Admin → Add Member whose
-      "Set my password" link showed "link expired" should also just use
-      "Forgot password?" now — there is no separate "re-send" button.
+- [ ] **Homepage social proof (2026-11-22):** send the three draft quotes in
+      `src/components/home/social-proof.ts` (`DRAFTS_FOR_APPROVAL`) to real club
+      owners (HaMeem, Border Performance, Sukata…) to rewrite or approve, and
+      ask permission to show their logo. Approved entries go into
+      `TESTIMONIALS` / `CLUB_LOGOS` in the same file and the sections switch
+      on by themselves (logos need 3 or more). Never publish an unapproved one.
+- [ ] **Decide the trial offer (2026-11-22):** the marketing mockup wanted
+      "No card required". Signup takes a card today, so the site now says
+      "Not charged until your trial ends". If a no-card trial is wanted, the
+      signup flow (`/get-started` → `/api/onboard`) has to change first.
+- [ ] **Member import (2026-11-22):** `/pricing` says "We support CSV import"
+      and lists "Migration assistance" on Pro/Elite, but the app has no import
+      tool. Either build it or reword the pricing FAQ. The homepage banner only
+      promises a conversation ("Talk to us about switching").
+- [ ] **Pricing page claims to check (2026-11-22):** `/pricing` lists "API
+      access & webhooks" on Elite (the app has no tenant API or outbound
+      webhooks) and badges Pro "Most Popular" (among active clubs Pro is the
+      least-chosen plan). The homepage now says "Recommended" and lists
+      "Your club on its own domain" instead. Decide and align `/pricing`.
+- [ ] **A photo for the homepage story (2026-11-22):** a real picture of the
+      academy next to "Built inside a working academy" would add proof.
+- [ ] **Old claims on other pages (2026-11-22):** the homepage no longer says
+      members can *book* classes, that classes have *waitlists*, or that clubs
+      can *build their own* belt system, because none exist. `/features/*`,
+      `/for/*`, `/faq` and the blog may still say so; sweep them.
 - [ ] Optional, Supabase dashboard → Authentication → Emails/SMTP: confirm
       whether custom SMTP is configured. Nothing in the app depends on
       Supabase's mailer any more, but if it is still the default sender,
@@ -71,6 +101,13 @@ is shipped. Remaining, roughly by value:
 - #18 Sidebar labels every admin "Club Owner".
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
+
+**Shipped 2026-11-22**: homepage rebuilt to the marketing consultant's mockup
+(hero with product, "why clubs switch", six-tab product tour of illustrated
+real screens, feature index, disciplines, steps, story, switching banner,
+pricing, FAQ, close), new dropdown navigation and a restyled footer sitewide.
+The homepage is now statically prerendered. Details in ARCHITECTURE "Recent
+additions" and DECISIONS "Marketing homepage".
 
 **Shipped 2026-11-09**: member "Forgot password?" emails never arrived
 (Supabase's built-in mailer only delivers to the project's team members) and

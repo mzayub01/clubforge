@@ -51,7 +51,10 @@ Each item lists effort (S/M/L) and who does it (code = Claude, owner =
 Zubair). Ship in order; batches are sized to about one session each.
 
 ### Batch A — technical foundation (code, ~1 session)
-- [ ] **A1. Static marketing pages.** Move the "who is logged in" check out of
+- [ ] **A1. Static marketing pages.** *(2026-11-22: done for the homepage —
+      `Navbar` now detects the session client-side when no `user` prop is passed;
+      pricing, features, faq, about, blog, for/*, city pages still to convert.)*
+      Move the "who is logged in" check out of
       the server pages into a small client component in the Navbar (reads the
       Supabase session on the client or calls `/api/auth/role`). Remove
       `createClient()`/`getUser()` from page.tsx, pricing, features, faq,
@@ -61,7 +64,8 @@ Zubair). Ship in order; batches are sized to about one session each.
       `title`, or use `title: { absolute }` where a page wants its own. (S)
 - [ ] **A3. 301 `www.clubforgehq.com` → apex** in `src/middleware.ts` (extend
       the existing custom-domain www branch to the base domain). (S)
-- [ ] **A4. Fix `sameAs`**: create the X/Twitter account or remove the link
+- [ ] **A4. Fix `sameAs`** *(2026-11-22: dead Twitter link removed from the
+      footer; the Organization schema `sameAs` still lists it)*: create the X/Twitter account or remove the link
       (owner decision); confirm Capterra/GetApp/G2 listings and add only live
       URLs; remove the dead Twitter link from the footer. (S, owner + code)
 - [ ] **A5. Remove `SearchAction`** (or point it at a real `/search?q=`). (S)

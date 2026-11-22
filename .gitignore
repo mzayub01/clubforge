@@ -44,3 +44,6 @@ next-env.d.ts
 
 # Google Search Console service-account key (see .agent/SEO_PLAN.md)
 gsc-service-account.json
+
+# Impeccable review captures (regenerated on demand)
+.impeccable/review/

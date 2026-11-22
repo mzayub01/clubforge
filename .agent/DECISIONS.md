@@ -370,6 +370,37 @@ class ends; staff can back-date via `classDate` on `/api/attendance/checkin`.
 - Structured data lives in `components/structured-data.tsx`; add schema there,
   not inline, and only link `sameAs` profiles that actually exist.
 
+### Marketing homepage (2026-11-22)
+Rebuilt from a mockup by the owner's marketing consultant. Rules that came out
+of it, for every public page:
+- **Public copy must be true of the product today.** `PRODUCT.md` (repo root)
+  lists what is and is not in the app; check it before writing a claim. Things
+  the mockup or older pages claimed that do not exist: class *booking*,
+  per-class *waitlists*, a *custom* belt-system builder, a member *import*
+  tool, "members drifting away" reports, and a card-free trial.
+- **No invented social proof.** Logos and quotes render only from
+  `src/components/home/social-proof.ts`, and only entries a real club has
+  approved (fake testimonials breach the CAP Code and the DMCC Act 2024). The
+  owner asked for invented quotes on 2026-11-22; this was declined and draft
+  wording for real owners to approve was provided instead.
+- **Product visuals are illustrated twins of real screens** (`screens.tsx`),
+  labelled "Sample data", because the demo club (Apex MMA, 7 profiles) is too
+  sparse to screenshot. Only draw screens and controls that exist; when a real
+  screen changes materially, update its twin. If a populated showcase club is
+  ever seeded, genuine screenshots can replace them.
+- **Homepage is static.** No `cookies()` / `getUser()` in the page; the Navbar
+  detects the session client-side. Other marketing pages still pass `user` and
+  stay dynamic until SEO Batch A1 converts them the same way (just drop the
+  prop and the server lookup).
+- The hero H1 is the consultant's "Run your whole club from one place." with
+  the category line "Club management software for martial arts." inside the
+  same `<h1>`; the keyword-heavy phrasing lives in `<title>`/meta. Section
+  kickers above headings were dropped on purpose.
+- Footer keeps the Features / Built for / Locations lists: they are the
+  sitewide internal links to the feature, discipline and city pages. The
+  mockup's Compare and Case studies columns wait for those pages
+  (SEO_PLAN C1, D3). The dead Twitter link is gone.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

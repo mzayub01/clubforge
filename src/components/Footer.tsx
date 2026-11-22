@@ -1,168 +1,123 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Twitter, Linkedin, Github } from 'lucide-react';
+import { Linkedin } from 'lucide-react';
+import s from './Footer.module.css';
+
+// The Features, Built for and Locations lists are the sitewide internal links
+// to the feature, discipline and city pages: keep them when restyling.
+// Add "Compare" and "Case studies" columns only once those pages exist
+// (.agent/SEO_PLAN.md C1 and D3).
+
+const PRODUCT = [
+    { href: '/features', label: 'All features' },
+    { href: '/pricing', label: 'Pricing' },
+    { href: '/#tour', label: 'See it in action' },
+    { href: '/#switching', label: 'Switching to ClubForge' },
+    { href: '/demo', label: 'Book a demo' },
+    { href: '/get-started', label: 'Start free trial' },
+];
+
+const FEATURES = [
+    { href: '/features/member-management', label: 'Member management' },
+    { href: '/features/class-scheduling', label: 'Class scheduling' },
+    { href: '/features/belt-progression', label: 'Belt progression' },
+    { href: '/features/attendance-tracking', label: 'Attendance tracking' },
+    { href: '/features/payments-billing', label: 'Payments and billing' },
+    { href: '/features/multi-location', label: 'Multi-location' },
+];
+
+const BUILT_FOR = [
+    { href: '/for/martial-arts', label: 'Martial arts clubs' },
+    { href: '/for/bjj', label: 'BJJ academies' },
+    { href: '/for/boxing-mma', label: 'Boxing and MMA gyms' },
+    { href: '/for/boxing', label: 'Boxing clubs' },
+    { href: '/for/kickboxing', label: 'Kickboxing clubs' },
+    { href: '/for/karate', label: 'Karate dojos' },
+    { href: '/for/taekwondo', label: 'Taekwondo clubs' },
+    { href: '/for/judo', label: 'Judo clubs' },
+    { href: '/for/fitness-studios', label: 'Fitness studios' },
+];
+
+const COMPANY = [
+    { href: '/about', label: 'About' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/faq', label: 'FAQ' },
+];
+
+const CITIES = [
+    { href: '/martial-arts-software-london', label: 'London' },
+    { href: '/bjj-gym-software-manchester', label: 'Manchester' },
+    { href: '/gym-management-birmingham', label: 'Birmingham' },
+    { href: '/martial-arts-software-leeds', label: 'Leeds' },
+    { href: '/bjj-gym-software-liverpool', label: 'Liverpool' },
+    { href: '/martial-arts-software-glasgow', label: 'Glasgow' },
+    { href: '/gym-management-edinburgh', label: 'Edinburgh' },
+    { href: '/martial-arts-software-bristol', label: 'Bristol' },
+    { href: '/bjj-gym-software-sheffield', label: 'Sheffield' },
+    { href: '/martial-arts-software-nottingham', label: 'Nottingham' },
+    { href: '/gym-management-leicester', label: 'Leicester' },
+    { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
+];
+
+function Column({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+    return (
+        <nav className={s.col} aria-label={title}>
+            <h2>{title}</h2>
+            <ul>
+                {links.map(link => (
+                    <li key={link.href}><Link href={link.href}>{link.label}</Link></li>
+                ))}
+            </ul>
+        </nav>
+    );
+}
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="footer" style={{ background: 'var(--color-gray-900)', color: 'var(--color-gray-300)' }}>
-            {/* Locations — full-width row */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'var(--space-16) var(--space-6) 0' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-4)', flexWrap: 'wrap', paddingBottom: 'var(--space-10)', borderBottom: '1px solid var(--color-gray-800)' }}>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', margin: 0, whiteSpace: 'nowrap' }}>
-                        Locations
-                    </h4>
-                    <nav style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
-                        {[
-                            { href: '/martial-arts-software-london', label: 'London' },
-                            { href: '/bjj-gym-software-manchester', label: 'Manchester' },
-                            { href: '/gym-management-birmingham', label: 'Birmingham' },
-                            { href: '/martial-arts-software-leeds', label: 'Leeds' },
-                            { href: '/bjj-gym-software-liverpool', label: 'Liverpool' },
-                            { href: '/martial-arts-software-glasgow', label: 'Glasgow' },
-                            { href: '/gym-management-edinburgh', label: 'Edinburgh' },
-                            { href: '/martial-arts-software-bristol', label: 'Bristol' },
-                            { href: '/bjj-gym-software-sheffield', label: 'Sheffield' },
-                            { href: '/martial-arts-software-nottingham', label: 'Nottingham' },
-                            { href: '/gym-management-leicester', label: 'Leicester' },
-                            { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
-                        ].map((city, i) => (
-                            <span key={city.href} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                                {i > 0 && <span style={{ color: 'var(--color-gray-700)' }}>·</span>}
-                                <Link href={city.href} style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>{city.label}</Link>
-                            </span>
-                        ))}
+        <footer className={s.footer}>
+            <div className={s.wrap}>
+                <div className={s.top}>
+                    <div className={s.brand}>
+                        <Image src="/logo-clubforge-final-dark.svg" alt="ClubForge" width={200} height={52} />
+                        <p>Club management software for martial arts clubs.</p>
+                        <a href="https://linkedin.com/company/clubforge" target="_blank" rel="noopener noreferrer" className={s.social}>
+                            <Linkedin size={18} aria-hidden="true" />
+                            ClubForge on LinkedIn
+                        </a>
+                    </div>
+
+                    <Column title="Product" links={PRODUCT} />
+                    <Column title="Features" links={FEATURES} />
+                    <Column title="Built for" links={BUILT_FOR} />
+                    <nav className={s.col} aria-label="Company">
+                        <h2>Company</h2>
+                        <ul>
+                            {COMPANY.map(link => (
+                                <li key={link.href}><Link href={link.href}>{link.label}</Link></li>
+                            ))}
+                            <li><a href="mailto:support@clubforgehq.com">Contact</a></li>
+                        </ul>
                     </nav>
                 </div>
-            </div>
 
-            {/* Main footer grid */}
-            <div
-                style={{
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    padding: 'var(--space-10) var(--space-6) var(--space-8)',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: 'var(--space-10)',
-                }}
-            >
-                {/* Brand */}
-                <div style={{ gridColumn: 'span 1' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
-                        <Image
-                            src="/logo-clubforge-final-dark.svg"
-                            alt="ClubForge"
-                            width={200}
-                            height={52}
-                            style={{ height: '36px', width: 'auto' }}
-                        />
-                    </div>
-                    <p style={{ fontSize: 'var(--text-sm)', lineHeight: '1.7', color: 'var(--color-gray-400)', marginBottom: 'var(--space-4)' }}>
-                        The operating system for clubs. Build, run, and grow your gym, dojo, or academy with one powerful platform.
-                    </p>
-                    <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                        <a href="https://twitter.com/clubforgehq" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gray-500)' }}>
-                            <Twitter size={18} />
-                        </a>
-                        <a href="https://linkedin.com/company/clubforge" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gray-500)' }}>
-                            <Linkedin size={18} />
-                        </a>
-                    </div>
-                </div>
-
-                {/* Product */}
-                <div>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
-                        Product
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/features" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>All Features</Link></li>
-                        <li><Link href="/pricing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Pricing</Link></li>
-                        <li><Link href="/demo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Book a Demo</Link></li>
-                        <li><Link href="/get-started" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Start Free Trial</Link></li>
+                <nav className={s.places} aria-label="Locations">
+                    <h2>Locations</h2>
+                    <ul>
+                        {CITIES.map(city => (
+                            <li key={city.href}><Link href={city.href}>{city.label}</Link></li>
+                        ))}
                     </ul>
-                </div>
+                </nav>
 
-                {/* Features */}
-                <div>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
-                        Features
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/features/member-management" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Member Management</Link></li>
-                        <li><Link href="/features/class-scheduling" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Class Scheduling</Link></li>
-                        <li><Link href="/features/belt-progression" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Belt Progression</Link></li>
-                        <li><Link href="/features/attendance-tracking" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Attendance Tracking</Link></li>
-                        <li><Link href="/features/payments-billing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Payments & Billing</Link></li>
-                        <li><Link href="/features/multi-location" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Multi-Location</Link></li>
+                <div className={s.bottom}>
+                    <p>© {currentYear} ClubForge</p>
+                    <ul>
+                        <li><Link href="/privacy">Privacy</Link></li>
+                        <li><Link href="/terms">Terms</Link></li>
+                        <li><a href="mailto:support@clubforgehq.com">support@clubforgehq.com</a></li>
                     </ul>
-                </div>
-
-                {/* Built For */}
-                <div>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
-                        Built For
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/for/martial-arts" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Martial Arts Clubs</Link></li>
-                        <li><Link href="/for/bjj" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>BJJ Academies</Link></li>
-                        <li><Link href="/for/boxing-mma" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Boxing & MMA Gyms</Link></li>
-                        <li><Link href="/for/boxing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Boxing Clubs</Link></li>
-                        <li><Link href="/for/kickboxing" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Kickboxing Clubs</Link></li>
-                        <li><Link href="/for/karate" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Karate Dojos</Link></li>
-                        <li><Link href="/for/taekwondo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Taekwondo Clubs</Link></li>
-                        <li><Link href="/for/judo" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Judo Clubs</Link></li>
-                        <li><Link href="/for/fitness-studios" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Fitness Studios</Link></li>
-                    </ul>
-                </div>
-
-                {/* Company */}
-                <div>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
-                        Company
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/about" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>About</Link></li>
-                        <li><Link href="/blog" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Blog</Link></li>
-                        <li><Link href="/faq" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>FAQ</Link></li>
-                        <li><a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Contact</a></li>
-                    </ul>
-                </div>
-
-                {/* Legal */}
-                <div>
-                    <h4 style={{ color: 'var(--color-white)', fontSize: 'var(--text-sm)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 'var(--space-4)' }}>
-                        Legal
-                    </h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-                        <li><Link href="/privacy" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Privacy Policy</Link></li>
-                        <li><Link href="/terms" style={{ color: 'var(--color-gray-400)', fontSize: 'var(--text-sm)' }}>Terms of Service</Link></li>
-                    </ul>
-                </div>
-            </div>
-
-            {/* Bottom bar */}
-            <div
-                style={{
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    padding: 'var(--space-6) var(--space-6)',
-                    borderTop: '1px solid var(--color-gray-800)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 'var(--space-4)',
-                }}
-            >
-                <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-gray-500)' }}>
-                    © {currentYear} ClubForge. All rights reserved.
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-gray-500)' }}>
-                    <Mail size={14} />
-                    <a href="mailto:support@clubforgehq.com" style={{ color: 'var(--color-gray-500)' }}>support@clubforgehq.com</a>
                 </div>
             </div>
         </footer>

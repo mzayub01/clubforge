@@ -63,7 +63,7 @@ function ArticleContent() {
                 <li style={articleStyle.li}>Open gym — Saturday 9:00am</li>
             </ul>
             <p style={articleStyle.p}>
-                Your <Link href="/features/class-scheduling" style={{ color: '#C5A456', fontWeight: '600' }}>class scheduling software</Link> needs to support recurring sessions, capacity limits (critical for safety in a contact sport), waitlists, and the ability to restrict certain sessions. For example, sparring sessions should only be open to members who&apos;ve been approved by a coach.
+                Your <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', fontWeight: '600' }}>class scheduling software</Link> needs to support recurring sessions, capacity limits (critical for safety in a contact sport), waitlists, and the ability to restrict certain sessions. For example, sparring sessions should only be open to members who&apos;ve been approved by a coach.
             </p>
 
             <h3 style={articleStyle.h3}>2. Membership Management &amp; Pricing Tiers</h3>
@@ -80,7 +80,7 @@ function ArticleContent() {
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Block bookings</strong> — 6-week or 8-week beginner courses at a fixed price</li>
             </ul>
             <p style={articleStyle.p}>
-                Your <Link href="/features/member-management" style={{ color: '#C5A456', fontWeight: '600' }}>member management system</Link> needs to support all of these tiers simultaneously, with different access permissions and billing for each.
+                Your <Link href="/features/member-management" style={{ color: '#7A5F1A', fontWeight: '600' }}>member management system</Link> needs to support all of these tiers simultaneously, with different access permissions and billing for each.
             </p>
 
             <h3 style={articleStyle.h3}>3. Payment Collection &amp; Billing</h3>
@@ -88,12 +88,12 @@ function ArticleContent() {
                 Cash is still king in many boxing gyms — and that&apos;s a problem. Cash payments mean chasing members, losing track of who&apos;s paid, and making trips to the bank. Worse, it creates unpredictable cash flow that makes it difficult to plan ahead.
             </p>
             <p style={articleStyle.p}>
-                Modern <Link href="/features/payments-billing" style={{ color: '#C5A456', fontWeight: '600' }}>payment and billing software</Link> automates recurring membership charges via Direct Debit or card payments. It should also handle one-off charges for things like equipment purchases, competition entries, and private coaching sessions. Look for a platform that uses Stripe for secure, reliable payment processing with transparent fees.
+                Modern <Link href="/features/payments-billing" style={{ color: '#7A5F1A', fontWeight: '600' }}>payment and billing software</Link> automates recurring membership charges via Direct Debit or card payments. It should also handle one-off charges for things like equipment purchases, competition entries, and private coaching sessions. Look for a platform that uses Stripe for secure, reliable payment processing with transparent fees.
             </p>
 
             <h3 style={articleStyle.h3}>4. Attendance Tracking</h3>
             <p style={articleStyle.p}>
-                <Link href="/features/attendance-tracking" style={{ color: '#C5A456', fontWeight: '600' }}>Digital attendance tracking</Link> serves several purposes for boxing gyms:
+                <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', fontWeight: '600' }}>Digital attendance tracking</Link> serves several purposes for boxing gyms:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Session compliance</strong> — For members on limited plans (e.g. 3 sessions/week), you need to track usage accurately.</li>
@@ -104,12 +104,12 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>5. Progression &amp; Skill Tracking</h3>
             <p style={articleStyle.p}>
-                While boxing doesn&apos;t have a formal belt system like karate or BJJ, many boxing gyms use structured skill levels or progression pathways — especially for beginners courses. ClubForge&apos;s <Link href="/features/belt-progression" style={{ color: '#C5A456', fontWeight: '600' }}>progression tracking</Link> can be customised for boxing: create skill levels like &ldquo;Foundation,&rdquo; &ldquo;Improver,&rdquo; &ldquo;Intermediate,&rdquo; &ldquo;Advanced,&rdquo; and &ldquo;Competition,&rdquo; and track each member&apos;s journey through the system.
+                While boxing doesn&apos;t have a formal belt system like karate or BJJ, many boxing gyms use structured skill levels or progression pathways — especially for beginners courses. ClubForge&apos;s <Link href="/features/belt-progression" style={{ color: '#7A5F1A', fontWeight: '600' }}>progression tracking</Link> can be customised for boxing: create skill levels like &ldquo;Foundation,&rdquo; &ldquo;Improver,&rdquo; &ldquo;Intermediate,&rdquo; &ldquo;Advanced,&rdquo; and &ldquo;Competition,&rdquo; and track each member&apos;s journey through the system.
             </p>
 
             <h3 style={articleStyle.h3}>6. Multi-Location Support</h3>
             <p style={articleStyle.p}>
-                Growing boxing gym brands often expand to multiple locations. Whether you&apos;re opening a second site or running sessions in rented spaces, <Link href="/features/multi-location" style={{ color: '#C5A456', fontWeight: '600' }}>multi-location management</Link> lets you manage all venues from one platform with separate timetables, attendance records, and revenue tracking per site.
+                Growing boxing gym brands often expand to multiple locations. Whether you&apos;re opening a second site or running sessions in rented spaces, <Link href="/features/multi-location" style={{ color: '#7A5F1A', fontWeight: '600' }}>multi-location management</Link> lets you manage all venues from one platform with separate timetables, attendance records, and revenue tracking per site.
             </p>
 
             <h2 style={articleStyle.h2}>Best Boxing Gym Software Compared (2026)</h2>
@@ -145,7 +145,7 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>ClubForge — Best Overall for Boxing Gyms</h3>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is purpose-built for combat sports clubs, making it an excellent fit for boxing gyms. Unlike Glofox or Mindbody (which are designed for boutique fitness and yoga studios), ClubForge understands the specific needs of boxing: session-based scheduling, mixed membership models, and the ability to restrict access to advanced sessions like sparring.
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is purpose-built for combat sports clubs, making it an excellent fit for boxing gyms. Unlike Glofox or Mindbody (which are designed for boutique fitness and yoga studios), ClubForge understands the specific needs of boxing: session-based scheduling, mixed membership models, and the ability to restrict access to advanced sessions like sparring.
             </p>
             <p style={articleStyle.p}>
                 Where ClubForge really stands out is its flexibility. You can set up customisable skill levels for boxing (Foundation, Improver, Intermediate, Advanced, Competition), manage multiple locations from one dashboard, and handle everything from pay-as-you-go drop-ins to monthly unlimited memberships. And because it&apos;s UK-based with Stripe-powered billing in pounds sterling, you avoid the currency conversion and GDPR issues that come with US-based platforms.
@@ -269,10 +269,10 @@ function ArticleContent() {
                 Boxing gyms in 2026 need software that understands combat sports — not generic fitness platforms designed for yoga studios. The right <strong style={articleStyle.strong}>boxing club software</strong> will save you hours every week, improve your cash flow, and give your members the professional experience they expect.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is the only UK-based platform built specifically for combat sports clubs, with session scheduling, flexible membership tiers, automated billing, attendance tracking, and optional skill progression — all from a free tier. For boxing gyms that want to run like a professional operation without the enterprise price tag, it&apos;s the clear choice.
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is the only UK-based platform built specifically for combat sports clubs, with session scheduling, flexible membership tiers, automated billing, attendance tracking, and optional skill progression — all from a free tier. For boxing gyms that want to run like a professional operation without the enterprise price tag, it&apos;s the clear choice.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600' }}>Start your free 14-day trial →</Link> or <Link href="/demo" style={{ color: '#C5A456', fontWeight: '600' }}>book a demo</Link> to see ClubForge in action for your boxing gym.
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600' }}>Start your free 14-day trial →</Link> or <Link href="/demo" style={{ color: '#7A5F1A', fontWeight: '600' }}>book a demo</Link> to see ClubForge in action for your boxing gym.
             </p>
         </article>
     );

@@ -40,7 +40,7 @@ function ArticleContent() {
             <p style={s.p}>At this level, expect basic features: member database, simple scheduling, and payment collection. Belt tracking and advanced features are usually limited or unavailable. Coacha and Kicksite fall into this range.</p>
 
             <h3 style={s.h3}>Mid-Range (£50–£130/month)</h3>
-            <p style={s.p}>This is where most martial arts clubs find the best value. Platforms like <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> (from £39/mo) and Gymdesk offer comprehensive features including belt progression, attendance tracking, member portals, and integrated payments.</p>
+            <p style={s.p}>This is where most martial arts clubs find the best value. Platforms like <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> (from £39/mo) and Gymdesk offer comprehensive features including belt progression, attendance tracking, member portals, and integrated payments.</p>
 
             <h3 style={s.h3}>Enterprise (£150+/month)</h3>
             <p style={s.p}>Enterprise-tier pricing is typically for multi-location chains, franchise operations, or clubs needing advanced automation, API access, and custom integrations. Zen Planner and Mindbody operate primarily at this level.</p>
@@ -58,8 +58,8 @@ function ArticleContent() {
             <p style={s.p}>Some platforms offer free plans, but they come with severe limitations: restricted member counts, no belt tracking, limited scheduling, and often display the platform&apos;s branding on your member-facing pages. For a professional martial arts academy, the £39–£129/month investment in proper software pays for itself through saved admin time, reduced payment chasing, and better member retention.</p>
 
             <h2 style={s.h2}>The Bottom Line</h2>
-            <p style={s.p}>For UK martial arts clubs, <Link href="/pricing" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge&apos;s pricing</Link> offers the best value: martial arts-specific features (belt tracking, grading, attendance) at a price point designed for real club operators, not enterprise chains. Start with the Starter plan at £39/month and scale as you grow.</p>
-            <p style={s.p}><Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600' }}>Start a free 14-day trial →</Link></p>
+            <p style={s.p}>For UK martial arts clubs, <Link href="/pricing" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge&apos;s pricing</Link> offers the best value: martial arts-specific features (belt tracking, grading, attendance) at a price point designed for real club operators, not enterprise chains. Start with the Starter plan at £39/month and scale as you grow.</p>
+            <p style={s.p}><Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600' }}>Start a free 14-day trial →</Link></p>
         </article>
     );
 }

@@ -50,13 +50,13 @@ export default async function PaymentsBillingPage() {
                 <section style={{ background: '#FAFBFC', padding: '140px 24px 80px', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)', top: '-150px', right: '-100px', pointerEvents: 'none' }} />
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#C5A456', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
+                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#7A5F1A', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
                         <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'rgba(236,72,153,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                             <CreditCard size={32} color="#EC4899" />
                         </div>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', fontWeight: '800', lineHeight: '1.1', color: '#0F172A', marginBottom: '20px' }}>
                             Gym Billing{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #EC4899, #DB2777)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Powered by Stripe</span>
+                            <span style={{ color: '#BE185D' }}>Powered by Stripe</span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#64748B', lineHeight: '1.7', marginBottom: '32px', maxWidth: '650px' }}>
                             Stop chasing payments. ClubForge connects directly to Stripe for automated subscriptions, invoicing, promo codes, and real-time revenue dashboards. Get paid on time, every time.
@@ -120,7 +120,7 @@ export default async function PaymentsBillingPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Stop chasing payments. Start automating them.</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. Connect Stripe in minutes.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. Connect Stripe in minutes.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

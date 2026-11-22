@@ -56,7 +56,7 @@ export default async function TermsPage() {
                             <p><strong>Paid Plans:</strong></p>
                             <ul style={{ paddingLeft: 'var(--space-6)' }}>
                                 <li>Plans are billed monthly or annually as selected at checkout.</li>
-                                <li>Payments are processed by Stripe. By subscribing, you also agree to <a href="https://stripe.com/legal" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold)' }}>Stripe&apos;s Terms of Service</a>.</li>
+                                <li>Payments are processed by Stripe. By subscribing, you also agree to <a href="https://stripe.com/legal" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold-text)' }}>Stripe&apos;s Terms of Service</a>.</li>
                                 <li>Price changes will be communicated 30 days in advance.</li>
                                 <li>Refunds are not provided for partial billing periods.</li>
                             </ul>
@@ -125,7 +125,7 @@ export default async function TermsPage() {
                             }}>
                                 <p style={{ margin: 0 }}>
                                     <strong>ClubForge</strong><br />
-                                    Email: <a href="mailto:legal@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>legal@clubforgehq.com</a><br />
+                                    Email: <a href="mailto:legal@clubforgehq.com" style={{ color: 'var(--color-gold-text)' }}>legal@clubforgehq.com</a><br />
                                     United Kingdom
                                 </p>
                             </div>

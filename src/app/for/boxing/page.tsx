@@ -53,7 +53,7 @@ export default async function BoxingPage() {
                         <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>
                             🥊 Built For Boxing Clubs
                         </p>
-                        <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
+                        <h1 style={{ color: '#FFFFFF', fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
                             Boxing Club Management{' '}
                             <span style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                                 Software UK
@@ -62,7 +62,7 @@ export default async function BoxingPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             Run your boxing gym with a platform that handles class scheduling, member management, automated Stripe payments, and attendance tracking — so you can focus on training fighters and building your community.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px' }}>
                             Amateur boxing clubs, professional gyms, and white collar boxing programmes.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -126,7 +126,7 @@ export default async function BoxingPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Ready to run your boxing gym like a pro?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. Set up in under 10 minutes.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. Set up in under 10 minutes.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

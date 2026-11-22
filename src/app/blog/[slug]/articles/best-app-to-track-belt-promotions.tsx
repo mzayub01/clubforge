@@ -69,7 +69,7 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>1. ClubForge — Best Overall for Belt Tracking</h3>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is purpose-built for martial arts academies, with belt progression as a core feature rather than an afterthought. You can define custom belt systems for any discipline — BJJ (white through black with four stripes per belt), Karate (kyu/dan), Taekwondo (gup/dan), Judo, or any custom structure.
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is purpose-built for martial arts academies, with belt progression as a core feature rather than an afterthought. You can define custom belt systems for any discipline — BJJ (white through black with four stripes per belt), Karate (kyu/dan), Taekwondo (gup/dan), Judo, or any custom structure.
             </p>
             <p style={articleStyle.p}>
                 What sets ClubForge apart is the depth of its belt tracking. Every stripe award and belt promotion is logged with instructor name, date, and detailed written feedback. Students see their full progression history in their member portal — from white belt to black belt, every milestone is recorded. When it&apos;s grading time, you can see exactly how many sessions each student has attended since their last promotion, giving you data-backed confidence in every promotion decision.
@@ -138,10 +138,10 @@ function ArticleContent() {
 
             <h2 style={articleStyle.h2}>The Bottom Line</h2>
             <p style={articleStyle.p}>
-                For UK-based martial arts clubs, <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> offers the best combination of belt tracking, payments, scheduling, and member management at a competitive price point. If you&apos;re running a BJJ academy, MMA gym, or multi-discipline martial arts school, having belt progression built into your management system (rather than tracked separately) saves time and eliminates errors.
+                For UK-based martial arts clubs, <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> offers the best combination of belt tracking, payments, scheduling, and member management at a competitive price point. If you&apos;re running a BJJ academy, MMA gym, or multi-discipline martial arts school, having belt progression built into your management system (rather than tracked separately) saves time and eliminates errors.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600' }}>Start a free 14-day trial →</Link>
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600' }}>Start a free 14-day trial →</Link>
             </p>
         </article>
     );

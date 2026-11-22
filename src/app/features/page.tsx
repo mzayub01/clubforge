@@ -135,7 +135,7 @@ export default async function FeaturesPage() {
                     }} />
                     <div style={{ maxWidth: '750px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px',
                         }}>
                             Platform Features
@@ -145,10 +145,7 @@ export default async function FeaturesPage() {
                             lineHeight: '1.1', color: '#0F172A', marginBottom: '20px',
                         }}>
                             Gym Management Software{' '}
-                            <span style={{
-                                background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                            }}>
+                            <span style={{ color: '#7A5F1A' }}>
                                 Features
                             </span>
                         </h1>
@@ -204,7 +201,7 @@ export default async function FeaturesPage() {
                                     }}>
                                         {feature.keywords.map((kw) => (
                                             <span key={kw} style={{
-                                                fontSize: '11px', fontWeight: '600', color: '#94A3B8',
+                                                fontSize: '11px', fontWeight: '600', color: '#475569',
                                                 background: '#F1F5F9', padding: '4px 10px',
                                                 borderRadius: '100px',
                                             }}>
@@ -217,7 +214,7 @@ export default async function FeaturesPage() {
                                             href={`/features/${feature.slug}`}
                                             style={{
                                                 display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                color: '#C5A456', fontWeight: '600', fontSize: '14px',
+                                                color: '#7A5F1A', fontWeight: '600', fontSize: '14px',
                                                 textDecoration: 'none',
                                             }}
                                         >
@@ -243,7 +240,7 @@ export default async function FeaturesPage() {
                             Ready to see it in action?
                         </h2>
                         <p style={{
-                            color: 'rgba(15,23,42,0.6)', fontSize: '1.05rem',
+                            color: '#0F172A', fontSize: '1.05rem',
                             marginBottom: '32px', lineHeight: '1.7',
                         }}>
                             Start a 14-day free trial with full Pro features. No card required.

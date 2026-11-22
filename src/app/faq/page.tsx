@@ -267,7 +267,7 @@ export default async function FAQPage() {
                                                 >
                                                     <span>{item.question}</span>
                                                     <span style={{
-                                                        color: '#94A3B8',
+                                                        color: '#64748B',
                                                         fontSize: '18px',
                                                         fontWeight: '400',
                                                         flexShrink: 0,
@@ -307,7 +307,7 @@ export default async function FAQPage() {
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>
                             Still have questions?
                         </h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>
                             Book a demo with our team or start a free trial and explore for yourself.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>

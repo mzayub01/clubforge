@@ -55,32 +55,32 @@ function ArticleContent() {
                 This is arguably the most important feature for any karate club. Your software should support the full kyu/dan grading structure, including coloured belt levels (white, orange, red, yellow, green, purple, brown, black) and the ability to customise these for your specific style — whether you teach Shotokan, Goju-Ryu, Wado-Ryu, or Shito-Ryu.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/features/belt-progression" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge&apos;s belt progression tracking</Link> lets you define your complete grading structure, log each promotion with instructor notes, and give students a clear view of their journey. Every grading is recorded with the date, examining instructor, and detailed feedback — creating a permanent record that satisfies governing body requirements.
+                <Link href="/features/belt-progression" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge&apos;s belt progression tracking</Link> lets you define your complete grading structure, log each promotion with instructor notes, and give students a clear view of their journey. Every grading is recorded with the date, examining instructor, and detailed feedback — creating a permanent record that satisfies governing body requirements.
             </p>
 
             <h3 style={articleStyle.h3}>2. Student &amp; Member Management</h3>
             <p style={articleStyle.p}>
-                A solid <Link href="/features/member-management" style={{ color: '#C5A456', fontWeight: '600' }}>member management system</Link> should store more than just names and email addresses. For karate clubs, you need emergency contact details, medical information (critical for a contact sport), licence numbers, insurance status, and parental consent for junior members. Look for software that handles family accounts, so parents with multiple children training don&apos;t need separate logins.
+                A solid <Link href="/features/member-management" style={{ color: '#7A5F1A', fontWeight: '600' }}>member management system</Link> should store more than just names and email addresses. For karate clubs, you need emergency contact details, medical information (critical for a contact sport), licence numbers, insurance status, and parental consent for junior members. Look for software that handles family accounts, so parents with multiple children training don&apos;t need separate logins.
             </p>
 
             <h3 style={articleStyle.h3}>3. Class Scheduling &amp; Timetabling</h3>
             <p style={articleStyle.p}>
-                Most karate dojos run a structured weekly timetable: beginners on Monday and Wednesday, advanced on Tuesday and Thursday, children&apos;s classes on Saturday morning. Your <Link href="/features/class-scheduling" style={{ color: '#C5A456', fontWeight: '600' }}>class scheduling software</Link> needs to handle recurring classes, one-off sessions (e.g. grading days, seminars), and capacity limits. If you hire hall space, knowing exactly how many students attend each session helps you plan room bookings efficiently.
+                Most karate dojos run a structured weekly timetable: beginners on Monday and Wednesday, advanced on Tuesday and Thursday, children&apos;s classes on Saturday morning. Your <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', fontWeight: '600' }}>class scheduling software</Link> needs to handle recurring classes, one-off sessions (e.g. grading days, seminars), and capacity limits. If you hire hall space, knowing exactly how many students attend each session helps you plan room bookings efficiently.
             </p>
 
             <h3 style={articleStyle.h3}>4. Attendance Tracking</h3>
             <p style={articleStyle.p}>
-                <Link href="/features/attendance-tracking" style={{ color: '#C5A456', fontWeight: '600' }}>Attendance tracking</Link> serves a dual purpose in karate: monitoring student engagement and determining grading eligibility. Most grading systems require a minimum number of sessions before a student can be promoted. Software that automatically tracks attendance against grading requirements removes the guesswork and ensures fair, consistent promotion decisions.
+                <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', fontWeight: '600' }}>Attendance tracking</Link> serves a dual purpose in karate: monitoring student engagement and determining grading eligibility. Most grading systems require a minimum number of sessions before a student can be promoted. Software that automatically tracks attendance against grading requirements removes the guesswork and ensures fair, consistent promotion decisions.
             </p>
 
             <h3 style={articleStyle.h3}>5. Payment &amp; Billing Automation</h3>
             <p style={articleStyle.p}>
-                Chasing members for monthly fees is the least enjoyable part of running a club. <Link href="/features/payments-billing" style={{ color: '#C5A456', fontWeight: '600' }}>Automated billing</Link> via Direct Debit or card payments ensures consistent cash flow. Look for software that supports different pricing tiers (e.g. adult, child, family, concession), one-off payments for grading fees or equipment, and handles failed payment retries automatically.
+                Chasing members for monthly fees is the least enjoyable part of running a club. <Link href="/features/payments-billing" style={{ color: '#7A5F1A', fontWeight: '600' }}>Automated billing</Link> via Direct Debit or card payments ensures consistent cash flow. Look for software that supports different pricing tiers (e.g. adult, child, family, concession), one-off payments for grading fees or equipment, and handles failed payment retries automatically.
             </p>
 
             <h3 style={articleStyle.h3}>6. Multi-Location Support</h3>
             <p style={articleStyle.p}>
-                Many karate organisations run classes across multiple venues — a village hall on Monday, a leisure centre on Wednesday, a school gymnasium on Saturday. <Link href="/features/multi-location" style={{ color: '#C5A456', fontWeight: '600' }}>Multi-location management</Link> lets you manage all venues from a single dashboard, with separate timetables, attendance records, and capacity limits per location.
+                Many karate organisations run classes across multiple venues — a village hall on Monday, a leisure centre on Wednesday, a school gymnasium on Saturday. <Link href="/features/multi-location" style={{ color: '#7A5F1A', fontWeight: '600' }}>Multi-location management</Link> lets you manage all venues from a single dashboard, with separate timetables, attendance records, and capacity limits per location.
             </p>
 
             <h2 style={articleStyle.h2}>Best Karate Club Software Compared (2026)</h2>
@@ -115,13 +115,13 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>ClubForge — Best Overall for Karate Clubs</h3>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is purpose-built for martial arts clubs, with karate-specific features baked into its core. Unlike generic gym software that bolts on belt tracking as an afterthought, ClubForge was designed from day one around the grading workflow that karate dojos depend on.
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is purpose-built for martial arts clubs, with karate-specific features baked into its core. Unlike generic gym software that bolts on belt tracking as an afterthought, ClubForge was designed from day one around the grading workflow that karate dojos depend on.
             </p>
             <p style={articleStyle.p}>
                 You can define your complete kyu/dan structure — from 10th kyu white belt through to 5th dan and beyond — with custom colours, names, and minimum requirements at each level. The system automatically tracks whether students have met the session attendance threshold for their next grading, so you never need to manually count register entries again.
             </p>
             <p style={articleStyle.p}>
-                For clubs that operate across multiple venues (which is common for karate organisations), ClubForge&apos;s <Link href="/features/multi-location" style={{ color: '#C5A456', fontWeight: '600' }}>multi-location management</Link> means you can run everything from one dashboard. And because it&apos;s a UK-based platform with Stripe-powered billing in pounds sterling, you avoid the currency conversion headaches and GDPR concerns that come with US-based alternatives.
+                For clubs that operate across multiple venues (which is common for karate organisations), ClubForge&apos;s <Link href="/features/multi-location" style={{ color: '#7A5F1A', fontWeight: '600' }}>multi-location management</Link> means you can run everything from one dashboard. And because it&apos;s a UK-based platform with Stripe-powered billing in pounds sterling, you avoid the currency conversion headaches and GDPR concerns that come with US-based alternatives.
             </p>
             <div style={articleStyle.callout}>
                 <p style={{ ...articleStyle.p, marginBottom: 0, color: '#0369A1' }}>
@@ -229,7 +229,7 @@ function ArticleContent() {
 
             <h2 style={articleStyle.h2}>How ClubForge Handles Karate-Specific Needs</h2>
             <p style={articleStyle.p}>
-                <Link href="/for/karate" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge for Karate</Link> was built after extensive consultation with karate club owners across the UK. Here are some of the karate-specific capabilities:
+                <Link href="/for/karate" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge for Karate</Link> was built after extensive consultation with karate club owners across the UK. Here are some of the karate-specific capabilities:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Full kyu/dan structure</strong> — Define every grade from 10th kyu to 10th dan, with custom colours, names, and promotion requirements.</li>
@@ -251,7 +251,7 @@ function ArticleContent() {
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Zen Planner</strong> — From $117/month (approximately £94). Enterprise-level features, but complex and expensive.</li>
             </ul>
             <p style={articleStyle.p}>
-                For most UK karate clubs, ClubForge offers the best value: karate-specific features at a fraction of the cost of US-based alternatives, with native GBP pricing and no currency conversion fees. Read our detailed <Link href="/blog/how-much-does-gym-management-software-cost" style={{ color: '#C5A456', fontWeight: '600' }}>gym software cost comparison</Link> for a full pricing breakdown.
+                For most UK karate clubs, ClubForge offers the best value: karate-specific features at a fraction of the cost of US-based alternatives, with native GBP pricing and no currency conversion fees. Read our detailed <Link href="/blog/how-much-does-gym-management-software-cost" style={{ color: '#7A5F1A', fontWeight: '600' }}>gym software cost comparison</Link> for a full pricing breakdown.
             </p>
 
             <h2 style={articleStyle.h2}>The Bottom Line</h2>
@@ -259,10 +259,10 @@ function ArticleContent() {
                 If you&apos;re running a karate club in the UK, dedicated <strong style={articleStyle.strong}>karate studio software</strong> will save you hours every week, make grading decisions more transparent, and give your students a professional experience that builds loyalty and retention.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is the only platform built specifically for martial arts clubs, with native karate grading workflows, UK payment support, and pricing that works for clubs of all sizes — including a free tier for those just getting started.
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is the only platform built specifically for martial arts clubs, with native karate grading workflows, UK payment support, and pricing that works for clubs of all sizes — including a free tier for those just getting started.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600' }}>Start your free 14-day trial →</Link> or <Link href="/demo" style={{ color: '#C5A456', fontWeight: '600' }}>book a demo</Link> to see ClubForge in action for your karate club.
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600' }}>Start your free 14-day trial →</Link> or <Link href="/demo" style={{ color: '#7A5F1A', fontWeight: '600' }}>book a demo</Link> to see ClubForge in action for your karate club.
             </p>
         </article>
     );

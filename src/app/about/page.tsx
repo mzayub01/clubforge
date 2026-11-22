@@ -46,12 +46,7 @@ export default async function AboutPage() {
                     <div className="container" style={{ maxWidth: '750px', margin: '0 auto' }}>
                         <h1 style={{ marginBottom: 'var(--space-4)' }}>
                             About ClubForge — Martial Arts Club{' '}
-                            <span style={{
-                                background: 'var(--color-gold-gradient)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                            }}>Management Software</span>
+                            <span style={{ color: '#7A5F1A' }}>Management Software</span>
                         </h1>
                         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xl)', lineHeight: '1.7' }}>
                             ClubForge wasn&apos;t designed in a boardroom. It was born from the chaos of actually running a club — managing members in spreadsheets, chasing payments on WhatsApp, and losing hours every week to admin that should have been automated.
@@ -184,7 +179,7 @@ export default async function AboutPage() {
                                 Start Free Trial
                                 <ArrowRight size={20} />
                             </Link>
-                            <Link href="/demo" className="btn btn-outline btn-lg">
+                            <Link href="/demo" className="btn btn-outline btn-lg" style={{ color: 'var(--color-gold-text)' }}>
                                 Book a Demo
                             </Link>
                         </div>

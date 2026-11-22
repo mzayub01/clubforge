@@ -86,7 +86,7 @@ export default async function MemberManagementPage() {
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
                         <Link href="/features" style={{
                             display: 'inline-flex', alignItems: 'center', gap: '6px',
-                            color: '#C5A456', fontSize: '14px', fontWeight: '600',
+                            color: '#7A5F1A', fontSize: '14px', fontWeight: '600',
                             textDecoration: 'none', marginBottom: '24px',
                         }}>
                             ← All Features
@@ -104,10 +104,7 @@ export default async function MemberManagementPage() {
                             lineHeight: '1.1', color: '#0F172A', marginBottom: '20px',
                         }}>
                             Gym Member Management{' '}
-                            <span style={{
-                                background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                            }}>
+                            <span style={{ color: '#1D4ED8' }}>
                                 That Runs Itself
                             </span>
                         </h1>
@@ -144,7 +141,7 @@ export default async function MemberManagementPage() {
                     padding: '80px 24px', color: '#FFFFFF',
                 }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: '800', marginBottom: '20px' }}>
+                        <h2 style={{ color: '#FFFFFF', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: '800', marginBottom: '20px' }}>
                             Sound familiar?
                         </h2>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginTop: '32px' }}>
@@ -285,7 +282,7 @@ export default async function MemberManagementPage() {
                             Ready to manage your members properly?
                         </h2>
                         <p style={{
-                            color: 'rgba(15,23,42,0.6)', fontSize: '1rem',
+                            color: '#0F172A', fontSize: '1rem',
                             marginBottom: '32px', lineHeight: '1.7',
                         }}>
                             Start a 14-day free trial. Import your existing members or start fresh.

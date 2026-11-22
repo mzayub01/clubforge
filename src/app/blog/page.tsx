@@ -158,7 +158,7 @@ export default async function BlogPage() {
                     <section style={{ background: '#FFFFFF', padding: '80px 24px', borderBottom: '1px solid #F1F5F9' }}>
                         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                             <p style={{
-                                fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                                fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                                 textTransform: 'uppercase', letterSpacing: '1.5px',
                                 marginBottom: '24px',
                             }}>
@@ -178,13 +178,13 @@ export default async function BlogPage() {
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                                             <span style={{
-                                                fontSize: '12px', fontWeight: '600', color: '#C5A456',
+                                                fontSize: '12px', fontWeight: '600', color: '#7A5F1A',
                                                 background: 'rgba(197,164,86,0.1)', padding: '4px 12px',
                                                 borderRadius: '100px',
                                             }}>
                                                 {post.category}
                                             </span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#94A3B8' }}>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#64748B' }}>
                                                 <Clock size={12} /> {post.readTime}
                                             </span>
                                         </div>
@@ -202,7 +202,7 @@ export default async function BlogPage() {
                                         </p>
                                         <span style={{
                                             display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                            color: '#C5A456', fontSize: '14px', fontWeight: '600',
+                                            color: '#7A5F1A', fontSize: '14px', fontWeight: '600',
                                         }}>
                                             Read article <ArrowRight size={14} />
                                         </span>
@@ -238,8 +238,8 @@ export default async function BlogPage() {
                                     >
                                         <div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                                <span style={{ fontSize: '12px', fontWeight: '600', color: '#C5A456' }}>{post.category}</span>
-                                                <span style={{ fontSize: '12px', color: '#94A3B8' }}>{post.readTime}</span>
+                                                <span style={{ fontSize: '12px', fontWeight: '600', color: '#7A5F1A' }}>{post.category}</span>
+                                                <span style={{ fontSize: '12px', color: '#64748B' }}>{post.readTime}</span>
                                             </div>
                                             <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>
                                                 {post.title}
@@ -265,7 +265,7 @@ export default async function BlogPage() {
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>
                             Ready to simplify your club management?
                         </h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>
                             Start your free 14-day trial. No credit card required.
                         </p>
                         <Link href="/get-started" style={{

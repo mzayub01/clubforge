@@ -49,13 +49,13 @@ export default async function MultiLocationPage() {
                 <section style={{ background: '#FAFBFC', padding: '140px 24px 80px', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)', top: '-150px', right: '-100px', pointerEvents: 'none' }} />
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#C5A456', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
+                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#7A5F1A', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
                         <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                             <Building2 size={32} color="#F97316" />
                         </div>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', fontWeight: '800', lineHeight: '1.1', color: '#0F172A', marginBottom: '20px' }}>
                             Multi-Location{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #F97316, #EA580C)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Without the Complexity</span>
+                            <span style={{ color: '#B45309' }}>Without the Complexity</span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#64748B', lineHeight: '1.7', marginBottom: '32px', maxWidth: '650px' }}>
                             One dashboard, many venues. Manage cross-site memberships, unified reporting, and location-specific settings — without juggling separate systems. Scale to 2, 5, or 50 locations without chaos.
@@ -119,7 +119,7 @@ export default async function MultiLocationPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Ready to scale your club?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>Start free with one location. Add more whenever you&apos;re ready.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>Start free with one location. Add more whenever you&apos;re ready.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

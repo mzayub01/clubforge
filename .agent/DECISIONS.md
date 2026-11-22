@@ -401,6 +401,24 @@ of it, for every public page:
   mockup's Compare and Case studies columns wait for those pages
   (SEO_PLAN C1, D3). The dead Twitter link is gone.
 
+### Text contrast on public pages (2026-11-22)
+The owner spotted invisible headings on `/for/karate`. An audit of 45 public
+pages found 623 text/background pairs below WCAG AA; all were fixed (0 left).
+Rules, so they do not come back:
+- **A heading on a dark section must set its own colour.** `globals.css` gives
+  every `h1`–`h6` `color: var(--text-primary)` (near-black), which beats a
+  white colour inherited from the section. That is what hid the `/for/*` H1s.
+- **Gold `#C5A456` is for fills, borders, icons and text on navy only.** As
+  text on white it is 2.4:1. On light backgrounds use `#7A5F1A` /
+  `var(--color-gold-text)` (new token in `globals.css`; `theme-provider.tsx`
+  points it at the club's dark brand colour on club sites).
+- On light backgrounds grey text is `#64748B` or darker (`#475569` on slate
+  tints); `#94A3B8` is for dark backgrounds only, where `#64748B` is too dim.
+- No gradient-filled text on light backgrounds; use a solid colour.
+- Text on the gold call-to-action band is solid `#0F172A`, not translucent.
+- `.btn-outline` (global, gold text) needs `color: var(--color-gold-text)`
+  when it sits on a light marketing page.
+
 ### Stripe Patterns
 - Lazy initialization: `getStripeClient()` returns null if not configured
 - Check `isStripeConfigured()` before Stripe operations

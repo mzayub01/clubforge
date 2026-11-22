@@ -154,10 +154,10 @@ export default async function BirminghamPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             Birmingham is the UK&apos;s second-largest city and home to a thriving martial arts community with over 120 clubs across the West Midlands. ClubForge is the platform built specifically for them.
                         </p>
-                        <p style={{ fontSize: '1rem', color: '#64748B', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '1rem', color: '#94A3B8', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
                             Manage memberships, automate Stripe payments, track attendance, and handle belt progression — all from one system designed for BJJ, MMA, Karate, Judo, and combat sports academies.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px', maxWidth: '620px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px', maxWidth: '620px', lineHeight: '1.7' }}>
                             Run your academy more efficiently — built specifically for martial arts clubs. 14-day free trial, no card required.
                         </p>
 
@@ -168,7 +168,7 @@ export default async function BirminghamPage() {
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '2px solid rgba(255,255,255,0.2)', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#64748B', fontSize: '13px', fontWeight: '500' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#94A3B8', fontSize: '13px', fontWeight: '500' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Shield size={15} color="#C5A456" /> Stripe-secured payments</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Palette size={15} color="#C5A456" /> Your branding</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={15} color="#C5A456" /> Set up in minutes</span>
@@ -200,7 +200,7 @@ export default async function BirminghamPage() {
                 {/* ==================== BIRMINGHAM SCENE ==================== */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>
                             The Birmingham Martial Arts Scene
                         </p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>
@@ -217,7 +217,7 @@ export default async function BirminghamPage() {
                                 For gym owners in Birmingham, the combination of a large, diverse population and growing competition means that professional operations are no longer optional. Clubs that still rely on spreadsheets, cash payments, and WhatsApp groups struggle to retain members compared to those offering seamless online booking, automated billing, and clear progression tracking.
                             </p>
                             <p style={{ marginBottom: '0' }}>
-                                ClubForge gives Birmingham&apos;s martial arts gyms the tools to compete and grow. Purpose-built for martial arts — not retrofitted from generic fitness software — it handles everything from <Link href="/features/payments-billing" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link> and <Link href="/features/attendance-tracking" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link> to <Link href="/features/belt-progression" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link> and <Link href="/features/multi-location" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>multi-location management</Link>.
+                                ClubForge gives Birmingham&apos;s martial arts gyms the tools to compete and grow. Purpose-built for martial arts — not retrofitted from generic fitness software — it handles everything from <Link href="/features/payments-billing" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link> and <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link> to <Link href="/features/belt-progression" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link> and <Link href="/features/multi-location" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>multi-location management</Link>.
                             </p>
                         </div>
                     </div>
@@ -226,7 +226,7 @@ export default async function BirminghamPage() {
                 {/* ==================== FEATURES ==================== */}
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>All-in-one platform</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>All-in-one platform</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '48px', lineHeight: '1.2' }}>
                             Everything Birmingham martial arts gyms need
                         </h2>
@@ -250,7 +250,7 @@ export default async function BirminghamPage() {
                                         <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.title}</h3>
                                         <p style={{ color: '#64748B', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>{item.desc}</p>
                                         {'link' in item && item.link && (
-                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#C5A456', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>
+                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>
                                         )}
                                     </div>
                                 </div>
@@ -273,7 +273,7 @@ export default async function BirminghamPage() {
                 {/* ==================== WHY BIRMINGHAM CLUBS CHOOSE CLUBFORGE ==================== */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>
                             Why Birmingham Clubs Choose ClubForge
                         </p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>
@@ -351,7 +351,7 @@ export default async function BirminghamPage() {
                 {/* ==================== FAQ ==================== */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
                         <h2 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '36px', lineHeight: '1.2' }}>
                             Common questions from Birmingham martial arts gyms
                         </h2>
@@ -366,7 +366,7 @@ export default async function BirminghamPage() {
                             ))}
                         </div>
                         <div style={{ textAlign: 'center', marginTop: '24px' }}>
-                            <Link href="/faq" style={{ color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link>
+                            <Link href="/faq" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link>
                         </div>
                     </div>
                 </section>
@@ -379,7 +379,7 @@ export default async function BirminghamPage() {
                             <span style={{ fontSize: '13px', fontWeight: '600', color: '#0F172A' }}>Birmingham</span>
                         </div>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>Ready to simplify your Birmingham gym operations?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join martial arts clubs across the West Midlands using ClubForge. 14-day free trial — no card required.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join martial arts clubs across the West Midlands using ClubForge. 14-day free trial — no card required.</p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <Link href="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>Book a Demo <ArrowRight size={18} /></Link>
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', color: '#0F172A', border: '2px solid rgba(15,23,42,0.3)', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
@@ -390,7 +390,7 @@ export default async function BirminghamPage() {
                 {/* ==================== INTERNAL LINKS ==================== */}
                 <section style={{ background: '#FAFBFC', padding: '48px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-                        <p style={{ fontSize: '13px', color: '#94A3B8', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
+                        <p style={{ fontSize: '13px', color: '#64748B', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {[
                                 { href: '/martial-arts-software-london', label: 'London' },
@@ -405,7 +405,7 @@ export default async function BirminghamPage() {
                                 { href: '/gym-management-leicester', label: 'Leicester' },
                                 { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
                             ].map((city, i) => (
-                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#C5A456', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
+                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
                             ))}
                         </div>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>

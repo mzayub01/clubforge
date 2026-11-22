@@ -98,7 +98,7 @@ function ArticleContent() {
 
             <div style={s.ctaBox}>
                 <p style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px', marginTop: 0 }}>Want to see how ClubForge handles all 12 criteria?</p>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600', fontSize: '1rem' }}>Start a free 14-day trial — no credit card required →</Link>
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '1rem' }}>Start a free 14-day trial — no credit card required →</Link>
             </div>
 
             {/* Section 3: Feature Comparison Table */}
@@ -160,7 +160,7 @@ function ArticleContent() {
 
             <h3 style={s.h3}>£ Pricing and UK Payment Methods</h3>
             <p style={s.p}>Your members expect to see prices in pounds sterling. When a US platform charges you $99/month, the actual cost fluctuates with exchange rates — one month it&apos;s £78, the next it&apos;s £82. And if the platform only supports USD billing for your members, they&apos;ll see foreign transaction charges on their bank statements. Not exactly the professional experience you want to create.</p>
-            <p style={s.p}><strong style={s.strong}>Stripe UK</strong> is the gold standard for UK martial arts club payments. It supports GBP natively, handles recurring subscriptions, and provides instant payouts to UK bank accounts. <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is built on Stripe UK from the ground up — your members pay in pounds, you receive pounds, and there are zero foreign exchange complications.</p>
+            <p style={s.p}><strong style={s.strong}>Stripe UK</strong> is the gold standard for UK martial arts club payments. It supports GBP natively, handles recurring subscriptions, and provides instant payouts to UK bank accounts. <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is built on Stripe UK from the ground up — your members pay in pounds, you receive pounds, and there are zero foreign exchange complications.</p>
 
             <h3 style={s.h3}>UK Support Hours</h3>
             <p style={s.p}>When your payment system goes down at 6pm on a Tuesday evening and you have 40 members arriving for the 7pm class, you need support <em>now</em> — not at 2am when the US support team wakes up. UK-based software means support in your timezone, from people who understand how UK martial arts clubs operate.</p>
@@ -171,7 +171,7 @@ function ArticleContent() {
             <div style={s.ctaBox}>
                 <p style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px', marginTop: 0 }}>Built in the UK, for UK martial arts clubs</p>
                 <p style={{ ...s.p, marginBottom: '12px', fontSize: '0.9rem' }}>ClubForge is the only martial arts management platform built specifically for the UK market — GBP pricing, GDPR compliant, Stripe UK powered.</p>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600', fontSize: '1rem' }}>Try ClubForge free for 14 days →</Link>
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '1rem' }}>Try ClubForge free for 14 days →</Link>
             </div>
 
             {/* Section 5: Belt & Rank Tracking */}
@@ -270,7 +270,7 @@ function ArticleContent() {
             <h2 style={s.h2} id="the-verdict">The Verdict: Which Martial Arts Software Should UK Clubs Choose?</h2>
             <p style={s.p}>After comparing features, pricing, UK-specific requirements, and belt tracking capabilities, here&apos;s our honest assessment:</p>
 
-            <p style={s.p}><strong style={s.strong}>For UK martial arts clubs that want a purpose-built solution:</strong> <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> is the clear winner. It&apos;s the only platform that combines martial arts-specific features (belt progression with stripe tracking and instructor feedback), native UK support (GBP pricing, Stripe UK, full GDPR compliance), and competitive flat-rate pricing (from £39/month). It was built specifically for martial arts — not retrofitted from a generic gym platform.</p>
+            <p style={s.p}><strong style={s.strong}>For UK martial arts clubs that want a purpose-built solution:</strong> <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> is the clear winner. It&apos;s the only platform that combines martial arts-specific features (belt progression with stripe tracking and instructor feedback), native UK support (GBP pricing, Stripe UK, full GDPR compliance), and competitive flat-rate pricing (from £39/month). It was built specifically for martial arts — not retrofitted from a generic gym platform.</p>
 
             <p style={s.p}><strong style={s.strong}>For clubs that don&apos;t need belt tracking:</strong> If you run a pure boxing or general fitness operation, Glofox is a solid (if expensive) alternative with good UK payment support. However, you&apos;ll be paying significantly more for fewer martial arts-specific features.</p>
 

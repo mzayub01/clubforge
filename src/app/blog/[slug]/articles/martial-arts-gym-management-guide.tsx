@@ -34,7 +34,7 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>1. Membership &amp; Student Management</h3>
             <p style={articleStyle.p}>
-                Your members are the foundation of everything. A solid <Link href="/features/member-management" style={{ color: '#C5A456', fontWeight: '600' }}>member management system</Link> needs to handle far more than a simple contact list. For martial arts specifically, you need:
+                Your members are the foundation of everything. A solid <Link href="/features/member-management" style={{ color: '#7A5F1A', fontWeight: '600' }}>member management system</Link> needs to handle far more than a simple contact list. For martial arts specifically, you need:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Detailed student profiles</strong> — Name, contact details, emergency contacts, medical conditions, belt rank, join date, and membership status all in one place.</li>
@@ -55,7 +55,7 @@ function ArticleContent() {
                 Belt progression is the backbone of student motivation in martial arts. It&apos;s what differentiates a martial arts club from a generic fitness class — your students are on a structured journey with clear milestones.
             </p>
             <p style={articleStyle.p}>
-                A proper <Link href="/features/belt-progression" style={{ color: '#C5A456', fontWeight: '600' }}>belt progression tracking system</Link> should support:
+                A proper <Link href="/features/belt-progression" style={{ color: '#7A5F1A', fontWeight: '600' }}>belt progression tracking system</Link> should support:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Custom grading structures</strong> — BJJ belts (white, blue, purple, brown, black with stripe increments), karate kyu/dan, taekwondo gup/dan, judo kyu/dan, or any custom system.</li>
@@ -80,12 +80,12 @@ function ArticleContent() {
                 <li style={articleStyle.li}>Saturday morning (all levels) — 10:00am</li>
             </ul>
             <p style={articleStyle.p}>
-                Your <Link href="/features/class-scheduling" style={{ color: '#C5A456', fontWeight: '600' }}>class scheduling system</Link> needs to handle recurring sessions, capacity limits, instructor assignments, and one-off events like grading days, seminars, and competitions. Students should be able to view the timetable from their phone and know exactly which classes they&apos;re eligible for.
+                Your <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', fontWeight: '600' }}>class scheduling system</Link> needs to handle recurring sessions, capacity limits, instructor assignments, and one-off events like grading days, seminars, and competitions. Students should be able to view the timetable from their phone and know exactly which classes they&apos;re eligible for.
             </p>
 
             <h3 style={articleStyle.h3}>4. Attendance Tracking</h3>
             <p style={articleStyle.p}>
-                <Link href="/features/attendance-tracking" style={{ color: '#C5A456', fontWeight: '600' }}>Attendance tracking</Link> in martial arts serves purposes that go well beyond knowing who showed up:
+                <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', fontWeight: '600' }}>Attendance tracking</Link> in martial arts serves purposes that go well beyond knowing who showed up:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Grading eligibility</strong> — Most martial arts grading systems require a minimum number of sessions before promotion. Accurate attendance records make this automatic.</li>
@@ -100,7 +100,7 @@ function ArticleContent() {
                 Let&apos;s be direct: most martial arts clubs that fail don&apos;t fail because of bad teaching. They fail because of bad financial management. Consistent cash flow is the lifeblood of your club, and manual payment collection is one of the biggest threats to it.
             </p>
             <p style={articleStyle.p}>
-                A proper <Link href="/features/payments-billing" style={{ color: '#C5A456', fontWeight: '600' }}>billing and payments system</Link> should automate:
+                A proper <Link href="/features/payments-billing" style={{ color: '#7A5F1A', fontWeight: '600' }}>billing and payments system</Link> should automate:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
                 <li style={articleStyle.li}><strong style={articleStyle.strong}>Recurring membership payments</strong> — Monthly Direct Debit or card payments that happen automatically. No chasing. No awkward conversations.</li>
@@ -212,7 +212,7 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>5. Using Software That Wasn&apos;t Built for Martial Arts</h3>
             <p style={articleStyle.p}>
-                Generic gym software like Mindbody or Glofox works brilliantly for yoga studios and CrossFit boxes. But it doesn&apos;t understand belt progression, grading eligibility, or the multi-discipline structures that martial arts clubs need. You end up building workarounds — custom fields for belt colours, manual grading spreadsheets alongside your management system, and separate tools for different jobs. A martial arts-specific platform like <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> eliminates this friction.
+                Generic gym software like Mindbody or Glofox works brilliantly for yoga studios and CrossFit boxes. But it doesn&apos;t understand belt progression, grading eligibility, or the multi-discipline structures that martial arts clubs need. You end up building workarounds — custom fields for belt colours, manual grading spreadsheets alongside your management system, and separate tools for different jobs. A martial arts-specific platform like <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> eliminates this friction.
             </p>
 
             <h2 style={articleStyle.h2}>Building a Growth Strategy for Your Martial Arts Club</h2>
@@ -227,7 +227,7 @@ function ArticleContent() {
 
             <h3 style={articleStyle.h3}>Use Belt Progression as a Retention Tool</h3>
             <p style={articleStyle.p}>
-                Students who can see their progression are more likely to stay. When a white belt student can log into their <Link href="/features/belt-progression" style={{ color: '#C5A456', fontWeight: '600' }}>member portal</Link> and see &ldquo;12 sessions completed — 8 more until grading eligibility,&rdquo; they have a concrete goal to work towards. This is one of the most powerful retention mechanisms in martial arts, and it only works if you track it digitally.
+                Students who can see their progression are more likely to stay. When a white belt student can log into their <Link href="/features/belt-progression" style={{ color: '#7A5F1A', fontWeight: '600' }}>member portal</Link> and see &ldquo;12 sessions completed — 8 more until grading eligibility,&rdquo; they have a concrete goal to work towards. This is one of the most powerful retention mechanisms in martial arts, and it only works if you track it digitally.
             </p>
 
             <h3 style={articleStyle.h3}>Optimise Your Timetable Based on Data</h3>
@@ -242,15 +242,15 @@ function ArticleContent() {
 
             <h2 style={articleStyle.h2}>How ClubForge Supports Martial Arts Gym Management</h2>
             <p style={articleStyle.p}>
-                <Link href="/" style={{ color: '#C5A456', fontWeight: '600' }}>ClubForge</Link> was built specifically for martial arts clubs — not adapted from generic gym software. Here&apos;s how it addresses every pillar of effective gym management:
+                <Link href="/" style={{ color: '#7A5F1A', fontWeight: '600' }}>ClubForge</Link> was built specifically for martial arts clubs — not adapted from generic gym software. Here&apos;s how it addresses every pillar of effective gym management:
             </p>
             <ul style={{ paddingLeft: '24px', marginBottom: '24px' }}>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Member management</strong> — Complete student profiles with belt history, attendance records, emergency contacts, and family account linking. <Link href="/features/member-management" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Belt progression</strong> — Full custom grading structures for any discipline, with automatic eligibility tracking and detailed instructor feedback. <Link href="/features/belt-progression" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Class scheduling</strong> — Recurring classes, one-off events, instructor assignments, and capacity management with a student-facing timetable. <Link href="/features/class-scheduling" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Attendance tracking</strong> — Digital check-in with grading eligibility integration, retention monitoring, and class viability insights. <Link href="/features/attendance-tracking" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Payments &amp; billing</strong> — Stripe-powered recurring billing in GBP, multiple pricing tiers, failed payment handling, and financial reporting. <Link href="/features/payments-billing" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
-                <li style={articleStyle.li}><strong style={articleStyle.strong}>Multi-location</strong> — Manage multiple venues from one dashboard with separate timetables and attendance per location. <Link href="/features/multi-location" style={{ color: '#C5A456', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Member management</strong> — Complete student profiles with belt history, attendance records, emergency contacts, and family account linking. <Link href="/features/member-management" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Belt progression</strong> — Full custom grading structures for any discipline, with automatic eligibility tracking and detailed instructor feedback. <Link href="/features/belt-progression" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Class scheduling</strong> — Recurring classes, one-off events, instructor assignments, and capacity management with a student-facing timetable. <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Attendance tracking</strong> — Digital check-in with grading eligibility integration, retention monitoring, and class viability insights. <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Payments &amp; billing</strong> — Stripe-powered recurring billing in GBP, multiple pricing tiers, failed payment handling, and financial reporting. <Link href="/features/payments-billing" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
+                <li style={articleStyle.li}><strong style={articleStyle.strong}>Multi-location</strong> — Manage multiple venues from one dashboard with separate timetables and attendance per location. <Link href="/features/multi-location" style={{ color: '#7A5F1A', fontWeight: '600' }}>Learn more →</Link></li>
             </ul>
             <p style={articleStyle.p}>
                 ClubForge is UK-based, prices in pounds sterling, and offers a free tier so you can get started without any financial commitment. Paid plans start from just £39/month.
@@ -275,7 +275,7 @@ function ArticleContent() {
                 The clubs that invest in proper management tools don&apos;t just run more smoothly — they retain more students, generate more consistent revenue, and free up the club owner to focus on what matters most: coaching.
             </p>
             <p style={articleStyle.p}>
-                <Link href="/get-started" style={{ color: '#C5A456', fontWeight: '600' }}>Start your free 14-day trial of ClubForge →</Link> or <Link href="/demo" style={{ color: '#C5A456', fontWeight: '600' }}>book a personalised demo</Link> to see how it works for your specific club setup.
+                <Link href="/get-started" style={{ color: '#7A5F1A', fontWeight: '600' }}>Start your free 14-day trial of ClubForge →</Link> or <Link href="/demo" style={{ color: '#7A5F1A', fontWeight: '600' }}>book a personalised demo</Link> to see how it works for your specific club setup.
             </p>
         </article>
     );

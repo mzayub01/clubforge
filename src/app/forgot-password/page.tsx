@@ -248,7 +248,7 @@ export default function ForgotPasswordPage() {
                             <Link
                                 href="/login"
                                 style={{
-                                    color: 'var(--color-gold)',
+                                    color: 'var(--color-gold-text)',
                                     fontWeight: '600',
                                 }}
                             >

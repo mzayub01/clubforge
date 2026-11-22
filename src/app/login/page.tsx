@@ -264,7 +264,7 @@ function LoginPageContent() {
                                 href="/forgot-password"
                                 style={{
                                     fontSize: 'var(--text-sm)',
-                                    color: 'var(--color-gold)',
+                                    color: 'var(--color-gold-text)',
                                 }}
                             >
                                 Forgot password?
@@ -340,7 +340,7 @@ function LoginPageContent() {
                             <Link
                                 href="/register"
                                 style={{
-                                    color: 'var(--color-gold)',
+                                    color: 'var(--color-gold-text)',
                                     fontWeight: '600',
                                 }}
                             >
@@ -353,7 +353,7 @@ function LoginPageContent() {
                             <Link
                                 href="/get-started"
                                 style={{
-                                    color: 'var(--color-gold)',
+                                    color: 'var(--color-gold-text)',
                                     fontWeight: '600',
                                 }}
                             >

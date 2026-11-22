@@ -34,7 +34,7 @@ export default function RelatedDisciplines({ currentHref, maxItems = 6 }: Relate
     return (
         <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid #F1F5F9' }}>
             <h3 style={{
-                fontSize: '0.9rem', fontWeight: '700', color: '#94A3B8',
+                fontSize: '0.9rem', fontWeight: '700', color: '#64748B',
                 textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px',
             }}>
                 ClubForge for Other Disciplines

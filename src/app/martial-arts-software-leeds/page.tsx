@@ -116,10 +116,10 @@ export default async function LeedsPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             Leeds is one of Northern England&apos;s martial arts hotspots, with over 80 clubs across the city and wider West Yorkshire region. ClubForge is the management platform built specifically for them.
                         </p>
-                        <p style={{ fontSize: '1rem', color: '#64748B', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '1rem', color: '#94A3B8', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
                             Manage memberships, automate Stripe payments, track attendance, and handle belt progression — all from one system designed for BJJ, MMA, Karate, and martial arts academies.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
                             Stop juggling spreadsheets and WhatsApp groups. Start your free 14-day trial today.
                         </p>
 
@@ -128,7 +128,7 @@ export default async function LeedsPage() {
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '2px solid rgba(255,255,255,0.2)', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#64748B', fontSize: '13px', fontWeight: '500' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#94A3B8', fontSize: '13px', fontWeight: '500' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Shield size={15} color="#C5A456" /> Stripe-secured payments</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Swords size={15} color="#C5A456" /> Built for martial arts</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={15} color="#C5A456" /> Set up in minutes</span>
@@ -160,7 +160,7 @@ export default async function LeedsPage() {
                 {/* LEEDS SCENE */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>The Leeds Martial Arts Scene</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>The Leeds Martial Arts Scene</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>
                             Why Leeds martial arts clubs need specialist software
                         </h2>
@@ -175,7 +175,7 @@ export default async function LeedsPage() {
                                 Leeds&apos; position at the heart of West Yorkshire also means many clubs draw members from across the region — Bradford, Wakefield, Huddersfield, and Halifax. For clubs operating across multiple locations or serving a wide catchment area, having a centralised management system is critical to maintaining consistent operations and member experience.
                             </p>
                             <p style={{ marginBottom: '0' }}>
-                                ClubForge was designed for exactly these challenges. Purpose-built for martial arts — not retrofitted from generic fitness software — it handles <Link href="/features/payments-billing" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link>, <Link href="/features/attendance-tracking" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link>, <Link href="/features/belt-progression" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link>, and <Link href="/features/class-scheduling" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>class scheduling</Link> in one integrated platform.
+                                ClubForge was designed for exactly these challenges. Purpose-built for martial arts — not retrofitted from generic fitness software — it handles <Link href="/features/payments-billing" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link>, <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link>, <Link href="/features/belt-progression" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link>, and <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>class scheduling</Link> in one integrated platform.
                             </p>
                         </div>
                     </div>
@@ -184,7 +184,7 @@ export default async function LeedsPage() {
                 {/* FEATURES */}
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Features</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Features</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '48px', lineHeight: '1.2' }}>
                             Everything Leeds martial arts clubs need
                         </h2>
@@ -206,7 +206,7 @@ export default async function LeedsPage() {
                                     <div>
                                         <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.title}</h3>
                                         <p style={{ color: '#64748B', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>{item.desc}</p>
-                                        {'link' in item && item.link && <Link href={item.link} style={{ fontSize: '0.85rem', color: '#C5A456', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>}
+                                        {'link' in item && item.link && <Link href={item.link} style={{ fontSize: '0.85rem', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>}
                                     </div>
                                 </div>
                             ))}
@@ -217,7 +217,7 @@ export default async function LeedsPage() {
                 {/* WHY LEEDS */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Why Leeds Clubs Choose ClubForge</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Why Leeds Clubs Choose ClubForge</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>
                             Built for West Yorkshire&apos;s martial arts community
                         </h2>
@@ -278,7 +278,7 @@ export default async function LeedsPage() {
                 {/* FAQ */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
                         <h2 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '36px', lineHeight: '1.2' }}>Common questions from Leeds martial arts clubs</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {faqs.map((faq, i) => (
@@ -288,7 +288,7 @@ export default async function LeedsPage() {
                                 </details>
                             ))}
                         </div>
-                        <div style={{ textAlign: 'center', marginTop: '24px' }}><Link href="/faq" style={{ color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link></div>
+                        <div style={{ textAlign: 'center', marginTop: '24px' }}><Link href="/faq" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link></div>
                     </div>
                 </section>
 
@@ -297,7 +297,7 @@ export default async function LeedsPage() {
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px', background: 'rgba(15,23,42,0.1)', padding: '8px 16px', borderRadius: '100px' }}><MapPin size={14} color="#0F172A" /><span style={{ fontSize: '13px', fontWeight: '600', color: '#0F172A' }}>Leeds</span></div>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>Ready to professionalise your Leeds martial arts club?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join clubs across West Yorkshire using ClubForge. 14-day free trial — no card required.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join clubs across West Yorkshire using ClubForge. 14-day free trial — no card required.</p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <Link href="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>Book a Demo <ArrowRight size={18} /></Link>
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', color: '#0F172A', border: '2px solid rgba(15,23,42,0.3)', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
@@ -308,14 +308,14 @@ export default async function LeedsPage() {
                 {/* INTERNAL LINKS */}
                 <section style={{ background: '#FAFBFC', padding: '48px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-                        <p style={{ fontSize: '13px', color: '#94A3B8', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
+                        <p style={{ fontSize: '13px', color: '#64748B', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {[
                                 { href: '/martial-arts-software-london', label: 'London' }, { href: '/bjj-gym-software-manchester', label: 'Manchester' }, { href: '/gym-management-birmingham', label: 'Birmingham' },
                                 { href: '/bjj-gym-software-liverpool', label: 'Liverpool' }, { href: '/martial-arts-software-glasgow', label: 'Glasgow' }, { href: '/gym-management-edinburgh', label: 'Edinburgh' },
                                 { href: '/martial-arts-software-bristol', label: 'Bristol' }, { href: '/bjj-gym-software-sheffield', label: 'Sheffield' }, { href: '/martial-arts-software-nottingham', label: 'Nottingham' },
                                 { href: '/gym-management-leicester', label: 'Leicester' }, { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
-                            ].map((city, i) => (<span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#C5A456', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>))}
+                            ].map((city, i) => (<span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>))}
                         </div>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>
                             <Link href="/" style={{ fontSize: '13px', color: '#64748B', textDecoration: 'none' }}>Home</Link><span style={{ color: '#E2E8F0' }}>·</span>

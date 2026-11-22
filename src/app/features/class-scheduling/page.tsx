@@ -48,13 +48,13 @@ export default async function ClassSchedulingPage() {
                 <section style={{ background: '#FAFBFC', padding: '140px 24px 80px', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%)', top: '-150px', right: '-100px', pointerEvents: 'none' }} />
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#C5A456', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
+                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#7A5F1A', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
                         <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
                             <Calendar size={32} color="#8B5CF6" />
                         </div>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', fontWeight: '800', lineHeight: '1.1', color: '#0F172A', marginBottom: '20px' }}>
                             Class Scheduling{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Made Effortless</span>
+                            <span style={{ color: '#5B21B6' }}>Made Effortless</span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#64748B', lineHeight: '1.7', marginBottom: '32px', maxWidth: '650px' }}>
                             Create your timetable once. ClubForge handles the rest — recurring classes, instructor assignment, capacity limits, waitlists, and member self-booking. Your schedule runs itself.
@@ -120,7 +120,7 @@ export default async function ClassSchedulingPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Ready to automate your class schedule?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Start a 14-day free trial. Set up your timetable in minutes.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Start a 14-day free trial. Set up your timetable in minutes.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

@@ -181,10 +181,10 @@ export default async function ManchesterPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             Manchester is one of the UK&apos;s biggest martial arts hubs, with over 150 clubs across Greater Manchester. ClubForge is the platform built specifically for them.
                         </p>
-                        <p style={{ fontSize: '1rem', color: '#64748B', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '1rem', color: '#94A3B8', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
                             Manage memberships, automate Stripe payments, track attendance, and handle belt progression — all from one system designed for BJJ, MMA, Karate, and combat sports academies.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
                             Stop juggling spreadsheets and WhatsApp groups. Start your free 14-day trial today.
                         </p>
 
@@ -208,7 +208,7 @@ export default async function ManchesterPage() {
 
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap',
-                            marginTop: '40px', color: '#64748B', fontSize: '13px', fontWeight: '500',
+                            marginTop: '40px', color: '#94A3B8', fontSize: '13px', fontWeight: '500',
                         }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <Shield size={15} color="#C5A456" /> Stripe-secured payments
@@ -256,7 +256,7 @@ export default async function ManchesterPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             The Manchester Martial Arts Scene
@@ -289,7 +289,7 @@ export default async function ManchesterPage() {
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             Features
@@ -330,7 +330,7 @@ export default async function ManchesterPage() {
                                         <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.title}</h3>
                                         <p style={{ color: '#64748B', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>{item.desc}</p>
                                         {'link' in item && item.link && (
-                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#C5A456', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>
+                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>
                                                 Learn more →
                                             </Link>
                                         )}
@@ -345,7 +345,7 @@ export default async function ManchesterPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             Why Manchester Clubs Choose ClubForge
@@ -484,7 +484,7 @@ export default async function ManchesterPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>FAQ</p>
                         <h2 style={{
@@ -506,7 +506,7 @@ export default async function ManchesterPage() {
                             ))}
                         </div>
                         <div style={{ textAlign: 'center', marginTop: '24px' }}>
-                            <Link href="/faq" style={{ color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link>
+                            <Link href="/faq" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link>
                         </div>
                     </div>
                 </section>
@@ -524,7 +524,7 @@ export default async function ManchesterPage() {
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>
                             Ready to professionalise your Manchester gym?
                         </h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>
                             Join martial arts clubs across Greater Manchester using ClubForge. 14-day free trial — no card required.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -541,7 +541,7 @@ export default async function ManchesterPage() {
                 {/* ==================== INTERNAL LINKS ==================== */}
                 <section style={{ background: '#FAFBFC', padding: '48px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-                        <p style={{ fontSize: '13px', color: '#94A3B8', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
+                        <p style={{ fontSize: '13px', color: '#64748B', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {[
                                 { href: '/martial-arts-software-london', label: 'London' },
@@ -556,7 +556,7 @@ export default async function ManchesterPage() {
                                 { href: '/gym-management-leicester', label: 'Leicester' },
                                 { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
                             ].map((city, i) => (
-                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#C5A456', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
+                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
                             ))}
                         </div>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>

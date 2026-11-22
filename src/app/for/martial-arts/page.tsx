@@ -51,7 +51,7 @@ export default async function MartialArtsPage() {
                         <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px' }}>
                             🥋 Built For Martial Arts
                         </p>
-                        <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
+                        <h1 style={{ color: '#FFFFFF', fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: '800', lineHeight: '1.1', marginBottom: '20px' }}>
                             The Management System{' '}
                             <span style={{ background: 'linear-gradient(135deg, #D4B86A, #A88B3D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                                 Built Inside a Dojo
@@ -60,7 +60,7 @@ export default async function MartialArtsPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             ClubForge wasn&apos;t designed in a boardroom. It was built inside a working martial arts academy — by operators who needed belt tracking, grading workflows, and member management that generic gym software couldn&apos;t provide.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px' }}>
                             For karate, taekwondo, judo, kung fu, kickboxing, hapkido, and every martial art with a structured ranking system.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -91,7 +91,7 @@ export default async function MartialArtsPage() {
                                 'Priced for large commercial gyms',
                             ].map((pain) => (
                                 <div key={pain} style={{ padding: '16px 20px', borderRadius: '12px', background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                                    <p style={{ color: '#DC2626', fontSize: '13px', margin: 0, fontWeight: '500' }}>✗ {pain}</p>
+                                    <p style={{ color: '#B91C1C', fontSize: '13px', margin: 0, fontWeight: '500' }}>✗ {pain}</p>
                                 </div>
                             ))}
                         </div>
@@ -120,7 +120,7 @@ export default async function MartialArtsPage() {
                                     <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#0F172A', marginBottom: '8px' }}>{item.title}</h3>
                                     <p style={{ color: '#64748B', margin: 0, lineHeight: '1.7', fontSize: '0.9rem', marginBottom: item.link ? '12px' : '0' }}>{item.desc}</p>
                                     {item.link && (
-                                        <Link href={item.link} style={{ color: '#C5A456', fontWeight: '600', fontSize: '13px', textDecoration: 'none' }}>
+                                        <Link href={item.link} style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '13px', textDecoration: 'none' }}>
                                             Learn more →
                                         </Link>
                                     )}
@@ -146,8 +146,8 @@ export default async function MartialArtsPage() {
                                 </span>
                             ))}
                         </div>
-                        <p style={{ color: '#94A3B8', fontSize: '13px', marginTop: '16px' }}>
-                            Looking for BJJ or MMA? See our dedicated pages for <Link href="/for/bjj" style={{ color: '#C5A456' }}>BJJ academies</Link> and <Link href="/for/boxing-mma" style={{ color: '#C5A456' }}>boxing & MMA gyms</Link>.
+                        <p style={{ color: '#64748B', fontSize: '13px', marginTop: '16px' }}>
+                            Looking for BJJ or MMA? See our dedicated pages for <Link href="/for/bjj" style={{ color: '#7A5F1A' }}>BJJ academies</Link> and <Link href="/for/boxing-mma" style={{ color: '#7A5F1A' }}>boxing & MMA gyms</Link>.
                         </p>
                     </div>
                 </section>
@@ -170,7 +170,7 @@ export default async function MartialArtsPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Ready to run your martial arts club professionally?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. No card required. Set up in under 10 minutes.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px' }}>14-day free trial. No card required. Set up in under 10 minutes.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

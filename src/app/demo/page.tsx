@@ -302,7 +302,7 @@ export default function DemoPage() {
                                                 </>
                                             )}
                                         </button>
-                                        <p style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', margin: 0, textAlign: 'center' }}>
+                                        <p style={{ color: '#94A3B8', fontSize: 'var(--text-xs)', margin: 0, textAlign: 'center' }}>
                                             We&apos;ll get back to you within 24 hours.
                                         </p>
                                     </form>

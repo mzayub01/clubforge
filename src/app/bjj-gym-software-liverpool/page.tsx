@@ -83,10 +83,10 @@ export default async function LiverpoolPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             Liverpool&apos;s martial arts community is thriving — with over 90 clubs across Merseyside serving a passionate combat sports fanbase. ClubForge is the management platform built specifically for them.
                         </p>
-                        <p style={{ fontSize: '1rem', color: '#64748B', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '1rem', color: '#94A3B8', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
                             Manage memberships, automate Stripe payments, track attendance, and handle belt progression — all from one system designed for BJJ, MMA, boxing, and martial arts academies.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
                             Stop juggling spreadsheets and disconnected tools. Start your free 14-day trial today.
                         </p>
 
@@ -95,7 +95,7 @@ export default async function LiverpoolPage() {
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '2px solid rgba(255,255,255,0.2)', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#64748B', fontSize: '13px', fontWeight: '500' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '40px', color: '#94A3B8', fontSize: '13px', fontWeight: '500' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Shield size={15} color="#C5A456" /> Stripe-secured payments</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Swords size={15} color="#C5A456" /> Built for martial arts</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={15} color="#C5A456" /> Set up in minutes</span>
@@ -127,7 +127,7 @@ export default async function LiverpoolPage() {
                 {/* LIVERPOOL SCENE */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>The Liverpool Martial Arts Scene</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>The Liverpool Martial Arts Scene</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>Why Liverpool gyms need specialist software</h2>
                         <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1rem' }}>
                             <p style={{ marginBottom: '16px' }}>
@@ -140,7 +140,7 @@ export default async function LiverpoolPage() {
                                 For club owners in Liverpool, managing a growing academy means dealing with high member volumes, diverse class schedules (adults, kids, competition teams), and the pressure to deliver a professional experience that matches the city&apos;s passionate sporting culture. Spreadsheets and WhatsApp groups simply don&apos;t cut it anymore.
                             </p>
                             <p style={{ marginBottom: '0' }}>
-                                ClubForge gives Liverpool&apos;s martial arts clubs the professional tools they need. Purpose-built for martial arts, it handles <Link href="/features/payments-billing" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link>, <Link href="/features/attendance-tracking" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link>, <Link href="/features/belt-progression" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link>, and <Link href="/features/class-scheduling" style={{ color: '#C5A456', textDecoration: 'none', fontWeight: '600' }}>class scheduling</Link> in one integrated platform.
+                                ClubForge gives Liverpool&apos;s martial arts clubs the professional tools they need. Purpose-built for martial arts, it handles <Link href="/features/payments-billing" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>automated payments</Link>, <Link href="/features/attendance-tracking" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>attendance tracking</Link>, <Link href="/features/belt-progression" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>belt progression</Link>, and <Link href="/features/class-scheduling" style={{ color: '#7A5F1A', textDecoration: 'none', fontWeight: '600' }}>class scheduling</Link> in one integrated platform.
                             </p>
                         </div>
                     </div>
@@ -149,7 +149,7 @@ export default async function LiverpoolPage() {
                 {/* FEATURES */}
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Features</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Features</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '48px', lineHeight: '1.2' }}>Everything Liverpool martial arts clubs need</h2>
                         <div className="cf-city-features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                             {[
@@ -167,7 +167,7 @@ export default async function LiverpoolPage() {
                                     <div>
                                         <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.title}</h3>
                                         <p style={{ color: '#64748B', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>{item.desc}</p>
-                                        {'link' in item && item.link && <Link href={item.link} style={{ fontSize: '0.85rem', color: '#C5A456', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>}
+                                        {'link' in item && item.link && <Link href={item.link} style={{ fontSize: '0.85rem', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>Learn more →</Link>}
                                     </div>
                                 </div>
                             ))}
@@ -178,7 +178,7 @@ export default async function LiverpoolPage() {
                 {/* WHY LIVERPOOL */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Why Liverpool Clubs Choose ClubForge</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>Why Liverpool Clubs Choose ClubForge</p>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '24px', lineHeight: '1.2' }}>Built for Merseyside&apos;s combat sports community</h2>
                         <div className="cf-city-local-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginTop: '32px' }}>
                             {[
@@ -235,7 +235,7 @@ export default async function LiverpoolPage() {
                 {/* FAQ */}
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#C5A456', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: '#7A5F1A', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center' }}>FAQ</p>
                         <h2 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', fontWeight: '800', color: '#0F172A', textAlign: 'center', marginBottom: '36px', lineHeight: '1.2' }}>Common questions from Liverpool martial arts clubs</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {faqs.map((faq, i) => (
@@ -245,7 +245,7 @@ export default async function LiverpoolPage() {
                                 </details>
                             ))}
                         </div>
-                        <div style={{ textAlign: 'center', marginTop: '24px' }}><Link href="/faq" style={{ color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link></div>
+                        <div style={{ textAlign: 'center', marginTop: '24px' }}><Link href="/faq" style={{ color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none' }}>View all FAQs →</Link></div>
                     </div>
                 </section>
 
@@ -254,7 +254,7 @@ export default async function LiverpoolPage() {
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '20px', background: 'rgba(15,23,42,0.1)', padding: '8px 16px', borderRadius: '100px' }}><MapPin size={14} color="#0F172A" /><span style={{ fontSize: '13px', fontWeight: '600', color: '#0F172A' }}>Liverpool</span></div>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px', lineHeight: '1.2' }}>Ready to professionalise your Liverpool gym?</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join martial arts clubs across Merseyside using ClubForge. 14-day free trial — no card required.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Join martial arts clubs across Merseyside using ClubForge. 14-day free trial — no card required.</p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                             <Link href="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>Book a Demo <ArrowRight size={18} /></Link>
                             <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', color: '#0F172A', border: '2px solid rgba(15,23,42,0.3)', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '600', textDecoration: 'none' }}>Start Free Trial</Link>
@@ -265,9 +265,9 @@ export default async function LiverpoolPage() {
                 {/* INTERNAL LINKS */}
                 <section style={{ background: '#FAFBFC', padding: '48px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-                        <p style={{ fontSize: '13px', color: '#94A3B8', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
+                        <p style={{ fontSize: '13px', color: '#64748B', fontWeight: '500', margin: 0 }}>Also available in other cities</p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                            {[{ href: '/martial-arts-software-london', label: 'London' }, { href: '/bjj-gym-software-manchester', label: 'Manchester' }, { href: '/gym-management-birmingham', label: 'Birmingham' }, { href: '/martial-arts-software-leeds', label: 'Leeds' }, { href: '/martial-arts-software-glasgow', label: 'Glasgow' }, { href: '/gym-management-edinburgh', label: 'Edinburgh' }, { href: '/martial-arts-software-bristol', label: 'Bristol' }, { href: '/bjj-gym-software-sheffield', label: 'Sheffield' }, { href: '/martial-arts-software-nottingham', label: 'Nottingham' }, { href: '/gym-management-leicester', label: 'Leicester' }, { href: '/martial-arts-software-newcastle', label: 'Newcastle' }].map((city, i) => (<span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#C5A456', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>))}
+                            {[{ href: '/martial-arts-software-london', label: 'London' }, { href: '/bjj-gym-software-manchester', label: 'Manchester' }, { href: '/gym-management-birmingham', label: 'Birmingham' }, { href: '/martial-arts-software-leeds', label: 'Leeds' }, { href: '/martial-arts-software-glasgow', label: 'Glasgow' }, { href: '/gym-management-edinburgh', label: 'Edinburgh' }, { href: '/martial-arts-software-bristol', label: 'Bristol' }, { href: '/bjj-gym-software-sheffield', label: 'Sheffield' }, { href: '/martial-arts-software-nottingham', label: 'Nottingham' }, { href: '/gym-management-leicester', label: 'Leicester' }, { href: '/martial-arts-software-newcastle', label: 'Newcastle' }].map((city, i) => (<span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>))}
                         </div>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>
                             <Link href="/" style={{ fontSize: '13px', color: '#64748B', textDecoration: 'none' }}>Home</Link><span style={{ color: '#E2E8F0' }}>·</span>

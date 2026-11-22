@@ -211,13 +211,13 @@ export default async function PricingPage() {
                                     <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="starter" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
-                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
                                     <CurrencyAnnualNote tier="starter" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                                     For new and small clubs getting started.
                                 </p>
-                                <Link href="/get-started" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)' }}>
+                                <Link href="/get-started" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)', color: 'var(--color-gold-text)' }}>
                                     Start Free Trial
                                 </Link>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -243,14 +243,14 @@ export default async function PricingPage() {
                                 }}>
                                     Most Popular
                                 </div>
-                                <h3 style={{ fontSize: 'var(--text-xl)', color: 'var(--color-gold)', marginBottom: 'var(--space-2)' }}>
+                                <h3 style={{ fontSize: 'var(--text-xl)', color: 'var(--color-gold-text)', marginBottom: 'var(--space-2)' }}>
                                     Pro
                                 </h3>
                                 <div style={{ marginBottom: 'var(--space-2)' }}>
                                     <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="pro" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
-                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
                                     <CurrencyAnnualNote tier="pro" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
@@ -264,7 +264,7 @@ export default async function PricingPage() {
                                         <li key={f} style={{
                                             display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
                                             fontSize: 'var(--text-sm)',
-                                            color: f.startsWith('Everything') ? 'var(--color-gold)' : 'var(--text-primary)',
+                                            color: f.startsWith('Everything') ? 'var(--color-gold-text)' : 'var(--text-primary)',
                                             fontWeight: f.startsWith('Everything') ? '600' : '400',
                                         }}>
                                             <CheckCircle2 size={16} color="var(--color-gold)" style={{ flexShrink: 0 }} /> {f}
@@ -282,13 +282,13 @@ export default async function PricingPage() {
                                     <span style={{ fontSize: 'var(--text-4xl)', fontWeight: '800' }}><CurrencyPrice tier="elite" period="monthly" /></span>
                                     <span style={{ color: 'var(--text-secondary)' }}>/month</span>
                                 </div>
-                                <p style={{ color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)' }}>
                                     <CurrencyAnnualNote tier="elite" />
                                 </p>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-6)' }}>
                                     For large academies and franchises.
                                 </p>
-                                <Link href="/demo" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)' }}>
+                                <Link href="/demo" className="btn btn-outline" style={{ width: '100%', marginBottom: 'var(--space-6)', color: 'var(--color-gold-text)' }}>
                                     Book a Demo
                                 </Link>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -296,7 +296,7 @@ export default async function PricingPage() {
                                         <li key={f} style={{
                                             display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
                                             fontSize: 'var(--text-sm)',
-                                            color: f.startsWith('Everything') ? 'var(--color-gold)' : 'var(--text-primary)',
+                                            color: f.startsWith('Everything') ? 'var(--color-gold-text)' : 'var(--text-primary)',
                                             fontWeight: f.startsWith('Everything') ? '600' : '400',
                                         }}>
                                             <CheckCircle2 size={16} color="var(--color-gold)" style={{ flexShrink: 0 }} /> {f}
@@ -362,7 +362,7 @@ export default async function PricingPage() {
                                         <th style={{
                                             padding: 'var(--space-3) var(--space-1)',
                                             textAlign: 'center', fontWeight: '700', fontSize: 'var(--text-xs)',
-                                            color: 'var(--color-gold)', borderBottom: '2px solid var(--border-primary)',
+                                            color: 'var(--color-gold-text)', borderBottom: '2px solid var(--border-primary)',
                                         }}>
                                             <span style={{
                                                 background: 'rgba(197, 164, 86, 0.08)',
@@ -431,7 +431,7 @@ export default async function PricingPage() {
                                                                     <span style={{
                                                                         fontSize: 'var(--text-xs)',
                                                                         fontWeight: '600',
-                                                                        color: tier === 'elite' ? 'var(--color-gold)' : 'var(--text-primary)',
+                                                                        color: tier === 'elite' ? 'var(--color-gold-text)' : 'var(--text-primary)',
                                                                         lineHeight: 1.3,
                                                                     }}>
                                                                         {val}
@@ -460,7 +460,7 @@ export default async function PricingPage() {
                                         </td>
                                         <td style={{ textAlign: 'center', padding: 'var(--space-6) var(--space-1) var(--space-2)' }}>
                                             <Link href="/get-started" style={{
-                                                fontSize: 'var(--text-xs)', color: 'var(--color-gold)',
+                                                fontSize: 'var(--text-xs)', color: 'var(--color-gold-text)',
                                                 fontWeight: '600', textDecoration: 'underline',
                                             }}>
                                                 Start Trial

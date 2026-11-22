@@ -9,6 +9,7 @@
   --color-gold: #C5A456;
   --color-gold-light: #D4B86A;
   --color-gold-dark: #A88B3D;
+  --color-gold-text: #7A5F1A; /* gold for text on light backgrounds (4.5:1+) */
   --color-gold-gradient: linear-gradient(135deg, #D4B86A 0%, #C5A456 50%, #A88B3D 100%);
 
   --color-black: #1A1A1A;

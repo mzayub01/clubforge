@@ -51,8 +51,8 @@ export default async function BeltProgressionPage() {
                 <section style={{ background: '#FAFBFC', padding: '140px 24px 80px', position: 'relative', overflow: 'hidden' }}>
                     <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)', top: '-150px', right: '-100px', pointerEvents: 'none' }} />
                     <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#C5A456', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
-                        <div style={{ display: 'inline-block', background: 'rgba(245,158,11,0.1)', color: '#D97706', padding: '6px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '20px' }}>
+                        <Link href="/features" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#7A5F1A', fontSize: '14px', fontWeight: '600', textDecoration: 'none', marginBottom: '24px' }}>← All Features</Link>
+                        <div style={{ display: 'inline-block', background: 'rgba(245,158,11,0.1)', color: '#92400E', padding: '6px 14px', borderRadius: '100px', fontSize: '12px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '20px' }}>
                             🥋 Unique to ClubForge
                         </div>
                         <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
@@ -60,12 +60,12 @@ export default async function BeltProgressionPage() {
                         </div>
                         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.2rem)', fontWeight: '800', lineHeight: '1.1', color: '#0F172A', marginBottom: '20px' }}>
                             Belt Progression &{' '}
-                            <span style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Grading Tracking</span>
+                            <span style={{ color: '#B45309' }}>Grading Tracking</span>
                         </h1>
                         <p style={{ fontSize: '1.15rem', color: '#64748B', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             The feature that makes ClubForge different. Native belt progression tracking with structured ranking systems, grading history, coach feedback, and complete audit trails. No other club management platform does this out of the box.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px' }}>
                             Built for BJJ, karate, taekwondo, judo, kung fu, kickboxing, and every martial art with a ranking system.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -79,7 +79,7 @@ export default async function BeltProgressionPage() {
 
                 <section style={{ background: 'linear-gradient(180deg, #0F172A, #1E293B)', padding: '80px 24px', color: '#FFFFFF' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: '800', marginBottom: '20px' }}>
+                        <h2 style={{ color: '#FFFFFF', fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: '800', marginBottom: '20px' }}>
                             Why spreadsheets fail at belt tracking
                         </h2>
                         <p style={{ color: '#94A3B8', fontSize: '1rem', marginBottom: '32px', maxWidth: '600px', margin: '0 auto 32px' }}>
@@ -154,7 +154,7 @@ export default async function BeltProgressionPage() {
                 <section style={{ background: 'linear-gradient(135deg, #D4B86A 0%, #C5A456 40%, #A88B3D 100%)', padding: '80px 24px', textAlign: 'center' }}>
                     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                         <h2 style={{ color: '#0F172A', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: '800', marginBottom: '16px' }}>Give your belt system the platform it deserves</h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Start tracking progression properly. 14-day free trial, no card required.</p>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>Start tracking progression properly. 14-day free trial, no card required.</p>
                         <Link href="/get-started" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#0F172A', color: '#FFFFFF', padding: '14px 32px', borderRadius: '12px', fontSize: '1rem', fontWeight: '700', textDecoration: 'none' }}>
                             Start Free Trial <ArrowRight size={18} />
                         </Link>

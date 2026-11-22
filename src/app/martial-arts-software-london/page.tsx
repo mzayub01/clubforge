@@ -187,10 +187,10 @@ export default async function LondonPage() {
                         <p style={{ fontSize: '1.15rem', color: '#94A3B8', lineHeight: '1.7', marginBottom: '16px', maxWidth: '650px' }}>
                             London is home to over 500 martial arts clubs — from BJJ academies in Shoreditch to Karate dojos in Croydon. ClubForge is the management platform built specifically for them.
                         </p>
-                        <p style={{ fontSize: '1rem', color: '#64748B', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '1rem', color: '#94A3B8', marginBottom: '16px', maxWidth: '650px', lineHeight: '1.7' }}>
                             Manage memberships, automate Stripe payments, track attendance, and handle belt progression — all from one system designed for how martial arts clubs actually operate.
                         </p>
-                        <p style={{ fontSize: '0.95rem', color: '#64748B', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
+                        <p style={{ fontSize: '0.95rem', color: '#94A3B8', marginBottom: '32px', maxWidth: '600px', lineHeight: '1.7' }}>
                             No more juggling spreadsheets, WhatsApp groups, and disconnected payment tools. Start your free 14-day trial today.
                         </p>
 
@@ -215,7 +215,7 @@ export default async function LondonPage() {
                         {/* Trust bar */}
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap',
-                            marginTop: '40px', color: '#64748B', fontSize: '13px', fontWeight: '500',
+                            marginTop: '40px', color: '#94A3B8', fontSize: '13px', fontWeight: '500',
                         }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <Shield size={15} color="#C5A456" /> Stripe-secured payments
@@ -263,7 +263,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             The London Martial Arts Scene
@@ -296,7 +296,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#EF4444',
+                            fontSize: '14px', fontWeight: '600', color: '#B91C1C',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             The Problem
@@ -349,7 +349,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#10B981',
+                            fontSize: '14px', fontWeight: '600', color: '#047857',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             The Solution
@@ -359,10 +359,7 @@ export default async function LondonPage() {
                             color: '#0F172A', textAlign: 'center', marginBottom: '16px', lineHeight: '1.2',
                         }}>
                             ClubForge replaces all of that with{' '}
-                            <span style={{
-                                background: 'linear-gradient(135deg, #D4B86A, #A88B3D)',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                            }}>one system</span>
+                            <span style={{ color: '#7A5F1A' }}>one system</span>
                         </h2>
                         <p style={{
                             fontSize: '1rem', color: '#64748B', textAlign: 'center',
@@ -404,7 +401,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             Features
@@ -446,7 +443,7 @@ export default async function LondonPage() {
                                         <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#0F172A', marginBottom: '6px' }}>{item.title}</h3>
                                         <p style={{ color: '#64748B', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>{item.desc}</p>
                                         {'link' in item && item.link && (
-                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#C5A456', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>
+                                            <Link href={item.link} style={{ fontSize: '0.85rem', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none', marginTop: '8px', display: 'inline-block' }}>
                                                 Learn more →
                                             </Link>
                                         )}
@@ -461,7 +458,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FAFBFC', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             Why London Clubs Choose ClubForge
@@ -605,7 +602,7 @@ export default async function LondonPage() {
                 <section style={{ background: '#FFFFFF', padding: '80px 24px', borderTop: '1px solid #F1F5F9' }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '16px', textAlign: 'center',
                         }}>
                             Every Discipline
@@ -652,7 +649,7 @@ export default async function LondonPage() {
                 }}>
                     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                         <p style={{
-                            fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                            fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                             textTransform: 'uppercase', letterSpacing: '1.5px',
                             marginBottom: '16px', textAlign: 'center',
                         }}>
@@ -700,7 +697,7 @@ export default async function LondonPage() {
 
                         <div style={{ textAlign: 'center', marginTop: '24px' }}>
                             <Link href="/faq" style={{
-                                color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none',
+                                color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none',
                             }}>
                                 View all FAQs →
                             </Link>
@@ -730,7 +727,7 @@ export default async function LondonPage() {
                         }}>
                             Ready to professionalise your London martial arts club?
                         </h2>
-                        <p style={{ color: 'rgba(15,23,42,0.6)', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>
+                        <p style={{ color: '#0F172A', fontSize: '1rem', marginBottom: '32px', lineHeight: '1.7' }}>
                             Join clubs across London using ClubForge to streamline operations. 14-day free trial — no card required.
                         </p>
                         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -761,7 +758,7 @@ export default async function LondonPage() {
                         maxWidth: '800px', margin: '0 auto', textAlign: 'center',
                         display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center',
                     }}>
-                        <p style={{ fontSize: '13px', color: '#94A3B8', fontWeight: '500', margin: 0 }}>
+                        <p style={{ fontSize: '13px', color: '#64748B', fontWeight: '500', margin: 0 }}>
                             Also available in other cities
                         </p>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -778,7 +775,7 @@ export default async function LondonPage() {
                                 { href: '/gym-management-leicester', label: 'Leicester' },
                                 { href: '/martial-arts-software-newcastle', label: 'Newcastle' },
                             ].map((city, i) => (
-                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#C5A456', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
+                                <span key={city.href}>{i > 0 && <span style={{ color: '#E2E8F0', marginRight: '16px' }}>·</span>}<Link href={city.href} style={{ fontSize: '14px', color: '#7A5F1A', fontWeight: '600', textDecoration: 'none' }}>{city.label}</Link></span>
                             ))}
                         </div>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>

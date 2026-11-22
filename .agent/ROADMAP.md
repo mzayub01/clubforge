@@ -40,6 +40,10 @@
       "Your club on its own domain" instead. Decide and align `/pricing`.
 - [ ] **A photo for the homepage story (2026-11-22):** a real picture of the
       academy next to "Built inside a working academy" would add proof.
+- [ ] **"Free tier" claim on the city pages (2026-11-22):** the 12 city pages
+      show a "£0 — Free tier available" stat and a "Free Tier ✓" row in the
+      comparison table. ClubForge has no free tier (plans start at £39 after a
+      14-day trial). Remove or reword.
 - [ ] **Old claims on other pages (2026-11-22):** the homepage no longer says
       members can *book* classes, that classes have *waitlists*, or that clubs
       can *build their own* belt system, because none exist. `/features/*`,
@@ -101,6 +105,11 @@ is shipped. Remaining, roughly by value:
 - #18 Sidebar labels every admin "Club Owner".
 - #6 (done in batch 1), #9 password rules inconsistent (6 vs 8 chars).
 - #28 Registration wizard refactor (1,300 lines; mandatory gender; no progress save).
+
+**Shipped 2026-11-22**: contrast sweep of 45 public pages (invisible
+`/for/*` headings, grey-on-navy hero text, gold and pale-grey text on white,
+gradient headings, the signup card): 623 failing pairs to 0. New token
+`--color-gold-text`. Rules in DECISIONS "Text contrast on public pages".
 
 **Shipped 2026-11-22**: homepage rebuilt to the marketing consultant's mockup
 (hero with product, "why clubs switch", six-tab product tour of illustrated

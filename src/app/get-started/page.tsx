@@ -808,6 +808,7 @@ export default function GetStartedPage() {
 
             {/* Form card */}
             <div className="glass-card" style={{
+                background: 'rgba(255, 255, 255, 0.97)',
                 maxWidth: step === 4 ? '800px' : '550px',
                 width: '100%',
                 padding: 'var(--space-8)',

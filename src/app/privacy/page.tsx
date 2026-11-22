@@ -126,7 +126,7 @@ export default async function PrivacyPage() {
                             }}>
                                 <p style={{ margin: 0 }}>
                                     <strong>ClubForge</strong><br />
-                                    Email: <a href="mailto:privacy@clubforgehq.com" style={{ color: 'var(--color-gold)' }}>privacy@clubforgehq.com</a><br />
+                                    Email: <a href="mailto:privacy@clubforgehq.com" style={{ color: 'var(--color-gold-text)' }}>privacy@clubforgehq.com</a><br />
                                     United Kingdom
                                 </p>
                             </div>

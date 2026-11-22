@@ -97,6 +97,7 @@ export function ThemeProvider({
         root.style.setProperty('--color-gold', primaryColor);
         root.style.setProperty('--color-gold-light', lightColor);
         root.style.setProperty('--color-gold-dark', darkColor);
+        root.style.setProperty('--color-gold-text', darkColor);
         root.style.setProperty('--color-gold-gradient', gradient);
         root.style.setProperty('--shadow-gold', `0 4px 20px hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.3)`);
 
@@ -114,6 +115,7 @@ export function ThemeProvider({
             root.style.removeProperty('--color-gold');
             root.style.removeProperty('--color-gold-light');
             root.style.removeProperty('--color-gold-dark');
+            root.style.removeProperty('--color-gold-text');
             root.style.removeProperty('--color-gold-gradient');
             root.style.removeProperty('--shadow-gold');
         };

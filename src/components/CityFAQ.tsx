@@ -36,7 +36,7 @@ export default function CityFAQ({ city }: CityFAQProps) {
             }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <p style={{
-                        fontSize: '14px', fontWeight: '600', color: '#C5A456',
+                        fontSize: '14px', fontWeight: '600', color: '#7A5F1A',
                         textTransform: 'uppercase', letterSpacing: '1.5px',
                         marginBottom: '16px', textAlign: 'center',
                     }}>
@@ -84,7 +84,7 @@ export default function CityFAQ({ city }: CityFAQProps) {
 
                     <div style={{ textAlign: 'center', marginTop: '24px' }}>
                         <Link href="/faq" style={{
-                            color: '#C5A456', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none',
+                            color: '#7A5F1A', fontWeight: '600', fontSize: '0.875rem', textDecoration: 'none',
                         }}>
                             View all FAQs →
                         </Link>

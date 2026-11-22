@@ -227,7 +227,7 @@ export default function HomePage() {
                   <div className={s.mini}>
                     <div className={s.miniCard}>
                       <BeltBar rank="blue" stripes={3} />
-                      <div style={{ marginTop: 10 }}><b>Aisha Khan · Blue belt, 3 stripes</b></div>
+                      <div style={{ marginTop: 10 }}><b>Emily Carter · Blue belt, 3 stripes</b></div>
                       <small>Promoted 14 Nov by Tom Wilson</small>
                       <p className={s.miniQuote}>Guard retention has come on a lot. Keep drilling the knee cut.</p>
                     </div>

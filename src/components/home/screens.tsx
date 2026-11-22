@@ -132,7 +132,7 @@ interface SampleMember {
 }
 
 const MEMBERS: SampleMember[] = [
-    { initials: 'AK', name: 'Aisha Khan', rank: 'blue', line: <><b className={s.cGreen}>Active</b> · Adults £45/mo <span className={s.chip}>Stripe subscription</span></>, end: 'Joined 12 Nov' },
+    { initials: 'EC', name: 'Emily Carter', rank: 'blue', line: <><b className={s.cGreen}>Active</b> · Adults £45/mo <span className={s.chip}>Stripe subscription</span></>, end: 'Joined 12 Nov' },
     { initials: 'LM', name: 'Leo Martins', rank: 'grey', tone: s.av4, line: <><b className={s.cGreen}>Active</b> · Kids £30/mo · guardian Ana Martins</>, end: 'Joined 9 Nov' },
     { initials: 'OJ', name: 'Olivia Jones', rank: 'white', tone: s.av3, line: <><b className={s.cAmber}>Pending payment</b> · Adults £45/mo</>, end: 'Joined 8 Nov' },
     { initials: 'TW', name: 'Tom Wilson', role: 'Instructor', rank: 'brown', tone: s.av2, line: <><b className={s.cGreen}>Active</b> · Staff</>, end: 'Joined 2 Mar' },
@@ -270,7 +270,7 @@ export function ClassesScreen() {
 
 export function GradingScreen() {
     const rows: { initials: string; name: string; rank: string; stripes: number; tone?: string; on?: boolean }[] = [
-        { initials: 'AK', name: 'Aisha Khan', rank: 'blue', stripes: 3, on: true },
+        { initials: 'EC', name: 'Emily Carter', rank: 'blue', stripes: 3, on: true },
         { initials: 'DO', name: 'Daniel Okafor', rank: 'purple', stripes: 1 },
         { initials: 'OJ', name: 'Olivia Jones', rank: 'white', stripes: 2, tone: s.av3 },
         { initials: 'MP', name: 'Maya Patel', rank: 'white', stripes: 4, tone: s.av4 },
@@ -305,7 +305,7 @@ export function GradingScreen() {
                 <div className={`${s.block} ${s.note}`}>
                     <h5>Promotion recorded</h5>
                     <dl>
-                        <dt>Member</dt><dd>Aisha Khan</dd>
+                        <dt>Member</dt><dd>Emily Carter</dd>
                         <dt>New rank</dt><dd>Blue belt, 3 stripes</dd>
                         <dt>Coach</dt><dd>Tom Wilson</dd>
                         <dt>Date</dt><dd>14 Nov 2026</dd>
@@ -376,7 +376,7 @@ function AppChrome({ here, children }: { here: 'home' | 'progress'; children: Re
 export function MemberHome() {
     return (
         <AppChrome here="home">
-            <h4>Welcome, Aisha!</h4>
+            <h4>Welcome, Emily!</h4>
             <p>Here&apos;s your training overview.</p>
             <div className={`${s.card} ${s.cardInk}`}>
                 <span>Today&apos;s class</span>
